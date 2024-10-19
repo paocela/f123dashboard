@@ -3,7 +3,13 @@ frontend:
     publish: dist
     scripts:
         build: npm run build
-        deploy: npm install
+        deploy:
+            - npm install
+        start:
+            - npm install --silent
+            - npm run start
+    sdk:
+        language: ts
     subdomain: f123dashboard
 name: f123dashboard
 region: eu-central-1
