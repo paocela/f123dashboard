@@ -31,6 +31,7 @@ interface ChampionshipStandings {
   car: string;
   pilot: string;
   points: number;
+  position: number
   lastwin: string;
   avatar: string;
 }
@@ -51,41 +52,46 @@ export class DashboardComponent implements OnInit {
   public championship_standings_users: ChampionshipStandings[] = [
     {
       username: 'redmamba_99_',
-      car: 'Alpine',
+      car: './assets/images/constructors/alpine.svg',
       pilot: 'Gasly',
       points: 500,
+      position: 1,
       lastwin: '16/10/2024',
       avatar: './assets/images/avatars/1.jpg',
     },
     {
       username: 'GiannisCorbe',
-      car: 'Haas',
+      car: './assets/images/constructors/haas.svg',
       pilot: 'Magnussen',
       points: 400,
+      position: 2,
       lastwin: '16/10/2024',
       avatar: './assets/images/avatars/2.jpg',
     },
     {
       username: 'HeavyButt',
-      car: 'Mercedes',
+      car: './assets/images/constructors/mercedes.svg',
       pilot: 'Hamilton',
       points: 300,
+      position: 3,
       lastwin: '16/10/2024',
       avatar: './assets/images/avatars/3.jpg',
     },
     {
-      username: 'Ganja',
-      car: 'Ferrari',
+      username: 'Marcogang97',
+      car: './assets/images/constructors/ferrari.svg',
       pilot: 'Leclerc',
       points: 200,
+      position: 4,
       lastwin: '16/10/2024',
       avatar: './assets/images/avatars/4.jpg',
     },
     {
       username: 'FASTman',
-      car: 'RedBull',
+      car: './assets/images/constructors/redbull.svg',
       pilot: 'Verstappen',
       points: 100,
+      position: 5,
       lastwin: '16/10/2024',
       avatar: './assets/images/avatars/5.jpg',
     },
