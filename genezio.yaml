@@ -1,6 +1,6 @@
 frontend:
     path: .
-    publish: src
+    publish: dist/browser
     scripts:
         build: npm run build
         deploy:
