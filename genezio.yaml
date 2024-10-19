@@ -5,9 +5,9 @@ frontend:
         build: npm run build
         deploy:
             - npm install
+            - npm update
         start:
-            - npm install --silent
-            - npm run start
+            - npm start
     sdk:
         language: ts
     subdomain: f123dashboard
