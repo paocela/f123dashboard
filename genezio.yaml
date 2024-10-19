@@ -1,5 +1,5 @@
 frontend:
-    path: ./src
+    path: .
     publish: src
     scripts:
         build: npm run build
