@@ -18,6 +18,19 @@ export const routes: Routes = [
         path: 'dashboard',
         loadChildren: () => import('./views/dashboard/routes').then((m) => m.routes)
       },
+
+      /* routing piloti */ 
+      {
+        path: 'piloti',
+        loadChildren: () => import('./views/piloti/routes').then((m) => m.routes)
+      },
+      /* routing regole */
+      {
+        path: 'regole',
+        loadChildren: () => import('./views/regole/routes').then((m) => m.routes)
+      },
+
+
       {
         path: 'theme',
         loadChildren: () => import('./views/theme/routes').then((m) => m.routes)
