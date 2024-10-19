@@ -1,0 +1,10 @@
+frontend:
+    path: .
+    publish: dist
+    scripts:
+        build: npm run build
+        deploy: npm install
+    subdomain: f123dashboard
+name: f123dashboard
+region: eu-central-1
+yamlVersion: 2
