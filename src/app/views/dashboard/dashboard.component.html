@@ -1,4 +1,65 @@
-<app-widgets-dropdown />
+<c-row>
+  <c-col xs>
+    <c-card class="mb-4">
+      <c-card-body>
+        <table
+          [hover]="true"
+          [responsive]="true"
+          [striped]="true"
+          align="middle"
+          cTable
+          class="mb-0 border"
+        >
+          <thead class="text-nowrap text-truncate">
+          <tr>
+            <th class="bg-body-tertiary text-center ">
+              <svg cIcon name="cilPeople"></svg>
+            </th>
+            <th class="bg-body-tertiary">Username</th>
+            <th class="bg-body-tertiary text-center">Car</th>
+            <th class="bg-body-tertiary">Pilot</th>
+            <th class="bg-body-tertiary text-center">Championship Points</th>
+            <th class="bg-body-tertiary">Status</th>
+          </tr>
+          </thead>
+          <tbody>
+            @for (user of championship_standings_users; track user.username; let i = $index) {
+              <tr>
+                <td class="text-center">
+                  <c-avatar [size]="'md'" src="{{ user.avatar }}" />
+                </td>
+                <td>
+                  <div>{{ user.username }}</div>
+                  <div class="small text-body-secondary text-nowrap">
+                  </div>
+                </td>
+                <td class="text-center">
+                  <svg
+                    cIcon
+                    id="{{ user.car }}"
+                    name="cif{{ user.car }}"
+                    size="xl"
+                    title="{{ user.car }}"
+                  ></svg>
+                </td>
+                <td>
+                  <div class="fw-semibold text-nowrap">{{ user.pilot }}</div>
+                </td>
+                <td>
+                  <div class="fw-semibold text-nowrap">{{ user.points }}</div>
+                </td>
+                <td>
+                  <div class="small text-body-secondary">Last Win</div>
+                  <div class="fw-semibold text-nowrap">{{ user.lastwin }}</div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </c-card-body>
+    </c-card>
+  </c-col>
+</c-row>
 <c-card class="my-4">
   <c-card-body>
     <c-row>
@@ -314,81 +375,6 @@
             </div>
           </c-col>
         </c-row>
-      </c-card-body>
-    </c-card>
-  </c-col>
-</c-row>
-<c-row>
-  <c-col xs>
-    <c-card class="mb-4">
-      <c-card-body>
-        <table
-          [hover]="true"
-          [responsive]="true"
-          [striped]="true"
-          align="middle"
-          cTable
-          class="mb-0 border"
-        >
-          <thead class="text-nowrap text-truncate">
-          <tr>
-            <th class="bg-body-tertiary text-center ">
-              <svg cIcon name="cilPeople"></svg>
-            </th>
-            <th class="bg-body-tertiary">User</th>
-            <th class="bg-body-tertiary text-center">Country</th>
-            <th class="bg-body-tertiary">Usage</th>
-            <th class="bg-body-tertiary text-center">Payment Method</th>
-            <th class="bg-body-tertiary">Activity</th>
-          </tr>
-          </thead>
-          <tbody>
-            @for (user of users; track user.name; let i = $index) {
-              <tr>
-                <td class="text-center">
-                  <c-avatar [size]="'md'" src="{{ user.avatar }}" status="{{ user.status }}" />
-                </td>
-                <td>
-                  <div>{{ user.name }}</div>
-                  <div class="small text-body-secondary text-nowrap">
-                  <span>
-                    {{ user.state }} | Registered: {{ user.registered }}
-                  </span>
-                  </div>
-                </td>
-                <td class="text-center">
-                  <svg
-                    cIcon
-                    id="{{ user.country + user.name }}"
-                    name="cif{{ user.country }}"
-                    size="xl"
-                    title="{{ user.country }}"
-                  ></svg>
-                </td>
-                <td>
-                  <div class="d-flex justify-content-between">
-                    <div class="float-start">
-                      <strong>{{ user.usage }}%</strong>
-                    </div>
-                    <div class="float-end ms-1 text-nowrap">
-                      <small class="text-body-secondary">
-                        {{ user.period }}
-                      </small>
-                    </div>
-                  </div>
-                  <c-progress thin [value]="user.usage" color="{{ user.color }}" aria-label="Usage" />
-                </td>
-                <td class="text-center">
-                  <svg cIcon name="cibCc{{ user.payment }}" size="xl"></svg>
-                </td>
-                <td>
-                  <div class="small text-body-secondary">Last login</div>
-                  <div class="fw-semibold text-nowrap">{{ user.activity }}</div>
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
       </c-card-body>
     </c-card>
   </c-col>

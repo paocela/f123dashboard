@@ -26,18 +26,13 @@ import { WidgetsBrandComponent } from '../widgets/widgets-brand/widgets-brand.co
 import { WidgetsDropdownComponent } from '../widgets/widgets-dropdown/widgets-dropdown.component';
 import { DashboardChartsData, IChartProps } from './dashboard-charts-data';
 
-interface IUser {
-  name: string;
-  state: string;
-  registered: string;
-  country: string;
-  usage: number;
-  period: string;
-  payment: string;
-  activity: string;
+interface ChampionshipStandings {
+  username: string;
+  car: string;
+  pilot: string;
+  points: number;
+  lastwin: string;
   avatar: string;
-  status: string;
-  color: string;
 }
 
 @Component({
@@ -53,85 +48,47 @@ export class DashboardComponent implements OnInit {
   readonly #renderer: Renderer2 = inject(Renderer2);
   readonly #chartsData: DashboardChartsData = inject(DashboardChartsData);
 
-  public users: IUser[] = [
+  public championship_standings_users: ChampionshipStandings[] = [
     {
-      name: 'Yiorgos Avraamu',
-      state: 'New',
-      registered: 'Jan 1, 2021',
-      country: 'Us',
-      usage: 50,
-      period: 'Jun 11, 2021 - Jul 10, 2021',
-      payment: 'Mastercard',
-      activity: '10 sec ago',
+      username: 'redmamba_99_',
+      car: 'Alpine',
+      pilot: 'Gasly',
+      points: 500,
+      lastwin: '16/10/2024',
       avatar: './assets/images/avatars/1.jpg',
-      status: 'success',
-      color: 'success'
     },
     {
-      name: 'Avram Tarasios',
-      state: 'Recurring ',
-      registered: 'Jan 1, 2021',
-      country: 'Br',
-      usage: 10,
-      period: 'Jun 11, 2021 - Jul 10, 2021',
-      payment: 'Visa',
-      activity: '5 minutes ago',
+      username: 'GiannisCorbe',
+      car: 'Haas',
+      pilot: 'Magnussen',
+      points: 400,
+      lastwin: '16/10/2024',
       avatar: './assets/images/avatars/2.jpg',
-      status: 'danger',
-      color: 'info'
     },
     {
-      name: 'Quintin Ed',
-      state: 'New',
-      registered: 'Jan 1, 2021',
-      country: 'In',
-      usage: 74,
-      period: 'Jun 11, 2021 - Jul 10, 2021',
-      payment: 'Stripe',
-      activity: '1 hour ago',
+      username: 'HeavyButt',
+      car: 'Mercedes',
+      pilot: 'Hamilton',
+      points: 300,
+      lastwin: '16/10/2024',
       avatar: './assets/images/avatars/3.jpg',
-      status: 'warning',
-      color: 'warning'
     },
     {
-      name: 'Enéas Kwadwo',
-      state: 'Sleep',
-      registered: 'Jan 1, 2021',
-      country: 'Fr',
-      usage: 98,
-      period: 'Jun 11, 2021 - Jul 10, 2021',
-      payment: 'Paypal',
-      activity: 'Last month',
+      username: 'Ganja',
+      car: 'Ferrari',
+      pilot: 'Leclerc',
+      points: 200,
+      lastwin: '16/10/2024',
       avatar: './assets/images/avatars/4.jpg',
-      status: 'secondary',
-      color: 'danger'
     },
     {
-      name: 'Agapetus Tadeáš',
-      state: 'New',
-      registered: 'Jan 1, 2021',
-      country: 'Es',
-      usage: 22,
-      period: 'Jun 11, 2021 - Jul 10, 2021',
-      payment: 'ApplePay',
-      activity: 'Last week',
+      username: 'FASTman',
+      car: 'RedBull',
+      pilot: 'Verstappen',
+      points: 100,
+      lastwin: '16/10/2024',
       avatar: './assets/images/avatars/5.jpg',
-      status: 'success',
-      color: 'primary'
     },
-    {
-      name: 'Friderik Dávid',
-      state: 'New',
-      registered: 'Jan 1, 2021',
-      country: 'Pl',
-      usage: 43,
-      period: 'Jun 11, 2021 - Jul 10, 2021',
-      payment: 'Amex',
-      activity: 'Yesterday',
-      avatar: './assets/images/avatars/6.jpg',
-      status: 'info',
-      color: 'dark'
-    }
   ];
 
   public mainChart: IChartProps = { type: 'line' };
