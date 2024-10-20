@@ -1,4 +1,5 @@
 import { DOCUMENT, NgStyle } from '@angular/common';
+import { CommonModule } from '@angular/common'; // Importa CommonModule
 import { Component, DestroyRef, effect, inject, OnInit, Renderer2, signal, WritableSignal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ChartOptions } from 'chart.js';
@@ -34,13 +35,14 @@ interface ChampionshipStandings {
   position: number
   lastwin: string;
   avatar: string;
+  color: string;
 }
 
 @Component({
   templateUrl: 'dashboard.component.html',
   styleUrls: ['dashboard.component.scss'],
   standalone: true,
-  imports: [WidgetsDropdownComponent, TextColorDirective, CardComponent, CardBodyComponent, RowComponent, ColComponent, ButtonDirective, IconDirective, ReactiveFormsModule, ButtonGroupComponent, FormCheckLabelDirective, ChartjsComponent, NgStyle, CardFooterComponent, GutterDirective, ProgressBarDirective, ProgressComponent, WidgetsBrandComponent, CardHeaderComponent, TableDirective, AvatarComponent]
+  imports: [CommonModule,WidgetsDropdownComponent, TextColorDirective, CardComponent, CardBodyComponent, RowComponent, ColComponent, ButtonDirective, IconDirective, ReactiveFormsModule, ButtonGroupComponent, FormCheckLabelDirective, ChartjsComponent, NgStyle, CardFooterComponent, GutterDirective, ProgressBarDirective, ProgressComponent, WidgetsBrandComponent, CardHeaderComponent, TableDirective, AvatarComponent]
 })
 export class DashboardComponent implements OnInit {
 
@@ -58,6 +60,7 @@ export class DashboardComponent implements OnInit {
       position: 1,
       lastwin: '16/10/2024',
       avatar: './assets/images/avatars/1.jpg',
+      color: 'success',
     },
     {
       username: 'GiannisCorbe',
@@ -67,15 +70,17 @@ export class DashboardComponent implements OnInit {
       position: 2,
       lastwin: '16/10/2024',
       avatar: './assets/images/avatars/2.jpg',
+      color: 'danger',
     },
     {
       username: 'HeavyButt',
       car: './assets/images/constructors/mercedes.svg',
-      pilot: 'Hamilton',
+      pilot: 'Warning ',
       points: 300,
       position: 3,
       lastwin: '16/10/2024',
       avatar: './assets/images/avatars/3.jpg',
+      color: 'info',
     },
     {
       username: 'Marcogang97',
@@ -85,6 +90,7 @@ export class DashboardComponent implements OnInit {
       position: 4,
       lastwin: '16/10/2024',
       avatar: './assets/images/avatars/4.jpg',
+      color: 'secondary',
     },
     {
       username: 'FASTman',
@@ -94,6 +100,7 @@ export class DashboardComponent implements OnInit {
       position: 5,
       lastwin: '16/10/2024',
       avatar: './assets/images/avatars/5.jpg',
+      color: 'primary',
     },
   ];
 
