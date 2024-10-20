@@ -8,6 +8,7 @@ import {
   ScaleOptions,
   TooltipLabelStyle
 } from 'chart.js';
+
 import { DeepPartial } from 'chart.js/dist/types/utils';
 import { getStyle, hexToRgba } from '@coreui/utils';
 
@@ -44,43 +45,37 @@ export class DashboardChartsData {
 
     // mainChart
     this.mainChart['elements'] = period === 'Month' ? 12 : 27;
-    this.mainChart['Data1'] = [];
-    this.mainChart['Data2'] = [];
-    this.mainChart['Data3'] = [];
+    this.mainChart['redmamba_99_'] = [];
+    this.mainChart['FASTman'] = [];
+    this.mainChart['HeavyButt'] = [];
 
     // generate random values for mainChart
     for (let i = 0; i <= this.mainChart['elements']; i++) {
-      this.mainChart['Data1'].push(this.random(50, 240));
-      this.mainChart['Data2'].push(this.random(20, 160));
-      this.mainChart['Data3'].push(65);
+      this.mainChart['redmamba_99_'].push(this.random(50, 240));
+      this.mainChart['FASTman'].push(this.random(20, 160));
+      this.mainChart['HeavyButt'].push(this.random(20, 200));
     }
 
     let labels: string[] = [];
     if (period === 'Month') {
       labels = [
-        'January',
-        'February',
-        'March',
-        'April',
-        'May',
-        'June',
-        'July',
-        'August',
-        'September',
-        'October',
-        'November',
-        'December'
+        'Br',
+        'Us',
+        'Es',
+        'Pl',
+        'Pl',
+        'Pl',
+        'Pl',
+        'Pl',
       ];
     } else {
       /* tslint:disable:max-line-length */
       const week = [
-        'Monday',
-        'Tuesday',
-        'Wednesday',
-        'Thursday',
-        'Friday',
-        'Saturday',
-        'Sunday'
+        'Pl',
+        'Es',
+        'Us',
+        'Pl',
+        'Br',
       ];
       labels = week.concat(week, week, week);
     }
@@ -105,25 +100,23 @@ export class DashboardChartsData {
         backgroundColor: 'transparent',
         borderColor: brandDanger || '#f86c6b',
         pointHoverBackgroundColor: brandDanger,
-        borderWidth: 1,
-        borderDash: [8, 5]
       }
     ];
 
     const datasets: ChartDataset[] = [
       {
-        data: this.mainChart['Data1'],
-        label: 'Current',
+        data: this.mainChart['redmamba_99_'],
+        label: 'redmamba_99_',
         ...colors[0]
       },
       {
-        data: this.mainChart['Data2'],
-        label: 'Previous',
+        data: this.mainChart['FASTman'],
+        label: 'FASTman',
         ...colors[1]
       },
       {
-        data: this.mainChart['Data3'],
-        label: 'BEP',
+        data: this.mainChart['HeavyButt'],
+        label: 'HeavyButt',
         ...colors[2]
       }
     ];
@@ -143,7 +136,9 @@ export class DashboardChartsData {
 
     const options: ChartOptions = {
       maintainAspectRatio: false,
-      plugins,
+      plugins: {
+        // TODO
+      },
       scales,
       elements: {
         line: {
@@ -165,6 +160,8 @@ export class DashboardChartsData {
       labels
     };
   }
+
+ 
 
   getScales() {
     const colorBorderTranslucent = getStyle('--cui-border-color-translucent');
