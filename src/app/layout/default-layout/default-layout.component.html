@@ -6,12 +6,15 @@
   id="sidebar1"
   visible
 >
-  <c-sidebar-header class="border-bottom">
-    <c-sidebar-brand [routerLink]="[]">
-      <svg [class]="{icon: false}" cIcon class="sidebar-brand-full" height="32" name="logo" title="CoreUI Logo"></svg>
-      <svg cIcon class="sidebar-brand-narrow" height="32" name="signet" title="CoreUI Logo"></svg>
-    </c-sidebar-brand>
-  </c-sidebar-header>
+<c-sidebar-header class="border-bottom">
+  <c-sidebar-brand [routerLink]="[]">
+    <!-- Logo completo -->
+    <span class="sidebar-brand-full" style="font-size: 24px; font-weight: bold;">F1 Race For Federica</span>
+    <!-- Logo ridotto -->
+    <span class="sidebar-brand-narrow" style="font-size: 20px; font-weight: bold;">F1 R.F.F.</span>
+  </c-sidebar-brand>
+</c-sidebar-header>
+
 
   <ng-scrollbar #scrollbar="ngScrollbar" (updated)="onScrollbarUpdate(scrollbar.state)" class="overflow" pointerEventsMethod="scrollbar" visibility="hover">
     <c-sidebar-nav #overflow [navItems]="navItems" dropdownMode="close" compact />
