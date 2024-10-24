@@ -11,7 +11,11 @@
               <p cCardText>{{ user.description }}</p>
             </c-card-body>
             <ul [flush]="true" cListGroup>
-              <li cListGroupItem>Punteggio: {{ user.points }} Pt.</li>
+              <li cListGroupItem>Championship: {{ user.Championship }} Pt.</li>
+              <li cListGroupItem>Race: {{ user.race }} Pt.</li>
+              <li cListGroupItem>Qualify: {{ user.qualify }} Pt.</li>
+              <li cListGroupItem>Sprint: {{ user.sprint }} Pt.</li>
+              <li cListGroupItem>Practice: {{ user.practice }} Pt.</li>
               <li cListGroupItem>Ultima vittoria: {{ user.lastwin }}</li>
               <li cListGroupItem>Posizione: {{ user.position }}°</li>
             </ul>
