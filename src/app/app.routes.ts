@@ -29,7 +29,11 @@ export const routes: Routes = [
         path: 'regole',
         loadChildren: () => import('./views/regole/routes').then((m) => m.routes)
       },
-
+      /* routing calendario */
+      {
+        path: 'championship',
+        loadChildren: () => import('./views/championship/routes').then((m) => m.routes)
+      },
 
       {
         path: 'theme',
