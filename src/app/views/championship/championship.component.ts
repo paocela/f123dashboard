@@ -15,6 +15,7 @@ interface GPResult {
 
 interface AllGPs {
   name: string;
+  flag: string;
   date: string;
   data: GPResult;
 }
@@ -27,25 +28,85 @@ interface AllGPs {
   styleUrl: './championship.component.scss'
 })
 export class ChampionshipComponent {
-  public gp_results: GPResult =
-  {
-      race: ["redmamba", "fastman"],
-      sprint_1: ["redmamba", "fastman"],
-      sprint_2: ["fastman", "redmamba"],
-      qualify: ["fastman", "redmamba"],
-      free_practice: ["redmamba", "fastman"],
-  };
+  public gp_results: GPResult[] = [
+    {
+      race: ["redmamba", "fastman", "HeavyButt"],
+      sprint_1: ["redmamba", "fastman", "HeavyButt"],
+      sprint_2: ["HeavyButt", "redmamba", "HeavyButt"],
+      qualify: ["fastman", "redmamba", "HeavyButt"],
+      free_practice: ["redmamba", "fastman", "HeavyButt"],
+    },
+    {
+      race: ["HeavyButt", "fastman", "HeavyButt"],
+      sprint_1: ["redmamba", "fastman", "HeavyButt"],
+      sprint_2: ["fastman", "redmamba", "HeavyButt"],
+      qualify: ["fastman", "HeavyButt", "HeavyButt"],
+      free_practice: ["redmamba", "fastman", "HeavyButt"],
+    },
+    {
+      race: ["redmamba", "fastman", "HeavyButt"],
+      sprint_1: ["HeavyButt", "fastman", "HeavyButt"],
+      sprint_2: ["fastman", "redmamba", "HeavyButt"],
+      qualify: ["HeavyButt", "redmamba", "HeavyButt"],
+      free_practice: ["redmamba", "HeavyButt", "HeavyButt"],
+    },
+    {
+      race: ["redmamba", "HeavyButt", "HeavyButt"],
+      sprint_1: ["redmamba", "fastman", "HeavyButt"],
+      sprint_2: ["HeavyButt", "redmamba", "HeavyButt"],
+      qualify: ["fastman", "redmamba", "HeavyButt"],
+      free_practice: ["redmamba", "HeavyButt", "HeavyButt"],
+    }
+  ];
+
 
   public all_gps: AllGPs[] = [
     {
-      name: "monaco",
+      name: "Monaco",
+      flag: "mc",
       date: "10/12/2022",
       data: {
-        race: this.gp_results.race,
-        sprint_1: this.gp_results.sprint_1,
-        sprint_2: this.gp_results.sprint_2,
-        qualify: this.gp_results.qualify,
-        free_practice: this.gp_results.free_practice,
+        race: this.gp_results[0].race,
+        sprint_1: this.gp_results[0].sprint_1,
+        sprint_2: this.gp_results[0].sprint_2,
+        qualify: this.gp_results[0].qualify,
+        free_practice: this.gp_results[0].free_practice,
+      }
+    },
+    {
+      name: "Singapore",
+      flag: "sg",
+      date: "10/12/2022",
+      data: {
+        race: this.gp_results[1].race,
+        sprint_1: this.gp_results[1].sprint_1,
+        sprint_2: this.gp_results[1].sprint_2,
+        qualify: this.gp_results[1].qualify,
+        free_practice: this.gp_results[1].free_practice,
+      }
+    },
+    {
+      name: "Monza",
+      flag: "it",
+      date: "10/12/2022",
+      data: {
+        race: this.gp_results[2].race,
+        sprint_1: this.gp_results[2].sprint_1,
+        sprint_2: this.gp_results[2].sprint_2,
+        qualify: this.gp_results[2].qualify,
+        free_practice: this.gp_results[2].free_practice,
+      }
+    },
+    {
+      name: "Texas",
+      flag: "us",
+      date: "10/12/2022",
+      data: {
+        race: this.gp_results[3].race,
+        sprint_1: this.gp_results[3].sprint_1,
+        sprint_2: this.gp_results[3].sprint_2,
+        qualify: this.gp_results[3].qualify,
+        free_practice: this.gp_results[3].free_practice,
       }
     }
   ];
