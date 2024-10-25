@@ -22,6 +22,7 @@ import {
 } from '@coreui/angular';
 import { ChartjsComponent } from '@coreui/angular-chartjs';
 import { IconDirective } from '@coreui/icons-angular';
+import { cifMc, cifSg, cifIt, cifUs, cilCalendar, cilMap } from '@coreui/icons';
 
 import { WidgetsBrandComponent } from '../widgets/widgets-brand/widgets-brand.component';
 import { WidgetsDropdownComponent } from '../widgets/widgets-dropdown/widgets-dropdown.component';
@@ -36,6 +37,13 @@ interface ChampionshipStandings {
   lastwin: string;
   avatar: string;
   color: string;
+}
+
+interface NextTrack {
+  name: string;
+  date: string;
+  flag: string[];
+  length: number;
 }
 
 @Component({
@@ -103,6 +111,16 @@ export class DashboardComponent implements OnInit {
       color: 'primary',
     },
   ];
+
+  public next_track: NextTrack = {
+    name: "Monaco",
+    date: '12/01/2024',
+    flag: cifMc,
+    length: 4.36,
+  }
+
+  public calendarIcon: string[] = cilCalendar;
+  public mapIcon: string[] = cilMap;
 
   public mainChart: IChartProps = { type: 'line' };
   public mainChartRef: WritableSignal<any> = signal(undefined);

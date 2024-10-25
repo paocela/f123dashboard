@@ -27,7 +27,7 @@ export const navItems: INavData[] = [
   {
     name: 'Championship',
     url: '/championship',
-    iconComponent: { name: 'cil-description' },
+    iconComponent: { name: 'cil-calendar' },
     badge: {
       color: 'info',
       text: 'NEW'

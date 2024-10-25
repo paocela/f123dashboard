@@ -1,7 +1,10 @@
 <c-row>
   <c-col xs>
     <c-card class="mb-4">
-      <c-card-header>Championship Standings</c-card-header>
+      <c-card-header>
+        <h4 class="card-title mb-0" id="traffic">Championship Standings</h4>
+        <strong></strong>
+      </c-card-header>
       <c-card-body>
         <table
           [hover]="true"
@@ -60,8 +63,21 @@
   </c-col>
   <c-col xs>
     <c-card class="mb-4">
-      <c-card-header>Next Track</c-card-header>
+      <c-card-header>
+        <h4 class="card-title mb-0" id="traffic">
+          Next Track: {{next_track.name}} 
+          <svg [cIcon]="next_track.flag"></svg>
+        </h4>
+      </c-card-header>
       <c-card-body>
+        <div class="small text-body-secondary">
+          <svg [cIcon]="calendarIcon"></svg>
+          Date: {{next_track.date}}
+        </div>
+        <div class="small text-body-secondary">
+          <svg [cIcon]="mapIcon"></svg>
+          Length: {{next_track.length}}km
+        </div>
         <img height="100%" width="100%" src="./assets/images/tracks/monaco.avif"/>
       </c-card-body>
     </c-card>
