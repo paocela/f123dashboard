@@ -2,8 +2,7 @@
     <c-col xs="12" *ngFor="let gp of all_gps; let id_gp = index">
       <c-card class="mb-4">
         <c-card-header>
-            <strong>{{gp.name}}</strong> <svg cIcon name="cif-{{gp.flag}}" size="m"></svg>
-            <small>{{gp.date}}</small>
+          <svg [cIcon]="gp.flag"></svg> <strong>{{gp.name}}</strong> (<small>{{gp.date}}</small>)
         </c-card-header>
         <c-card-body>
             <table cTable>

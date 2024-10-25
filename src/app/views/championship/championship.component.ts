@@ -2,8 +2,8 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common'; 
 import { DocsExampleComponent } from '@docs-components/public-api';
 import { RowComponent, ColComponent, TextColorDirective, CardComponent, CardHeaderComponent, CardBodyComponent, TableDirective, TableColorDirective, TableActiveDirective, BorderDirective, AlignDirective } from '@coreui/angular';
+import { cifMc, cifSg, cifIt, cifUs, cilShieldAlt } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
-
 
 interface GPResult {
   race: string[];
@@ -15,7 +15,7 @@ interface GPResult {
 
 interface AllGPs {
   name: string;
-  flag: string;
+  flag: string[];
   date: string;
   data: GPResult;
 }
@@ -23,7 +23,7 @@ interface AllGPs {
 @Component({
   selector: 'app-championship',
   standalone: true,
-  imports: [CommonModule, IconDirective, RowComponent, ColComponent, TextColorDirective, CardComponent, CardHeaderComponent, CardBodyComponent, DocsExampleComponent, TableDirective, TableColorDirective, TableActiveDirective, BorderDirective, AlignDirective],
+  imports: [IconDirective, CommonModule, IconDirective, RowComponent, ColComponent, TextColorDirective, CardComponent, CardHeaderComponent, CardBodyComponent, DocsExampleComponent, TableDirective, TableColorDirective, TableActiveDirective, BorderDirective, AlignDirective],
   templateUrl: './championship.component.html',
   styleUrl: './championship.component.scss'
 })
@@ -63,7 +63,7 @@ export class ChampionshipComponent {
   public all_gps: AllGPs[] = [
     {
       name: "Monaco",
-      flag: "mc",
+      flag: cifMc,
       date: "10/12/2022",
       data: {
         race: this.gp_results[0].race,
@@ -75,7 +75,7 @@ export class ChampionshipComponent {
     },
     {
       name: "Singapore",
-      flag: "sg",
+      flag: cifSg,
       date: "10/12/2022",
       data: {
         race: this.gp_results[1].race,
@@ -87,7 +87,7 @@ export class ChampionshipComponent {
     },
     {
       name: "Monza",
-      flag: "it",
+      flag: cifIt,
       date: "10/12/2022",
       data: {
         race: this.gp_results[2].race,
@@ -99,7 +99,7 @@ export class ChampionshipComponent {
     },
     {
       name: "Texas",
-      flag: "us",
+      flag: cifUs,
       date: "10/12/2022",
       data: {
         race: this.gp_results[3].race,
@@ -112,5 +112,4 @@ export class ChampionshipComponent {
   ];
 
   constructor() { }
-
 }
