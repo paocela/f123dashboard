@@ -2,6 +2,7 @@ import { DOCUMENT, NgStyle } from '@angular/common';
 import { CommonModule } from '@angular/common'; // Importa CommonModule
 import { Component, DestroyRef, effect, inject, OnInit, Renderer2, signal, WritableSignal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import {DbDataService} from 'src/app/service/db-data.service';  //aggiunto il servizio per dati db
 import { ChartOptions } from 'chart.js';
 import {
   AvatarComponent,
@@ -32,7 +33,7 @@ interface ChampionshipStandings {
   username: string;
   car: string;
   pilot: string;
-  points: number;
+  Championship: number;
   position: number
   lastwin: string;
   avatar: string;
@@ -54,63 +55,14 @@ interface NextTrack {
 })
 export class DashboardComponent implements OnInit {
 
+  constructor(private dbData: DbDataService) {} //aggiunto il servizio per dati db
+
   readonly #destroyRef: DestroyRef = inject(DestroyRef);
   readonly #document: Document = inject(DOCUMENT);
   readonly #renderer: Renderer2 = inject(Renderer2);
   readonly #chartsData: DashboardChartsData = inject(DashboardChartsData);
 
-  public championship_standings_users: ChampionshipStandings[] = [
-    {
-      username: 'redmamba_99_',
-      car: './assets/images/constructors/alpine.svg',
-      pilot: 'Gasly',
-      points: 500,
-      position: 1,
-      lastwin: '16/10/2024',
-      avatar: './assets/images/avatars/1.jpg',
-      color: 'success',
-    },
-    {
-      username: 'GiannisCorbe',
-      car: './assets/images/constructors/haas.svg',
-      pilot: 'Magnussen',
-      points: 400,
-      position: 2,
-      lastwin: '16/10/2024',
-      avatar: './assets/images/avatars/2.jpg',
-      color: 'danger',
-    },
-    {
-      username: 'HeavyButt',
-      car: './assets/images/constructors/mercedes.svg',
-      pilot: 'Warning ',
-      points: 300,
-      position: 3,
-      lastwin: '16/10/2024',
-      avatar: './assets/images/avatars/3.jpg',
-      color: 'info',
-    },
-    {
-      username: 'Marcogang97',
-      car: './assets/images/constructors/ferrari.svg',
-      pilot: 'Leclerc',
-      points: 200,
-      position: 4,
-      lastwin: '16/10/2024',
-      avatar: './assets/images/avatars/4.jpg',
-      color: 'secondary',
-    },
-    {
-      username: 'FASTman',
-      car: './assets/images/constructors/redbull.svg',
-      pilot: 'Verstappen',
-      points: 100,
-      position: 5,
-      lastwin: '16/10/2024',
-      avatar: './assets/images/avatars/5.jpg',
-      color: 'primary',
-    },
-  ];
+  public championship_standings_users!: ChampionshipStandings[];
 
   public next_track: NextTrack = {
     name: "Monaco",
@@ -135,6 +87,13 @@ export class DashboardComponent implements OnInit {
   });
 
   ngOnInit(): void {
+
+    //richiesta dati al db
+    this.championship_standings_users = this.dbData.getPiloti() ;
+    console.log(this.championship_standings_users); 
+
+
+
     this.initCharts();
     this.updateChartOnColorModeChange();
   }
