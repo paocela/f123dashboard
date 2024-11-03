@@ -1,5 +1,8 @@
+name: f123dashboard
+region: eu-central-1
+yamlVersion: 2
 frontend:
-    path: .
+    path: ./client
     publish: dist/browser
     scripts:
         build: npm run build
@@ -11,6 +14,16 @@ frontend:
     sdk:
         language: ts
     subdomain: f123dashboard
-name: f123dashboard
-region: eu-central-1
-yamlVersion: 2
+backend:
+  path: ./server
+  language:
+    name: js
+  scripts:
+    deploy:
+      - npm install
+      - npm update
+    local:
+      - npm install
+    start:
+      - npm install
+  cloudProvider: genezio
