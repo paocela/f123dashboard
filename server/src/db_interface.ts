@@ -29,8 +29,6 @@ export class PostgresService {
   async insertUser(name: string): Promise<string> {
     const result = await this.pool.query("SELECT * FROM tracks");
 
-    console.log(JSON.stringify(result.rows));
-
     return JSON.stringify(result.rows);
   }
 }

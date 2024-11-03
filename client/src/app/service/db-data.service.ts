@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-
-
+import { PostgresService } from "@genezio-sdk/f123dashboard" 
 
 interface Piloti {
   username: string;
@@ -111,6 +110,13 @@ piloti: Piloti[] = [
   constructor() { }
 
   getPiloti(){
+
+
+  (async () => {
+    // Use the SDK to make requests to the Hello World Service.
+    console.log(await PostgresService.insertUser("George"));
+  })();
+
    return(this.piloti) 
   }
 

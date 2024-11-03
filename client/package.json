@@ -36,6 +36,7 @@
     "@coreui/icons": "^3.0.1",
     "@coreui/icons-angular": "5.2",
     "@coreui/utils": "^2.0.2",
+    "@genezio-sdk/f123dashboard": "^1.0.0-prod",
     "@ng-bootstrap/ng-bootstrap": "^17.0.1",
     "angularx-flatpickr": "^8.0.0",
     "chart.js": "^4.4.4",
