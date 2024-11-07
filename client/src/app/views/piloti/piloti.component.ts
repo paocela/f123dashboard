@@ -35,6 +35,8 @@ import { IconDirective } from '@coreui/icons-angular';
 
 interface Pilota {
   username: string;
+  name: string;
+  surname: string;
   description: string;
   car: string;
   pilot: string;
@@ -131,10 +133,15 @@ export class PilotiComponent implements OnInit {
   constructor(private dbData: DbDataService) {} //aggiunto il servizio per dati db
 
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     //richiesta dati al db
-    this.piloti = this.dbData.getPiloti() ;
-    console.log(this.piloti);  
+    //this.piloti = this.dbData.getPiloti();
+    const allDrivers = JSON.parse(await this.dbData.getAllDrivers());
+
+
+    // HOW TO FUCKING LOOOOOOOP??????????????
+  
+  
 
 
     this.initializeRadarChartData();
@@ -146,7 +153,7 @@ export class PilotiComponent implements OnInit {
   initializeRadarChartData(): void {
     this.piloti.forEach(pilota => {
       pilota.radarChartData = {
-        labels: ['veloce', 'pericoloso', 'suicida', 'stratega', 'Consistenza'],
+        labels: ['Giro Veloce', 'Pericolosità', 'Ingenuità', 'Strategia', 'Consistenza'],
         datasets: [
           {
             label: pilota.pilot,
@@ -158,7 +165,6 @@ export class PilotiComponent implements OnInit {
           }
         ]
       };
-      console.log(`Radar Chart Data for ${pilota.pilot}:`, pilota.radarChartData);
     });
   }
 }

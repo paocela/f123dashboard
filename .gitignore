@@ -45,3 +45,6 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# SDK
+client/dist

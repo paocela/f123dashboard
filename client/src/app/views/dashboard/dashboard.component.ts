@@ -90,9 +90,6 @@ export class DashboardComponent implements OnInit {
 
     //richiesta dati al db
     this.championship_standings_users = this.dbData.getPiloti() ;
-    console.log(this.championship_standings_users); 
-
-
 
     this.initCharts();
     this.updateChartOnColorModeChange();

@@ -26,9 +26,29 @@ export class PostgresService {
     ssl: true,
   });
 
-  async insertUser(name: string): Promise<string> {
-    const result = await this.pool.query("SELECT * FROM tracks");
-
+  async getAllPilots(): Promise<string> {
+    const result = await this.pool.query("SELECT * FROM pilots");
     return JSON.stringify(result.rows);
   }
+
+  async getAllTracks(): Promise<string> {
+    const result = await this.pool.query("SELECT * FROM tracks");
+    return JSON.stringify(result.rows);
+  }
+
+  async getAllDrivers(): Promise<string> {
+    const result = await this.pool.query("SELECT * FROM drivers");
+    return JSON.stringify(result.rows);
+  }
+
+  async getAllCars(): Promise<string> {
+    const result = await this.pool.query("SELECT * FROM cars");
+    return JSON.stringify(result.rows);
+  }
+
+  async insertUser(name: string): Promise<string> {
+    const result = await this.pool.query("SELECT * FROM tracks");
+    return JSON.stringify(result.rows);
+  }
+
 }

@@ -109,13 +109,22 @@ piloti: Piloti[] = [
 ];
   constructor() { }
 
+  async getAllDrivers(): Promise<string> {
+    const drivers = await PostgresService.getAllDrivers();
+    // const drivers = (async () : Promise<string> => {
+    //   // Use the SDK to make requests to the Hello World Service.
+    //   return await PostgresService.getDrivers();
+    // })();
+    
+    return drivers;
+  }
+
   getPiloti(){
 
-
-  (async () => {
-    // Use the SDK to make requests to the Hello World Service.
-    console.log(await PostgresService.insertUser("George"));
-  })();
+  // (async () => {
+  //   // Use the SDK to make requests to the Hello World Service.
+  //   console.log(await PostgresService.insertUser("George"));
+  // })();
 
    return(this.piloti) 
   }
