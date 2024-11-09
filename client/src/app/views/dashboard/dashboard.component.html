@@ -48,7 +48,7 @@
                   <div class="text-nowrap">{{ user.pilot }}</div>
                 </td>
                 <td>
-                  <div class="fw-semibold text-center">{{ user.Championship }}</div>
+                  <div class="fw-semibold text-center">{{ user.championship }}</div>
                 </td>
                 <td>
                   <div class="small text-body-secondary">Last Win</div>
@@ -167,8 +167,8 @@
       <div *ngFor="let user of championship_standings_users">
         <c-col>
           <div class="text-body-secondary">{{ user.username }}</div>
-          <strong> ({{ user.Championship }} points)</strong>
-          <c-progress class="mt-2" thin [color]="user.color" [value]="(user.Championship / 500) * 100" aria-label="User visits"></c-progress>
+          <strong> ({{ user.championship }} points)</strong>
+          <c-progress class="mt-2" thin [color]="user.color" [value]="(user.championship / 500) * 100" aria-label="User visits"></c-progress>
         </c-col>
       </div>
 

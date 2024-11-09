@@ -32,6 +32,7 @@ import {
 } from '@coreui/angular';
 import { ChartjsComponent } from '@coreui/angular-chartjs';  // Import per il componente grafici
 import { IconDirective } from '@coreui/icons-angular';
+import { ChangeDetectorRef } from '@angular/core';
 
 interface Pilota {
   username: string;
@@ -40,7 +41,7 @@ interface Pilota {
   description: string;
   car: string;
   pilot: string;
-  Championship : number,
+  championship : number,
   race:number,
   qualify: number,
   sprint: number,
@@ -128,20 +129,37 @@ export class PilotiComponent implements OnInit {
       }
     }
   };
-  piloti!: Pilota[];
+  piloti: any[] = [];
 
   constructor(private dbData: DbDataService) {} //aggiunto il servizio per dati db
 
 
-  async ngOnInit(): Promise<void> {
-    //richiesta dati al db
-    //this.piloti = this.dbData.getPiloti();
-    const allDrivers = JSON.parse(await this.dbData.getAllDrivers());
+  ngOnInit(): void {
+    
+    this.piloti = this.dbData.getAllDrivers();
 
-
-    // HOW TO FUCKING LOOOOOOOP??????????????
-  
-  
+    //const allDrivers = JSON.parse(await this.dbData.getAllDrivers());
+    // const allPiloti: Pilota[] = [];
+    // for (const key in allDrivers) {
+    //   console.log(`${key} --> ${allDrivers[key]["username"]}`);
+    //   const pilota: Pilota = ({} as any) as Pilota;
+    //   pilota.username = allDrivers[key]["username"];
+    //   pilota.name = allDrivers[key]["name"];
+    //   pilota.surname = allDrivers[key]["surname"];
+    //   pilota.description = allDrivers[key]["description"];
+    //   pilota.race = allDrivers[key]["race_points"];
+    //   pilota.qualify = allDrivers[key]["qualifying_points"];
+    //   pilota.practice = allDrivers[key]["free_practice_points"];
+    //   pilota.championship = pilota.race + pilota.qualify + pilota.practice;
+    //   pilota.position = 1;
+    //   pilota.lastwin = '16/16/16'
+    //   pilota.avatar = './assets/images/avatars/1.jpg';
+    //   pilota.car = './assets/images/constructors/haas.svg';
+    //   pilota.color = 'success';
+    //   pilota.pilot = 'Leclerc';
+    //   pilota.radarData = [allDrivers[key]["consistency_pt"], allDrivers[key]["fast_lap_pt"], allDrivers[key]["dangerous_pt"], allDrivers[key]["ingenuity_pt"], allDrivers[key]["strategy_pt"]];
+    //   allPiloti.push(pilota);
+    // }
 
 
     this.initializeRadarChartData();
@@ -153,7 +171,7 @@ export class PilotiComponent implements OnInit {
   initializeRadarChartData(): void {
     this.piloti.forEach(pilota => {
       pilota.radarChartData = {
-        labels: ['Giro Veloce', 'Pericolosità', 'Ingenuità', 'Strategia', 'Consistenza'],
+        labels: ['Consistenza', 'Giro Veloce', 'Pericolosità', 'Ingenuità', 'Strategia'],
         datasets: [
           {
             label: pilota.pilot,

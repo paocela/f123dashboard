@@ -1,30 +1,30 @@
-<c-row ngPreserveWhitespaces class="g-1"> <!-- Aggiunto margine tra le colonne -->
-
-    <c-col *ngFor="let user of piloti" xs="12" md="6" lg="4"> <!-- Modificato per avere un layout responsivo e risolvere problema dimensioni su telefoni -->
+<div *ngIf="piloti.length; else goto_loading">
+  <c-row ngPreserveWhitespaces class="g-1"> <!-- Aggiunto margine tra le colonne -->
+    <c-col *ngFor="let pilota of piloti" xs="12" md="6" lg="4"> <!-- Modificato per avere un layout responsivo e risolvere problema dimensioni su telefoni -->
       <c-card class="mb-4">
         <c-card-body>
           <c-card style="width: 100%;">
-            <img [cCardImg]="'top'" [src]="user.avatar" alt="{{ user.username }}'s avatar" />
+            <img [cCardImg]="'top'" [src]="pilota.avatar" alt="{{ pilota.username }}'s avatar" />
             <c-card-body>
               
-              <h5 cCardTitle>{{ user.username }}</h5>
-              <p cCardText>{{ user.description }}</p>
+              <h5 cCardTitle>{{ pilota.username }}</h5>
+              <p cCardText>{{ pilota.description }}</p>
             </c-card-body>
             <ul [flush]="true" cListGroup>
-              <li cListGroupItem>Championship: {{ user.Championship }} Pt.</li>
-              <li cListGroupItem>Race: {{ user.race }} Pt.</li>
-              <li cListGroupItem>Qualify: {{ user.qualify }} Pt.</li>
-              <li cListGroupItem>Sprint: {{ user.sprint }} Pt.</li>
-              <li cListGroupItem>Practice: {{ user.practice }} Pt.</li>
-              <li cListGroupItem>Ultima vittoria: {{ user.lastwin }}</li>
-              <li cListGroupItem>Posizione: {{ user.position }}°</li>
+              <li cListGroupItem>Championship: {{ pilota.championship }} Pt.</li>
+              <li cListGroupItem>Race: {{ pilota.race }} Pt.</li>
+              <li cListGroupItem>Qualify: {{ pilota.qualify }} Pt.</li>
+              <li cListGroupItem>Sprint: {{ pilota.sprint }} Pt.</li>
+              <li cListGroupItem>Practice: {{ pilota.practice }} Pt.</li>
+              <li cListGroupItem>Ultima vittoria: {{ pilota.lastwin }}</li>
+              <li cListGroupItem>Posizione: {{ pilota.position }}°</li>
             </ul>
 
             <!-- Radar Chart -->
             <c-card-body>
               <c-chart 
                 type="radar" 
-                [data]="user.radarChartData" 
+                [data]="pilota.radarChartData" 
                 [options]="radarChartOptions"
                 style="height: 400px;">
               </c-chart>
@@ -34,4 +34,11 @@
         </c-card-body>
       </c-card>
     </c-col>
-</c-row>
+  </c-row>
+</div>
+<ng-template #goto_loading>
+  <div class="fade show" style="text-align: center; padding-top: calc(100vh / 2); height: 100vh">
+    <i class="spinner-border text-danger"></i>
+    <span class="m-1"><strong>ASPETTA STRONZO</strong></span>
+    <i class="spinner-border text-danger"></i>
+  </div></ng-template>

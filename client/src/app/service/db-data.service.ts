@@ -3,10 +3,12 @@ import { PostgresService } from "@genezio-sdk/f123dashboard"
 
 interface Piloti {
   username: string;
+  name: string;
+  surname: string;
   description: string;
   car: string;
   pilot: string;
-  Championship : number,
+  championship : number,
   race:number,
   qualify: number,
   sprint: number,
@@ -27,11 +29,13 @@ export class DbDataService {
 //dati temporanei per vedere se funziona il collegamento fra le pagine 
 piloti: Piloti[] = [
   {
-    username: 'redmamba_99_',
-    description: 'Non è bravo come programmatore ma come pilota se la cava. Durante la scorsa stagione ha fatto notare la sua crescita vincendo il campionato.',
+    username: '',
+    name: '',
+    surname: '',
+    description: '',
     car: './assets/images/constructors/alpine.svg',
     pilot: 'Gasly',
-    Championship : 500,
+    championship : 500,
     race:100,
     qualify: 100,
     sprint: 100,
@@ -40,14 +44,16 @@ piloti: Piloti[] = [
     lastwin: '16/10/2024',
     avatar: './assets/images/avatars/1.jpg',
     color: 'success',
-    radarData: [80, 20, 10, 70, 90]
+    radarData: []
   },
   {
-    username: 'GiannisCorbe',
-    description: 'Descrizione per GiannisCorbe. ',
+    username: '',
+    name: '',
+    surname: '',
+    description: '',
     car: './assets/images/constructors/haas.svg',
     pilot: 'Magnussen',
-    Championship : 500,
+    championship : 500,
     race:100,
     qualify: 100,
     sprint: 100,
@@ -56,14 +62,16 @@ piloti: Piloti[] = [
     lastwin: '16/10/2024',
     avatar: './assets/images/avatars/2.jpg',
     color: 'danger',
-    radarData: [90, 30, 50, 70, 90]
+    radarData: []
   },
   {
-    username: 'HeavyButt',
-    description: 'Descrizione per HeavyButt.',
+    username: '',
+    name: '',
+    surname: '',
+    description: '',
     car: './assets/images/constructors/mercedes.svg',
     pilot: 'Hamilton',
-    Championship : 500,
+    championship : 500,
     race:100,
     qualify: 100,
     sprint: 100,
@@ -72,14 +80,16 @@ piloti: Piloti[] = [
     lastwin: '16/10/2024',
     avatar: './assets/images/avatars/3.jpg',
     color: 'info',
-    radarData: [60, 100, 70, 90, 60]
+    radarData: []
   },
   {
-    username: 'Marcogang97',
-    description: 'Descrizione per Marcogang97.',
+    username: '',
+    name: '',
+    surname: '',
+    description: '',
     car: './assets/images/constructors/ferrari.svg',
     pilot: 'Leclerc',
-    Championship : 500,
+    championship : 500,
     race:100,
     qualify: 100,
     sprint: 100,
@@ -88,14 +98,16 @@ piloti: Piloti[] = [
     lastwin: '16/10/2024',
     avatar: './assets/images/avatars/4.jpg',
     color: 'secondary',
-    radarData: [60, 30, 80, 30, 50]
+    radarData: []
   },
   {
-    username: 'FASTman',
-    description: 'è il pilota più bravo di tutta la contea',
+    username: '',
+    name: '',
+    surname: '',
+    description: '',
     car: './assets/images/constructors/redbull.svg',
     pilot: 'Verstappen',
-    Championship : 500,
+    championship : 500,
     race:100,
     qualify: 100,
     sprint: 100,
@@ -104,32 +116,24 @@ piloti: Piloti[] = [
     lastwin: '16/10/2024',
     avatar: './assets/images/avatars/5.jpg',
     color: 'primary',
-    radarData: [50, 30, 80, 40, 50]
+    radarData: []
   }
 ];
   constructor() { }
 
-  async getAllDrivers(): Promise<string> {
-    const drivers = await PostgresService.getAllDrivers();
-    // const drivers = (async () : Promise<string> => {
-    //   // Use the SDK to make requests to the Hello World Service.
-    //   return await PostgresService.getDrivers();
-    // })();
-    
-    return drivers;
+  drivers: string = "";
+
+
+  async queryAllDrivers() {
+    this.drivers = await PostgresService.getAllDrivers();
+  }
+
+  getAllDrivers() {
+    return JSON.parse(this.drivers);
   }
 
   getPiloti(){
-
-  // (async () => {
-  //   // Use the SDK to make requests to the Hello World Service.
-  //   console.log(await PostgresService.insertUser("George"));
-  // })();
-
    return(this.piloti) 
   }
-
-
-
 
 }

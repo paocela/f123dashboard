@@ -33,7 +33,7 @@ interface ChampionshipStandings {
   username: string;
   car: string;
   pilot: string;
-  Championship: number;
+  championship: number;
   position: number
   lastwin: string;
   avatar: string;

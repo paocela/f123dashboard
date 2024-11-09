@@ -8,6 +8,9 @@ import { ColorModeService } from '@coreui/angular';
 import { IconSetService } from '@coreui/icons-angular';
 import { iconSubset } from './icons/icon-subset';
 
+import { ChangeDetectorRef } from '@angular/core';
+import {DbDataService} from 'src/app/service/db-data.service';  //aggiunto il servizio per dati db
+
 @Component({
   selector: 'app-root',
   template: '<router-outlet />',
@@ -25,13 +28,15 @@ export class AppComponent implements OnInit {
   readonly #colorModeService = inject(ColorModeService);
   readonly #iconSetService = inject(IconSetService);
 
-  constructor() {
+  constructor(private dbData: DbDataService, private cdr: ChangeDetectorRef) {
     this.#titleService.setTitle(this.title);
     // iconSet singleton
     this.#iconSetService.icons = { ...iconSubset };
     this.#colorModeService.localStorageItemName.set('coreui-free-angular-admin-template-theme-default');
     this.#colorModeService.eventName.set('ColorSchemeChange');
   }
+
+  piloti: any[] = [];
 
   ngOnInit(): void {
 
@@ -54,5 +59,10 @@ export class AppComponent implements OnInit {
         takeUntilDestroyed(this.#destroyRef)
       )
       .subscribe();
+
+    this.dbData.queryAllDrivers();
+
+    this.cdr.detectChanges();
   }
+
 }
