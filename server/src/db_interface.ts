@@ -17,8 +17,6 @@ const { Pool } = pg;
 //});
 
 
-
-
 @GenezioDeploy()
 export class PostgresService {
   pool = new Pool({

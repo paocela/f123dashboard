@@ -1,5 +1,7 @@
-import { ApplicationConfig, importProvidersFrom } from '@angular/core';
+import { ApplicationConfig, importProvidersFrom, APP_INITIALIZER  } from '@angular/core';
 import { provideAnimations } from '@angular/platform-browser/animations';
+import { provideHttpClient } from '@angular/common/http';
+import {DbDataService} from 'src/app/service/db-data.service';
 import {
   provideRouter,
   withEnabledBlockingInitialNavigation,
@@ -12,6 +14,10 @@ import {
 import { DropdownModule, SidebarModule } from '@coreui/angular';
 import { IconSetService } from '@coreui/icons-angular';
 import { routes } from './app.routes';
+
+export function initializeApp(dbDataService: DbDataService) {
+  return () => dbDataService.queryAllDrivers(); // Funzione di inizializzazione dei dati
+}
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -29,6 +35,15 @@ export const appConfig: ApplicationConfig = {
     ),
     importProvidersFrom(SidebarModule, DropdownModule),
     IconSetService,
-    provideAnimations()
+    provideAnimations(),
+
+    provideHttpClient(),
+    DbDataService,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initializeApp,
+      deps: [DbDataService],
+      multi: true
+    }
   ]
 };

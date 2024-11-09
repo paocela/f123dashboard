@@ -122,10 +122,15 @@ piloti: Piloti[] = [
   constructor() { }
 
   drivers: string = "";
+  tracks: string = "";
+  cars: string = "";
+
 
 
   async queryAllDrivers() {
     this.drivers = await PostgresService.getAllDrivers();
+    this.tracks = await PostgresService.getAllTracks();
+    this.cars = await PostgresService.getAllCars();
   }
 
   getAllDrivers() {

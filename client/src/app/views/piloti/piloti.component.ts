@@ -137,6 +137,7 @@ export class PilotiComponent implements OnInit {
   ngOnInit(): void {
     
     this.piloti = this.dbData.getAllDrivers();
+    console.log(this.piloti)
 
     //const allDrivers = JSON.parse(await this.dbData.getAllDrivers());
     // const allPiloti: Pilota[] = [];
