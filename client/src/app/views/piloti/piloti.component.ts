@@ -34,25 +34,6 @@ import { ChartjsComponent } from '@coreui/angular-chartjs';  // Import per il co
 import { IconDirective } from '@coreui/icons-angular';
 import { ChangeDetectorRef } from '@angular/core';
 
-interface Pilota {
-  username: string;
-  name: string;
-  surname: string;
-  description: string;
-  car: string;
-  pilot: string;
-  championship : number,
-  race:number,
-  qualify: number,
-  sprint: number,
-  practice: number,
-  position: number;
-  lastwin: string;
-  avatar: string;
-  color: string;
-  radarData: number[];
-  radarChartData?: ChartData<'radar'>;  // Dati Radar Chart precomputati
-}
 
 @Component({
   selector: 'app-cards',
@@ -94,7 +75,8 @@ interface Pilota {
 })
 export class PilotiComponent implements OnInit {
 
-  
+  piloti: any[] = [];
+  pilotChart: any[] = [];
 
 
   // Opzioni comuni per il radar chart
@@ -103,12 +85,14 @@ export class PilotiComponent implements OnInit {
     scales: {
       r: {
         beginAtZero: true,
+        max: 5,
         grid: {
           color: 'rgba(200, 200, 200, 1)', // Cambia il colore delle linee di base
           lineWidth: 2, // Imposta la larghezza delle linee
         },
         ticks: {
           display: false, // Rimuove i numeri
+          stepSize:1,
         }
       }
     },
@@ -129,42 +113,23 @@ export class PilotiComponent implements OnInit {
       }
     }
   };
-  piloti: any[] = [];
+
 
   constructor(private dbData: DbDataService) {} //aggiunto il servizio per dati db
 
 
   ngOnInit(): void {
-    
-    this.piloti = this.dbData.getAllDrivers();
-    console.log(this.piloti)
 
-    //const allDrivers = JSON.parse(await this.dbData.getAllDrivers());
-    // const allPiloti: Pilota[] = [];
-    // for (const key in allDrivers) {
-    //   console.log(`${key} --> ${allDrivers[key]["username"]}`);
-    //   const pilota: Pilota = ({} as any) as Pilota;
-    //   pilota.username = allDrivers[key]["username"];
-    //   pilota.name = allDrivers[key]["name"];
-    //   pilota.surname = allDrivers[key]["surname"];
-    //   pilota.description = allDrivers[key]["description"];
-    //   pilota.race = allDrivers[key]["race_points"];
-    //   pilota.qualify = allDrivers[key]["qualifying_points"];
-    //   pilota.practice = allDrivers[key]["free_practice_points"];
-    //   pilota.championship = pilota.race + pilota.qualify + pilota.practice;
-    //   pilota.position = 1;
-    //   pilota.lastwin = '16/16/16'
-    //   pilota.avatar = './assets/images/avatars/1.jpg';
-    //   pilota.car = './assets/images/constructors/haas.svg';
-    //   pilota.color = 'success';
-    //   pilota.pilot = 'Leclerc';
-    //   pilota.radarData = [allDrivers[key]["consistency_pt"], allDrivers[key]["fast_lap_pt"], allDrivers[key]["dangerous_pt"], allDrivers[key]["ingenuity_pt"], allDrivers[key]["strategy_pt"]];
-    //   allPiloti.push(pilota);
-    // }
+    //richiesta di dati dal servizio
+    this.piloti = this.dbData.getAllDrivers();
+
+    console.log(this.piloti);
 
 
     this.initializeRadarChartData();
   }
+
+
 
   /**
    * Precomputa i dati del radar chart per ogni pilota.
@@ -180,9 +145,10 @@ export class PilotiComponent implements OnInit {
             borderColor: 'rgba(255,180,180,0.8)',
             pointBackgroundColor: 'rgba(255,180,180,0.8)',
             pointBorderColor: 'rgba(255,180,180,0.8)',
-            data: pilota.radarData
+            data: [pilota.consistency_pt, pilota.fast_lap_pt, pilota.dangerous_pt,pilota.ingenuity_pt,pilota.strategy_pt]
           }
-        ]
+        ],
+        
       };
     });
   }
