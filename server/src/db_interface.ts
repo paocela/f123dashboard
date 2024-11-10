@@ -35,7 +35,20 @@ export class PostgresService {
   }
 
   async getAllDrivers(): Promise<string> {
-    const result = await this.pool.query("SELECT * FROM drivers");
+    const result = await this.pool.query(`
+      SELECT drivers.username AS driver_username, drivers.name AS driver_name, drivers.surname AS driver_surname, drivers.description as driver_description,
+      drivers.consistency_pt AS driver_consistency_pt, drivers.fast_lap_pt AS driver_fast_lap_pt, drivers.dangerous_pt AS drivers_dangerous_pt, drivers.ingenuity_pt AS driver_ingenuity_pt,
+      drivers.strategy_pt AS driver_strategy_pt, drivers.avatar AS driver_avatar, inner_table.pilot_name AS pilot_name, inner_table.pilot_surname AS pilot_surname, inner_table.car_name AS car_name,
+      inner_table.car_overall_score AS car_overall_score, inner_table.car_logo AS car_logo
+      FROM drivers
+      INNER JOIN (
+        SELECT pilots.id AS pilot_id, pilots.name AS pilot_name, pilots.surname AS pilot_surname, cars.name AS car_name, cars.overall_score AS car_overall_score, cars.logo AS car_logo
+        FROM pilots
+        INNER JOIN cars
+        ON pilots.car_id = cars.id
+      ) as inner_table
+      ON drivers.pilot_id = inner_table.pilot_id
+      `);
     return JSON.stringify(result.rows);
   }
 
