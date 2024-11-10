@@ -125,18 +125,20 @@ piloti: Piloti[] = [
   tracks: string = "";
   cars: string = "";
 
+//compilazione delle variabili pre caricamento del interfaccia web 
   async queryAllDrivers() {
     this.drivers = await PostgresService.getAllDrivers();
     this.tracks = await PostgresService.getAllTracks();
     this.cars = await PostgresService.getAllCars();
   }
 
+//chiamate che trasferiscono le variabili alle varie pagine 
   getAllDrivers() {
     return JSON.parse(this.drivers);
   }
 
   getPiloti(){
-   return(this.piloti) 
+    return JSON.parse(this.drivers);
   }
 
 }
