@@ -124,7 +124,7 @@ AS
 (
     SELECT drivers.id AS driver_id, drivers.username AS driver_username, drivers.name AS driver_name, drivers.surname AS driver_surname, drivers.description as driver_description,
     drivers.consistency_pt AS driver_consistency_pt, drivers.fast_lap_pt AS driver_fast_lap_pt, drivers.dangerous_pt AS drivers_dangerous_pt, drivers.ingenuity_pt AS driver_ingenuity_pt,
-    drivers.strategy_pt AS driver_strategy_pt, drivers.avatar AS driver_avatar, inner_table.pilot_name AS pilot_name, inner_table.pilot_surname AS pilot_surname, inner_table.car_name AS car_name,
+    drivers.strategy_pt AS driver_strategy_pt, drivers.avatar AS driver_avatar, drivers.color AS driver_color, inner_table.pilot_name AS pilot_name, inner_table.pilot_surname AS pilot_surname, inner_table.car_name AS car_name,
     inner_table.car_overall_score AS car_overall_score, inner_table.car_logo AS car_logo
     FROM drivers
     INNER JOIN 
@@ -163,5 +163,12 @@ ON all_drivers.driver_id = inner_table.driver_id
 ORDER BY total_points DESC
 
 
-
-
+/* ALL TRACKS RESULTS */
+SELECT *
+FROM gran_prix
+INNER JOIN
+(
+    SELECT *
+    FROM race_results
+) AS inner_table
+ON gran_prix.race_results_id = inner_table.id
