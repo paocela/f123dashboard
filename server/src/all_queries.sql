@@ -1,4 +1,6 @@
+/*******************************************************/
 /* ALL DRIVERS POINTS: RACE, QUALIFYING, FREE-PRACTICE */
+/*******************************************************/
 /* TODO: add sprint points */
 WITH all_race_points AS
 (
@@ -164,7 +166,9 @@ ON all_drivers.driver_id = inner_table.driver_id
 ORDER BY total_points DESC
 
 
+/******************/
 /* ALL GP RESULTS */
+/******************/
 SELECT inner_table_tracks.name AS track_name, inner_table_tracks.flag AS track_flag,
 gran_prix.date as gran_prix_date,
 inner_table_race."1_place_username" AS driver_race_1_place, inner_table_race."2_place_username" AS driver_race_2_place, inner_table_race."3_place_username" AS driver_race_3_place, inner_table_race."4_place_username" AS driver_race_4_place, inner_table_race."5_place_username" AS driver_race_5_place, inner_table_race."fast_lap_username" AS driver_race_fast_lap, inner_table_race.race_dnf AS race_dnf,
@@ -370,3 +374,286 @@ LEFT JOIN
     FROM tracks
 ) AS inner_table_tracks
 ON gran_prix.track_id = inner_table_tracks.id
+
+/**********************/
+/* CHAMPIONSHIP TREND */
+/**********************/
+WITH all_race_points AS
+(
+    SELECT outer_table.date, outer_table.id, outer_table.driver_id, outer_table.race_point, drivers.username AS driver_username
+    FROM drivers
+    RIGHT JOIN
+    (
+        SELECT gran_prix.date, inner_table.id, inner_table.driver_id, inner_table.race_point
+        FROM gran_prix
+        RIGHT JOIN
+        (
+            SELECT 
+            race_results.id,
+            race_results."1_place_id" AS driver_id,
+            (SELECT "1_points" FROM session_type WHERE session_type.id = 1) as race_point
+            FROM race_results
+
+            UNION ALL
+
+            SELECT 
+                race_results.id,
+                race_results."2_place_id" AS driver_id,
+                (SELECT "2_points" FROM session_type WHERE session_type.id = 1) as race_point
+            FROM race_results
+
+            UNION ALL
+
+            SELECT 
+                race_results.id,
+                race_results."3_place_id" AS driver_id,
+                (SELECT "3_points" FROM session_type WHERE session_type.id = 1) as race_point
+            FROM race_results
+
+            UNION ALL
+
+            SELECT 
+                race_results.id,
+                race_results."4_place_id" AS driver_id,
+                (SELECT "4_points" FROM session_type WHERE session_type.id = 1) as race_point
+            FROM race_results
+
+            UNION ALL
+
+            SELECT 
+                race_results.id,
+                race_results."5_place_id" AS driver_id,
+                (SELECT "5_points" FROM session_type WHERE session_type.id = 1) as race_point
+            FROM race_results
+        ) AS inner_table
+        ON gran_prix.race_results_id = inner_table.id
+    ) AS outer_table
+    ON drivers.id = outer_table.driver_id
+), 
+all_qualifying_points AS 
+(
+    SELECT outer_table.date, outer_table.id, outer_table.driver_id, outer_table.qualifying_point, drivers.username AS driver_username
+    FROM drivers
+    RIGHT JOIN
+    (
+        SELECT gran_prix.date, inner_table.id, inner_table.driver_id, inner_table.qualifying_point
+        FROM gran_prix
+        RIGHT JOIN
+        (
+            SELECT 
+            qualifying_results.id,
+            qualifying_results."1_place_id" AS driver_id,
+            (SELECT "1_points" FROM session_type WHERE session_type.id = 2) as qualifying_point
+            FROM qualifying_results
+
+            UNION ALL
+
+            SELECT 
+                qualifying_results.id,
+                qualifying_results."2_place_id" AS driver_id,
+                (SELECT "2_points" FROM session_type WHERE session_type.id = 2) as qualifying_point
+            FROM qualifying_results
+
+            UNION ALL
+
+            SELECT 
+                qualifying_results.id,
+                qualifying_results."3_place_id" AS driver_id,
+                (SELECT "3_points" FROM session_type WHERE session_type.id = 2) as qualifying_point
+            FROM qualifying_results
+
+            UNION ALL
+
+            SELECT 
+                qualifying_results.id,
+                qualifying_results."4_place_id" AS driver_id,
+                (SELECT "4_points" FROM session_type WHERE session_type.id = 2) as qualifying_point
+            FROM qualifying_results
+
+            UNION ALL
+
+            SELECT 
+                qualifying_results.id,
+                qualifying_results."5_place_id" AS driver_id,
+                (SELECT "5_points" FROM session_type WHERE session_type.id = 2) as qualifying_point
+            FROM qualifying_results
+        ) AS inner_table
+        ON gran_prix.qualifying_results_id = inner_table.id
+    ) AS outer_table
+    ON drivers.id = outer_table.driver_id
+), 
+all_free_practice_points AS 
+(
+    SELECT outer_table.date, outer_table.id, outer_table.driver_id, outer_table.free_practice_point, drivers.username AS driver_username
+    FROM drivers
+    RIGHT JOIN
+    (
+        SELECT gran_prix.date, inner_table.id, inner_table.driver_id, inner_table.free_practice_point
+        FROM gran_prix
+        RIGHT JOIN
+        (
+            SELECT 
+            free_practice_results.id,
+            free_practice_results."1_place_id" AS driver_id,
+            (SELECT "1_points" FROM session_type WHERE session_type.id = 3) as free_practice_point
+            FROM free_practice_results
+
+            UNION ALL
+
+            SELECT 
+                free_practice_results.id,
+                free_practice_results."2_place_id" AS driver_id,
+                (SELECT "2_points" FROM session_type WHERE session_type.id = 3) as free_practice_point
+            FROM free_practice_results
+
+            UNION ALL
+
+            SELECT 
+                free_practice_results.id,
+                free_practice_results."3_place_id" AS driver_id,
+                (SELECT "3_points" FROM session_type WHERE session_type.id = 3) as free_practice_point
+            FROM free_practice_results
+
+            UNION ALL
+
+            SELECT 
+                free_practice_results.id,
+                free_practice_results."4_place_id" AS driver_id,
+                (SELECT "4_points" FROM session_type WHERE session_type.id = 3) as free_practice_point
+            FROM free_practice_results
+
+            UNION ALL
+            
+            SELECT 
+                free_practice_results.id,
+                free_practice_results."5_place_id" AS driver_id,
+                (SELECT "5_points" FROM session_type WHERE session_type.id = 3) as free_practice_point
+            FROM free_practice_results
+        ) AS inner_table
+        ON gran_prix.free_practice_results_id = inner_table.id
+    ) AS outer_table
+    ON drivers.id = outer_table.driver_id
+)
+
+SELECT *
+FROM
+(
+    SELECT date, driver_id, driver_username, SUM(session_point) OVER (ORDER BY date) AS cumulative_points
+    FROM
+    (
+        SELECT date, driver_id, driver_username, race_point AS session_point
+        FROM all_race_points
+
+        UNION ALL
+
+        SELECT date, driver_id, driver_username, qualifying_point AS session_point
+        FROM all_qualifying_points
+
+        UNION ALL
+
+        SELECT date, driver_id, driver_username, free_practice_point AS session_point
+        FROM all_free_practice_points
+    )
+    WHERE driver_id = 1
+)
+GROUP BY date, driver_id, driver_username, cumulative_points
+
+UNION ALL
+
+SELECT *
+FROM
+(
+    SELECT date, driver_id, driver_username, SUM(session_point) OVER (ORDER BY date) AS cumulative_points
+    FROM
+    (
+        SELECT date, driver_id, driver_username, race_point AS session_point
+        FROM all_race_points
+
+        UNION ALL
+
+        SELECT date, driver_id, driver_username, qualifying_point AS session_point
+        FROM all_qualifying_points
+
+        UNION ALL
+
+        SELECT date, driver_id, driver_username, free_practice_point AS session_point
+        FROM all_free_practice_points
+    )
+    WHERE driver_id = 2
+)
+GROUP BY date, driver_id, driver_username, cumulative_points
+
+UNION ALL
+
+SELECT *
+FROM
+(
+    SELECT date, driver_id, driver_username, SUM(session_point) OVER (ORDER BY date) AS cumulative_points
+    FROM
+    (
+        SELECT date, driver_id, driver_username, race_point AS session_point
+        FROM all_race_points
+
+        UNION ALL
+
+        SELECT date, driver_id, driver_username, qualifying_point AS session_point
+        FROM all_qualifying_points
+
+        UNION ALL
+
+        SELECT date, driver_id, driver_username, free_practice_point AS session_point
+        FROM all_free_practice_points
+    )
+    WHERE driver_id = 3
+)
+GROUP BY date, driver_id, driver_username, cumulative_points
+
+UNION ALL
+
+SELECT *
+FROM
+(
+    SELECT date, driver_id, driver_username, SUM(session_point) OVER (ORDER BY date) AS cumulative_points
+    FROM
+    (
+        SELECT date, driver_id, driver_username, race_point AS session_point
+        FROM all_race_points
+
+        UNION ALL
+
+        SELECT date, driver_id, driver_username, qualifying_point AS session_point
+        FROM all_qualifying_points
+
+        UNION ALL
+
+        SELECT date, driver_id, driver_username, free_practice_point AS session_point
+        FROM all_free_practice_points
+    )
+    WHERE driver_id = 4
+)
+GROUP BY date, driver_id, driver_username, cumulative_points
+
+UNION ALL
+
+SELECT *
+FROM
+(
+    SELECT date, driver_id, driver_username, SUM(session_point) OVER (ORDER BY date) AS cumulative_points
+    FROM
+    (
+        SELECT date, driver_id, driver_username, race_point AS session_point
+        FROM all_race_points
+
+        UNION ALL
+
+        SELECT date, driver_id, driver_username, qualifying_point AS session_point
+        FROM all_qualifying_points
+
+        UNION ALL
+
+        SELECT date, driver_id, driver_username, free_practice_point AS session_point
+        FROM all_free_practice_points
+    )
+    WHERE driver_id = 5
+)
+GROUP BY date, driver_id, driver_username, cumulative_points
