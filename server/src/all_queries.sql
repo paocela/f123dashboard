@@ -229,6 +229,11 @@ ON all_drivers.driver_id = inner_table.driver_id
 ORDER BY total_points DESC
 
 
+
+
+
+
+
 /******************/
 /* ALL GP RESULTS */
 /******************/
@@ -437,6 +442,12 @@ LEFT JOIN
     FROM tracks
 ) AS inner_table_tracks
 ON gran_prix.track_id = inner_table_tracks.id
+
+
+
+
+
+
 
 /**********************/
 /* CHAMPIONSHIP TREND */

@@ -24,35 +24,30 @@
             <th class="bg-body-tertiary text-center">Car</th>
             <th class="bg-body-tertiary">Pilot</th>
             <th class="bg-body-tertiary text-center">tot. Points</th>
-            <th class="bg-body-tertiary">Status</th>
           </tr>
           </thead>
           <tbody>
-            @for (user of championship_standings_users; track user.username; let i = $index) {
+            @for (user of championship_standings_users; track user.driver_username; let i = $index) {
               <tr>
                 <td>
-                  <div class="fw-semibold text-center">#{{ user.position }}</div>
+                  <div class="fw-semibold text-center">#{{ user.driver_id }}</div>
                 </td>
                 <td class="text-center">
                   <c-avatar [size]="'md'" src="{{ user.avatar }}" />
                 </td>
                 <td>
-                  <div>{{ user.username }}</div>
+                  <div>{{ user.driver_username }}</div>
                   <div class="small text-body-secondary text-nowrap">
                   </div>
                 </td>
                 <td class="text-center">
-                  <img width="100%" src="{{ user.car }}"/>
+                  <img width="100%" src="{{ user.car_logo }}"/>
                 </td>
                 <td>
-                  <div class="text-nowrap">{{ user.pilot }}</div>
+                  <div class="text-nowrap">{{user.pilot_name}} {{user.pilot_surname}}</div>
                 </td>
                 <td>
-                  <div class="fw-semibold text-center">{{ user.championship }}</div>
-                </td>
-                <td>
-                  <div class="small text-body-secondary">Last Win</div>
-                  <div class="text-nowrap">{{ user.lastwin }}</div>
+                  <div class="fw-semibold text-center">{{ user.total_points }}</div>
                 </td>
               </tr>
             }

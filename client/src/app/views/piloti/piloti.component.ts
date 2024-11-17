@@ -145,7 +145,11 @@ export class PilotiComponent implements OnInit {
             borderColor: 'rgba(255,180,180,0.8)',
             pointBackgroundColor: 'rgba(255,180,180,0.8)',
             pointBorderColor: 'rgba(255,180,180,0.8)',
-            data: [pilota.consistency_pt, pilota.fast_lap_pt, pilota.dangerous_pt,pilota.ingenuity_pt,pilota.strategy_pt]
+            data: [pilota.driver_consistency_pt, 
+              pilota.driver_fast_lap_pt, 
+              pilota.drivers_dangerous_pt, 
+              pilota.driver_ingenuity_pt, 
+              pilota.driver_strategy_pt]
           }
         ],
         

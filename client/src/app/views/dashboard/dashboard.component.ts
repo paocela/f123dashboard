@@ -29,6 +29,8 @@ import { WidgetsBrandComponent } from '../widgets/widgets-brand/widgets-brand.co
 import { WidgetsDropdownComponent } from '../widgets/widgets-dropdown/widgets-dropdown.component';
 import { DashboardChartsData, IChartProps } from './dashboard-charts-data';
 
+
+
 interface ChampionshipStandings {
   username: string;
   car: string;
@@ -62,7 +64,7 @@ export class DashboardComponent implements OnInit {
   readonly #renderer: Renderer2 = inject(Renderer2);
   readonly #chartsData: DashboardChartsData = inject(DashboardChartsData);
 
-  public championship_standings_users!: ChampionshipStandings[];
+  public championship_standings_users: any[] = [];
 
   public next_track: NextTrack = {
     name: "Monaco",
@@ -89,10 +91,12 @@ export class DashboardComponent implements OnInit {
   ngOnInit(): void {
 
     //richiesta dati al db
-    this.championship_standings_users = this.dbData.getPiloti() ;
+    this.championship_standings_users = this.dbData.getAllDrivers() ;
 
     this.initCharts();
     this.updateChartOnColorModeChange();
+
+    console.log(this.championship_standings_users)
   }
 
   initCharts(): void {

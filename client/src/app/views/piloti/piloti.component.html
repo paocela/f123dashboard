@@ -4,20 +4,19 @@
       <c-card class="mb-4">
         <c-card-body>
           <c-card style="width: 100%;">
-            <img [cCardImg]="'top'" [src]="pilota.avatar" alt="{{ pilota.username }}'s avatar" />
+            <img [cCardImg]="'top'" [src]="pilota.driver_avatar" alt="{{ pilota.driver_username }}'s avatar" />
             <c-card-body>
               
-              <h5 cCardTitle>{{ pilota.username }}</h5>
-              <p cCardText>{{ pilota.description }}</p>
+              <h5 cCardTitle>{{ pilota.driver_username }}</h5>
+              <p cCardText>{{ pilota.driver_description }}</p>
             </c-card-body>
             <ul [flush]="true" cListGroup>
-              <li cListGroupItem>Championship: {{ pilota.championship }} Pt.</li>
-              <li cListGroupItem>Race: {{ pilota.race }} Pt.</li>
-              <li cListGroupItem>Qualify: {{ pilota.qualify }} Pt.</li>
-              <li cListGroupItem>Sprint: {{ pilota.sprint }} Pt.</li>
-              <li cListGroupItem>Practice: {{ pilota.practice }} Pt.</li>
-              <li cListGroupItem>Ultima vittoria: {{ pilota.lastwin }}</li>
-              <li cListGroupItem>Posizione: {{ pilota.position }}°</li>
+              <li cListGroupItem>Posizione: {{ pilota.driver_id }}°</li>
+              <li cListGroupItem>Tot. points: {{ pilota.total_points }} Pt.</li>
+              <li cListGroupItem>Race: {{ pilota.total_race_points }} Pt.</li>
+              <li cListGroupItem>Sprint: {{ pilota.total_sprint_points }} Pt.</li>
+              <li cListGroupItem>Qualify: {{ pilota.total_qualifying_points }} Pt.</li>
+              <li cListGroupItem>Practice: {{ pilota.total_free_practice_points }} Pt.</li>
             </ul>
 
             <!-- Radar Chart -->
