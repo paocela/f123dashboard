@@ -41,6 +41,14 @@ WITH all_race_points AS
         race_results."5_place_id" AS driver_id,
         (SELECT "5_points" FROM session_type WHERE session_type.id = 1) as race_point
     FROM race_results
+
+    UNION ALL
+
+    SELECT 
+        race_results.id,
+        race_results."fast_lap_id" AS driver_id,
+        (SELECT "fast_lap_points" FROM session_type WHERE session_type.id = 1) as race_point
+    FROM race_results
 ), 
 all_sprint_points AS
 (
@@ -80,6 +88,14 @@ all_sprint_points AS
         sprint_results.id,
         sprint_results."5_place_id" AS driver_id,
         (SELECT "5_points" FROM session_type WHERE session_type.id = 4) as sprint_point
+    FROM sprint_results
+
+    UNION ALL
+
+    SELECT 
+        sprint_results.id,
+        sprint_results."fast_lap_id" AS driver_id,
+        (SELECT "fast_lap_points" FROM session_type WHERE session_type.id = 4) as sprint_point
     FROM sprint_results
 ), 
 all_qualifying_points AS 
@@ -472,6 +488,14 @@ WITH all_race_points AS
                 race_results."5_place_id" AS driver_id,
                 (SELECT "5_points" FROM session_type WHERE session_type.id = 1) as race_point
             FROM race_results
+
+            UNION ALL
+
+            SELECT 
+                race_results.id,
+                race_results."fast_lap_id" AS driver_id,
+                (SELECT "fast_lap_points" FROM session_type WHERE session_type.id = 1) as race_point
+            FROM race_results
         ) AS inner_table
         ON gran_prix.race_results_id = inner_table.id
     ) AS outer_table
@@ -490,7 +514,7 @@ all_sprint_points AS
             SELECT 
             sprint_results.id,
             sprint_results."1_place_id" AS driver_id,
-            (SELECT "1_points" FROM session_type WHERE session_type.id = 1) as sprint_point
+            (SELECT "1_points" FROM session_type WHERE session_type.id = 4) as sprint_point
             FROM sprint_results
 
             UNION ALL
@@ -498,7 +522,7 @@ all_sprint_points AS
             SELECT 
                 sprint_results.id,
                 sprint_results."2_place_id" AS driver_id,
-                (SELECT "2_points" FROM session_type WHERE session_type.id = 1) as sprint_point
+                (SELECT "2_points" FROM session_type WHERE session_type.id = 4) as sprint_point
             FROM sprint_results
 
             UNION ALL
@@ -506,7 +530,7 @@ all_sprint_points AS
             SELECT 
                 sprint_results.id,
                 sprint_results."3_place_id" AS driver_id,
-                (SELECT "3_points" FROM session_type WHERE session_type.id = 1) as sprint_point
+                (SELECT "3_points" FROM session_type WHERE session_type.id = 4) as sprint_point
             FROM sprint_results
 
             UNION ALL
@@ -514,7 +538,7 @@ all_sprint_points AS
             SELECT 
                 sprint_results.id,
                 sprint_results."4_place_id" AS driver_id,
-                (SELECT "4_points" FROM session_type WHERE session_type.id = 1) as sprint_point
+                (SELECT "4_points" FROM session_type WHERE session_type.id = 4) as sprint_point
             FROM sprint_results
 
             UNION ALL
@@ -522,7 +546,15 @@ all_sprint_points AS
             SELECT 
                 sprint_results.id,
                 sprint_results."5_place_id" AS driver_id,
-                (SELECT "5_points" FROM session_type WHERE session_type.id = 1) as sprint_point
+                (SELECT "5_points" FROM session_type WHERE session_type.id = 4) as sprint_point
+            FROM sprint_results
+
+            UNION ALL
+
+            SELECT 
+                sprint_results.id,
+                sprint_results."fast_lap_id" AS driver_id,
+                (SELECT "fast_lap_points" FROM session_type WHERE session_type.id = 4) as sprint_point
             FROM sprint_results
         ) AS inner_table
         ON gran_prix.sprint_results_id = inner_table.id
