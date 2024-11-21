@@ -122,14 +122,14 @@ piloti: Piloti[] = [
   constructor() { }
 
   drivers: string = "";
-  tracks: string = "";
-  cars: string = "";
+  championship: string = "";
+  cumulative_points: string = "";
 
 //compilazione delle variabili pre caricamento del interfaccia web 
   async queryAllDrivers() {
     this.drivers = await PostgresService.getAllDrivers();
-    this.tracks = await PostgresService.getAllTracks();
-    this.cars = await PostgresService.getAllCars();
+    this.championship = await PostgresService.getChampionship();
+    this.cumulative_points = await PostgresService.getCumulativePoints();
   }
 
 //chiamate che trasferiscono le variabili alle varie pagine 
@@ -137,8 +137,13 @@ piloti: Piloti[] = [
     return JSON.parse(this.drivers);
   }
 
-  getPiloti(){
-    return JSON.parse(this.drivers);
+  getChampionship() {
+    return JSON.parse(this.championship);
   }
+
+  getCumulativePoints() {
+    return JSON.parse(this.cumulative_points);
+  }
+
 
 }
