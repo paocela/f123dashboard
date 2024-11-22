@@ -233,7 +233,7 @@ export class PostgresService {
   /* All tracks and standings (for Championship page) */
   async getChampionship(): Promise<string> {
     const result = await this.pool.query(`
-        SELECT inner_table_tracks.name AS track_name, inner_table_tracks.flag AS track_flag,
+        SELECT inner_table_tracks.name AS track_name, inner_table_tracks.country AS track_country,
         gran_prix.date as gran_prix_date,
         inner_table_race."1_place_username" AS driver_race_1_place, inner_table_race."2_place_username" AS driver_race_2_place, inner_table_race."3_place_username" AS driver_race_3_place, inner_table_race."4_place_username" AS driver_race_4_place, inner_table_race."5_place_username" AS driver_race_5_place, inner_table_race."fast_lap_username" AS driver_race_fast_lap, inner_table_race.race_dnf AS race_dnf,
         inner_table_sprint."1_place_username" AS driver_sprint_1_place, inner_table_sprint."2_place_username" AS driver_sprint_2_place, inner_table_sprint."3_place_username" AS driver_sprint_3_place, inner_table_sprint."4_place_username" AS driver_sprint_4_place, inner_table_sprint."5_place_username" AS driver_sprint_5_place, inner_table_sprint."fast_lap_username" AS driver_sprint_fast_lap, inner_table_sprint.sprint_dnf AS sprint_dnf,

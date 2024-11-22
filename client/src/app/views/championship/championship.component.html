@@ -6,9 +6,9 @@
             <c-row>
               <c-col xs="auto" class="me-auto">
                 <h5 class="card-title mb-0" id="traffic">
-                  <svg size='lg' [cIcon]="gp.track_flag"></svg>
+                  <svg size='lg' [cIcon]="allFlags[gp.track_country]"></svg>
                   <strong>{{gp.track_name}}</strong>
-                  <svg size='lg' [cIcon]="gp.track_flag"></svg>
+                  <svg size='lg' [cIcon]="allFlags[gp.track_country]"></svg>
                 </h5>
             </c-col>
             <c-col xs="auto">
@@ -30,11 +30,11 @@
               </thead>
               <tbody>
                 <tr>
-                  <th scope="row">1</th>
-                  <td>{{gp.driver_race_1_place}}</td>
-                  <td>{{gp.driver_sprint_1_place}}</td>
-                  <td>{{gp.driver_qualifying_1_place}}</td>
-                  <td>{{gp.driver_free_practice_1_place}}</td>
+                  <th scope="row" [ngStyle]="{'color':'green'}">1</th>
+                  <td [ngStyle]="{'color':'green'}">{{gp.driver_race_1_place}}</td>
+                  <td [ngStyle]="{'color':'green'}">{{gp.driver_sprint_1_place}}</td>
+                  <td [ngStyle]="{'color':'green'}">{{gp.driver_qualifying_1_place}}</td>
+                  <td [ngStyle]="{'color':'green'}">{{gp.driver_free_practice_1_place}}</td>
                 </tr>
                 <tr>
                   <th scope="row">2</th>
@@ -58,16 +58,16 @@
                   <td>{{gp.driver_free_practice_4_place}}</td>
                 </tr>
                 <tr>
-                  <th scope="row">5</th>
-                  <td>{{gp.driver_race_5_place}}</td>
-                  <td>{{gp.driver_sprint_5_place}}</td>
-                  <td>{{gp.driver_qualifying_5_place}}</td>
-                  <td>{{gp.driver_free_practice_5_place}}</td>
+                  <th scope="row" [ngStyle]="{'color':'red'}">5</th>
+                  <td [ngStyle]="{'color':'red'}">{{gp.driver_race_5_place}}</td>
+                  <td [ngStyle]="{'color':'red'}">{{gp.driver_sprint_5_place}}</td>
+                  <td [ngStyle]="{'color':'red'}">{{gp.driver_qualifying_5_place}}</td>
+                  <td [ngStyle]="{'color':'red'}">{{gp.driver_free_practice_5_place}}</td>
                 </tr>
                 <tr>
-                  <th scope="row">Fast Lap</th>
-                  <td>{{gp.driver_race_fast_lap}}</td>
-                  <td>{{gp.driver_sprint_fast_lap}}</td>
+                  <th scope="row" [ngStyle]="{'color':'purple'}">Fast Lap</th>
+                  <td [ngStyle]="{'color':'purple'}">{{gp.driver_race_fast_lap}}</td>
+                  <td [ngStyle]="{'color':'purple'}">{{gp.driver_sprint_fast_lap}}</td>
                   <td></td>
                   <td></td>
                 </tr>
