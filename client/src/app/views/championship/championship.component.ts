@@ -1,24 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common'; 
 import { DocsExampleComponent } from '@docs-components/public-api';
 import { RowComponent, ColComponent, TextColorDirective, CardComponent, CardHeaderComponent, CardBodyComponent, TableDirective, TableColorDirective, TableActiveDirective, BorderDirective, AlignDirective, ContainerComponent } from '@coreui/angular';
-import { cifMc, cifSg, cifIt, cifUs } from '@coreui/icons';
+import { cifBh, cifAt, cifMc, cifJp, cifHu, cifCn, cifCa, cifEs, cifGb, cifBe, cifNl, cifAz, cifSg, cifIt, cifUs, cifAu, cifMx, cifBr, cifQa, cifAe, cifSa } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
-
-interface GPResult {
-  race: string[];
-  sprint_1: string[];
-  sprint_2: string[];
-  qualify: string[];
-  free_practice: string[];
-}
-
-interface AllGPs {
-  name: string;
-  flag: string[];
-  date: string;
-  data: GPResult;
-}
+import {DbDataService} from 'src/app/service/db-data.service';  //aggiunto il servizio per dati db
 
 @Component({
   selector: 'app-championship',
@@ -27,89 +13,37 @@ interface AllGPs {
   templateUrl: './championship.component.html',
   styleUrl: './championship.component.scss'
 })
-export class ChampionshipComponent {
-  public gp_results: GPResult[] = [
-    {
-      race: ["redmamba", "fastman", "HeavyButt"],
-      sprint_1: ["redmamba", "fastman", "HeavyButt"],
-      sprint_2: ["HeavyButt", "redmamba", "HeavyButt"],
-      qualify: ["fastman", "redmamba", "HeavyButt"],
-      free_practice: ["redmamba", "fastman", "HeavyButt"],
-    },
-    {
-      race: ["HeavyButt", "fastman", "HeavyButt"],
-      sprint_1: ["redmamba", "fastman", "HeavyButt"],
-      sprint_2: ["fastman", "redmamba", "HeavyButt"],
-      qualify: ["fastman", "HeavyButt", "HeavyButt"],
-      free_practice: ["redmamba", "fastman", "HeavyButt"],
-    },
-    {
-      race: ["redmamba", "fastman", "HeavyButt"],
-      sprint_1: ["HeavyButt", "fastman", "HeavyButt"],
-      sprint_2: ["fastman", "redmamba", "HeavyButt"],
-      qualify: ["HeavyButt", "redmamba", "HeavyButt"],
-      free_practice: ["redmamba", "HeavyButt", "HeavyButt"],
-    },
-    {
-      race: ["redmamba", "HeavyButt", "HeavyButt"],
-      sprint_1: ["redmamba", "fastman", "HeavyButt"],
-      sprint_2: ["HeavyButt", "redmamba", "HeavyButt"],
-      qualify: ["fastman", "redmamba", "HeavyButt"],
-      free_practice: ["redmamba", "HeavyButt", "HeavyButt"],
-    }
-  ];
+export class ChampionshipComponent implements OnInit{
 
+  public championship_data: any[] = [];
+  public allFlags: {[key: string]: any} = {
+    "Barhain": cifBh,
+    "Arabia Saudita": cifSa,
+    "Australia": cifAu,
+    "Giappone": cifJp,
+    "Cina": cifCn,
+    "USA": cifUs,
+    "Monaco": cifMc,
+    "Canada": cifCa,
+    "Spagna": cifEs,
+    "Austria": cifAt,
+    "UK": cifGb,
+    "Ungheria": cifHu,
+    "Belgio": cifBe,
+    "Olanda": cifNl,
+    "Italia": cifIt,
+    "Azerbaijan": cifAz,
+    "Singapore": cifSg,
+    "Messico": cifMx,
+    "Brasile": cifBr,
+    "Qatar": cifQa,
+    "Emirati Arabi Uniti": cifAe,
+  };
+  
+  constructor(private dbData: DbDataService) { }
 
-  public all_gps: AllGPs[] = [
-    {
-      name: "Monaco",
-      flag: cifMc,
-      date: "10/12/2022",
-      data: {
-        race: this.gp_results[0].race,
-        sprint_1: this.gp_results[0].sprint_1,
-        sprint_2: this.gp_results[0].sprint_2,
-        qualify: this.gp_results[0].qualify,
-        free_practice: this.gp_results[0].free_practice,
-      }
-    },
-    {
-      name: "Singapore",
-      flag: cifSg,
-      date: "10/12/2022",
-      data: {
-        race: this.gp_results[1].race,
-        sprint_1: this.gp_results[1].sprint_1,
-        sprint_2: this.gp_results[1].sprint_2,
-        qualify: this.gp_results[1].qualify,
-        free_practice: this.gp_results[1].free_practice,
-      }
-    },
-    {
-      name: "Monza",
-      flag: cifIt,
-      date: "10/12/2022",
-      data: {
-        race: this.gp_results[2].race,
-        sprint_1: this.gp_results[2].sprint_1,
-        sprint_2: this.gp_results[2].sprint_2,
-        qualify: this.gp_results[2].qualify,
-        free_practice: this.gp_results[2].free_practice,
-      }
-    },
-    {
-      name: "Texas",
-      flag: cifUs,
-      date: "10/12/2022",
-      data: {
-        race: this.gp_results[3].race,
-        sprint_1: this.gp_results[3].sprint_1,
-        sprint_2: this.gp_results[3].sprint_2,
-        qualify: this.gp_results[3].qualify,
-        free_practice: this.gp_results[3].free_practice,
-      }
-    }
-  ];
+  ngOnInit(): void {
+    this.championship_data = this.dbData.getChampionship() ;
 
-  constructor() { }
+  }
 }

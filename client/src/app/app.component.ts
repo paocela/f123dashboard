@@ -18,7 +18,7 @@ import {DbDataService} from 'src/app/service/db-data.service';  //aggiunto il se
   imports: [RouterOutlet]
 })
 export class AppComponent implements OnInit {
-  title = 'F1 Race For Federica';
+  title = 'F1 RaceForFederica';
 
   readonly #destroyRef: DestroyRef = inject(DestroyRef);
   readonly #activatedRoute: ActivatedRoute = inject(ActivatedRoute);

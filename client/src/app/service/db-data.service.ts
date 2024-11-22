@@ -15,20 +15,19 @@ export class DbDataService {
 //variabili locali
 /****************************************************************/
   drivers: string = "";
-  ChampionshipTrend: string = "";
+  championship: string = "";
+  cumulative_points: string = "";
 
 
 
 
 /****************************************************************/
 //compilazione delle variabili pre caricamento del interfaccia web 
-/****************************************************************/
-async AllData() {
-
-  this.drivers = await PostgresService.getAllDrivers();
-
-  this.ChampionshipTrend = await PostgresService.getChampionshipTrend();
-}
+  async AllData() {
+    this.drivers = await PostgresService.getAllDrivers();
+    this.championship = await PostgresService.getChampionship();
+    this.cumulative_points = await PostgresService.getCumulativePoints();
+  }
 
   
 
@@ -38,8 +37,14 @@ async AllData() {
   getAllDrivers() {
     return JSON.parse(this.drivers);
   }
-  championshipTrend() {
-    return JSON.parse(this.ChampionshipTrend);
+
+  getChampionship() {
+    return JSON.parse(this.championship);
   }
+
+  getCumulativePoints() {
+    return JSON.parse(this.cumulative_points);
+  }
+
 
 }
