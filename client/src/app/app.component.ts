@@ -60,8 +60,7 @@ export class AppComponent implements OnInit {
       )
       .subscribe();
 
-    this.dbData.queryAllDrivers();
-
+    this.dbData.AllData();
     this.cdr.detectChanges();
   }
 

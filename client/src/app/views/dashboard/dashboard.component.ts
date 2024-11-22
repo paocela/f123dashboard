@@ -65,6 +65,7 @@ export class DashboardComponent implements OnInit {
   readonly #chartsData: DashboardChartsData = inject(DashboardChartsData);
 
   public championship_standings_users: any[] = [];
+  public championshipTrend: any[] = [];
 
   public next_track: NextTrack = {
     name: "Monaco",
@@ -92,11 +93,12 @@ export class DashboardComponent implements OnInit {
 
     //richiesta dati al db
     this.championship_standings_users = this.dbData.getAllDrivers() ;
+    this.championshipTrend = this.dbData.championshipTrend() ;
 
     this.initCharts();
     this.updateChartOnColorModeChange();
 
-    console.log(this.championship_standings_users)
+    console.log(this.championshipTrend)
   }
 
   initCharts(): void {

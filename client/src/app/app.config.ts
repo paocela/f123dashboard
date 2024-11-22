@@ -16,7 +16,7 @@ import { IconSetService } from '@coreui/icons-angular';
 import { routes } from './app.routes';
 
 export function initializeApp(dbDataService: DbDataService) {
-  return () => dbDataService.queryAllDrivers(); // Funzione di inizializzazione dei dati
+  return () => dbDataService.AllData(); // Funzione di inizializzazione dei dati
 }
 
 export const appConfig: ApplicationConfig = {
