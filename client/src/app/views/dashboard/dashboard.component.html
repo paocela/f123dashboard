@@ -33,7 +33,7 @@
                   <div class="fw-semibold text-center">#{{ user.driver_id }}</div>
                 </td>
                 <td class="text-center">
-                  <c-avatar [size]="'md'" src="{{ user.avatar }}" />
+                  <c-avatar [size]="'md'" src="./assets/images/avatars/{{ user.driver_username }}.jpg" />
                 </td>
                 <td>
                   <div>{{ user.driver_username }}</div>
@@ -41,7 +41,7 @@
                   </div>
                 </td>
                 <td class="text-center">
-                  <img width="100%" src="{{ user.car_logo }}"/>
+                  <img width="100%" src="./assets/images/constructors/{{ user.car_name }}.svg"/>
                 </td>
                 <td>
                   <div class="text-nowrap">{{user.pilot_name}} {{user.pilot_surname}}</div>

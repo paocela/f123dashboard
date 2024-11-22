@@ -23,6 +23,8 @@ export class DbDataService {
 
 /****************************************************************/
 //compilazione delle variabili pre caricamento del interfaccia web 
+/****************************************************************/
+
   async AllData() {
     this.drivers = await PostgresService.getAllDrivers();
     this.championship = await PostgresService.getChampionship();

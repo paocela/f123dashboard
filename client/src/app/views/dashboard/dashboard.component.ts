@@ -93,7 +93,7 @@ export class DashboardComponent implements OnInit {
 
     //richiesta dati al db
     this.championship_standings_users = this.dbData.getAllDrivers() ;
-    this.championshipTrend = this.dbData.championshipTrend() ;
+    this.championshipTrend = this.dbData.getCumulativePoints() ;
 
     this.initCharts();
     this.updateChartOnColorModeChange();
