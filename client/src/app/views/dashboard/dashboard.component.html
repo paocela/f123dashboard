@@ -41,7 +41,7 @@
                   </div>
                 </td>
                 <td class="text-center">
-                  <img width="100%" src="./assets/images/constructors/{{ user.car_name }}.svg"/>
+                  <img width="50%" src="./assets/images/constructors/{{ user.car_name }}.svg"/>
                 </td>
                 <td>
                   <div class="text-nowrap">{{user.pilot_name}} {{user.pilot_surname}}</div>
@@ -104,7 +104,7 @@
               variant="outline"
               for="dayRadio"
             >
-              Last 3 GP
+              Last 7 GP
             </label>
             <input
               class="btn-check"
@@ -121,7 +121,7 @@
               variant="outline"
               for="radioMonth"
             >
-              Last 7 GP
+              Last 3 GP
             </label>
             <input
               class="btn-check"
@@ -159,13 +159,6 @@
     <c-row class="text-center mb-2" [xl]="5" [lg]="4" [sm]="2" [xs]="1" [gutter]="4">
       
 
-      <div *ngFor="let user of championship_standings_users">
-        <c-col>
-          <div class="text-body-secondary">{{ user.username }}</div>
-          <strong> ({{ user.championship }} points)</strong>
-          <c-progress class="mt-2" thin [color]="user.color" [value]="(user.championship / 500) * 100" aria-label="User visits"></c-progress>
-        </c-col>
-      </div>
 
     </c-row>
   </c-card-footer>

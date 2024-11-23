@@ -11,6 +11,7 @@ import {
 
 import { DeepPartial } from 'chart.js/dist/types/utils';
 import { getStyle, hexToRgba } from '@coreui/utils';
+import {DbDataService} from 'src/app/service/db-data.service';  //aggiunto il servizio per dati db
 
 export interface IChartProps {
   data?: ChartData;
@@ -27,11 +28,12 @@ export interface IChartProps {
   providedIn: 'any'
 })
 export class DashboardChartsData {
-  constructor() {
+  constructor(private dbData: DbDataService) {
     this.initMainChart();
   }
 
   public mainChart: IChartProps = { type: 'line' };
+  public championshipTrend: any[] = [];
 
   public random(min: number, max: number) {
     return Math.floor(Math.random() * (max - min + 1) + min);
@@ -43,18 +45,21 @@ export class DashboardChartsData {
     const brandInfoBg = hexToRgba(getStyle('--cui-info') ?? '#20a8d8', 10);
     const brandDanger = getStyle('--cui-danger') ?? '#f86c6b';
 
+
+    this.championshipTrend = this.dbData.getCumulativePoints() ;
+
     // mainChart
     this.mainChart['elements'] = period === 'Month' ? 12 : 27;
     this.mainChart['redmamba_99_'] = [];
     this.mainChart['FASTman'] = [];
     this.mainChart['HeavyButt'] = [];
+    this.mainChart["Marcogang96"] = [];
+    this.mainChart["GiannisCorbe"] = [];
 
-    // generate random values for mainChart
-    for (let i = 0; i <= this.mainChart['elements']; i++) {
-      this.mainChart['redmamba_99_'].push(this.random(50, 240));
-      this.mainChart['FASTman'].push(this.random(20, 160));
-      this.mainChart['HeavyButt'].push(this.random(20, 200));
+    for (let pippo of this.championshipTrend ){
+      this.mainChart[pippo.driver_username].push(pippo.cumulative_points)
     }
+
 
     let labels: string[] = [];
     if (period === 'Month') {
