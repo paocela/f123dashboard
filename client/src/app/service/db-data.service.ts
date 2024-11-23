@@ -10,16 +10,13 @@ export class DbDataService {
 
   constructor() { }
 
-
 /****************************************************************/
 //variabili locali
 /****************************************************************/
   drivers: string = "";
   championship: string = "";
   cumulative_points: string = "";
-
-
-
+  tracks: string = "";
 
 /****************************************************************/
 //compilazione delle variabili pre caricamento del interfaccia web 
@@ -29,9 +26,8 @@ export class DbDataService {
     this.drivers = await PostgresService.getAllDrivers();
     this.championship = await PostgresService.getChampionship();
     this.cumulative_points = await PostgresService.getCumulativePoints();
-  }
-
-  
+    this.tracks = await PostgresService.getAllTracks();
+  } 
 
 /****************************************************************/
 //chiamate che trasferiscono le variabili alle varie pagine 
@@ -48,5 +44,8 @@ export class DbDataService {
     return JSON.parse(this.cumulative_points);
   }
 
+  getAllTracks() {
+    return JSON.parse(this.tracks);
+  }
 
 }

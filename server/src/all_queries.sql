@@ -454,12 +454,23 @@ ON gran_prix.track_id = inner_table_tracks.id
 /**********************/
 WITH all_race_points AS
 (
-    SELECT outer_table.date, outer_table.id, outer_table.driver_id, outer_table.race_point, drivers.username AS driver_username
+    SELECT outer_table.date, outer_table.track_name, outer_table.id, outer_table.driver_id, outer_table.race_point, 
+    drivers.username AS driver_username, drivers.color AS driver_color
     FROM drivers
     RIGHT JOIN
     (
-        SELECT gran_prix.date, inner_table.id, inner_table.driver_id, inner_table.race_point
-        FROM gran_prix
+        SELECT gran_prix.date, gran_prix.track_name, inner_table.id, inner_table.driver_id, inner_table.race_point
+        FROM 
+        (
+            SELECT *, track_table.name AS track_name
+            FROM gran_prix
+            LEFT JOIN
+            (
+                SELECT *
+                FROM tracks
+            ) AS track_table
+            ON gran_prix.track_id = track_table.id
+        ) AS gran_prix
         RIGHT JOIN
         (
             SELECT 
@@ -514,12 +525,23 @@ WITH all_race_points AS
 ), 
 all_sprint_points AS
 (
-    SELECT outer_table.date, outer_table.id, outer_table.driver_id, outer_table.sprint_point, drivers.username AS driver_username
+    SELECT outer_table.date, outer_table.track_name, outer_table.id, outer_table.driver_id, outer_table.sprint_point,
+    drivers.username AS driver_username, drivers.color AS driver_color
     FROM drivers
     RIGHT JOIN
     (
-        SELECT gran_prix.date, inner_table.id, inner_table.driver_id, inner_table.sprint_point
-        FROM gran_prix
+        SELECT gran_prix.date, gran_prix.track_name, inner_table.id, inner_table.driver_id, inner_table.sprint_point
+        FROM 
+        (
+            SELECT *, track_table.name AS track_name
+            FROM gran_prix
+            LEFT JOIN
+            (
+                SELECT *
+                FROM tracks
+            ) AS track_table
+            ON gran_prix.track_id = track_table.id
+        ) AS gran_prix
         RIGHT JOIN
         (
             SELECT 
@@ -574,12 +596,23 @@ all_sprint_points AS
 ), 
 all_qualifying_points AS 
 (
-    SELECT outer_table.date, outer_table.id, outer_table.driver_id, outer_table.qualifying_point, drivers.username AS driver_username
+    SELECT outer_table.date, outer_table.track_name, outer_table.id, outer_table.driver_id, outer_table.qualifying_point, 
+    drivers.username AS driver_username, drivers.color AS driver_color
     FROM drivers
     RIGHT JOIN
     (
-        SELECT gran_prix.date, inner_table.id, inner_table.driver_id, inner_table.qualifying_point
-        FROM gran_prix
+        SELECT gran_prix.date, gran_prix.track_name, inner_table.id, inner_table.driver_id, inner_table.qualifying_point
+        FROM 
+        (
+            SELECT *, track_table.name AS track_name
+            FROM gran_prix
+            LEFT JOIN
+            (
+                SELECT *
+                FROM tracks
+            ) AS track_table
+            ON gran_prix.track_id = track_table.id
+        ) AS gran_prix
         RIGHT JOIN
         (
             SELECT 
@@ -626,12 +659,23 @@ all_qualifying_points AS
 ), 
 all_free_practice_points AS 
 (
-    SELECT outer_table.date, outer_table.id, outer_table.driver_id, outer_table.free_practice_point, drivers.username AS driver_username
+    SELECT outer_table.date, outer_table.track_name, outer_table.id, outer_table.driver_id, outer_table.free_practice_point, 
+    drivers.username AS driver_username, drivers.color AS driver_color
     FROM drivers
     RIGHT JOIN
     (
-        SELECT gran_prix.date, inner_table.id, inner_table.driver_id, inner_table.free_practice_point
-        FROM gran_prix
+        SELECT gran_prix.date, gran_prix.track_name, inner_table.id, inner_table.driver_id, inner_table.free_practice_point
+        FROM 
+        (
+            SELECT *, track_table.name AS track_name
+            FROM gran_prix
+            LEFT JOIN
+            (
+                SELECT *
+                FROM tracks
+            ) AS track_table
+            ON gran_prix.track_id = track_table.id
+        ) AS gran_prix
         RIGHT JOIN
         (
             SELECT 
@@ -680,147 +724,170 @@ all_free_practice_points AS
 SELECT *
 FROM
 (
-    SELECT date, driver_id, driver_username, SUM(session_point) OVER (ORDER BY date) AS cumulative_points
+    SELECT date, track_name, driver_id, driver_username, driver_color, SUM(session_point) OVER (ORDER BY date) AS cumulative_points
     FROM
     (
-        SELECT date, driver_id, driver_username, race_point AS session_point
+        SELECT date, track_name, driver_id, driver_username, driver_color, race_point AS session_point
         FROM all_race_points
 
         UNION ALL 
 
-        SELECT date, driver_id, driver_username, sprint_point AS session_point
+        SELECT date, track_name, driver_id, driver_username, driver_color, sprint_point AS session_point
         FROM all_sprint_points
 
         UNION ALL
 
-        SELECT date, driver_id, driver_username, qualifying_point AS session_point
+        SELECT date, track_name, driver_id, driver_username, driver_color, qualifying_point AS session_point
         FROM all_qualifying_points
 
         UNION ALL
 
-        SELECT date, driver_id, driver_username, free_practice_point AS session_point
+        SELECT date, track_name, driver_id, driver_username, driver_color, free_practice_point AS session_point
         FROM all_free_practice_points
     )
     WHERE driver_id = 1
 )
-GROUP BY date, driver_id, driver_username, cumulative_points
+GROUP BY date, track_name, driver_id, driver_username, driver_color, cumulative_points
 
 UNION ALL
 
 SELECT *
 FROM
 (
-    SELECT date, driver_id, driver_username, SUM(session_point) OVER (ORDER BY date) AS cumulative_points
+    SELECT date, track_name, driver_id, driver_username, driver_color, SUM(session_point) OVER (ORDER BY date) AS cumulative_points
     FROM
     (
-        SELECT date, driver_id, driver_username, race_point AS session_point
+        SELECT date, track_name, driver_id, driver_username, driver_color, race_point AS session_point
         FROM all_race_points
 
         UNION ALL 
 
-        SELECT date, driver_id, driver_username, sprint_point AS session_point
+        SELECT date, track_name, driver_id, driver_username, driver_color, sprint_point AS session_point
         FROM all_sprint_points
 
         UNION ALL
 
-        SELECT date, driver_id, driver_username, qualifying_point AS session_point
+        SELECT date, track_name, driver_id, driver_username, driver_color, qualifying_point AS session_point
         FROM all_qualifying_points
 
         UNION ALL
 
-        SELECT date, driver_id, driver_username, free_practice_point AS session_point
+        SELECT date, track_name, driver_id, driver_username, driver_color, free_practice_point AS session_point
         FROM all_free_practice_points
     )
     WHERE driver_id = 2
 )
-GROUP BY date, driver_id, driver_username, cumulative_points
+GROUP BY date, track_name, driver_id, driver_username, driver_color, cumulative_points
 
 UNION ALL
 
 SELECT *
 FROM
 (
-    SELECT date, driver_id, driver_username, SUM(session_point) OVER (ORDER BY date) AS cumulative_points
+    SELECT date, track_name, driver_id, driver_username, driver_color, SUM(session_point) OVER (ORDER BY date) AS cumulative_points
     FROM
     (
-        SELECT date, driver_id, driver_username, race_point AS session_point
+        SELECT date, track_name, driver_id, driver_username, driver_color, race_point AS session_point
         FROM all_race_points
 
         UNION ALL 
 
-        SELECT date, driver_id, driver_username, sprint_point AS session_point
+        SELECT date, track_name, driver_id, driver_username, driver_color, sprint_point AS session_point
         FROM all_sprint_points
 
         UNION ALL
 
-        SELECT date, driver_id, driver_username, qualifying_point AS session_point
+        SELECT date, track_name, driver_id, driver_username, driver_color, qualifying_point AS session_point
         FROM all_qualifying_points
 
         UNION ALL
 
-        SELECT date, driver_id, driver_username, free_practice_point AS session_point
+        SELECT date, track_name, driver_id, driver_username, driver_color, free_practice_point AS session_point
         FROM all_free_practice_points
     )
     WHERE driver_id = 3
 )
-GROUP BY date, driver_id, driver_username, cumulative_points
+GROUP BY date, track_name, driver_id, driver_username, driver_color, cumulative_points
 
 UNION ALL
 
 SELECT *
 FROM
 (
-    SELECT date, driver_id, driver_username, SUM(session_point) OVER (ORDER BY date) AS cumulative_points
+    SELECT date, track_name, driver_id, driver_username, driver_color, SUM(session_point) OVER (ORDER BY date) AS cumulative_points
     FROM
     (
-        SELECT date, driver_id, driver_username, race_point AS session_point
+        SELECT date, track_name, driver_id, driver_username, driver_color, race_point AS session_point
         FROM all_race_points
 
         UNION ALL 
 
-        SELECT date, driver_id, driver_username, sprint_point AS session_point
+        SELECT date, track_name, driver_id, driver_username, driver_color, sprint_point AS session_point
         FROM all_sprint_points
 
         UNION ALL
 
-        SELECT date, driver_id, driver_username, qualifying_point AS session_point
+        SELECT date, track_name, driver_id, driver_username, driver_color, qualifying_point AS session_point
         FROM all_qualifying_points
 
         UNION ALL
 
-        SELECT date, driver_id, driver_username, free_practice_point AS session_point
+        SELECT date, track_name, driver_id, driver_username, driver_color, free_practice_point AS session_point
         FROM all_free_practice_points
     )
     WHERE driver_id = 4
 )
-GROUP BY date, driver_id, driver_username, cumulative_points
+GROUP BY date, track_name, driver_id, driver_username, driver_color, cumulative_points
 
 UNION ALL
 
 SELECT *
 FROM
 (
-    SELECT date, driver_id, driver_username, SUM(session_point) OVER (ORDER BY date) AS cumulative_points
+    SELECT date, track_name, driver_id, driver_username, driver_color, SUM(session_point) OVER (ORDER BY date) AS cumulative_points
     FROM
     (
-        SELECT date, driver_id, driver_username, race_point AS session_point
+        SELECT date, track_name, driver_id, driver_username, driver_color, race_point AS session_point
         FROM all_race_points
 
         UNION ALL 
 
-        SELECT date, driver_id, driver_username, sprint_point AS session_point
+        SELECT date, track_name, driver_id, driver_username, driver_color, sprint_point AS session_point
         FROM all_sprint_points
 
         UNION ALL
 
-        SELECT date, driver_id, driver_username, qualifying_point AS session_point
+        SELECT date, track_name, driver_id, driver_username, driver_color, qualifying_point AS session_point
         FROM all_qualifying_points
 
         UNION ALL
 
-        SELECT date, driver_id, driver_username, free_practice_point AS session_point
+        SELECT date, track_name, driver_id, driver_username, driver_color, free_practice_point AS session_point
         FROM all_free_practice_points
     )
     WHERE driver_id = 5
 )
-GROUP BY date, driver_id, driver_username, cumulative_points
+GROUP BY date, track_name, driver_id, driver_username, driver_color, cumulative_points
+
+/**************/
+/* NEXT TRACK */
+/**************/
+SELECT outer_table_tracks.track_id, outer_table_tracks.name, outer_table_tracks.date, outer_table_tracks.country, outer_table_tracks.besttime_driver_time,
+outer_table_drivers.username
+FROM
+(
+    SELECT *
+    FROM tracks
+    LEFT JOIN
+    (
+        SELECT *
+        FROM gran_prix
+    ) AS inner_table
+    ON tracks.id = inner_table.track_id
+) AS outer_table_tracks
+LEFT JOIN
+(
+    SELECT *
+    FROM drivers
+) AS outer_table_drivers
+ON outer_table_tracks.besttime_driver_id = outer_table_drivers.id

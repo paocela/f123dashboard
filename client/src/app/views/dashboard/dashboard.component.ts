@@ -23,7 +23,9 @@ import {
 } from '@coreui/angular';
 import { ChartjsComponent } from '@coreui/angular-chartjs';
 import { IconDirective } from '@coreui/icons-angular';
-import { cifMc, cifSg, cifIt, cifUs, cilCalendar, cilMap } from '@coreui/icons';
+import { cilCalendar, cilMap, cilFire } from '@coreui/icons';
+import { cifBh, cifAt, cifMc, cifJp, cifHu, cifCn, cifCa, cifEs, cifGb, cifBe, cifNl, cifAz, cifSg, cifIt, cifUs, cifAu, cifMx, cifBr, cifQa, cifAe, cifSa } from '@coreui/icons';
+import { DatePipe } from '@angular/common';
 
 import { WidgetsBrandComponent } from '../widgets/widgets-brand/widgets-brand.component';
 import { WidgetsDropdownComponent } from '../widgets/widgets-dropdown/widgets-dropdown.component';
@@ -53,7 +55,7 @@ interface NextTrack {
   templateUrl: 'dashboard.component.html',
   styleUrls: ['dashboard.component.scss'],
   standalone: true,
-  imports: [CommonModule,WidgetsDropdownComponent, TextColorDirective, CardComponent, CardBodyComponent, RowComponent, ColComponent, ButtonDirective, IconDirective, ReactiveFormsModule, ButtonGroupComponent, FormCheckLabelDirective, ChartjsComponent, NgStyle, CardFooterComponent, GutterDirective, ProgressBarDirective, ProgressComponent, WidgetsBrandComponent, CardHeaderComponent, TableDirective, AvatarComponent]
+  imports: [DatePipe, CommonModule,WidgetsDropdownComponent, TextColorDirective, CardComponent, CardBodyComponent, RowComponent, ColComponent, ButtonDirective, IconDirective, ReactiveFormsModule, ButtonGroupComponent, FormCheckLabelDirective, ChartjsComponent, NgStyle, CardFooterComponent, GutterDirective, ProgressBarDirective, ProgressComponent, WidgetsBrandComponent, CardHeaderComponent, TableDirective, AvatarComponent]
 })
 export class DashboardComponent implements OnInit {
 
@@ -66,16 +68,36 @@ export class DashboardComponent implements OnInit {
 
   public championship_standings_users: any[] = [];
   public championshipTrend: any[] = [];
+  public championshipTracks: any[] = [];
+  public championshipNextTrack: any;
 
-  public next_track: NextTrack = {
-    name: "Monaco",
-    date: '12/01/2024',
-    flag: cifMc,
-    length: 4.36,
-  }
+  public allFlags: {[key: string]: any} = {
+    "Barhain": cifBh,
+    "Arabia Saudita": cifSa,
+    "Australia": cifAu,
+    "Giappone": cifJp,
+    "Cina": cifCn,
+    "USA": cifUs,
+    "Monaco": cifMc,
+    "Canada": cifCa,
+    "Spagna": cifEs,
+    "Austria": cifAt,
+    "UK": cifGb,
+    "Ungheria": cifHu,
+    "Belgio": cifBe,
+    "Olanda": cifNl,
+    "Italia": cifIt,
+    "Azerbaijan": cifAz,
+    "Singapore": cifSg,
+    "Messico": cifMx,
+    "Brasile": cifBr,
+    "Qatar": cifQa,
+    "Emirati Arabi Uniti": cifAe,
+  };
 
   public calendarIcon: string[] = cilCalendar;
   public mapIcon: string[] = cilMap;
+  public fireIcon: string[] = cilFire;
 
   public mainChart: IChartProps = { type: 'line' };
   public mainChartRef: WritableSignal<any> = signal(undefined);
@@ -94,6 +116,23 @@ export class DashboardComponent implements OnInit {
     //richiesta dati al db
     this.championship_standings_users = this.dbData.getAllDrivers() ;
     this.championshipTrend = this.dbData.getCumulativePoints() ;
+    this.championshipTracks = this.dbData.getAllTracks();
+
+    // filter next championship track
+    const current_date: Date = new Date();
+    for (let track of this.championshipTracks){
+      const db_date: Date = new Date(track.date);
+      if ( db_date > current_date )
+      {
+        this.championshipNextTrack = track;
+        break;
+      }
+      // TODO: delete this
+      this.championshipNextTrack = track;
+      this.championshipNextTrack["date"] = db_date.toDateString()
+      console.log(this.championshipNextTrack);
+      break;
+    }
 
     this.initCharts();
     this.updateChartOnColorModeChange();

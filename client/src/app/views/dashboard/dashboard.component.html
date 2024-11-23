@@ -60,20 +60,26 @@
     <c-card class="mb-4">
       <c-card-header>
         <h4 class="card-title mb-0" id="traffic">
-          Next Track: {{next_track.name}} 
-          <svg size='lg' [cIcon]="next_track.flag"></svg>
+          Next Track: {{championshipNextTrack.name}} 
+          <svg size='lg' [cIcon]="allFlags[championshipNextTrack.country]"></svg>
         </h4>
       </c-card-header>
       <c-card-body>
-        <div class="small text-body-secondary">
-          <svg [cIcon]="calendarIcon"></svg>
-          Date: {{next_track.date}}
-        </div>
-        <div class="small text-body-secondary">
-          <svg [cIcon]="mapIcon"></svg>
-          Length: {{next_track.length}}km
-        </div>
-        <img height="100%" width="100%" src="./assets/images/tracks/monaco.avif"/>
+        <img height="flex" width="100%" src="./assets/images/tracks/{{championshipNextTrack.track_id}}.png"/>
+        <c-row>
+          <c-col>
+            <div class="small text-body-secondary">
+              <svg [cIcon]="calendarIcon"></svg>
+              <strong> Date:</strong> {{championshipNextTrack.date}}
+            </div>
+          </c-col>
+          <c-col class="text-end">
+            <div class="small text-body-secondary">
+              <svg [cIcon]="fireIcon"></svg>
+              <strong> Fastest Lap:</strong> {{championshipNextTrack.besttime_driver_time}} ({{championshipNextTrack.username}})
+            </div>
+          </c-col>
+        </c-row>
       </c-card-body>
     </c-card>
   </c-col>
