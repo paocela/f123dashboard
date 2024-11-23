@@ -868,3 +868,26 @@ FROM
     WHERE driver_id = 5
 )
 GROUP BY date, track_name, driver_id, driver_username, driver_color, cumulative_points
+
+/**************/
+/* NEXT TRACK */
+/**************/
+SELECT outer_table_tracks.name, outer_table_tracks.country, outer_table_tracks.besttime_driver_time,
+outer_table_drivers.username
+FROM
+(
+    SELECT *
+    FROM tracks
+    LEFT JOIN
+    (
+        SELECT *
+        FROM gran_prix
+    ) AS inner_table
+    ON tracks.id = inner_table.track_id
+) AS outer_table_tracks
+LEFT JOIN
+(
+    SELECT *
+    FROM drivers
+) AS outer_table_drivers
+ON outer_table_tracks.besttime_driver_id = outer_table_drivers.id

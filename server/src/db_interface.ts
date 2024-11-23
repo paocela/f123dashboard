@@ -860,4 +860,30 @@ export class PostgresService {
     return JSON.stringify(result.rows);
   }
 
+  /* All championship tracks with best time info */
+  async getAllTracks(): Promise<string> {
+    const result = await this.pool.query (`
+        SELECT outer_table_tracks.name, outer_table_tracks.date, outer_table_tracks.country, outer_table_tracks.besttime_driver_time,
+        outer_table_drivers.username
+        FROM
+        (
+            SELECT *
+            FROM tracks
+            LEFT JOIN
+            (
+                SELECT *
+                FROM gran_prix
+            ) AS inner_table
+            ON tracks.id = inner_table.track_id
+        ) AS outer_table_tracks
+        LEFT JOIN
+        (
+            SELECT *
+            FROM drivers
+        ) AS outer_table_drivers
+        ON outer_table_tracks.besttime_driver_id = outer_table_drivers.id
+    `);
+    return JSON.stringify(result.rows);
+  }
+
 }
