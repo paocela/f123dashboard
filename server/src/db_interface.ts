@@ -863,7 +863,7 @@ export class PostgresService {
   /* All championship tracks with best time info */
   async getAllTracks(): Promise<string> {
     const result = await this.pool.query (`
-        SELECT outer_table_tracks.name, outer_table_tracks.date, outer_table_tracks.country, outer_table_tracks.besttime_driver_time,
+        SELECT outer_table_tracks.track_id, outer_table_tracks.name, outer_table_tracks.date, outer_table_tracks.country, outer_table_tracks.besttime_driver_time,
         outer_table_drivers.username
         FROM
         (
