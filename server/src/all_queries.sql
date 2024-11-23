@@ -872,7 +872,7 @@ GROUP BY date, track_name, driver_id, driver_username, driver_color, cumulative_
 /**************/
 /* NEXT TRACK */
 /**************/
-SELECT outer_table_tracks.name, outer_table_tracks.country, outer_table_tracks.besttime_driver_time,
+SELECT outer_table_tracks.name, outer_table_tracks.date, outer_table_tracks.country, outer_table_tracks.besttime_driver_time,
 outer_table_drivers.username
 FROM
 (
