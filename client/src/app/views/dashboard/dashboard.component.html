@@ -1,5 +1,5 @@
 <c-row>
-  <c-col xs>
+  <c-col xs="12" md="6" >
     <c-card class="mb-4">
       <c-card-header>
         <h4 class="card-title mb-0" id="traffic">Championship Standings</h4>
@@ -41,7 +41,7 @@
                   </div>
                 </td>
                 <td class="text-center">
-                  <img width="50%" src="./assets/images/constructors/{{ user.car_name }}.svg"/>
+                  <img width="100%" height="40px" src="./assets/images/constructors/{{ user.car_name }}.svg"/>
                 </td>
                 <td>
                   <div class="text-nowrap">{{user.pilot_name}} {{user.pilot_surname}}</div>
@@ -102,16 +102,7 @@
               value="Day"
               id="dayRadio"
             />
-            <label
-              (click)="setTrafficPeriod('Day')"
-              cButton
-              cFormCheckLabel
-              color="secondary"
-              variant="outline"
-              for="dayRadio"
-            >
-              Last 7 GP
-            </label>
+            
             <input
               class="btn-check"
               formControlName="trafficRadio"
@@ -127,7 +118,7 @@
               variant="outline"
               for="radioMonth"
             >
-              Last 3 GP
+              Last 8 GP
             </label>
             <input
               class="btn-check"
@@ -136,6 +127,16 @@
               value="Year"
               id="radioYear"
             />
+            <label
+              (click)="setTrafficPeriod('Day')"
+              cButton
+              cFormCheckLabel
+              color="secondary"
+              variant="outline"
+              for="dayRadio"
+            >
+              Last 7 GP
+            </label>
             <label
               (click)="setTrafficPeriod('Year')"
               cButton

@@ -88,23 +88,39 @@ export class DashboardChartsData {
     const colors = [
       {
         // Colore brandInfo
-        backgroundColor: brandInfo,
-        borderColor: brandInfo,
-        pointHoverBackgroundColor: brandInfo,
+        backgroundColor: '#8a2be2',
+        borderColor: '#8a2be2',
+        pointHoverBackgroundColor: '#8a2be2',
         borderWidth: 2,
       },
       {
         // Colore brandSuccess
-        backgroundColor: brandSuccess,
-        borderColor: brandSuccess || '#4dbd74',
-        pointHoverBackgroundColor: '#fff'
+        backgroundColor: '#32cd32',
+        borderColor: '#32cd32',
+        pointHoverBackgroundColor: '#fff',
+        borderWidth: 2,
       },
       {
         // Colore brandDanger
-        backgroundColor: brandDanger,
-        borderColor: brandDanger || '#f86c6b',
-        pointHoverBackgroundColor: brandDanger,
-      }
+        backgroundColor: '#c0c0c0',
+        borderColor: '#c0c0c0',
+        pointHoverBackgroundColor: '#fff',
+        borderWidth: 2,
+      },
+      {
+        // Colore brandSuccess
+        backgroundColor: '#f86c6b',
+        borderColor: '#f86c6b',
+        pointHoverBackgroundColor: '#f86c6b',
+        borderWidth: 2,
+      },
+      {
+        // Colore brandSuccess
+        backgroundColor: '#ffa500',
+        borderColor: '#ffa500',
+        pointHoverBackgroundColor: '#fff',
+        borderWidth: 2,
+      },
     ];
 
     const datasets: ChartDataset[] = [
@@ -122,6 +138,16 @@ export class DashboardChartsData {
         data: this.mainChart['HeavyButt'],
         label: 'HeavyButt',
         ...colors[2]
+      },
+      {
+        data: this.mainChart['Marcogang96'],
+        label: 'Marcogang96',
+        ...colors[3]
+      },
+      {
+        data: this.mainChart['GiannisCorbe'],
+        label: 'GiannisCorbe',
+        ...colors[4]
       }
     ];
 
@@ -166,7 +192,6 @@ export class DashboardChartsData {
   }
 
  
-
   getScales() {
     const colorBorderTranslucent = getStyle('--cui-border-color-translucent');
     const colorBody = getStyle('--cui-body-color');
