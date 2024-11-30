@@ -1,5 +1,5 @@
 <c-row>
-  <c-col xs="12" md="6" >
+  <c-col xs="12" md="6">
     <c-card class="mb-4">
       <c-card-header>
         <h4 class="card-title mb-0" id="traffic">Championship Standings</h4>
@@ -15,41 +15,52 @@
           class="mb-0 border"
         >
           <thead class="text-nowrap text-truncate">
-          <tr>
-            <th class="bg-body-tertiary text-center ">
-              <svg cIcon name="cilPeople"></svg>
-            </th>
-            <th class="bg-body-tertiary"></th>
-            <th class="bg-body-tertiary">Username</th>
-            <th class="bg-body-tertiary text-center">Car</th>
-            <th class="bg-body-tertiary">Pilot</th>
-            <th class="bg-body-tertiary text-center">tot. Points</th>
-          </tr>
+            <tr>
+              <th class="bg-body-tertiary text-center">
+                <svg cIcon name="cilPeople"></svg>
+              </th>
+              <th class="bg-body-tertiary"></th>
+              <th class="bg-body-tertiary">Username</th>
+              <th class="bg-body-tertiary text-center">Car</th>
+              <th class="bg-body-tertiary">Pilot</th>
+              <th class="bg-body-tertiary text-center">tot. Points</th>
+            </tr>
           </thead>
           <tbody>
-            @for (user of championship_standings_users; track user.driver_username; let i = $index) {
-              <tr>
-                <td>
-                  <div class="fw-semibold text-center">#{{ user.driver_id }}</div>
-                </td>
-                <td class="text-center">
-                  <c-avatar [size]="'md'" src="./assets/images/avatars/{{ user.driver_username }}.jpg" />
-                </td>
-                <td>
-                  <div>{{ user.driver_username }}</div>
-                  <div class="small text-body-secondary text-nowrap">
-                  </div>
-                </td>
-                <td class="text-center">
-                  <img width="100%" height="40px" src="./assets/images/constructors/{{ user.car_name }}.svg"/>
-                </td>
-                <td>
-                  <div class="text-nowrap">{{user.pilot_name}} {{user.pilot_surname}}</div>
-                </td>
-                <td>
-                  <div class="fw-semibold text-center">{{ user.total_points }}</div>
-                </td>
-              </tr>
+            @for (user of championship_standings_users; track
+            user.driver_username; let i = $index) {
+            <tr>
+              <td>
+                <div class="fw-semibold text-center">#{{ user.driver_id }}</div>
+              </td>
+              <td class="text-center">
+                <c-avatar
+                  [size]="'md'"
+                  src="./assets/images/avatars/{{ user.driver_username }}.jpg"
+                />
+              </td>
+              <td>
+                <div>{{ user.driver_username }}</div>
+                <div class="small text-body-secondary text-nowrap"></div>
+              </td>
+              <td class="text-center">
+                <img
+                  width="100%"
+                  height="40px"
+                  src="./assets/images/constructors/{{ user.car_name }}.svg"
+                />
+              </td>
+              <td>
+                <div class="text-nowrap">
+                  {{ user.pilot_name }} {{ user.pilot_surname }}
+                </div>
+              </td>
+              <td>
+                <div class="fw-semibold text-center">
+                  {{ user.total_points }}
+                </div>
+              </td>
+            </tr>
             }
           </tbody>
         </table>
@@ -60,23 +71,33 @@
     <c-card class="mb-4">
       <c-card-header>
         <h4 class="card-title mb-0" id="traffic">
-          Next Track: {{championshipNextTrack.name}} 
-          <svg size='lg' [cIcon]="allFlags[championshipNextTrack.country]"></svg>
+          Next Track: {{ championshipNextTrack.name }}
+          <svg
+            size="lg"
+            [cIcon]="allFlags[championshipNextTrack.country]"
+          ></svg>
         </h4>
       </c-card-header>
       <c-card-body>
-        <img height="flex" width="100%" src="./assets/images/tracks/{{championshipNextTrack.track_id}}.png"/>
+        <img
+          height="flex"
+          width="100%"
+          src="./assets/images/tracks/{{ championshipNextTrack.track_id }}.png"
+        />
         <c-row>
           <c-col>
             <div class="small text-body-secondary">
               <svg [cIcon]="calendarIcon"></svg>
-              <strong> Date:</strong> {{championshipNextTrack.date}}
+              <strong> Date:</strong> {{ championshipNextTrack.date }}
             </div>
           </c-col>
           <c-col class="text-end">
             <div class="small text-body-secondary">
               <svg [cIcon]="fireIcon"></svg>
-              <strong> Fastest Lap:</strong> {{championshipNextTrack.besttime_driver_time}} ({{championshipNextTrack.username}})
+              <strong> Fastest Lap:</strong>
+              {{ championshipNextTrack.besttime_driver_time }} ({{
+                championshipNextTrack.username
+              }})
             </div>
           </c-col>
         </c-row>
@@ -92,17 +113,8 @@
         <div class="small text-body-secondary">Pilots trend after every GP</div>
       </c-col>
       <c-col sm="7">
-
         <form [formGroup]="trafficRadioGroup">
           <c-button-group class="float-end me-3" role="group">
-            <input
-              class="btn-check"
-              formControlName="trafficRadio"
-              type="radio"
-              value="Day"
-              id="dayRadio"
-            />
-            
             <input
               class="btn-check"
               formControlName="trafficRadio"
@@ -127,16 +139,6 @@
               value="Year"
               id="radioYear"
             />
-            <label
-              (click)="setTrafficPeriod('Day')"
-              cButton
-              cFormCheckLabel
-              color="secondary"
-              variant="outline"
-              for="dayRadio"
-            >
-              Last 7 GP
-            </label>
             <label
               (click)="setTrafficPeriod('Year')"
               cButton
@@ -163,10 +165,14 @@
     </c-chart>
   </c-card-body>
   <c-card-footer>
-    <c-row class="text-center mb-2" [xl]="5" [lg]="4" [sm]="2" [xs]="1" [gutter]="4">
-      
-
-
+    <c-row
+      class="text-center mb-2"
+      [xl]="5"
+      [lg]="4"
+      [sm]="2"
+      [xs]="1"
+      [gutter]="4"
+    >
     </c-row>
   </c-card-footer>
 </c-card>

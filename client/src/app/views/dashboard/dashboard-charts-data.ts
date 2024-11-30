@@ -63,26 +63,35 @@ export class DashboardChartsData {
 
     let labels: string[] = [];
     if (period === 'Month') {
-      labels = [
-        'Br',
-        'Us',
-        'Es',
-        'Pl',
-        'Pl',
-        'Pl',
-        'Pl',
-        'Pl',
-      ];
+
+      labels = this.championshipTrend
+      .filter(item => item.driver_username === 'FASTman') // Filtra i dati per un pilota
+      .map(item => item.track_name); // Estrai track_name
+
     } else {
       /* tslint:disable:max-line-length */
-      const week = [
-        'Pl',
-        'Es',
-        'Us',
-        'Pl',
-        'Br',
+      labels = [
+        '1',
+        '2',
+        '3',
+        '4',
+        '5',
+        '6',
+        '7',
+        '8',
+        '9',
+        '10',
+        '11',
+        '12',
+        '13',
+        'monza',
+        'imola',
+        'redbull ring',
+        '17',
+        '18',
+        '19',
+        '20',
       ];
-      labels = week.concat(week, week, week);
     }
 
     const colors = [
