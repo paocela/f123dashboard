@@ -297,7 +297,7 @@ ORDER BY total_points DESC
   /* All tracks and standings (for Championship page) */
   async getChampionship(): Promise<string> {
     const result = await this.pool.query(`
-SELECT inner_table_tracks.name AS track_name, gran_prix.date as gran_prix_date,
+SELECT inner_table_tracks.name AS track_name, gran_prix.date as gran_prix_date, inner_table_tracks.country AS track_country,
 inner_table_race."1_place_username" AS driver_race_1_place, inner_table_race."2_place_username" AS driver_race_2_place, inner_table_race."3_place_username" AS driver_race_3_place, inner_table_race."4_place_username" AS driver_race_4_place, inner_table_race."5_place_username" AS driver_race_5_place, inner_table_race."6_place_username" AS driver_race_6_place, inner_table_race."fast_lap_username" AS driver_race_fast_lap, inner_table_race.race_dnf AS race_dnf,
 inner_table_sprint."1_place_username" AS driver_sprint_1_place, inner_table_sprint."2_place_username" AS driver_sprint_2_place, inner_table_sprint."3_place_username" AS driver_sprint_3_place, inner_table_sprint."4_place_username" AS driver_sprint_4_place, inner_table_sprint."5_place_username" AS driver_sprint_5_place, inner_table_sprint."6_place_username" AS driver_sprint_6_place, inner_table_sprint."fast_lap_username" AS driver_sprint_fast_lap, inner_table_sprint.sprint_dnf AS sprint_dnf,
 inner_table_qualifying."1_place_username" AS driver_qualifying_1_place, inner_table_qualifying."2_place_username" AS driver_qualifying_2_place, inner_table_qualifying."3_place_username" AS driver_qualifying_3_place, inner_table_qualifying."4_place_username" AS driver_qualifying_4_place, inner_table_qualifying."5_place_username" AS driver_qualifying_5_place, inner_table_qualifying."6_place_username" AS driver_qualifying_6_place,

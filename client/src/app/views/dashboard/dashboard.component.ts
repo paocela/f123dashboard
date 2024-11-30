@@ -1,4 +1,4 @@
-import { DOCUMENT, NgStyle } from '@angular/common';
+import { DOCUMENT, formatDate, NgStyle } from '@angular/common';
 import { CommonModule } from '@angular/common'; // Importa CommonModule
 import { Component, DestroyRef, effect, inject, OnInit, Renderer2, signal, WritableSignal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
@@ -123,13 +123,9 @@ export class DashboardComponent implements OnInit {
       if ( db_date > current_date )
       {
         this.championshipNextTrack = track;
+        this.championshipNextTrack["date"] = db_date.toLocaleDateString("it-CH");
         break;
       }
-      // TODO: delete this
-      this.championshipNextTrack = track;
-      this.championshipNextTrack["date"] = db_date.toDateString()
-      console.log(this.championshipNextTrack);
-      break;
     }
 
     this.initCharts();

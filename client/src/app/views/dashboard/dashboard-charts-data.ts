@@ -55,6 +55,7 @@ export class DashboardChartsData {
     this.mainChart['HeavyButt'] = [];
     this.mainChart["Marcogang96"] = [];
     this.mainChart["GiannisCorbe"] = [];
+    this.mainChart["Lil Mvrck"] = [];
 
     for (let pippo of this.championshipTrend ){
       this.mainChart[pippo.driver_username].push(pippo.cumulative_points)

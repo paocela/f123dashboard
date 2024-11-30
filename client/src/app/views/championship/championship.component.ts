@@ -45,5 +45,11 @@ export class ChampionshipComponent implements OnInit{
   ngOnInit(): void {
     this.championship_data = this.dbData.getChampionship() ;
 
+    // for (let track of this.championship_data){
+    //   const db_date: Date = new Date(track.date);
+    //   console.log(this.championship_data[track.track_name]);
+    //   //this.championship_data[track.track_name]["track_date"] = db_date.toLocaleDateString("it-CH");
+    // }
+
   }
 }
