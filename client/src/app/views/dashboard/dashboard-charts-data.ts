@@ -11,6 +11,7 @@ import {
 
 import { DeepPartial } from 'chart.js/dist/types/utils';
 import { getStyle, hexToRgba } from '@coreui/utils';
+import {DbDataService} from 'src/app/service/db-data.service';  //aggiunto il servizio per dati db
 
 export interface IChartProps {
   data?: ChartData;
@@ -27,11 +28,12 @@ export interface IChartProps {
   providedIn: 'any'
 })
 export class DashboardChartsData {
-  constructor() {
+  constructor(private dbData: DbDataService) {
     this.initMainChart();
   }
 
   public mainChart: IChartProps = { type: 'line' };
+  public championshipTrend: any[] = [];
 
   public random(min: number, max: number) {
     return Math.floor(Math.random() * (max - min + 1) + min);
@@ -43,18 +45,21 @@ export class DashboardChartsData {
     const brandInfoBg = hexToRgba(getStyle('--cui-info') ?? '#20a8d8', 10);
     const brandDanger = getStyle('--cui-danger') ?? '#f86c6b';
 
+
+    this.championshipTrend = this.dbData.getCumulativePoints() ;
+
     // mainChart
     this.mainChart['elements'] = period === 'Month' ? 12 : 27;
     this.mainChart['redmamba_99_'] = [];
     this.mainChart['FASTman'] = [];
     this.mainChart['HeavyButt'] = [];
+    this.mainChart["Marcogang96"] = [];
+    this.mainChart["GiannisCorbe"] = [];
 
-    // generate random values for mainChart
-    for (let i = 0; i <= this.mainChart['elements']; i++) {
-      this.mainChart['redmamba_99_'].push(this.random(50, 240));
-      this.mainChart['FASTman'].push(this.random(20, 160));
-      this.mainChart['HeavyButt'].push(this.random(20, 200));
+    for (let pippo of this.championshipTrend ){
+      this.mainChart[pippo.driver_username].push(pippo.cumulative_points)
     }
+
 
     let labels: string[] = [];
     if (period === 'Month') {
@@ -83,23 +88,39 @@ export class DashboardChartsData {
     const colors = [
       {
         // Colore brandInfo
-        backgroundColor: brandInfo,
-        borderColor: brandInfo,
-        pointHoverBackgroundColor: brandInfo,
+        backgroundColor: '#8a2be2',
+        borderColor: '#8a2be2',
+        pointHoverBackgroundColor: '#8a2be2',
         borderWidth: 2,
       },
       {
         // Colore brandSuccess
-        backgroundColor: brandSuccess,
-        borderColor: brandSuccess || '#4dbd74',
-        pointHoverBackgroundColor: '#fff'
+        backgroundColor: '#32cd32',
+        borderColor: '#32cd32',
+        pointHoverBackgroundColor: '#fff',
+        borderWidth: 2,
       },
       {
         // Colore brandDanger
-        backgroundColor: brandDanger,
-        borderColor: brandDanger || '#f86c6b',
-        pointHoverBackgroundColor: brandDanger,
-      }
+        backgroundColor: '#c0c0c0',
+        borderColor: '#c0c0c0',
+        pointHoverBackgroundColor: '#fff',
+        borderWidth: 2,
+      },
+      {
+        // Colore brandSuccess
+        backgroundColor: '#f86c6b',
+        borderColor: '#f86c6b',
+        pointHoverBackgroundColor: '#f86c6b',
+        borderWidth: 2,
+      },
+      {
+        // Colore brandSuccess
+        backgroundColor: '#ffa500',
+        borderColor: '#ffa500',
+        pointHoverBackgroundColor: '#fff',
+        borderWidth: 2,
+      },
     ];
 
     const datasets: ChartDataset[] = [
@@ -117,6 +138,16 @@ export class DashboardChartsData {
         data: this.mainChart['HeavyButt'],
         label: 'HeavyButt',
         ...colors[2]
+      },
+      {
+        data: this.mainChart['Marcogang96'],
+        label: 'Marcogang96',
+        ...colors[3]
+      },
+      {
+        data: this.mainChart['GiannisCorbe'],
+        label: 'GiannisCorbe',
+        ...colors[4]
       }
     ];
 
@@ -161,7 +192,6 @@ export class DashboardChartsData {
   }
 
  
-
   getScales() {
     const colorBorderTranslucent = getStyle('--cui-border-color-translucent');
     const colorBody = getStyle('--cui-body-color');

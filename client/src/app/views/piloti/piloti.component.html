@@ -1,11 +1,11 @@
 <div *ngIf="piloti.length; else goto_loading">
   <c-row ngPreserveWhitespaces class="g-1"> <!-- Aggiunto margine tra le colonne -->
-    <c-col *ngFor="let pilota of piloti" xs="12" md="6" lg="4"> <!-- Modificato per avere un layout responsivo e risolvere problema dimensioni su telefoni -->
-      <c-card class="mb-4">
-        <c-card-body>
-          <c-card style="width: 100%;">
+    <c-col *ngFor="let pilota of piloti" xs="12" md="6" lg="3"> <!-- Modificato per avere un layout responsivo e risolvere problema dimensioni su telefoni -->
+      <c-card [cBorder]="pilota.driver_color"  [textColor]="pilota.driver_color" class="mb-4 text-center" >
+        <c-card-body> 
+          <c-card [textColor]="pilota.driver_color" style="width: 100%;">
             <img [cCardImg]="'top'" src='./assets/images/avatars/{{pilota.driver_username}}.jpg' alt="{{ pilota.driver_username }}'s avatar" />
-            <c-card-body>
+            <c-card-body >
               
               <h5 cCardTitle>{{ pilota.driver_username }}</h5>
               <p cCardText>{{ pilota.driver_description }}</p>
