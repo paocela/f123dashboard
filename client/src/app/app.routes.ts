@@ -33,6 +33,11 @@ export const routes: Routes = [
       {
         path: 'championship',
         loadChildren: () => import('./views/championship/routes').then((m) => m.routes)
+      },
+       /* routing fanta */
+      {
+        path: 'fanta',
+        loadChildren: () => import('./views/fanta/routes').then((m) => m.routes)
       }
     ]
   },
