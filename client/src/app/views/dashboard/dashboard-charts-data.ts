@@ -85,9 +85,9 @@ export class DashboardChartsData {
         '11',
         '12',
         '13',
-        'monza',
-        'imola',
-        'redbull ring',
+        '14',
+        '15',
+        '16',
         '17',
         '18',
         '19',
@@ -97,37 +97,44 @@ export class DashboardChartsData {
 
     const colors = [
       {
-        // Colore brandInfo
+        // Colore redmamba_99_
         backgroundColor: '#8a2be2',
         borderColor: '#8a2be2',
         pointHoverBackgroundColor: '#8a2be2',
         borderWidth: 2,
       },
       {
-        // Colore brandSuccess
+        // Colore FASTman
         backgroundColor: '#32cd32',
         borderColor: '#32cd32',
         pointHoverBackgroundColor: '#fff',
         borderWidth: 2,
       },
       {
-        // Colore brandDanger
+        // Colore HeavyButt
         backgroundColor: '#c0c0c0',
         borderColor: '#c0c0c0',
         pointHoverBackgroundColor: '#fff',
         borderWidth: 2,
       },
       {
-        // Colore brandSuccess
+        // Colore Marcogang96
         backgroundColor: '#f86c6b',
         borderColor: '#f86c6b',
         pointHoverBackgroundColor: '#f86c6b',
         borderWidth: 2,
       },
       {
-        // Colore brandSuccess
+        // Colore GiannisCorbe
         backgroundColor: '#ffa500',
         borderColor: '#ffa500',
+        pointHoverBackgroundColor: '#fff',
+        borderWidth: 2,
+      },
+      {
+        // Colore Lil Mvrck
+        backgroundColor: '#6495ed',
+        borderColor: '#6495ed',
         pointHoverBackgroundColor: '#fff',
         borderWidth: 2,
       },
@@ -158,6 +165,11 @@ export class DashboardChartsData {
         data: this.mainChart['GiannisCorbe'],
         label: 'GiannisCorbe',
         ...colors[4]
+      },
+      {
+        data: this.mainChart['Lil Mvrck'],
+        label: 'Lil Mvrckà',
+        ...colors[5]
       }
     ];
 
