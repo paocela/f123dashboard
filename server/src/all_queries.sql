@@ -239,16 +239,16 @@ INNER JOIN
         FROM all_qualifying_points
         INNER JOIN
         (
-            SELECT all_sprint_points.driver_id AS driver_id, SUM(all_sprint_points.sprint_point) AS total_sprint_points, inner_table_3.total_race_points
-            FROM all_sprint_points
-            INNER JOIN
+            SELECT all_race_points.driver_id AS driver_id, SUM(all_race_points.race_point) AS total_race_points, COALESCE(inner_table_3.total_sprint_points,0) AS total_sprint_points
+            FROM all_race_points
+            LEFT JOIN
             (
-                SELECT all_race_points.driver_id AS driver_id, SUM(all_race_points.race_point) AS total_race_points
-                FROM all_race_points
-                GROUP BY all_race_points.driver_id
+                SELECT all_sprint_points.driver_id AS driver_id, SUM(all_sprint_points.sprint_point) AS total_sprint_points 
+                FROM all_sprint_points
+                GROUP BY all_sprint_points.driver_id
             ) AS inner_table_3
-            ON inner_table_3.driver_id = all_sprint_points.driver_id
-            GROUP BY all_sprint_points.driver_id, inner_table_3.total_race_points
+            ON inner_table_3.driver_id = all_race_points.driver_id
+            GROUP BY all_race_points.driver_id, inner_table_3.total_sprint_points
         ) AS inner_table_2
         ON inner_table_2.driver_id = all_qualifying_points.driver_id
         GROUP BY all_qualifying_points.driver_id, inner_table_2.total_race_points, inner_table_2.total_sprint_points
@@ -258,7 +258,6 @@ INNER JOIN
 ) AS inner_table
 ON all_drivers.driver_id = inner_table.driver_id
 ORDER BY total_points DESC
-
 
 
 
@@ -818,7 +817,7 @@ all_free_practice_points AS
 SELECT *
 FROM
 (
-    SELECT date, track_name, driver_id, driver_username, driver_color, SUM(session_point) OVER (ORDER BY date) AS cumulative_points
+    SELECT date, track_name, driver_id, driver_username, driver_color, SUM(session_point) OVER (ORDER BY date, track_name) AS cumulative_points
     FROM
     (
         SELECT date, track_name, driver_id, driver_username, driver_color, race_point AS session_point
@@ -848,7 +847,7 @@ UNION ALL
 SELECT *
 FROM
 (
-    SELECT date, track_name, driver_id, driver_username, driver_color, SUM(session_point) OVER (ORDER BY date) AS cumulative_points
+    SELECT date, track_name, driver_id, driver_username, driver_color, SUM(session_point) OVER (ORDER BY date, track_name) AS cumulative_points
     FROM
     (
         SELECT date, track_name, driver_id, driver_username, driver_color, race_point AS session_point
@@ -878,7 +877,7 @@ UNION ALL
 SELECT *
 FROM
 (
-    SELECT date, track_name, driver_id, driver_username, driver_color, SUM(session_point) OVER (ORDER BY date) AS cumulative_points
+    SELECT date, track_name, driver_id, driver_username, driver_color, SUM(session_point) OVER (ORDER BY date, track_name) AS cumulative_points
     FROM
     (
         SELECT date, track_name, driver_id, driver_username, driver_color, race_point AS session_point
@@ -908,7 +907,7 @@ UNION ALL
 SELECT *
 FROM
 (
-    SELECT date, track_name, driver_id, driver_username, driver_color, SUM(session_point) OVER (ORDER BY date) AS cumulative_points
+    SELECT date, track_name, driver_id, driver_username, driver_color, SUM(session_point) OVER (ORDER BY date, track_name) AS cumulative_points
     FROM
     (
         SELECT date, track_name, driver_id, driver_username, driver_color, race_point AS session_point
@@ -938,7 +937,7 @@ UNION ALL
 SELECT *
 FROM
 (
-    SELECT date, track_name, driver_id, driver_username, driver_color, SUM(session_point) OVER (ORDER BY date) AS cumulative_points
+    SELECT date, track_name, driver_id, driver_username, driver_color, SUM(session_point) OVER (ORDER BY date, track_name) AS cumulative_points
     FROM
     (
         SELECT date, track_name, driver_id, driver_username, driver_color, race_point AS session_point
@@ -968,7 +967,7 @@ UNION ALL
 SELECT *
 FROM
 (
-    SELECT date, track_name, driver_id, driver_username, driver_color, SUM(session_point) OVER (ORDER BY date) AS cumulative_points
+    SELECT date, track_name, driver_id, driver_username, driver_color, SUM(session_point) OVER (ORDER BY date, track_name) AS cumulative_points
     FROM
     (
         SELECT date, track_name, driver_id, driver_username, driver_color, race_point AS session_point
