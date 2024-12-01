@@ -68,7 +68,8 @@ export class DashboardChartsData {
       labels = this.championshipTrend
       .filter(item => item.driver_username === 'FASTman') // Filtra i dati per un pilota
       .map(item => item.track_name); // Estrai track_name
-
+      
+      console.log(labels);
     } else {
       /* tslint:disable:max-line-length */
       labels = [

@@ -21,18 +21,15 @@ export const navItems: INavData[] = [
     name: 'Championship',
     url: '/championship',
     iconComponent: { name: 'cil-calendar' },
-    badge: {
-      color: 'info',
-      text: 'NEW'
-    }
+
   },
   {
     name: 'Fanta',
     url: '/fanta',
-    iconComponent: { name: 'cil-casino' },
+    iconComponent: { name: 'cilCasino' },
     badge: {
-      color: 'info',
-      text: 'NEW'
+      color: 'danger',
+      text: 'Coming Soon'
     }
   }
 ];
