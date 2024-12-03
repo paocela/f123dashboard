@@ -8,5 +8,11 @@ import { Component } from '@angular/core';
   styleUrl: './fanta.component.scss'
 })
 export class FantaComponent {
+  username: any = '';
+  ngOnInit(): void {
 
+      this.username = sessionStorage.getItem('user');
+      
+    
+  }
 }
