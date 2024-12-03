@@ -1,4 +1,42 @@
 <div>
-    <h1>{{username}}</h1>
-    <img src="assets/images/under_construction_fanta.png" style="max-width: 100%;" alt="Fanta F1 RaceForFederica">
+    <c-container class="m-2">
+        <c-row>
+            <c-col>
+                <h1>Ciao {{username}}</h1>
+            </c-col>
+            <c-col>
+                <div class="align">
+                    <button cButton
+                    (click)="this.logout()"
+                    >
+                    Logout
+                    </button>
+                </div>
+            </c-col>
+        </c-row>
+    </c-container>  
+    <c-container>
+        <c-row *ngFor="let posizione of posizioni | keyvalue" class="m-2">
+            <c-col>
+                seleziona il pilota che arrivera {{posizione?.value}}
+                <img *ngIf="posizione.key<=3" 
+                class="cIcon" 
+                style="width: 25px;"
+                attr.src="assets/medals/{{medals.get(posizione.key)}}">
+            </c-col>
+            <c-col>
+                <select attr.aria-label="seleziona il pilota che arrivera {{posizione?.value}}" 
+                attr.id="{{posizione.key}}" 
+                cSelect
+                >
+                    <option>Seleziona il Pilota</option>
+                    <option *ngFor="let pilota of piloti" 
+                    attr.value="{{pilota.driver_id}}"
+                    >
+                        {{pilota.driver_username}}
+                    </option>
+                </select>
+            </c-col>
+        </c-row>
+    </c-container>
 </div>

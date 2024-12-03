@@ -31,7 +31,7 @@ export class AuthService {
 
   logout(): void {
     this.currentUser = null;
-    localStorage.removeItem('user');
-    localStorage.removeItem('isLoggedIn');
+    sessionStorage.removeItem('user');
+    sessionStorage.removeItem('isLoggedIn');
   }
 }

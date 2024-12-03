@@ -1,12 +1,12 @@
 import { NgIf } from '@angular/common';
 import { Component } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
 import { Router, ActivatedRoute } from '@angular/router';
-import { AppComponent } from 'src/app/app.component';
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';    
 import { FormsModule } from '@angular/forms';
+import { FormModule } from '@coreui/angular';
 import { AuthService } from './../../service/auth.service';
+import { GridModule } from '@coreui/angular';
+import { ButtonDirective } from '@coreui/angular';
 
 @Component({
   selector: 'app-login',
@@ -14,7 +14,10 @@ import { AuthService } from './../../service/auth.service';
   imports: [
     NgIf,
     CommonModule,
-    FormsModule
+    FormsModule,
+    FormModule,
+    ButtonDirective,
+    GridModule
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
