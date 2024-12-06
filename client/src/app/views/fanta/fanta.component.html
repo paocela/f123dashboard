@@ -5,6 +5,9 @@
                 <h1>Ciao {{username}}</h1>
             </c-col>
             <c-col xs="auto">
+                <h3 [ngStyle]="{'color':'green'}" >Punteggio: {{getUserPoints()}}</h3>
+            </c-col>
+            <c-col xs="auto">
                 <div class="align">
                     <button cButton
                     (click)="this.logout()"
@@ -21,14 +24,14 @@
             <p class="lead">Qui puoi inserire le votazioni per ogni gp che verrà disputato</p>
         </c-row>
         <c-row>
-              <c-accordion>
+            <c-accordion>
                 <c-accordion-item 
                     #item0="cAccordionItem" 
                     [visible]="false"
                     *ngFor="let track of nextTracks"
                 >
                 <strong>{{track.track_name}}</strong>
-                  <ng-template cTemplateId="accordionHeaderTemplate">
+                <ng-template cTemplateId="accordionHeaderTemplate">
                     <button (click)="item0.toggleItem()" [collapsed]="!item0.visible" cAccordionButton>
                         <c-container>
                             <c-row>
@@ -45,8 +48,8 @@
                             </c-row>
                         </c-container>
                     </button>
-                  </ng-template>
-                  <ng-template cTemplateId="accordionBodyTemplate">
+                </ng-template>
+                <ng-template cTemplateId="accordionBodyTemplate">
                     <div class="accordion-body">
                         <form cForm (ngSubmit)="onVoto(track.track_id)">
                             <c-container>
@@ -61,7 +64,8 @@
                                     <c-col>
                                         <select attr.aria-label="seleziona il pilota che arrivera {{posizione?.value}}" 
                                         attr.id="{{track.track_id+posizione.key}}" 
-                                        [(ngModel)]="voto[posizione.key]" 
+                                        [ngModel]="getVoto(track.track_id, posizione.key)"
+                                        (ngModelChange)="setVoto(track.track_id, posizione.key, $event)"
                                         name="voto{{track.track_id+posizione.key}}"
                                         cSelect
                                         >
@@ -80,10 +84,107 @@
                             </c-container>
                         </form>
                     </div>
-                  </ng-template>
+                </ng-template>
                 </c-accordion-item>
-              </c-accordion>
+            </c-accordion>
         </c-row>
     </c-container>  
-    
+    <c-container *ngIf="previusTracks.length > 0">
+        <c-row >
+            <h2 class="mt-4">Votazioni pregresse</h2>
+        </c-row>
+        <c-row>
+            <c-accordion>
+                <c-accordion-item 
+                    #item0="cAccordionItem" 
+                    [visible]="false"
+                    *ngFor="let track of previusTracks"
+                >
+                    <strong>{{track.track_name}}</strong>
+                    <ng-template cTemplateId="accordionHeaderTemplate">
+                        <button (click)="item0.toggleItem()" [collapsed]="!item0.visible" cAccordionButton>
+                            <c-container>
+                                <c-row>
+                                    <c-col xs="auto" class="me-auto">
+                                        <h5 class="card-title mb-0" id="traffic">
+                                            <svg class="mx-1" size='lg' [cIcon]="allFlags[track.country]"></svg>
+                                            <strong>{{track.name}}</strong>
+                                            <svg class="mx-1" size='lg' [cIcon]="allFlags[track.country]"></svg>
+                                        </h5>
+                                    </c-col>
+                                    <c-col xs="auto">
+                                        <div class="small">{{track.date | date: 'dd/MM/yyyy'}}</div>
+                                    </c-col>
+                                </c-row>
+                            </c-container>
+                        </button>
+                    </ng-template>
+                    <ng-template cTemplateId="accordionBodyTemplate">
+                        <div class="accordion-body">
+                            <c-container>
+                                <c-row>
+                                    <table
+                                    [hover]="true"
+                                    [responsive]="true"
+                                    [striped]="true"
+                                    align="middle"
+                                    cTable
+                                    class="mb-0 border"
+                                    >
+                                        <thead class="text-nowrap text-truncate">
+                                        <tr>
+                                            <th class="bg-body-tertiary text-center">
+                                                voto
+                                            </th>
+                                            <th class="bg-body-tertiary"></th>
+                                            <th class="bg-body-tertiary">Username</th>
+                                            <th class="bg-body-tertiary text-center">Posizione di arrivo</th>
+                                            <th class="bg-body-tertiary text-center">punti Effettuati</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                            @for (voto of votazioni.get(+track.track_id); track
+                                                voto; let i = $index) {
+                                                <tr>
+                                                    <td>
+                                                        <div class="text-center">
+                                                            <div [class]="">#{{ i+1 }}</div>
+                                                            <svg [cIcon]="isCorrect(voto, +track.track_id)" size='lg' ></svg>
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <c-avatar
+                                                            [size]="'md'"
+                                                            src="./assets/images/avatars/{{ getPilota(voto).driver_username }}.png"
+                                                        />
+                                                    </td>
+                                                    <td>
+                                                        <div>{{ getPilota(voto).driver_username }}</div>
+                                                        <div class="small text-body-secondary text-nowrap"></div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="fw-semibold text-center">
+                                                            {{ getPosizioneArrivo(voto, +track.track_id) }}
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="fw-semibold text-center">
+                                                            {{ getPunti(voto, +track.track_id) }}
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </c-row>
+                                <c-row class="m-3" >
+                                    <h4 class="text-center" >Totale Punti: {{ getPuntiGp(+track.track_id) }}</h4>
+                                </c-row>
+                            </c-container>
+                        </div>
+                    </ng-template>
+                </c-accordion-item>
+            </c-accordion>
+        </c-row>
+    </c-container>
 </div>

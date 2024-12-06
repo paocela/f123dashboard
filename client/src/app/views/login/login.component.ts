@@ -7,6 +7,8 @@ import { FormModule } from '@coreui/angular';
 import { AuthService } from './../../service/auth.service';
 import { GridModule } from '@coreui/angular';
 import { ButtonDirective } from '@coreui/angular';
+import { PilotiComponent } from "../piloti/piloti.component";
+import { LeaderboardComponent } from "../../../components/leaderboard/leaderboard.component";
 
 @Component({
   selector: 'app-login',
@@ -17,8 +19,9 @@ import { ButtonDirective } from '@coreui/angular';
     FormsModule,
     FormModule,
     ButtonDirective,
-    GridModule
-  ],
+    GridModule,
+    LeaderboardComponent
+],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
