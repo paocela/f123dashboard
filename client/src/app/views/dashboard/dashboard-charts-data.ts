@@ -34,6 +34,7 @@ export class DashboardChartsData {
 
   public mainChart: IChartProps = { type: 'line' };
   public championshipTrend: any[] = [];
+  public championshipTracks: any[] = [];
 
   public random(min: number, max: number) {
     return Math.floor(Math.random() * (max - min + 1) + min);
@@ -45,8 +46,8 @@ export class DashboardChartsData {
     const brandInfoBg = hexToRgba(getStyle('--cui-info') ?? '#20a8d8', 10);
     const brandDanger = getStyle('--cui-danger') ?? '#f86c6b';
 
-
     this.championshipTrend = this.dbData.getCumulativePoints() ;
+    this.championshipTracks = this.dbData.getAllTracks();
 
     // mainChart
     this.mainChart['elements'] = period === 'Month' ? 12 : 27;
@@ -61,39 +62,24 @@ export class DashboardChartsData {
       this.mainChart[pippo.driver_username].push(pippo.cumulative_points)
     }
 
-
     let labels: string[] = [];
     if (period === 'Month') {
-
+    
       labels = this.championshipTrend
       .filter(item => item.driver_username === 'FASTman') // Filtra i dati per un pilota
       .map(item => item.track_name); // Estrai track_name
-      
-      console.log(labels);
+
+      //se minore di 8 record prendi le piste da qui 
+      if (labels.length<8){
+        labels = this.championshipTracks.slice(0, 8).map(track => track.country);
+      }
+      else {
+        labels=labels.slice(labels.length-8, labels.length)
+      }
+
     } else {
       /* tslint:disable:max-line-length */
-      labels = [
-        '1',
-        '2',
-        '3',
-        '4',
-        '5',
-        '6',
-        '7',
-        '8',
-        '9',
-        '10',
-        '11',
-        '12',
-        '13',
-        '14',
-        '15',
-        '16',
-        '17',
-        '18',
-        '19',
-        '20',
-      ];
+      labels = this.championshipTracks.map(track => track.country); ;
     }
 
     const colors = [
