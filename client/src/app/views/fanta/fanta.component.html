@@ -10,7 +10,7 @@
             <c-col xs="auto">
                 <div class="align">
                     <button cButton
-                    (click)="this.logout()"
+                    (click)="this.authService.logout()"
                     >
                     Logout
                     </button>
@@ -63,13 +63,14 @@
                                     </c-col>
                                     <c-col>
                                         <select attr.aria-label="seleziona il pilota che arrivera {{posizione?.value}}" 
-                                        attr.id="{{track.track_id+posizione.key}}" 
-                                        [ngModel]="getVoto(track.track_id, posizione.key)"
-                                        (ngModelChange)="setVoto(track.track_id, posizione.key, $event)"
-                                        name="voto{{track.track_id+posizione.key}}"
-                                        cSelect
-                                        >
-                                            <option>Seleziona il Pilota</option>
+                                            attr.id="{{track.track_id+posizione.key}}" 
+                                            [ngModel]="getVoto(track.track_id, posizione.key)"
+                                            (ngModelChange)="setVoto(track.track_id, posizione.key, $event)"
+                                            name="voto{{track.track_id+posizione.key}}"
+                                            cSelect
+                                            cFormControl
+                                            required="true"
+                                        >                
                                             <option *ngFor="let pilota of piloti" 
                                             attr.value="{{pilota.driver_id}}"
                                             >
@@ -79,8 +80,11 @@
                                     </c-col>
                                 </c-row>
                                 <c-row>
-                                    <input cButton type="submit" color="">
+                                    <p *ngIf="errorMessage" class="error ">{{ errorMessage }}</p>
                                 </c-row>
+                                <c-row>
+                                    <input cButton type="submit" color="">
+                                </c-row>                               
                             </c-container>
                         </form>
                     </div>
@@ -133,13 +137,12 @@
                                     >
                                         <thead class="text-nowrap text-truncate">
                                         <tr>
-                                            <th class="bg-body-tertiary text-center">
-                                                voto
-                                            </th>
+                                            <th class="bg-body-tertiary text-center"></th>
+                                            <th class="bg-body-tertiary text-center">voto</th>
                                             <th class="bg-body-tertiary"></th>
                                             <th class="bg-body-tertiary">Username</th>
                                             <th class="bg-body-tertiary text-center">Posizione di arrivo</th>
-                                            <th class="bg-body-tertiary text-center">punti Effettuati</th>
+                                            <th class="bg-body-tertiary text-center">Punti Effettuati</th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -148,8 +151,12 @@
                                                 <tr>
                                                     <td>
                                                         <div class="text-center">
-                                                            <div [class]="">#{{ i+1 }}</div>
                                                             <svg [cIcon]="isCorrect(voto, +track.track_id)" size='lg' ></svg>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="text-center">
+                                                            <div [class]="">#{{ i+1 }}</div>
                                                         </div>
                                                     </td>
                                                     <td class="text-center">

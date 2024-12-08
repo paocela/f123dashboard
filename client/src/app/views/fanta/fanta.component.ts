@@ -8,7 +8,6 @@ import { AccordionComponent,
     FormModule, 
     SharedModule,
     ButtonDirective, 
-    DropdownComponent,  
     TemplateIdDirective,
     AccordionButtonDirective,
     TableDirective,
@@ -20,7 +19,7 @@ import { DbDataService } from 'src/app/service/db-data.service';
 import { cifAe, cifAt, cifAu, cifAz, cifBe, cifBh, cifBr, cifCa, cifCn, cifEs, cifGb, cifHu, cifIt, 
     cifJp, cifMc, cifMx, cifNl, cifQa, cifSa, cifSg, cifUs, cilX, cilCheck } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
-import { map } from 'rxjs';
+import { Fanta } from '../../model/fanta';
 
 @Component({
   selector: 'app-fanta',
@@ -47,8 +46,9 @@ import { map } from 'rxjs';
   styleUrl: './fanta.component.scss'
 })
 export class FantaComponent {
-
-  username: any = '';
+  errorMessage: string = '';
+  username: string | null = '';
+  userId!: number;
   piloti: any[] = [];
   tracks: any[] = [];
   nextTracks: any[] = [];
@@ -63,42 +63,43 @@ export class FantaComponent {
     [4, "quarto"],
     [5, "quinto"],
     [6, "sesto"]
-]);
+  ]);
 
-medals = new Map<number, string>([
-  [1, "medal_first.png"],
-  [2, "medal_second.png"],
-  [3, "medal_third.png"]
-]);
+  medals = new Map<number, string>([
+    [1, "medal_first.png"],
+    [2, "medal_second.png"],
+    [3, "medal_third.png"]
+  ]);
 
-public allFlags: {[key: string]: any} = {
-  "Barhain": cifBh,
-  "Arabia Saudita": cifSa,
-  "Australia": cifAu,
-  "Giappone": cifJp,
-  "Cina": cifCn,
-  "USA": cifUs,
-  "Monaco": cifMc,
-  "Canada": cifCa,
-  "Spagna": cifEs,
-  "Austria": cifAt,
-  "UK": cifGb,
-  "Ungheria": cifHu,
-  "Belgio": cifBe,
-  "Olanda": cifNl,
-  "Italia": cifIt,
-  "Azerbaijan": cifAz,
-  "Singapore": cifSg,
-  "Messico": cifMx,
-  "Brasile": cifBr,
-  "Qatar": cifQa,
-  "Emirati Arabi Uniti": cifAe,
-};
+  public allFlags: {[key: string]: any} = {
+    "Barhain": cifBh,
+    "Arabia Saudita": cifSa,
+    "Australia": cifAu,
+    "Giappone": cifJp,
+    "Cina": cifCn,
+    "USA": cifUs,
+    "Monaco": cifMc,
+    "Canada": cifCa,
+    "Spagna": cifEs,
+    "Austria": cifAt,
+    "UK": cifGb,
+    "Ungheria": cifHu,
+    "Belgio": cifBe,
+    "Olanda": cifNl,
+    "Italia": cifIt,
+    "Azerbaijan": cifAz,
+    "Singapore": cifSg,
+    "Messico": cifMx,
+    "Brasile": cifBr,
+    "Qatar": cifQa,
+    "Emirati Arabi Uniti": cifAe,
+  };
 
-  constructor(public authService: AuthService, private router: Router, private dbData: DbDataService){}
+  constructor(public authService: AuthService, private dbData: DbDataService){}
 
   ngOnInit(): void {
       this.username = sessionStorage.getItem('user');
+      this.userId = Number(sessionStorage.getItem('userId'));
       this.piloti  = this.dbData.getAllDrivers();
 
       this.tracks = this.dbData.getAllTracks();
@@ -112,30 +113,44 @@ public allFlags: {[key: string]: any} = {
       this.votazioni.set(1, previusVote);
 
       this.nextTracks = this.tracks
-                        .filter(item => new Date(item.date) >= new Date())
-                        .slice(0,4);
+        .filter(item => new Date(item.date) >= new Date())
+        .slice(0,4);
       this.previusTracks = this.tracks
         .filter(item => new Date(item.date) < new Date());
-      console.log(this.piloti);
-      console.log(this.posizioni);
-      console.log(this.tracks);
-      console.log(this.votazioni);
-      console.log(this.votazioni.get(1));
   }
 
-  logout(){
-    this.authService.logout()
-    this.router.navigate(['/']);
+
+  onVoto(trackId: number) {
+    if(this.formIsValid(trackId)){
+      this.errorMessage = '';
+      let fantaVoto: Fanta = {
+        fantaPlayerId: this.userId,
+        place1Id: this.getVoto(trackId,1),
+        place2Id: this.getVoto(trackId,2),
+        place3Id: this.getVoto(trackId,3),
+        place4Id: this.getVoto(trackId,4),
+        place5Id: this.getVoto(trackId,5),
+        place6Id: this.getVoto(trackId,6),
+        raceId: trackId,
+      };
+      console.log(fantaVoto);
+   } else {
+    this.errorMessage = 'piloti assenti o inseriti più volte';
+   }
   }
 
-  onVoto(trackName: number) {
-    console.log("votazione di: " + this.username + " per pista " + trackName);
-    console.log(this.votazioni.get(trackName));
+  formIsValid(trackId: number): boolean {
+    const votoArray = this.votazioni.get(trackId) || [];
+    const hasDuplicates = votoArray.some((v, i) => votoArray.indexOf(v) !== i);
+    if(hasDuplicates || votoArray.length < 6){
+      return false;
+    }
+    return true;
   }
 
   getVoto(trackId: number, index: number): number {
     const votoArray = this.votazioni.get(trackId) || [];
-    return votoArray[index] || 0;
+    return votoArray[index-1] || 0;
   }
 
   getVoti(trackId: number): number[] | undefined{ 
@@ -143,12 +158,14 @@ public allFlags: {[key: string]: any} = {
   }
   
   setVoto(trackId: number, index: number, valore: number): void {
-    let votoArray = this.votazioni.get(trackId);
-    if (!votoArray) {
-      votoArray = [];
-      this.votazioni.set(trackId, votoArray);
+    if(valore){
+      let votoArray = this.votazioni.get(trackId);
+      if (!votoArray) {
+        votoArray = [];
+        this.votazioni.set(trackId, votoArray);
+      }
+      votoArray[index-1] = valore;
     }
-    votoArray[index] = valore;
   }
 
   getPilota(id: number): any | null{

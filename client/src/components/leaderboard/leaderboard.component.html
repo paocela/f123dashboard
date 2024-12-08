@@ -1,1 +1,44 @@
-<p>leaderboard works!</p>
+<c-container class="my-4">
+    <c-row>
+        <h2 class="text-center">Classifica Fanta</h2>
+    </c-row>
+    <c-row>
+        <table
+        [hover]="true"
+        [responsive]="true"
+        [striped]="true"
+        align="middle"
+        cTable
+        class="mb-0 border"
+        >
+            <thead class="text-nowrap text-truncate">
+            <tr>
+                <th class="bg-body-tertiary text-center"></th>
+                <th class="bg-body-tertiary">Username</th>
+                <th class="bg-body-tertiary text-center">Punti Effettuati</th>
+            </tr>
+            </thead>
+            <tbody>
+                @for ( leaderBoard of leaderBoards ; track
+                    leaderBoard.id; let i = $index) {
+                    <tr>
+                        <td>
+                            <div class="text-center">
+                                <div [class]="">#{{ i+1 }}</div>
+                            </div>
+                        </td>
+                        <td>
+                            <div>{{ leaderBoard.username }}</div>
+                            <div class="small text-body-secondary text-nowrap"></div>
+                        </td>
+                        <td>
+                            <div class="fw-semibold text-center">
+                                {{ getTotalPoints(leaderBoard.id)}}
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </c-row>
+</c-container>
