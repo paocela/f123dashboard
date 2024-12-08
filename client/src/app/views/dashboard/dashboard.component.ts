@@ -142,9 +142,6 @@ export class DashboardComponent implements OnInit {
 
     this.initCharts();
     this.updateChartOnColorModeChange();
-
-    console.log(this.championshipTrend)
-    //console.log(this.mainChart)
   }
 
   initCharts(): void {
