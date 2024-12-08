@@ -1048,4 +1048,113 @@ ON outer_table_tracks.besttime_driver_id = outer_table_drivers.id
     return JSON.stringify(result.rows);
   }
 
+
+  /* All fanta participants with gp picks */
+  async getAllFanta(): Promise<string> {
+    const result = await this.pool.query (`
+WITH all_session_points AS
+(
+    SELECT inner_table_tracks.name AS track_name, gran_prix.date as gran_prix_date, inner_table_tracks.country AS track_country,
+    inner_table_race."race_id" AS race_id, inner_table_race."1_place_id" AS driver_race_1_place, inner_table_race."2_place_id" AS driver_race_2_place, inner_table_race."3_place_id" AS driver_race_3_place, inner_table_race."4_place_id" AS driver_race_4_place, inner_table_race."5_place_id" AS driver_race_5_place, inner_table_race."6_place_id" AS driver_race_6_place, inner_table_race."fast_lap_id" AS driver_race_fast_lap
+    FROM gran_prix
+    LEFT JOIN
+    (
+        SELECT first_table.race_id, first_table.race_dnf, first_table."1_place_id", second_table."2_place_id", third_table."3_place_id", fourth_table."4_place_id", fifth_table."5_place_id", sixth_table."6_place_id", fast_lap_table."fast_lap_id"
+        FROM
+        (
+            SELECT race_results.id AS race_id, race_results.dnf AS race_dnf, drivers.id AS "1_place_id"
+            FROM race_results
+            LEFT JOIN drivers 
+            ON race_results."1_place_id" = drivers.id
+        ) AS first_table
+        INNER JOIN
+        (
+            SELECT race_results.id AS race_id, drivers.id AS "2_place_id"
+            FROM race_results
+            LEFT JOIN drivers 
+            ON race_results."2_place_id" = drivers.id
+        ) AS second_table
+        ON first_table.race_id = second_table.race_id
+        INNER JOIN
+        (
+            SELECT race_results.id AS race_id, drivers.id AS "3_place_id"
+            FROM race_results
+            LEFT JOIN drivers 
+            ON race_results."3_place_id" = drivers.id
+        ) AS third_table
+        ON first_table.race_id = third_table.race_id
+        INNER JOIN
+        (
+            SELECT race_results.id AS race_id, drivers.id AS "4_place_id"
+            FROM race_results
+            LEFT JOIN drivers 
+            ON race_results."4_place_id" = drivers.id
+        ) AS fourth_table
+        ON first_table.race_id = fourth_table.race_id
+        INNER JOIN
+        (
+            SELECT race_results.id AS race_id, drivers.id AS "5_place_id"
+            FROM race_results
+            LEFT JOIN drivers 
+            ON race_results."5_place_id" = drivers.id
+        ) AS fifth_table
+        ON first_table.race_id = fifth_table.race_id
+        INNER JOIN
+        (
+            SELECT race_results.id AS race_id, drivers.id AS "6_place_id"
+            FROM race_results
+            LEFT JOIN drivers 
+            ON race_results."6_place_id" = drivers.id
+        ) AS sixth_table
+        ON first_table.race_id = sixth_table.race_id
+        INNER JOIN
+        (
+            SELECT race_results.id AS race_id, drivers.id AS "fast_lap_id"
+            FROM race_results
+            LEFT JOIN drivers 
+            ON race_results."fast_lap_id" = drivers.id
+        ) AS fast_lap_table
+        ON first_table.race_id = fast_lap_table.race_id
+    ) AS inner_table_race
+    ON gran_prix.race_results_id = inner_table_race.race_id
+    LEFT JOIN
+    (
+        SELECT *
+        FROM tracks
+    ) AS inner_table_tracks
+    ON gran_prix.track_id = inner_table_tracks.id
+),
+all_fanta_picks AS
+(
+    SELECT *
+    FROM fanta
+    LEFT JOIN
+    (
+        SELECT *
+        FROM fanta_player
+    ) AS inner_table
+    ON fanta.fanta_player_id = inner_table.id
+)
+
+SELECT track_name, driver_race_1_place, driver_race_2_place, driver_race_3_place, driver_race_4_place, driver_race_5_place, driver_race_6_place, driver_race_fast_lap, 
+fanta_player_id, "1_place_pick", "2_place_pick", "3_place_pick", "4_place_pick", "5_place_pick", "6_place_pick", fast_lap_pick, username, name, surname
+FROM all_session_points
+LEFT JOIN
+(
+    SELECT race_id, fanta_player_id, 
+    "1_place_id" AS "1_place_pick",
+    "2_place_id" AS "2_place_pick",
+    "3_place_id" AS "3_place_pick",
+    "4_place_id" AS "4_place_pick",
+    "5_place_id" AS "5_place_pick",
+    "6_place_id" AS "6_place_pick", 
+    fast_lap_id AS "fast_lap_pick",
+    username, name, surname
+    FROM all_fanta_picks
+) AS inner_table
+ON all_session_points.race_id = inner_table.race_id
+    `);
+    return JSON.stringify(result.rows);
+  }
+
 }

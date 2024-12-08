@@ -19,8 +19,15 @@ import {
   ProgressComponent,
   RowComponent,
   TableDirective,
-  TextColorDirective
+  TextColorDirective,
+  CarouselComponent,
+  CarouselControlComponent,
+  CarouselIndicatorsComponent,
+  CarouselInnerComponent,
+  CarouselItemComponent,
+  ThemeDirective
 } from '@coreui/angular';
+import { RouterLink } from '@angular/router';
 import { ChartjsComponent } from '@coreui/angular-chartjs';
 import { IconDirective } from '@coreui/icons-angular';
 import { cilCalendar, cilMap, cilFire } from '@coreui/icons';
@@ -53,7 +60,7 @@ interface NextTrack {
   templateUrl: 'dashboard.component.html',
   styleUrls: ['dashboard.component.scss'],
   standalone: true,
-  imports: [DatePipe, CommonModule, TextColorDirective, CardComponent, CardBodyComponent, RowComponent, ColComponent, ButtonDirective, IconDirective, ReactiveFormsModule, ButtonGroupComponent, FormCheckLabelDirective, ChartjsComponent, NgStyle, CardFooterComponent, GutterDirective, ProgressBarDirective, ProgressComponent, CardHeaderComponent, TableDirective, AvatarComponent]
+  imports: [ThemeDirective, CarouselComponent, CarouselIndicatorsComponent, CarouselInnerComponent, CarouselItemComponent, CarouselControlComponent, RouterLink, DatePipe, CommonModule, TextColorDirective, CardComponent, CardBodyComponent, RowComponent, ColComponent, ButtonDirective, IconDirective, ReactiveFormsModule, ButtonGroupComponent, FormCheckLabelDirective, ChartjsComponent, NgStyle, CardFooterComponent, GutterDirective, ProgressBarDirective, ProgressComponent, CardHeaderComponent, TableDirective, AvatarComponent]
 })
 export class DashboardComponent implements OnInit {
 
@@ -67,7 +74,7 @@ export class DashboardComponent implements OnInit {
   public championship_standings_users: any[] = [];
   public championshipTrend: any[] = [];
   public championshipTracks: any[] = [];
-  public championshipNextTrack: any;
+  public championshipNextTracks: any[] = [];
 
   public allFlags: {[key: string]: any} = {
     "Barhain": cifBh,
@@ -117,22 +124,24 @@ export class DashboardComponent implements OnInit {
     this.championshipTracks = this.dbData.getAllTracks();
 
     // filter next championship track
+    var i = 0;
     const current_date: Date = new Date();
     for (let track of this.championshipTracks){
       const db_date: Date = new Date(track.date);
       if ( db_date > current_date )
       {
-        this.championshipNextTrack = track;
-        this.championshipNextTrack["date"] = db_date.toLocaleDateString("it-CH");
-        break;
+        this.championshipNextTracks[i] = track;
+        this.championshipNextTracks[i]["date"] = db_date.toLocaleDateString("it-CH");
+        i++;
+        if (i == 2)
+        {
+          break;
+        }
       }
     }
 
     this.initCharts();
     this.updateChartOnColorModeChange();
-
-    console.log(this.championshipTrend)
-    //console.log(this.mainChart)
   }
 
   initCharts(): void {

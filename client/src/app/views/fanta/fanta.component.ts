@@ -1,6 +1,5 @@
 import { DatePipe, NgIf } from '@angular/common';
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';    
 import { FormsModule } from '@angular/forms';
 import { AccordionComponent, 
@@ -20,6 +19,7 @@ import { cifAe, cifAt, cifAu, cifAz, cifBe, cifBh, cifBr, cifCa, cifCn, cifEs, c
     cifJp, cifMc, cifMx, cifNl, cifQa, cifSa, cifSg, cifUs, cilX, cilCheck } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
 import { Fanta } from '../../model/fanta';
+
 
 @Component({
   selector: 'app-fanta',
@@ -56,6 +56,9 @@ export class FantaComponent {
   //voto: number[] = [];
   votazioni: Map<number, number[]> = new Map<number, number[]>();
 
+  public fantaData: any[] = [];
+  public fantaPoints: any[] = [];
+  
   posizioni = new Map<number, string>([
     [1, "primo"],
     [2, "secondo"],
@@ -98,27 +101,42 @@ export class FantaComponent {
   constructor(public authService: AuthService, private dbData: DbDataService){}
 
   ngOnInit(): void {
-      this.username = sessionStorage.getItem('user');
-      this.userId = Number(sessionStorage.getItem('userId'));
-      this.piloti  = this.dbData.getAllDrivers();
 
-      this.tracks = this.dbData.getAllTracks();
-     
-      //test votazione pregeressa
-      const updatedDate = "2024-12-05T23:00:00.000Z";
-      this.tracks = this.tracks.map(item => 
-        item.track_id === "1" ? { ...item, date: updatedDate } : item
-      );
-      const previusVote: number[] = [1,2,3,4,5,6];
-      this.votazioni.set(1, previusVote);
+    this.fantaData = this.dbData.getAllFanta();
 
-      this.nextTracks = this.tracks
-        .filter(item => new Date(item.date) >= new Date())
-        .slice(0,4);
-      this.previusTracks = this.tracks
-        .filter(item => new Date(item.date) < new Date());
+    for (let fanta_entry of this.fantaData) {
+      this.fantaPoints[fanta_entry["username"]] += this.calculateFantaPoints(fanta_entry);
+    }
+    console.log(this.fantaPoints);
+
+    this.username = sessionStorage.getItem('user');
+    this.userId = Number(sessionStorage.getItem('userId'));
+    this.piloti  = this.dbData.getAllDrivers();
+
+    this.tracks = this.dbData.getAllTracks();
+    
+    //test votazione pregeressa
+    const updatedDate = "2024-12-05T23:00:00.000Z";
+    this.tracks = this.tracks.map(item => 
+      item.track_id === "1" ? { ...item, date: updatedDate } : item
+    );
+    const previusVote: number[] = [1,2,3,4,5,6];
+    this.votazioni.set(1, previusVote);
+
+    this.nextTracks = this.tracks
+      .filter(item => new Date(item.date) >= new Date())
+      .slice(0,4);
+    this.previusTracks = this.tracks
+      .filter(item => new Date(item.date) < new Date());
   }
 
+  calculateFantaPoints(entry: any): number {
+    var results_array = [entry["driver_race_1_place"], entry["driver_race_2_place"], entry["driver_race_3_place"], entry["driver_race_4_place"], entry["driver_race_5_place"], entry["driver_race_6_place"], entry["driver_race_fast_lap"]];
+    var picks_array = [entry["1_place_pick"], entry["2_place_pick"], entry["3_place_pick"], entry["4_place_pick"], entry["5_place_pick"], entry["6_place_pick"], entry["fast_lap_pick"]];
+
+    var and_array = results_array.map((item, index) => (item === picks_array[index] ? 1 : 0));
+    return 0;
+  }
 
   onVoto(trackId: number) {
     if(this.formIsValid(trackId)){
