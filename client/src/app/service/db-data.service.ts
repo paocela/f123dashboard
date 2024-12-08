@@ -17,6 +17,7 @@ export class DbDataService {
   championship: string = "";
   cumulative_points: string = "";
   tracks: string = "";
+  fanta: string = "";
 
 /****************************************************************/
 //compilazione delle variabili pre caricamento del interfaccia web 
@@ -27,6 +28,7 @@ export class DbDataService {
     this.championship = await PostgresService.getChampionship();
     this.cumulative_points = await PostgresService.getCumulativePoints();
     this.tracks = await PostgresService.getAllTracks();
+    this.fanta = await PostgresService.getAllFanta();
   } 
 
 /****************************************************************/
@@ -46,6 +48,10 @@ export class DbDataService {
 
   getAllTracks() {
     return JSON.parse(this.tracks);
+  }
+
+  getAllFanta() {
+    return JSON.parse(this.fanta);
   }
 
 }
