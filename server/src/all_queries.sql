@@ -504,7 +504,7 @@ LEFT JOIN
     FROM tracks
 ) AS inner_table_tracks
 ON gran_prix.track_id = inner_table_tracks.id
-
+ORDER BY gran_prix.date ASC
 
 
 
