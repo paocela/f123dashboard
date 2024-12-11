@@ -126,9 +126,11 @@ export class DashboardComponent implements OnInit {
     // filter next championship track
     var i = 0;
     const current_date: Date = new Date();
+    current_date.setHours(0, 0, 0, 0);
     for (let track of this.championshipTracks){
       const db_date: Date = new Date(track.date);
-      if ( db_date > current_date )
+      db_date.setHours(0, 0, 0, 0);
+      if ( db_date >= current_date )
       {
         this.championshipNextTracks[i] = track;
         this.championshipNextTracks[i]["date"] = db_date.toLocaleDateString("it-CH");

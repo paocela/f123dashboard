@@ -1,6 +1,6 @@
 <div *ngIf="piloti.length; else goto_loading">
   <c-row ngPreserveWhitespaces class="g-1"> <!-- Aggiunto margine tra le colonne -->
-    <c-col *ngFor="let pilota of piloti" xs="12" md="6" lg="3"> <!-- Modificato per avere un layout responsivo e risolvere problema dimensioni su telefoni -->
+    <c-col *ngFor="let pilota of piloti; index as i" xs="12" md="6" lg="3"> <!-- Modificato per avere un layout responsivo e risolvere problema dimensioni su telefoni -->
       <c-card [cBorder]="pilota.driver_color"  [textColor]="pilota.driver_color" class="mb-4 text-center" >
         <c-card-body> 
           <c-card [textColor]="pilota.driver_color" style="width: 100%;">
@@ -14,7 +14,7 @@
               <li cListGroupItem>
                 <div class="row">
                   <div class="col-6 border-end"><strong>Posizione:</strong></div>
-                  <div class="col-6">{{ pilota.driver_id }}°</div>
+                  <div class="col-6">{{ i + 1 }}°</div>
                 </div>
               </li>
               <li cListGroupItem>
