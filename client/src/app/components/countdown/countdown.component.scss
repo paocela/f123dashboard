@@ -25,4 +25,12 @@
     justify-content: space-between;
     align-items: center;
   }
+
+  .clock {
+    display: flex; /* Imposta il layout flessibile */
+    justify-content: center; /* Centra orizzontalmente */
+    align-items: center; /* Centra verticalmente */
+    margin-top: 10px; /* Mantiene il margine superiore */
+    height: 100%; /* Se necessario, assicura che l'altezza del contenitore permetta la centratura verticale */
+  }
   
