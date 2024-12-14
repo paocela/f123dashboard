@@ -1,0 +1,32 @@
+
+<c-card class="mb-3" [ngStyle]="{'max-width.px': 540}" color="success" textColor="white">
+      <c-card-body>
+            <div class="d-flex text-center">
+                <!-- Logo -->
+                <div class="mx-2">
+                    <!-- Logo -->
+                    <img src="../../../assets/images/rolex_logo.png" alt="Rolex Logo" width="100%" height="30vh">
+                </div>
+                <!-- DAYS -->
+                <div class="mx-2">
+                    <div class="display-4 font-weight-bold">{{ timeRemaining.days | number: '2.0' }}</div>
+                    <small>DAYS</small>
+                </div>
+                <!-- HRS -->
+                <div class="mx-2">
+                    <div class="display-4 font-weight-bold">{{ timeRemaining.hours | number: '2.0' }}</div>
+                    <small>HRS</small>
+                </div>
+                <!-- MINS -->
+                <div class="mx-2">
+                    <div class="display-4 font-weight-bold">{{ timeRemaining.minutes | number: '2.0' }}</div>
+                    <small>MINS</small>
+                </div>
+                <!-- SECS -->
+                <div class="mx-2">
+                    <div class="display-4 font-weight-bold">{{ timeRemaining.seconds | number: '2.0' }}</div>
+                    <small>SECS</small>
+                </div>
+            </div>
+      </c-card-body>
+  </c-card>

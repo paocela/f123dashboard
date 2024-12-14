@@ -1,0 +1,28 @@
+.card {
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .display-4 {
+    font-weight: bold;
+    font-size: 1.1rem; /* Adjust size of the numbers */
+    line-height: 1;
+  }
+  
+  small {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 1px;
+  }
+  
+  .time-box {
+    text-align: center;
+  }
+  
+  .card-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  

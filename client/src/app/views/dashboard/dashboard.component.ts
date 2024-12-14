@@ -36,8 +36,6 @@ import { DatePipe } from '@angular/common';
 
 import { DashboardChartsData, IChartProps } from './dashboard-charts-data';
 
-
-
 interface ChampionshipStandings {
   username: string;
   car: string;
@@ -142,6 +140,8 @@ export class DashboardComponent implements OnInit {
       }
     }
 
+    // countdown to next gp
+
     this.initCharts();
     this.updateChartOnColorModeChange();
   }
@@ -182,4 +182,6 @@ export class DashboardComponent implements OnInit {
       });
     }
   }
+
+
 }
