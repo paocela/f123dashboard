@@ -53,22 +53,21 @@ export class CountdownComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // countdown to next gp
-    this.startCountdown();
     this.championshipNextTracks = this.dbData.getAllTracks();
-
+    
     // filter next championship track
     var i = 0;
     const current_date: Date = new Date();
-    current_date.setHours(0, 0, 0, 0);
     for (let track of this.championshipNextTracks){
       const db_date: Date = new Date(track.date);
-      db_date.setHours(0, 0, 0, 0);
       if ( db_date >= current_date )
       {
         this.targetDate = new Date(db_date);
         break;
       }
     }
+
+    this.startCountdown();
   }
 
   startCountdown(): void {

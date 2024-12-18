@@ -1046,6 +1046,7 @@ LEFT JOIN
     FROM drivers
 ) AS outer_table_drivers
 ON outer_table_tracks.besttime_driver_id = outer_table_drivers.id
+ORDER BY date ASC
     `);
     return JSON.stringify(result.rows);
   }
