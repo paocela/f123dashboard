@@ -74,13 +74,22 @@
         <c-carousel-item *ngFor="let next_track of championshipNextTracks">
           <c-card class="mb-4">
             <c-card-header>
-              <h4 class="card-title mb-0" id="traffic">
-                Next Track: {{ next_track.name }}
-                <svg
-                  size="lg"
-                  [cIcon]="allFlags[next_track.country]"
-                ></svg>
-              </h4>
+              <c-row>
+                <c-col xs="auto">
+                  <h4 class="card-title mb-0" id="traffic">
+                    Next Track: {{ next_track.name }}
+                    <svg
+                      size="lg"
+                      [cIcon]="allFlags[next_track.country]"
+                    ></svg>
+                  </h4>
+                </c-col>
+                @if (next_track.has_sprint == 1) {
+                    <c-col xs="auto">
+                      <c-badge color="info">Sprint</c-badge>
+                    </c-col>
+                  }
+              </c-row>
             </c-card-header>
             <c-card-body>
               <img

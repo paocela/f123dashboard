@@ -268,7 +268,7 @@ ORDER BY total_points DESC
 /******************/
 /* ALL GP RESULTS */
 /******************/
-SELECT inner_table_tracks.name AS track_name, gran_prix.date as gran_prix_date, inner_table_tracks.country AS track_country,
+SELECT inner_table_tracks.name AS track_name, gran_prix.date AS gran_prix_date, gran_prix.has_sprint AS gran_prix_has_sprint, inner_table_tracks.country AS track_country,
 inner_table_race."1_place_username" AS driver_race_1_place, inner_table_race."2_place_username" AS driver_race_2_place, inner_table_race."3_place_username" AS driver_race_3_place, inner_table_race."4_place_username" AS driver_race_4_place, inner_table_race."5_place_username" AS driver_race_5_place, inner_table_race."6_place_username" AS driver_race_6_place, inner_table_race."fast_lap_username" AS driver_race_fast_lap, inner_table_race.race_dnf AS race_dnf,
 inner_table_sprint."1_place_username" AS driver_sprint_1_place, inner_table_sprint."2_place_username" AS driver_sprint_2_place, inner_table_sprint."3_place_username" AS driver_sprint_3_place, inner_table_sprint."4_place_username" AS driver_sprint_4_place, inner_table_sprint."5_place_username" AS driver_sprint_5_place, inner_table_sprint."6_place_username" AS driver_sprint_6_place, inner_table_sprint."fast_lap_username" AS driver_sprint_fast_lap, inner_table_sprint.sprint_dnf AS sprint_dnf,
 inner_table_qualifying."1_place_username" AS driver_qualifying_1_place, inner_table_qualifying."2_place_username" AS driver_qualifying_2_place, inner_table_qualifying."3_place_username" AS driver_qualifying_3_place, inner_table_qualifying."4_place_username" AS driver_qualifying_4_place, inner_table_qualifying."5_place_username" AS driver_qualifying_5_place, inner_table_qualifying."6_place_username" AS driver_qualifying_6_place,
@@ -1003,7 +1003,7 @@ GROUP BY date, track_name, driver_id, driver_username, driver_color, cumulative_
 /**************/
 /* NEXT TRACK */
 /**************/
-SELECT outer_table_tracks.track_id, outer_table_tracks.name, outer_table_tracks.date, outer_table_tracks.country, outer_table_tracks.besttime_driver_time,
+SELECT outer_table_tracks.track_id, outer_table_tracks.name, outer_table_tracks.date, outer_table_tracks.has_sprint, outer_table_tracks.country, outer_table_tracks.besttime_driver_time,
 outer_table_drivers.username
 FROM
 (
