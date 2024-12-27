@@ -10,10 +10,15 @@
                   <strong>{{gp.track_name}}</strong>
                   <svg size='lg' [cIcon]="allFlags[gp.track_country]"></svg>
                 </h5>
-            </c-col>
-            <c-col xs="auto">
-              <div class="small">{{gp.gran_prix_date | date: 'dd/MM/yyyy'}}</div>
-            </c-col>
+              </c-col>
+              @if (gp.gran_prix_has_sprint == 1) {
+                <c-col xs="auto">
+                  <c-badge color="info">Sprint</c-badge>
+                </c-col>
+              }
+              <c-col xs="auto">
+                <div class="small">{{gp.gran_prix_date | date: 'dd/MM/yyyy'}}</div>
+              </c-col>
           </c-row>
         </c-container>
         </c-card-header>

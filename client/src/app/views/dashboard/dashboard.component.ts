@@ -20,6 +20,7 @@ import {
   RowComponent,
   TableDirective,
   TextColorDirective,
+  BadgeComponent,
   CarouselComponent,
   CarouselControlComponent,
   CarouselIndicatorsComponent,
@@ -35,8 +36,6 @@ import { cifBh, cifAt, cifMc, cifJp, cifHu, cifCn, cifCa, cifEs, cifGb, cifBe, c
 import { DatePipe } from '@angular/common';
 
 import { DashboardChartsData, IChartProps } from './dashboard-charts-data';
-
-
 
 interface ChampionshipStandings {
   username: string;
@@ -60,7 +59,7 @@ interface NextTrack {
   templateUrl: 'dashboard.component.html',
   styleUrls: ['dashboard.component.scss'],
   standalone: true,
-  imports: [ThemeDirective, CarouselComponent, CarouselIndicatorsComponent, CarouselInnerComponent, CarouselItemComponent, CarouselControlComponent, RouterLink, DatePipe, CommonModule, TextColorDirective, CardComponent, CardBodyComponent, RowComponent, ColComponent, ButtonDirective, IconDirective, ReactiveFormsModule, ButtonGroupComponent, FormCheckLabelDirective, ChartjsComponent, NgStyle, CardFooterComponent, GutterDirective, ProgressBarDirective, ProgressComponent, CardHeaderComponent, TableDirective, AvatarComponent]
+  imports: [BadgeComponent, ThemeDirective, CarouselComponent, CarouselIndicatorsComponent, CarouselInnerComponent, CarouselItemComponent, CarouselControlComponent, RouterLink, DatePipe, CommonModule, TextColorDirective, CardComponent, CardBodyComponent, RowComponent, ColComponent, ButtonDirective, IconDirective, ReactiveFormsModule, ButtonGroupComponent, FormCheckLabelDirective, ChartjsComponent, NgStyle, CardFooterComponent, GutterDirective, ProgressBarDirective, ProgressComponent, CardHeaderComponent, TableDirective, AvatarComponent]
 })
 export class DashboardComponent implements OnInit {
 
@@ -142,6 +141,8 @@ export class DashboardComponent implements OnInit {
       }
     }
 
+    // countdown to next gp
+
     this.initCharts();
     this.updateChartOnColorModeChange();
   }
@@ -182,4 +183,6 @@ export class DashboardComponent implements OnInit {
       });
     }
   }
+
+
 }
