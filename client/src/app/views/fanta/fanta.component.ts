@@ -15,6 +15,7 @@ import { AccordionComponent,
 import { AuthService } from './../../service/auth.service';
 import { GridModule } from '@coreui/angular';
 import { DbDataService } from 'src/app/service/db-data.service';
+import { FantaService } from 'src/app/service/fanta.service';
 import { cifAe, cifAt, cifAu, cifAz, cifBe, cifBh, cifBr, cifCa, cifCn, cifEs, cifGb, cifHu, cifIt, 
     cifJp, cifMc, cifMx, cifNl, cifQa, cifSa, cifSg, cifUs, cilX, cilCheck } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
@@ -47,7 +48,7 @@ import { Fanta } from '../../model/fanta';
 })
 export class FantaComponent {
   errorMessage: string = '';
-  username: string | null = '';
+  username: string  = '';
   userId!: number;
   piloti: any[] = [];
   tracks: any[] = [];
@@ -55,9 +56,6 @@ export class FantaComponent {
   previusTracks: any[] = [];
   //voto: number[] = [];
   votazioni: Map<number, number[]> = new Map<number, number[]>();
-
-  public fantaData: any[] = [];
-  public fantaPoints: any[] = [];
   
   posizioni = new Map<number, string>([
     [1, "primo"],
@@ -98,19 +96,13 @@ export class FantaComponent {
     "Emirati Arabi Uniti": cifAe,
   };
 
-  constructor(public authService: AuthService, private dbData: DbDataService){}
+  constructor(public authService: AuthService, private dbData: DbDataService, public fantaService: FantaService){}
 
   ngOnInit(): void {
-
-    this.fantaData = this.dbData.getAllFanta();
-
-    for (let fanta_entry of this.fantaData) {
-      this.fantaPoints[fanta_entry["username"]] += this.calculateFantaPoints(fanta_entry);
-    }
-    console.log(this.fantaPoints);
-
-    this.username = sessionStorage.getItem('user');
+    
+    this.username = sessionStorage.getItem('user') ?? "";
     this.userId = Number(sessionStorage.getItem('userId'));
+    
     this.piloti  = this.dbData.getAllDrivers();
 
     this.tracks = this.dbData.getAllTracks();
@@ -130,26 +122,20 @@ export class FantaComponent {
       .filter(item => new Date(item.date) < new Date());
   }
 
-  calculateFantaPoints(entry: any): number {
-    var results_array = [entry["driver_race_1_place"], entry["driver_race_2_place"], entry["driver_race_3_place"], entry["driver_race_4_place"], entry["driver_race_5_place"], entry["driver_race_6_place"], entry["driver_race_fast_lap"]];
-    var picks_array = [entry["1_place_pick"], entry["2_place_pick"], entry["3_place_pick"], entry["4_place_pick"], entry["5_place_pick"], entry["6_place_pick"], entry["fast_lap_pick"]];
-
-    var and_array = results_array.map((item, index) => (item === picks_array[index] ? 1 : 0));
-    return 0;
-  }
 
   onVoto(trackId: number) {
     if(this.formIsValid(trackId)){
       this.errorMessage = '';
       let fantaVoto: Fanta = {
-        fantaPlayerId: this.userId,
-        place1Id: this.getVoto(trackId,1),
-        place2Id: this.getVoto(trackId,2),
-        place3Id: this.getVoto(trackId,3),
-        place4Id: this.getVoto(trackId,4),
-        place5Id: this.getVoto(trackId,5),
-        place6Id: this.getVoto(trackId,6),
-        raceId: trackId,
+        fantaplayerid: this.userId,
+        username: this.username,
+        place1id: this.getVoto(trackId,1),
+        place2id: this.getVoto(trackId,2),
+        place3id: this.getVoto(trackId,3),
+        place4id: this.getVoto(trackId,4),
+        place5id: this.getVoto(trackId,5),
+        place6id: this.getVoto(trackId,6),
+        raceid: trackId,
       };
       console.log(fantaVoto);
    } else {

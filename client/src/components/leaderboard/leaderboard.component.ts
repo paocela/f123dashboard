@@ -5,6 +5,8 @@ import { User, USERS } from '../../app/model/user';
 import { LeaderBoard } from '../../app/model/leaderboard'
 import { forEach } from 'lodash-es';
 import { ReturnStatement } from '@angular/compiler';
+import { FantaService } from 'src/app/service/fanta.service';
+import { DbDataService } from 'src/app/service/db-data.service';
 
 @Component({
   selector: 'app-leaderboard',
@@ -20,23 +22,23 @@ import { ReturnStatement } from '@angular/compiler';
 
 export class LeaderboardComponent {
 
-   users: User[] = USERS;
-   leaderBoards: LeaderBoard[] = [];
+  constructor(private fantaService: FantaService, private dbData: DbDataService){}
 
-  getTotalPoints(ueserId: number): number {
-    return ueserId * 100;
-  }
+   users: User[] = this.dbData.getUsers();
+   leaderBoards: LeaderBoard[] = [];
   
   ngOnInit(): void {
-    this.users = this.users.filter(u => u.id !== 0); //remove admin user
+    //this.users = this.users.filter(u => u.id !== 0); //remove admin user
     this.users.forEach(user => {
       let newUser: LeaderBoard = {
         id: user.id,
         username: user.username,
-        points: this.getTotalPoints(user.id)
+        points: this.fantaService.getFantaPoints(user.id)
       };
+      console.log(user.id , this.fantaService.getFantaPoints(user.id));
+      console.log(newUser);
       this.leaderBoards.push(newUser);
-      this.leaderBoards.sort((a,b) => a.points - b.points );
+      this.leaderBoards.sort((a,b) => a.points + b.points );
     });
   }
 }

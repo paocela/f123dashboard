@@ -9,6 +9,7 @@ import { GridModule } from '@coreui/angular';
 import { ButtonDirective } from '@coreui/angular';
 import { PilotiComponent } from "../piloti/piloti.component";
 import { LeaderboardComponent } from "../../../components/leaderboard/leaderboard.component";
+import { DbDataService } from 'src/app/service/db-data.service';
 
 @Component({
   selector: 'app-login',
@@ -41,6 +42,7 @@ export class LoginComponent {
       this.errorMessage = 'Credenziali non valide!';
     }
   }
+
   ngOnInit(): void {
     this.isLoggedIn = sessionStorage.getItem('isLoggedIn');
     console.log('is logged in ' + this.isLoggedIn)

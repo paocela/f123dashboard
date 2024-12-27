@@ -1132,3 +1132,50 @@ LEFT JOIN
     FROM all_fanta_picks
 ) AS inner_table
 ON all_session_points.race_id = inner_table.race_id
+
+/*
+fanta vote
+*/
+SELECT 
+    fp.id AS fantaPlayerId,
+    f.race_id as raceId,
+    fp.username as username,
+    f."1_place_id" as place1Id,
+    f."2_place_id" as place2Id,
+    f."3_place_id" as place3Id,
+    f."4_place_id" as place4Id,
+    f."5_place_id" as place5Id,
+    f."6_place_id" as place6Id
+FROM 
+    public.fanta_player fp
+JOIN 
+    public.fanta f ON fp.id = f.fanta_player_id
+ORDER BY 
+    fp.id, f.race_id;
+/*
+ race resoult for fanta
+*/
+select 
+    rr.id as id, 
+    rr."1_place_id" as place1Id,
+    rr."2_place_id" as place2Id,
+    rr."3_place_id" as place3Id,
+    rr."4_place_id" as place4Id,
+    rr."5_place_id" as place5Id,
+    rr."6_place_id" as place6Id
+from 
+    public.race_results rr 
+where 
+    session_type_id = 1;
+   
+/*
+ User for login and leaderboard
+*/
+SELECT
+    id,
+    username,
+    "name",
+    surname,
+    "password"
+FROM 
+    public.fanta_player;

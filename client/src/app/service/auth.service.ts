@@ -1,17 +1,22 @@
 import { Injectable } from '@angular/core';
-import { USERS } from '../model/user';
+import { User, USERS } from '../model/user';
 import { Router } from '@angular/router';
+import { DbDataService } from './db-data.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private currentUser: string | null = null;
+  private users: User[] = [];
 
-  constructor(private router: Router) { }
+  constructor(private router: Router, private dbData: DbDataService) { 
+    this.users = dbData.getUsers();
+    console.log(this.users);
+  }
 
   login(username: string, password: string): boolean {
-    const user = USERS.find(u => u.username === username && u.password === password);
+    const user = this.users.find(u => u.username === username && u.password === password);
     if (user) {
       this.currentUser = user.username; // Salva l'utente loggato
       sessionStorage.setItem('user', user.username); // Salva nel sessionStorage

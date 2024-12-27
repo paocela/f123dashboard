@@ -5,7 +5,7 @@
                 <h1>Ciao {{username}}</h1>
             </c-col>
             <c-col xs="auto">
-                <h3 [ngStyle]="{'color':'green'}" >Punteggio: {{getUserPoints()}}</h3>
+                <h3 [ngStyle]="{'color':'green'}" >Punteggio: {{this.fantaService.getFantaPoints(this.userId)}}</h3>
             </c-col>
             <c-col xs="auto">
                 <div class="align">
