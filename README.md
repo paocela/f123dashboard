@@ -8,3 +8,5 @@
 - mandare query con votazione per utente
 - chiudere votazione quando scatta il countdown
 
+mail:raceforfederica@gmail.com
+password mail: RaceForFederica2024_

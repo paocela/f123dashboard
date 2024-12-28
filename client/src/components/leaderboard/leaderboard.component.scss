@@ -1,4 +1,5 @@
-.table{
-    border-radius: 10px;
-
-}
+.custom-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden; /* Nasconde i bordi sporgenti */
+  }

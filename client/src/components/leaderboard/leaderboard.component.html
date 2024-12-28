@@ -9,14 +9,13 @@
         [striped]="true"
         align="middle"
         cTable
-        class="mb-0 border "
-        style="border-radius: 10px !important"
+        class="mb-3 border rounded custom-table"
 
-        
         >
             <thead class="text-nowrap text-truncate">
             <tr>
-                <th class="bg-body-tertiary text-center"></th>
+                <th class="bg-body-tertiary text-center">Position</th>
+                <th class="bg-body-tertiary "><svg cIcon name="cilPeople"></svg></th>
                 <th class="bg-body-tertiary">Username</th>
                 <th class="bg-body-tertiary text-center">Punti Effettuati</th>
             </tr>
@@ -29,6 +28,12 @@
                             <div class="text-center">
                                 <div [class]="">#{{ i+1 }}</div>
                             </div>
+                        </td>
+                        <td>
+                            <c-avatar class="text-center"
+                                [size]="'md'"
+                                src="./assets/images/fanta_players/{{ leaderBoard.id }}.jpg"
+                            />
                         </td>
                         <td>
                             <div>{{ leaderBoard.username }}</div>
