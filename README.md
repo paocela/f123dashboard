@@ -2,10 +2,9 @@
 - quando cambi le funzioni dentro `server/src/db_interface.ts`, fai un `npm add @genezio-sdk/f123dashboard@1.0.0-prod` dentro la cartella del client. Se no le funzioni aggiunte non le riconosce.
 
 ### TODO
-- allineare login e classifica (fede)
 - selezione giocatori dinamica: giocatori selezionati già devono scomparire
 - pulsante submit query!!!
 - prendere voti pregressi automaticamente da db, e popolare in base all'utente loggato
 - mandare query con votazione per utente
 - chiudere votazione quando scatta il countdown
-- pulsante logout deve rimandare alla pagina del fanta
+
