@@ -1,199 +1,285 @@
 <div>
-    <c-container class="m-2">
-        <c-row>
-            <c-col xs="auto" class="me-auto">
-                <h1>Ciao {{username}}</h1>
-            </c-col>
-            <c-col xs="auto">
-                <h3 [ngStyle]="{'color':'green'}" >Punteggio: {{this.userFantaPoints}}</h3>
-            </c-col>
-            <c-col xs="auto">
-                <div class="align">
-                    <button cButton
-                    (click)="this.authService.logout()"
-                    >
-                    Logout
-                    </button>
-                </div>
-            </c-col>
-        </c-row>
-    </c-container>
-    <c-container>
-        <c-row >
-            <h2 class="mt-4">Votazioni gare future</h2>
-            <p class="lead">Inserisci le votazioni per le prossime 4 gare</p>
-        </c-row>
-        <c-row>
-            <c-accordion>
-                <c-accordion-item 
-                    #item0="cAccordionItem" 
-                    [visible]="false"
-                    *ngFor="let track of nextTracks"
-                >
-                <strong>{{track.track_name}}</strong>
-                <ng-template cTemplateId="accordionHeaderTemplate">
-                    <button (click)="item0.toggleItem()" [collapsed]="!item0.visible" cAccordionButton>
-                        <c-container>
-                            <c-row>
-                                <c-col xs="auto" class="me-auto">
-                                    <h5 class="card-title mb-0" id="traffic">
-                                        <svg class="mx-1" size='lg' [cIcon]="allFlags[track.country]"></svg>
-                                        <strong>{{track.name}}</strong>
-                                        <svg class="mx-1" size='lg' [cIcon]="allFlags[track.country]"></svg>
-                                    </h5>
-                                </c-col>
-                                <c-col xs="auto">
-                                    <div class="small">{{track.date | date: 'dd/MM/yyyy'}}</div>
-                                </c-col>
-                            </c-row>
-                        </c-container>
-                    </button>
-                </ng-template>
-                <ng-template cTemplateId="accordionBodyTemplate">
-                    <div class="accordion-body">
-                        <form cForm (ngSubmit)="onVoto(track.track_id)">
-                            <c-container>
-                                <c-row *ngFor="let posizione of posizioni | keyvalue" class="m-2">
-                                    <c-col xs="8">
-                                        seleziona il {{posizione?.value}} 
-                                        <img *ngIf="posizione.key<=3" 
-                                        class="cIcon" 
-                                        style="width: 25px;"
-                                        attr.src="assets/medals/{{medals.get(posizione.key)}}">  
-                                    </c-col>
-                                    <c-col>
-                                        <select attr.aria-label="seleziona il pilota che arrivera {{posizione?.value}}" 
-                                            attr.id="{{track.track_id+posizione.key}}" 
-                                            [ngModel]="getVoto(track.track_id, posizione.key)"
-                                            (ngModelChange)="setVoto(track.track_id, posizione.key, $event)"
-                                            name="voto{{track.track_id+posizione.key}}"
-                                            cSelect
-                                            cFormControl
-                                            required="true"
-                                        >                
-                                            <option value="0">
-                                                -- Seleziona un pilota --
-                                            </option>
-                                            <option *ngFor="let pilota of piloti" 
-                                            attr.value="{{pilota.driver_id}}"
-                                            >
-                                                {{pilota.driver_username}}
-                                            </option>
-                                        </select>
-                                    </c-col>
-                                </c-row>
-                                <c-row>
-                                    <p *ngIf="errorMessage" class="error ">{{ errorMessage }}</p>
-                                </c-row>
-                                <c-row>
-                                    <input cButton type="submit" color="">
-                                </c-row>                               
-                            </c-container>
-                        </form>
+  <c-container class="m-2">
+    <c-row>
+      <c-col xs="auto" class="me-auto">
+
+        <table 
+        [hover]="true"
+        [responsive]="true"
+        [striped]="true"
+        align="middle"
+        cTable
+        class="mb-3 border rounded custom-table" 
+        >
+          <tr>
+            <th>
+              <div>
+                <c-avatar
+                [size]="'md'"
+                src="./assets/images/fanta_players/{{ this.userId }}.jpg"
+              />
+              </div>
+              
+            </th>
+            <th>
+              <div>
+                <h3>{{ username }}</h3>
+              </div>
+            </th>
+            <th  >
+              <div>
+                <h3 [ngStyle]="{ color: 'green' }">
+                  Punteggio: {{ this.userFantaPoints }}
+                </h3>
+              </div>
+              
+            </th>
+          </tr>
+        </table>
+      </c-col>
+
+      
+      <c-col xs="auto">
+        <div class="align">
+          <button cButton (click)="this.authService.logout()">Logout</button>
+        </div>
+      </c-col>
+    </c-row>
+  </c-container>
+  <c-container>
+    <c-row>
+      <h2 class="mt-4 text-center" >Votazioni gare future</h2>
+      <p class="lead text-center">
+        In questa sezione puoi inserire le votazione per le prossime 4 gare
+      </p>
+    </c-row>
+    <c-row>
+      <c-accordion>
+        <c-accordion-item
+          #item0="cAccordionItem"
+          [visible]="false"
+          *ngFor="let track of nextTracks"
+        >
+          <strong>{{ track.track_name }}</strong>
+          <ng-template cTemplateId="accordionHeaderTemplate">
+            <button
+              (click)="item0.toggleItem()"
+              [collapsed]="!item0.visible"
+              cAccordionButton
+            >
+              <c-container>
+                <c-row>
+                  <c-col xs="auto" class="me-auto">
+                    <h5 class="card-title mb-0" id="traffic">
+                      <svg
+                        class="mx-1"
+                        size="lg"
+                        [cIcon]="allFlags[track.country]"
+                      ></svg>
+                      <strong>{{ track.name }}</strong>
+                      <svg
+                        class="mx-1"
+                        size="lg"
+                        [cIcon]="allFlags[track.country]"
+                      ></svg>
+                    </h5>
+                  </c-col>
+                  <c-col xs="auto">
+                    <div class="small">
+                      {{ track.date | date : "dd/MM/yyyy" }}
                     </div>
-                </ng-template>
-                </c-accordion-item>
-            </c-accordion>
-        </c-row>
-    </c-container>  
-    <c-container *ngIf="previusTracks.length > 0">
-        <c-row >
-            <h2 class="mt-4">Votazioni gare passate</h2>
-        </c-row>
-        <c-row>
-            <c-accordion>
-                <c-accordion-item 
-                    #item0="cAccordionItem" 
-                    [visible]="false"
-                    *ngFor="let track of previusTracks"
-                >
-                    <strong>{{track.track_name}}</strong>
-                    <ng-template cTemplateId="accordionHeaderTemplate">
-                        <button (click)="item0.toggleItem()" [collapsed]="!item0.visible" cAccordionButton>
-                            <c-container>
-                                <c-row>
-                                    <c-col xs="auto" class="me-auto">
-                                        <h5 class="card-title mb-0" id="traffic">
-                                            <svg class="mx-1" size='lg' [cIcon]="allFlags[track.country]"></svg>
-                                            <strong>{{track.name}}</strong>
-                                            <svg class="mx-1" size='lg' [cIcon]="allFlags[track.country]"></svg>
-                                        </h5>
-                                    </c-col>
-                                    <c-col xs="auto">
-                                        <div class="small">{{track.date | date: 'dd/MM/yyyy'}}</div>
-                                    </c-col>
-                                </c-row>
-                            </c-container>
-                        </button>
-                    </ng-template>
-                    <ng-template cTemplateId="accordionBodyTemplate">
-                        <div class="accordion-body">
-                            <c-container>
-                                <c-row>
-                                    <table
-                                    [hover]="true"
-                                    [responsive]="true"
-                                    [striped]="true"
-                                    align="middle"
-                                    cTable
-                                    class="mb-0 border"
-                                    >
-                                        <thead class="text-nowrap text-truncate">
-                                        <tr>
-                                            <th class="bg-body-tertiary text-center"></th>
-                                            <th class="bg-body-tertiary text-center">Voto</th>
-                                            <th class="bg-body-tertiary"></th>
-                                            <th class="bg-body-tertiary">Username</th>
-                                            <th class="bg-body-tertiary text-center">Posizione di arrivo</th>
-                                            <th class="bg-body-tertiary text-center">Punti Effettuati</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                            <ng-container *ngFor="let voto of votazioni.get(track.track_id); let i = index">
-                                                <tr>
-                                                    <td>
-                                                        <div class="text-center">
-                                                            <svg [cIcon]="isCorrect(voto, track.track_id).icon" size='lg' [ngStyle]="{'color':isCorrect(voto, track.track_id).color}" ></svg>
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <div class="text-center">
-                                                            <div [class]="">#{{ i+1 }}</div>
-                                                        </div>
-                                                    </td>
-                                                    <td class="text-center">
-                                                        <c-avatar
-                                                            [size]="'md'"
-                                                            src="./assets/images/avatars/{{ getPilota(voto).driver_username }}.png"
-                                                        />
-                                                    </td>
-                                                    <td>
-                                                        <div>{{ getPilota(voto).driver_username }}</div>
-                                                        <div class="small text-body-secondary text-nowrap"></div>
-                                                    </td>
-                                                    <td>
-                                                        <div class="fw-semibold text-center">
-                                                            {{ getPosizioneArrivo(voto, track.track_id) }}
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <div class="fw-semibold text-center">
-                                                            {{ getPunti(voto, track.track_id) }}
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            </ng-container>
-                                        </tbody>
-                                    </table>
-                                </c-row>
-                                <c-row class="m-3" >
-                                    <h4 class="text-center" >Totale Punti: {{ getPuntiGp(track.track_id) }}</h4>
-                                </c-row>
-                            </c-container>
-                        </div>
-                    </ng-template>
-                </c-accordion-item>
-            </c-accordion>
-        </c-row>
-    </c-container>
+                  </c-col>
+                </c-row>
+              </c-container>
+            </button>
+          </ng-template>
+          <ng-template cTemplateId="accordionBodyTemplate">
+            <div class="accordion-body">
+              <form cForm (ngSubmit)="onVoto(track.track_id)">
+                <c-container>
+                  <c-row
+                    *ngFor="let posizione of posizioni | keyvalue"
+                    class="m-2"
+                  >
+                    <c-col xs="8">
+                      seleziona il {{ posizione?.value }}
+                      <img
+                        *ngIf="posizione.key <= 3"
+                        class="cIcon"
+                        style="width: 25px"
+                        attr.src="assets/medals/{{ medals.get(posizione.key) }}"
+                      />
+                    </c-col>
+                    <c-col>
+                      <select
+                        attr.aria-label="seleziona il pilota che arrivera {{
+                          posizione?.value
+                        }}"
+                        attr.id="{{ track.track_id + posizione.key }}"
+                        [ngModel]="getVoto(track.track_id, posizione.key)"
+                        (ngModelChange)="
+                          setVoto(track.track_id, posizione.key, $event)
+                        "
+                        name="voto{{ track.track_id + posizione.key }}"
+                        cSelect
+                        cFormControl
+                        required="true"
+                      >
+                        <option value="0">
+                            -- Seleziona un pilota --
+                        </option>
+                        <option
+                          *ngFor="let pilota of piloti"
+                          attr.value="{{ pilota.driver_id }}"
+                        >
+                          {{ pilota.driver_username }}
+                        </option>
+                      </select>
+                    </c-col>
+                  </c-row>
+                  <c-row>
+                    <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
+                  </c-row>
+                  <c-row>
+                    <input cButton type="submit" color="" />
+                  </c-row>
+                </c-container>
+              </form>
+            </div>
+          </ng-template>
+        </c-accordion-item>
+      </c-accordion>
+    </c-row>
+  </c-container>
+  <c-container *ngIf="previusTracks.length > 0">
+    <c-row>
+      <div class="titolo">
+        <h2 class="mt-4 text-center titolo">Storico Votazioni</h2>
+        <p class="lead text-center">
+          In questa sezione puoi visualizzare i punti guadagnati 
+        </p>
+      </div>
+    </c-row>
+
+    <c-row class="storico">
+      <c-accordion>
+        <c-accordion-item
+          #item0="cAccordionItem"
+          [visible]="false"
+          *ngFor="let track of previusTracks"
+        >
+          <strong>{{ track.track_name }}</strong>
+          <ng-template cTemplateId="accordionHeaderTemplate">
+            <button
+              (click)="item0.toggleItem()"
+              [collapsed]="!item0.visible"
+              cAccordionButton
+            >
+              <c-container >
+                <c-row>
+                  <c-col xs="auto" class="me-auto">
+                    <h5 class="card-title mb-0" id="traffic">
+                      <svg
+                        class="mx-1"
+                        size="lg"
+                        [cIcon]="allFlags[track.country]"
+                      ></svg>
+                      <strong>{{ track.name }}</strong>
+                      <svg
+                        class="mx-1"
+                        size="lg"
+                        [cIcon]="allFlags[track.country]"
+                      ></svg>
+                    </h5>
+                  </c-col>
+                  <c-col xs="auto">
+                    <div class="small">
+                      {{ track.date | date : "dd/MM/yyyy" }}
+                    </div>
+                  </c-col>
+                </c-row>
+              </c-container>
+            </button>
+          </ng-template>
+          <ng-template cTemplateId="accordionBodyTemplate">
+            <div class="accordion-body">
+              <c-container>
+                <c-row>
+                  <table
+                    [hover]="true"
+                    [responsive]="true"
+                    [striped]="true"
+                    align="middle"
+                    cTable
+                    class="mb-0 border"
+                  >
+                    <thead class="text-nowrap text-truncate">
+                      <tr>
+                        <th class="bg-body-tertiary text-center"></th>
+                        <th class="bg-body-tertiary text-center">Voto</th>
+                        <th class="bg-body-tertiary"></th>
+                        <th class="bg-body-tertiary">Username</th>
+                        <th class="bg-body-tertiary text-center">
+                          Posizione di arrivo
+                        </th>
+                        <th class="bg-body-tertiary text-center">
+                          Punti Effettuati
+                        </th>
+                      </tr>
+                    </thead>
+                    
+                    <tbody>
+                    <ng-container *ngFor="let voto of votazioni.get(track.track_id); let i = index">
+                      <tr>
+                        <td>
+                          <div class="text-center">
+                            <svg [cIcon]="isCorrect(voto, track.track_id).icon" size='lg' [ngStyle]="{'color':isCorrect(voto, track.track_id).color}" ></svg>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="text-center">
+                            <div [class]="">#{{ i + 1 }}</div>
+                          </div>
+                        </td>
+                        <td class="text-center">
+                          <c-avatar
+                            [size]="'md'"
+                            src="./assets/images/avatars/{{
+                              getPilota(voto).driver_username
+                            }}.png"
+                          />
+                        </td>
+                        <td>
+                          <div>{{ getPilota(voto).driver_username }}</div>
+                          <div
+                            class="small text-body-secondary text-nowrap"
+                          ></div>
+                        </td>
+                        <td>
+                          <div class="fw-semibold text-center">
+                            {{ getPosizioneArrivo(voto, track.track_id) }}
+                          </div>
+                        </td>
+                        <td>
+                          <div class="fw-semibold text-center">
+                            {{ getPunti(voto, track.track_id) }}
+                          </div>
+                        </td>
+                      </tr>
+                    </ng-container>
+                    </tbody>
+                  </table>
+                </c-row>
+                <c-row class="m-3">
+                  <h4 class="text-center">
+                    Totale Punti: {{ getPuntiGp(track.track_id) }}
+                  </h4>
+                </c-row>
+              </c-container>
+            </div>
+          </ng-template>
+        </c-accordion-item>
+      </c-accordion>
+    </c-row>
+  </c-container>
 </div>
