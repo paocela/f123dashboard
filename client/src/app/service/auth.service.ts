@@ -12,7 +12,6 @@ export class AuthService {
 
   constructor(private router: Router, private dbData: DbDataService) { 
     this.users = dbData.getUsers();
-    console.log(this.users);
   }
 
   login(username: string, password: string): boolean {

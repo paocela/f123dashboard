@@ -45,9 +45,7 @@ export class LoginComponent {
 
   ngOnInit(): void {
     this.isLoggedIn = sessionStorage.getItem('isLoggedIn');
-    console.log('is logged in ' + this.isLoggedIn)
     if( this.isLoggedIn === 'true'){
-      console.log('logged in as ' + sessionStorage.getItem('username'))
       this.router.navigate(['/fanta']);
     }
   }
