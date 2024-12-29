@@ -1,12 +1,21 @@
 export interface Fanta {
-    fantaplayerid: number,
+    fanta_player_id: number,
     username: string,
-    raceid: number,
-    place1id: number,
-    place2id: number,
-    place3id: number,
-    place4id: number,
-    place5id: number,
-    place6id: number,
-    sprintid?: number
+    track_id: number,
+    id_1_place: number,
+    id_2_place: number,
+    id_3_place: number,
+    id_4_place: number,
+    id_5_place: number,
+    id_6_place: number
+}
+
+export interface RaceResult {
+    track_id: number,
+    id_1_place: number,
+    id_2_place: number,
+    id_3_place: number,
+    id_4_place: number,
+    id_5_place: number,
+    id_6_place: number
 }

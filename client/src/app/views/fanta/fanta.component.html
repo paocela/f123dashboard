@@ -5,7 +5,7 @@
                 <h1>Ciao {{username}}</h1>
             </c-col>
             <c-col xs="auto">
-                <h3 [ngStyle]="{'color':'green'}" >Punteggio: {{this.fantaService.getFantaPoints(this.userId)}}</h3>
+                <h3 [ngStyle]="{'color':'green'}" >Punteggio: {{this.userFantaPoints}}</h3>
             </c-col>
             <c-col xs="auto">
                 <div class="align">
@@ -146,12 +146,12 @@
                                         </tr>
                                         </thead>
                                         <tbody>
-                                            @for (voto of votazioni.get(+track.track_id); track
+                                            @for (voto of votazioni.get(track.track_id); track
                                                 voto; let i = $index) {
                                                 <tr>
                                                     <td>
                                                         <div class="text-center">
-                                                            <svg [cIcon]="isCorrect(voto, +track.track_id)" size='lg' ></svg>
+                                                            <svg [cIcon]="isCorrect(voto, track.track_id)" size='lg' ></svg>
                                                         </div>
                                                     </td>
                                                     <td>
@@ -171,12 +171,12 @@
                                                     </td>
                                                     <td>
                                                         <div class="fw-semibold text-center">
-                                                            {{ getPosizioneArrivo(voto, +track.track_id) }}
+                                                            {{ getPosizioneArrivo(voto, track.track_id) }}
                                                         </div>
                                                     </td>
                                                     <td>
                                                         <div class="fw-semibold text-center">
-                                                            {{ getPunti(voto, +track.track_id) }}
+                                                            {{ getPunti(voto, track.track_id) }}
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -185,7 +185,7 @@
                                     </table>
                                 </c-row>
                                 <c-row class="m-3" >
-                                    <h4 class="text-center" >Totale Punti: {{ getPuntiGp(+track.track_id) }}</h4>
+                                    <h4 class="text-center" >Totale Punti: {{ getPuntiGp(track.track_id) }}</h4>
                                 </c-row>
                             </c-container>
                         </div>

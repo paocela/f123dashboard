@@ -1163,49 +1163,50 @@ ON all_session_points.race_id = inner_table.race_id
     /* All fanta vote */
     async getFantaVote(): Promise<string> {
         const result = await this.pool.query (`
-        SELECT
-            fp.id AS fantaPlayerId,
-            f.race_id as raceId,
-            fp.username as username,
-            f."1_place_id" as place1Id,
-            f."2_place_id" as place2Id,
-            f."3_place_id" as place3Id,
-            f."4_place_id" as place4Id,
-            f."5_place_id" as place5Id,
-            f."6_place_id" as place6Id
-        FROM 
-            public.fanta_player fp
-        JOIN 
-            public.fanta f ON fp.id = f.fanta_player_id
-        ORDER BY 
-            fp.id, f.race_id;
+SELECT
+    fp_table.id AS fanta_player_id,
+    f_table.race_id AS track_id,
+    fp_table.username AS username,
+    f_table."1_place_id" AS "id_1_place",
+    f_table."2_place_id" AS "id_2_place",
+    f_table."3_place_id" AS "id_3_place",
+    f_table."4_place_id" AS "id_4_place",
+    f_table."5_place_id" AS "id_5_place",
+    f_table."6_place_id" AS "id_6_place"
+FROM fanta_player fp_table
+JOIN fanta f_table
+ON fp_table.id = f_table.fanta_player_id
+ORDER BY fp_table.id, f_table.race_id;
         `);
         return JSON.stringify(result.rows);
     }
 
     async getRaceResoult(): Promise<string> {
         const result = await this.pool.query (`
-        select 
-            rr.id as id, 
-            rr."1_place_id" as place1Id,
-            rr."2_place_id" as place2Id,
-            rr."3_place_id" as place3Id,
-            rr."4_place_id" as place4Id,
-            rr."5_place_id" as place5Id,
-            rr."6_place_id" as place6Id
-        from 
-            public.race_results rr 
-        where 
-            session_type_id = 1;
-   
+SELECT 
+    inner_table.id AS track_id,
+    "1_place_id" AS "id_1_place",
+    "2_place_id" AS "id_2_place",
+    "3_place_id" AS "id_3_place",
+    "4_place_id" AS "id_4_place",
+    "5_place_id" AS "id_5_place",
+    "6_place_id" AS "id_6_place"
+FROM race_results
+LEFT JOIN 
+(
+    SELECT id, race_results_id, track_id
+    FROM gran_prix
+) AS inner_table
+ON race_results.id = inner_table.race_results_id
+WHERE session_type_id = 1
         `);
         return JSON.stringify(result.rows);
     }
 
     async getUsers(): Promise<string> {
         const result = await this.pool.query (`
-        SELECT id, username, "name", surname, "password"
-        FROM public.fanta_player;
+SELECT id, username, name, surname, password
+FROM fanta_player;
         `);
         return JSON.stringify(result.rows);
     }

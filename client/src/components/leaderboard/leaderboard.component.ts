@@ -35,10 +35,7 @@ export class LeaderboardComponent {
         username: user.username,
         points: this.fantaService.getFantaPoints(user.id)
       };
-      console.log(user.id , this.fantaService.getFantaPoints(user.id));
-      console.log(newUser);
       this.leaderBoards.push(newUser);
-      this.leaderBoards.sort((a,b) => a.points + b.points );
     });
   }
 }
