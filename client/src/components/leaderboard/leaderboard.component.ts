@@ -7,6 +7,10 @@ import { forEach } from 'lodash-es';
 import { ReturnStatement } from '@angular/compiler';
 import { FantaService } from 'src/app/service/fanta.service';
 import { DbDataService } from 'src/app/service/db-data.service';
+import { cilPeople} from '@coreui/icons';
+import { IconDirective } from '@coreui/icons-angular';
+import { AvatarComponent, TextColorDirective } from '@coreui/angular';
+
 
 @Component({
   selector: 'app-leaderboard',
@@ -15,6 +19,9 @@ import { DbDataService } from 'src/app/service/db-data.service';
     CommonModule,
     GridModule,
     TableDirective,
+    IconDirective,
+    TextColorDirective, 
+    AvatarComponent
   ],
   templateUrl: './leaderboard.component.html',
   styleUrl: './leaderboard.component.scss',
@@ -22,12 +29,17 @@ import { DbDataService } from 'src/app/service/db-data.service';
 
 export class LeaderboardComponent {
 
+  public cilPeople: string[] = cilPeople;
+
   constructor(private fantaService: FantaService, private dbData: DbDataService){}
 
    users: User[] = this.dbData.getUsers();
    leaderBoards: LeaderBoard[] = [];
   
   ngOnInit(): void {
+
+    console.log(this.leaderBoards)
+
     //this.users = this.users.filter(u => u.id !== 0); //remove admin user
     this.users.forEach(user => {
       let newUser: LeaderBoard = {
