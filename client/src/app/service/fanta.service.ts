@@ -32,6 +32,7 @@ export class FantaService {
 
     //order by points
     this.fantaPoints = new Map(Array.from(this.fantaPoints.entries()).sort(([, valueA], [, valueB]) => valueA - valueB));
+    console.log(this.fantaPoints)
 
    }
 

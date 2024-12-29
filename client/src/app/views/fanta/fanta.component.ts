@@ -17,11 +17,15 @@ import { GridModule } from '@coreui/angular';
 import { DbDataService } from 'src/app/service/db-data.service';
 import { FantaService } from 'src/app/service/fanta.service';
 import { cifAe, cifAt, cifAu, cifAz, cifBe, cifBh, cifBr, cifCa, cifCn, cifEs, cifGb, cifHu, cifIt, 
-    cifJp, cifMc, cifMx, cifNl, cifQa, cifSa, cifSg, cifUs, cilX, cilCheck } from '@coreui/icons';
+    cifJp, cifMc, cifMx, cifNl, cifQa, cifSa, cifSg, cifUs, cilXCircle, cilCheckCircle } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
 import { Fanta, RaceResult } from '../../model/fanta';
 import { rest } from 'lodash-es';
 
+interface voteStatus {
+  icon: any;
+  color: string;
+}
 
 @Component({
   selector: 'app-fanta',
@@ -97,6 +101,7 @@ export class FantaComponent {
     "Qatar": cifQa,
     "Emirati Arabi Uniti": cifAe,
   };
+  
 
   constructor(public authService: AuthService, private dbData: DbDataService, public fantaService: FantaService){}
 
@@ -230,10 +235,24 @@ export class FantaComponent {
     return 100;
   }
 
-  isCorrect(pilota: number, trackId: number): string[] {
+  isCorrect(pilota: number, trackId: number): voteStatus {
     let posizioneArrivo: number = this.getPosizioneArrivo(pilota, trackId);
     let votazione: number = this.getVoto(trackId, posizioneArrivo);
-    return votazione == pilota ? cilCheck: cilX;
+    let status: voteStatus = {
+      icon: cilXCircle,
+      color: 'red'
+    };
+    if (votazione == pilota)
+    {
+      status.icon = cilCheckCircle;
+      status.color = 'green';
+    }
+    else
+    {
+      status.icon = cilXCircle;
+      status.color = 'red';
+    }
+    return status;
   }
 
 }

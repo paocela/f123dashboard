@@ -71,6 +71,9 @@
                                             cFormControl
                                             required="true"
                                         >                
+                                            <option value="0">
+                                                -- Seleziona un pilota --
+                                            </option>
                                             <option *ngFor="let pilota of piloti" 
                                             attr.value="{{pilota.driver_id}}"
                                             >
@@ -138,7 +141,7 @@
                                         <thead class="text-nowrap text-truncate">
                                         <tr>
                                             <th class="bg-body-tertiary text-center"></th>
-                                            <th class="bg-body-tertiary text-center">voto</th>
+                                            <th class="bg-body-tertiary text-center">Voto</th>
                                             <th class="bg-body-tertiary"></th>
                                             <th class="bg-body-tertiary">Username</th>
                                             <th class="bg-body-tertiary text-center">Posizione di arrivo</th>
@@ -146,12 +149,11 @@
                                         </tr>
                                         </thead>
                                         <tbody>
-                                            @for (voto of votazioni.get(track.track_id); track
-                                                voto; let i = $index) {
+                                            <ng-container *ngFor="let voto of votazioni.get(track.track_id); let i = index">
                                                 <tr>
                                                     <td>
                                                         <div class="text-center">
-                                                            <svg [cIcon]="isCorrect(voto, track.track_id)" size='lg' ></svg>
+                                                            <svg [cIcon]="isCorrect(voto, track.track_id).icon" size='lg' [ngStyle]="{'color':isCorrect(voto, track.track_id).color}" ></svg>
                                                         </div>
                                                     </td>
                                                     <td>
@@ -180,7 +182,7 @@
                                                         </div>
                                                     </td>
                                                 </tr>
-                                            }
+                                            </ng-container>
                                         </tbody>
                                     </table>
                                 </c-row>
