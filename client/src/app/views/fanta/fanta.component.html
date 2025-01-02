@@ -18,8 +18,7 @@
                 [size]="'md'"
                 src="./assets/images/fanta_players/{{ this.userId }}.jpg"
               />
-              </div>
-              
+              </div>     
             </th>
             <th>
               <div>
@@ -95,7 +94,7 @@
           </ng-template>
           <ng-template cTemplateId="accordionBodyTemplate">
             <div class="accordion-body">
-              <form cForm (ngSubmit)="onVoto(track.track_id)">
+              <form cForm (ngSubmit)="publishVoto(track.track_id)">
                 <c-container>
                   <c-row
                     *ngFor="let posizione of posizioni | keyvalue"

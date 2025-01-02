@@ -75,4 +75,8 @@ export class DbDataService {
     return this.users;
   }
 
+  async setFantaVoto(voto: Fanta): Promise<void> {
+    await PostgresService.setFantaVoto(voto);
+  }
+
 }

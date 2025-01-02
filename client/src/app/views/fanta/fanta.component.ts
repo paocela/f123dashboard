@@ -148,7 +148,7 @@ export class FantaComponent {
   }
 
 
-  onVoto(trackId: number) {
+  publishVoto(trackId: number) {
     if(this.formIsValid(trackId)){
       this.errorMessage = '';
       let fantaVoto: Fanta = {
@@ -162,9 +162,10 @@ export class FantaComponent {
         id_6_place: this.getVoto(trackId,6),
         track_id: trackId,
       };
-   } else {
-    this.errorMessage = 'piloti assenti o inseriti più volte';
-   }
+      this.dbData.setFantaVoto(fantaVoto);
+    } else {
+     this.errorMessage = 'piloti assenti o inseriti più volte';
+    }
   }
 
   formIsValid(trackId: number): boolean {

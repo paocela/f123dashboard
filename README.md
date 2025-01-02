@@ -7,6 +7,8 @@
 - prendere voti pregressi automaticamente da db, e popolare in base all'utente loggato
 - mandare query con votazione per utente
 - chiudere votazione quando scatta il countdown
+- aggiungere punteggi bonus
+- aggiungere votazione giro veloce
 
 mail:raceforfederica@gmail.com
 password mail: RaceForFederica2024_
