@@ -13,7 +13,8 @@ export class FantaService {
   fantaVotes:  Fanta[] = [];
   raceResults: RaceResult[] = [];
 
-  correctResponsePoint: number = 2;
+  correctResponsePoint: number = 1;
+  correctResponsePointFastLap: number = 2
   allCorrectResponsePoint: number = 5;
 
 
@@ -59,6 +60,7 @@ export class FantaService {
     points = raceResult.id_4_place === fantaVote.id_4_place ? points + this.correctResponsePoint : points;
     points = raceResult.id_5_place === fantaVote.id_5_place ? points + this.correctResponsePoint : points;
     points = raceResult.id_6_place === fantaVote.id_6_place ? points + this.correctResponsePoint : points;
+    points = raceResult.id_fast_lap === fantaVote.id_fast_lap ? points + this.correctResponsePointFastLap : points;
     return points;
   }
 
@@ -68,6 +70,10 @@ export class FantaService {
 
   getAllCorrectResponsePoint(): number {
     return this.allCorrectResponsePoint;
+  }
+
+  getCorrectResponsePointFastLap(): number {
+    return this.correctResponsePointFastLap;
   }
 
   

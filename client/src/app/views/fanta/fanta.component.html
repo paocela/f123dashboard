@@ -2,7 +2,7 @@
   <c-container class="m-2">
     <c-row>
       <c-col xs="auto" class="me-auto">
-        <table class="mb-3 border rounded custom-table">
+        <table class="mb-3 border border-primary rounded custom-table">
           <tr>
             <td rowspan="2">
               <div>
@@ -12,19 +12,18 @@
                 />
               </div>
             </td>
-
             <th>
               <div>
-                <h4>{{ username }}</h4>
+                <h3>{{ username }}</h3>
               </div>
             </th>
           </tr>
           <tr>
             <th>
               <div>
-                <h6 [ngStyle]="{ color: 'green' }">
+                <h5 [ngStyle]="{ color: 'green' }">
                   Punteggio: {{ this.userFantaPoints }}
-                </h6>
+                </h5>
               </div>
             </th>
           </tr>
@@ -94,13 +93,20 @@
                     class="m-2"
                   >
                     <c-col xs="8">
-                      seleziona il {{ posizione?.value }}
+                      <strong>
+                        @if (posizione.key != 7) {
+                          {{ posizione?.value }} posto
+                        } @else {
+                          {{posizione?.value}}
+                        }
+                      </strong>
                       <img
                         *ngIf="posizione.key <= 3"
                         class="cIcon"
                         style="width: 25px"
                         attr.src="assets/medals/{{ medals.get(posizione.key) }}"
                       />
+                      <svg *ngIf="posizione.key == 7" [cIcon]="fireIcon" style="color: purple"></svg>
                     </c-col>
                     <c-col>
                       <select
@@ -128,15 +134,18 @@
                     </c-col>
                   </c-row>
                   <c-row>
-                    <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
-                  </c-row>
-                  <c-row>
-
                     <c-col></c-col>
                     <c-col class="text-center">
                       <button cButton type="submit" >Conferma</button>
                     </c-col>
-                    <c-col></c-col>
+                    <c-col class="text-center">
+                        <p *ngIf="errorMessage" class="error">
+                          <c-badge color="danger">{{errorMessage}}</c-badge>
+                        </p>
+                        <p *ngIf="successMessage" class="success">
+                          <c-badge color="success">{{successMessage}}</c-badge>
+                        </p>
+                    </c-col>
 
                   </c-row>
                 </c-container>
@@ -220,7 +229,7 @@
                           Posizione di arrivo
                         </th>
                         <th class="bg-body-tertiary text-center">
-                          Punti guadagati
+                          Punti fatti
                         </th>
                         <th class="bg-body-tertiary text-center">Risultato</th>
                       </tr>
@@ -235,8 +244,13 @@
                       >
                         <tr>
                           <td>
-                            <div class="text-center">
-                              <div [class]="">{{ i + 1 }}</div>
+                            <div class="text-center fw-semibold">
+                              @if (i + 1 != 7)
+                              {
+                                <div [class]="">{{ i + 1 }}</div>
+                              } @else {
+                                <div [class]="">GV</div>
+                              }
                             </div>
                           </td>
                           <td class="text-center">
@@ -254,24 +268,49 @@
                             ></div>
                           </td>
                           <td>
-                            <div class="fw-semibold text-center">
-                              {{ getPosizioneArrivo(voto, track.track_id) }}
-                            </div>
+                            @if (i + 1 != 7) {
+                              <div class="fw-semibold text-center">
+                                {{ getPosizioneArrivo(voto, track.track_id) }}
+                              </div>
+                            } @else {
+                              <div class="fw-semibold text-center">
+                                @if (getFastLap(track.track_id) == voto)
+                                {
+                                  SI
+                                } @else {
+                                  NO
+                                }
+                              </div>
+                            }
                           </td>
                           <td>
                             <div class="fw-semibold text-center">
-                              {{ getPunti(voto, track.track_id) }}
+                              @if (i + 1 != 7) {
+                                {{getPunti(voto, track.track_id)}}
+                              } @else {
+                                {{getPuntiFastLap(track.track_id)}}
+                              }
                             </div>
                           </td>
                           <td>
                             <div class="text-center">
-                              <svg
-                                [cIcon]="isCorrect(voto, track.track_id).icon"
+                              @if (i + 1 != 7) {
+                                <svg
+                                  [cIcon]="isCorrect(voto, track.track_id).icon"
+                                  size="lg"
+                                  [ngStyle]="{
+                                    color: isCorrect(voto, track.track_id).color
+                                  }"
+                                ></svg>
+                              } @else {
+                                <svg
+                                [cIcon]="isCorrectFastLap(track.track_id).icon"
                                 size="lg"
                                 [ngStyle]="{
-                                  color: isCorrect(voto, track.track_id).color
+                                  color: isCorrectFastLap(track.track_id).color
                                 }"
                               ></svg>
+                              }
                             </div>
                           </td>
                         </tr>
@@ -280,7 +319,7 @@
                   </table>
                 </c-row>
                 <c-row class="m-3">
-                  <h4 class="text-center">
+                  <h4 class="text-center text-success">
                     Totale Punti: {{ getPuntiGp(track.track_id) }}
                   </h4>
                 </c-row>

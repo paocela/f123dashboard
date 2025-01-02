@@ -1172,7 +1172,8 @@ SELECT
     f_table."3_place_id" AS "id_3_place",
     f_table."4_place_id" AS "id_4_place",
     f_table."5_place_id" AS "id_5_place",
-    f_table."6_place_id" AS "id_6_place"
+    f_table."6_place_id" AS "id_6_place",
+    f_table."fast_lap_id" AS "id_fast_lap"
 FROM fanta_player fp_table
 JOIN fanta f_table
 ON fp_table.id = f_table.fanta_player_id
@@ -1190,7 +1191,8 @@ SELECT
     "3_place_id" AS "id_3_place",
     "4_place_id" AS "id_4_place",
     "5_place_id" AS "id_5_place",
-    "6_place_id" AS "id_6_place"
+    "6_place_id" AS "id_6_place",
+    "fast_lap_id" AS "id_fast_lap"
 FROM race_results
 LEFT JOIN 
 (
@@ -1214,7 +1216,7 @@ FROM fanta_player;
     async setFantaVoto(voto: any): Promise<void> {
         const result = await this.pool.query(`
 INSERT INTO "fanta" ("fanta_player_id", "race_id", "1_place_id", "2_place_id", "3_place_id", "4_place_id", "5_place_id", "6_place_id", "fast_lap_id") 
-VALUES (` + voto.fanta_player_id + `, ` + voto.track_id + `, ` + voto.id_1_place + `, ` + voto.id_2_place + `, ` + voto.id_3_place + `, ` + voto.id_4_place + `, ` + voto.id_5_place + `, ` + voto.id_6_place + `, 6)
+VALUES (` + voto.fanta_player_id + `, ` + voto.track_id + `, ` + voto.id_1_place + `, ` + voto.id_2_place + `, ` + voto.id_3_place + `, ` + voto.id_4_place + `, ` + voto.id_5_place + `, ` + voto.id_6_place + `, ` + voto.id_fast_lap + `)
 ON CONFLICT ("fanta_player_id", "race_id")
 DO
 UPDATE SET
@@ -1223,8 +1225,8 @@ UPDATE SET
     "3_place_id" = ` + voto.id_3_place + `,
     "4_place_id" = ` + voto.id_4_place + `,
     "5_place_id" = ` + voto.id_5_place + `,
-    "6_place_id" = ` + voto.id_6_place + `
-    "fast_lap_id" = 6
+    "6_place_id" = ` + voto.id_6_place + `,
+    "fast_lap_id" = ` + voto.id_fast_lap + `
             `)
     }
 

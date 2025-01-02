@@ -35,22 +35,36 @@
               </thead>
               <tbody>
                 <tr>
-                  <th scope="row" [ngStyle]="{'color':'green'}">1</th>
+                  <th scope="row" [ngStyle]="{'color':'green'}">
+                    <img
+                    class="cIcon"
+                    style="width: 25px"
+                    src="assets/medals/medal_first.svg"
+                  />
+                  </th>
                   <td [ngStyle]="{'color':'green'}">{{gp.driver_race_1_place}}</td>
                   <td [ngStyle]="{'color':'green'}">{{gp.driver_sprint_1_place}}</td>
                   <td [ngStyle]="{'color':'green'}">{{gp.driver_qualifying_1_place}}</td>
                   <td [ngStyle]="{'color':'green'}">{{gp.driver_free_practice_1_place}}</td>
                 </tr>
                 <tr>
-                  <th scope="row">2</th>
-                  <td>{{gp.driver_race_2_place}}</td>
+                  <th scope="row" [ngStyle]="{'color':'green'}">
+                    <img
+                    class="cIcon"
+                    style="width: 25px"
+                    src="assets/medals/medal_second.svg"
+                  />                  <td>{{gp.driver_race_2_place}}</td>
                   <td>{{gp.driver_sprint_2_place}}</td>
                   <td>{{gp.driver_qualifying_2_place}}</td>
                   <td>{{gp.driver_free_practice_2_place}}</td>
                 </tr>
                 <tr>
-                  <th scope="row">3</th>
-                  <td>{{gp.driver_race_3_place}}</td>
+                  <th scope="row" [ngStyle]="{'color':'green'}">
+                    <img
+                    class="cIcon"
+                    style="width: 25px"
+                    src="assets/medals/medal_third.svg"
+                  />                  <td>{{gp.driver_race_3_place}}</td>
                   <td>{{gp.driver_sprint_3_place}}</td>
                   <td>{{gp.driver_qualifying_3_place}}</td>
                   <td>{{gp.driver_free_practice_3_place}}</td>
@@ -77,7 +91,10 @@
                   <td [ngStyle]="{'color':'red'}">{{gp.driver_free_practice_6_place}}</td>
                 </tr>
                 <tr>
-                  <th scope="row" [ngStyle]="{'color':'purple'}">Fast Lap</th>
+                  <th scope="row" [ngStyle]="{'color':'purple'}">
+                    Fast Lap
+                    <svg [cIcon]="fireIcon"></svg>
+                  </th>
                   <td [ngStyle]="{'color':'purple'}">{{gp.driver_race_fast_lap}}</td>
                   <td [ngStyle]="{'color':'purple'}">{{gp.driver_sprint_fast_lap}}</td>
                   <td></td>

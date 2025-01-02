@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { DocsExampleComponent } from '@docs-components/public-api';
 import { BadgeComponent, RowComponent, ColComponent, TextColorDirective, CardComponent, CardHeaderComponent, CardBodyComponent, TableDirective, TableColorDirective, TableActiveDirective, BorderDirective, AlignDirective, ContainerComponent } from '@coreui/angular';
 import { cifBh, cifAt, cifMc, cifJp, cifHu, cifCn, cifCa, cifEs, cifGb, cifBe, cifNl, cifAz, cifSg, cifIt, cifUs, cifAu, cifMx, cifBr, cifQa, cifAe, cifSa } from '@coreui/icons';
+import { cilFire } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
 import {DbDataService} from 'src/app/service/db-data.service';  //aggiunto il servizio per dati db
 
@@ -39,6 +40,8 @@ export class ChampionshipComponent implements OnInit{
     "Qatar": cifQa,
     "Emirati Arabi Uniti": cifAe,
   };
+
+  public fireIcon: string[] = cilFire; 
   
   constructor(private dbData: DbDataService) { }
 

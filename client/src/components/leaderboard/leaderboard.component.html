@@ -14,10 +14,10 @@
         >
             <thead class="text-nowrap text-truncate">
             <tr>
-                <th class="bg-body-tertiary text-center">Position</th>
-                <th class="bg-body-tertiary "><svg cIcon name="cilPeople"></svg></th>
-                <th class="bg-body-tertiary">Username</th>
-                <th class="bg-body-tertiary text-center">Punti Effettuati</th>
+                <th class="col-2 bg-body-tertiary text-center">Posizione</th>
+                <th class="col-2 bg-body-tertiary text-center"><svg cIcon name="cilPeople"></svg></th>
+                <th class="col-4 bg-body-tertiary">Username</th>
+                <th class="col-2 bg-body-tertiary text-center">Punti</th>
             </tr>
             </thead>
             <tbody>
@@ -25,12 +25,12 @@
                     leaderBoard.id; let i = $index) {
                     <tr>
                         <td>
-                            <div class="text-center">
-                                <div [class]="">#{{ i+1 }}</div>
+                            <div class="text-center fw-semibold">
+                                    <div [class]="">#{{ i+1 }}</div>
                             </div>
                         </td>
-                        <td>
-                            <c-avatar class="text-center"
+                        <td class="text-center">
+                            <c-avatar
                                 [size]="'md'"
                                 src="./assets/images/fanta_players/{{ leaderBoard.id }}.jpg"
                             />

@@ -5,8 +5,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FormModule } from '@coreui/angular';
 import { AuthService } from './../../service/auth.service';
-import { GridModule } from '@coreui/angular';
-import { ButtonDirective } from '@coreui/angular';
+import { GridModule, ButtonDirective, ModalComponent, ModalHeaderComponent, ModalBodyComponent, ModalFooterComponent, ModalToggleDirective} from '@coreui/angular';
 import { PilotiComponent } from "../piloti/piloti.component";
 import { LeaderboardComponent } from "../../../components/leaderboard/leaderboard.component";
 import { DbDataService } from 'src/app/service/db-data.service';
@@ -21,7 +20,12 @@ import { DbDataService } from 'src/app/service/db-data.service';
     FormModule,
     ButtonDirective,
     GridModule,
-    LeaderboardComponent
+    LeaderboardComponent,
+    ModalComponent,
+    ModalHeaderComponent,
+    ModalBodyComponent, 
+    ModalFooterComponent,
+    ModalToggleDirective
 ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
