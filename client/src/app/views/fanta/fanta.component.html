@@ -2,42 +2,35 @@
   <c-container class="m-2">
     <c-row>
       <c-col xs="auto" class="me-auto">
+        <table class="mb-3 border rounded custom-table">
+          <tr>
+            <td rowspan="2">
+              <div>
+                <c-avatar
+                  [size]="'xl'"
+                  src="./assets/images/fanta_players/{{ this.userId }}.jpg"
+                />
+              </div>
+            </td>
 
-        <table 
-        [hover]="true"
-        [responsive]="true"
-        [striped]="true"
-        align="middle"
-        cTable
-        class="mb-3 border rounded custom-table" 
-        >
+            <th>
+              <div>
+                <h4>{{ username }}</h4>
+              </div>
+            </th>
+          </tr>
           <tr>
             <th>
               <div>
-                <c-avatar
-                [size]="'md'"
-                src="./assets/images/fanta_players/{{ this.userId }}.jpg"
-              />
-              </div>     
-            </th>
-            <th>
-              <div>
-                <h3>{{ username }}</h3>
-              </div>
-            </th>
-            <th  >
-              <div>
-                <h3 [ngStyle]="{ color: 'green' }">
+                <h6 [ngStyle]="{ color: 'green' }">
                   Punteggio: {{ this.userFantaPoints }}
-                </h3>
+                </h6>
               </div>
-              
             </th>
           </tr>
         </table>
       </c-col>
 
-      
       <c-col xs="auto">
         <div class="align">
           <button cButton (click)="this.authService.logout()">Logout</button>
@@ -47,7 +40,7 @@
   </c-container>
   <c-container>
     <c-row>
-      <h2 class="mt-4 text-center" >Votazioni gare future</h2>
+      <h2 class="mt-4 text-center">Votazioni gare future</h2>
       <p class="lead text-center">
         In questa sezione puoi inserire le votazione per le prossime 4 gare
       </p>
@@ -124,9 +117,7 @@
                         cFormControl
                         required="true"
                       >
-                        <option value="0">
-                            -- Seleziona un pilota --
-                        </option>
+                        <option value="0">-- Seleziona un pilota --</option>
                         <option
                           *ngFor="let pilota of piloti"
                           attr.value="{{ pilota.driver_id }}"
@@ -140,7 +131,13 @@
                     <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
                   </c-row>
                   <c-row>
-                    <input cButton type="submit" color="" />
+
+                    <c-col></c-col>
+                    <c-col class="text-center">
+                      <button cButton type="submit" >Conferma</button>
+                    </c-col>
+                    <c-col></c-col>
+
                   </c-row>
                 </c-container>
               </form>
@@ -155,7 +152,7 @@
       <div class="titolo">
         <h2 class="mt-4 text-center titolo">Storico Votazioni</h2>
         <p class="lead text-center">
-          In questa sezione puoi visualizzare i punti guadagnati 
+          In questa sezione puoi visualizzare i punti guadagnati
         </p>
       </div>
     </c-row>
@@ -174,7 +171,7 @@
               [collapsed]="!item0.visible"
               cAccordionButton
             >
-              <c-container >
+              <c-container>
                 <c-row>
                   <c-col xs="auto" class="me-auto">
                     <h5 class="card-title mb-0" id="traffic">
@@ -214,58 +211,71 @@
                   >
                     <thead class="text-nowrap text-truncate">
                       <tr>
-                        <th class="bg-body-tertiary text-center"></th>
                         <th class="bg-body-tertiary text-center">Voto</th>
-                        <th class="bg-body-tertiary"></th>
+                        <th class="bg-body-tertiary text-center">
+                          <svg cIcon name="cilPeople"></svg>
+                        </th>
                         <th class="bg-body-tertiary">Username</th>
                         <th class="bg-body-tertiary text-center">
                           Posizione di arrivo
                         </th>
                         <th class="bg-body-tertiary text-center">
-                          Punti Effettuati
+                          Punti guadagati
                         </th>
+                        <th class="bg-body-tertiary text-center">Risultato</th>
                       </tr>
                     </thead>
-                    
+
                     <tbody>
-                    <ng-container *ngFor="let voto of votazioni.get(track.track_id); let i = index">
-                      <tr>
-                        <td>
-                          <div class="text-center">
-                            <svg [cIcon]="isCorrect(voto, track.track_id).icon" size='lg' [ngStyle]="{'color':isCorrect(voto, track.track_id).color}" ></svg>
-                          </div>
-                        </td>
-                        <td>
-                          <div class="text-center">
-                            <div [class]="">#{{ i + 1 }}</div>
-                          </div>
-                        </td>
-                        <td class="text-center">
-                          <c-avatar
-                            [size]="'md'"
-                            src="./assets/images/avatars/{{
-                              getPilota(voto).driver_username
-                            }}.png"
-                          />
-                        </td>
-                        <td>
-                          <div>{{ getPilota(voto).driver_username }}</div>
-                          <div
-                            class="small text-body-secondary text-nowrap"
-                          ></div>
-                        </td>
-                        <td>
-                          <div class="fw-semibold text-center">
-                            {{ getPosizioneArrivo(voto, track.track_id) }}
-                          </div>
-                        </td>
-                        <td>
-                          <div class="fw-semibold text-center">
-                            {{ getPunti(voto, track.track_id) }}
-                          </div>
-                        </td>
-                      </tr>
-                    </ng-container>
+                      <ng-container
+                        *ngFor="
+                          let voto of votazioni.get(track.track_id);
+                          let i = index
+                        "
+                      >
+                        <tr>
+                          <td>
+                            <div class="text-center">
+                              <div [class]="">{{ i + 1 }}</div>
+                            </div>
+                          </td>
+                          <td class="text-center">
+                            <c-avatar
+                              [size]="'md'"
+                              src="./assets/images/avatars/{{
+                                getPilota(voto).driver_username
+                              }}.png"
+                            />
+                          </td>
+                          <td>
+                            <div>{{ getPilota(voto).driver_username }}</div>
+                            <div
+                              class="small text-body-secondary text-nowrap"
+                            ></div>
+                          </td>
+                          <td>
+                            <div class="fw-semibold text-center">
+                              {{ getPosizioneArrivo(voto, track.track_id) }}
+                            </div>
+                          </td>
+                          <td>
+                            <div class="fw-semibold text-center">
+                              {{ getPunti(voto, track.track_id) }}
+                            </div>
+                          </td>
+                          <td>
+                            <div class="text-center">
+                              <svg
+                                [cIcon]="isCorrect(voto, track.track_id).icon"
+                                size="lg"
+                                [ngStyle]="{
+                                  color: isCorrect(voto, track.track_id).color
+                                }"
+                              ></svg>
+                            </div>
+                          </td>
+                        </tr>
+                      </ng-container>
                     </tbody>
                   </table>
                 </c-row>
