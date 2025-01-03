@@ -37,9 +37,6 @@ export class LeaderboardComponent {
    leaderBoards: LeaderBoard[] = [];
   
   ngOnInit(): void {
-
-    console.log(this.leaderBoards)
-
     //this.users = this.users.filter(u => u.id !== 0); //remove admin user
     this.users.forEach(user => {
       let newUser: LeaderBoard = {
@@ -49,5 +46,6 @@ export class LeaderboardComponent {
       };
       this.leaderBoards.push(newUser);
     });
+    this.leaderBoards.sort((a,b) => b.points - a.points );
   }
 }
