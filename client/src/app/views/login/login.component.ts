@@ -9,6 +9,7 @@ import { GridModule, ButtonDirective, ModalComponent, ModalHeaderComponent, Moda
 import { PilotiComponent } from "../piloti/piloti.component";
 import { LeaderboardComponent } from "../../../components/leaderboard/leaderboard.component";
 import { DbDataService } from 'src/app/service/db-data.service';
+import { Fanta, FantaPlayer } from '../../model/fanta';
 
 
 @Component({
@@ -33,14 +34,15 @@ import { DbDataService } from 'src/app/service/db-data.service';
 })
 
 export class LoginComponent {
-  name = '';
-  surname = '';
-  username = '';
-  password = '';
+  name: string = '';
+  surname: string = '';
+  username: string = '';
+  password: string = '';
+  image: File = new File([], "empty.txt", {type: "text/plain"});
   errorMessage = '';
   isLoggedIn : any = 'false';
   photoError: string = '';
-  constructor(private authService: AuthService, private router: Router, private route: ActivatedRoute) {}
+  constructor(private authService: AuthService, private router: Router, private route: ActivatedRoute, private dbData: DbDataService) {}
 
   onLogin() {
     if (this.authService.login(this.username, this.password)) {
@@ -75,6 +77,7 @@ export class LoginComponent {
       }
 
       this.photoError = ''; // Nessun errore
+      this.image = file;
     }
   }
 
@@ -84,14 +87,16 @@ export class LoginComponent {
       alert('Correggi gli errori prima di inviare il form.');
       return;
     }
-    
-    // Logica per gestire la registrazione
-    console.log({
+
+    const fantaPlayer: FantaPlayer = {
       name: this.name,
       surname: this.surname,
       username: this.username,
       password: this.password,
-    }); 
+      image: this.image
+    }
+
+    this.dbData.setFantaPlayer(fantaPlayer);
   }
 
   ngOnInit(): void {

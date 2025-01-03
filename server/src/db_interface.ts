@@ -1,7 +1,9 @@
 import express, { Application, Request, Response } from 'express';
 import { GenezioDeploy } from "@genezio/types";
 import pg from "pg";
+import fs from "fs";
 const { Pool } = pg;
+// const { FileSystem } = fs;
 
 //const app: Application = express();
 //const port: number = 3000;
@@ -1227,7 +1229,15 @@ UPDATE SET
     "5_place_id" = ` + voto.id_5_place + `,
     "6_place_id" = ` + voto.id_6_place + `,
     "fast_lap_id" = ` + voto.id_fast_lap + `
-            `)
+            `);
     }
+
+    async setFantaPlayer(player: any): Promise<void> {
+        const query = `INSERT INTO "fanta_player" ("username", "name", "surname", "password", "image")
+VALUES (` + player.username + `, ` + player.name + `, ` + player.surname + `, ` + player.password + `, $1)`;
+        console.log( "QUERY", query);
+        const result = await this.pool.query(query, [player.image]);
+    }
+    
 
 }

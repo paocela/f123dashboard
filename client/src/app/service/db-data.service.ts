@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { PostgresService } from "@genezio-sdk/f123dashboard" 
-import { Fanta } from '../model/fanta';
+import { Fanta, FantaPlayer } from '../model/fanta';
 import { User } from '../model/user';
 
 
@@ -77,6 +77,10 @@ export class DbDataService {
 
   async setFantaVoto(voto: Fanta): Promise<void> {
     await PostgresService.setFantaVoto(voto);
+  }
+
+  async setFantaPlayer(player: FantaPlayer): Promise<void> {
+    await PostgresService.setFantaPlayer(player);
   }
 
 }

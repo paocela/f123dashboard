@@ -21,3 +21,11 @@ export interface RaceResult {
     id_6_place: number,
     id_fast_lap: number
 }
+
+export interface FantaPlayer {
+    username: string,
+    name: string,
+    surname: string,
+    password: string,
+    image: File
+}
