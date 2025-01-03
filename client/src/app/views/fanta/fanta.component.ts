@@ -12,7 +12,12 @@ import { AccordionComponent,
     TableDirective,
     AvatarComponent,
     UtilitiesModule,
-    BadgeComponent} from '@coreui/angular';
+    BadgeComponent,
+    ModalComponent,
+    ModalHeaderComponent,
+    ModalBodyComponent, 
+    ModalFooterComponent,
+    ModalToggleDirective} from '@coreui/angular';
 import { AuthService } from './../../service/auth.service';
 import { GridModule } from '@coreui/angular';
 import { DbDataService } from 'src/app/service/db-data.service';
@@ -49,7 +54,12 @@ interface voteStatus {
     TableDirective,
     AvatarComponent,
     UtilitiesModule,
-    BadgeComponent
+    BadgeComponent,
+    ModalComponent,
+    ModalHeaderComponent,
+    ModalBodyComponent, 
+    ModalFooterComponent,
+    ModalToggleDirective
 ],
   templateUrl: './fanta.component.html',
   styleUrl: './fanta.component.scss'
@@ -138,6 +148,23 @@ export class FantaComponent {
       .filter(item => new Date(item.date) < new Date());
 
     this.previusTracks.forEach( track => {
+      const previousVote: Fanta | undefined = this.fantaService.getFantaVote(this.userId, track.track_id);
+      if ( previousVote )
+      {
+        const previousVoteArray = [
+          previousVote.id_1_place ?? 0, 
+          previousVote.id_2_place ?? 0,
+          previousVote.id_3_place ?? 0,
+          previousVote.id_4_place ?? 0,
+          previousVote.id_5_place ?? 0,
+          previousVote.id_6_place ?? 0,
+          previousVote.id_fast_lap ?? 0
+        ];
+        this.votazioni.set(track.track_id, previousVoteArray);
+      }
+    });
+    
+    this.nextTracks.forEach( track => {
       const previousVote: Fanta | undefined = this.fantaService.getFantaVote(this.userId, track.track_id);
       if ( previousVote )
       {
