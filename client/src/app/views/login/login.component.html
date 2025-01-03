@@ -64,117 +64,131 @@
             <h5 cModalTitle>Registrati</h5>
           </c-modal-header>
 
-        <form cForm (ngSubmit)="onRegistration()">
-          <c-modal-body>
-             
-              <c-container breakpoint="md" class="px-4">
-
-                <c-row [gutter]="{gy: 5}">
-                  <c-col>
-                    <div [cFormFloating]="true" class="mb-3">
-                      <input cFormControl 
+          <form cForm (ngSubmit)="onRegistration()" #registrationForm="ngForm">
+            <c-modal-body>
+            <c-container breakpoint="md" class="px-4">
+              
+              <!-- Campo Nome -->
+              <c-row [gutter]="{gy: 5}">
+                <c-col>
+                  <div [cFormFloating]="true" class="mb-3">
+                    <input 
+                      cFormControl 
                       id="name" 
                       placeholder="Nome" 
-                      type="Nome" 
+                      type="text" 
                       class="m-2" 
                       autocomplete="on"
                       [(ngModel)]="name" 
-                      name="Nome" 
+                      name="name" 
+                      #nameField="ngModel"
                       required
-                      >
-                      <label cLabel for="Nome">Nome:</label>
-                    </div>
-                  </c-col>
-                </c-row>              
-
-                <c-row [gutter]="{gy: 5}">
-                  <c-col>
-                    <div [cFormFloating]="true" class="mb-3">
-                      <input cFormControl 
-                      id="Cognome" 
+                    >
+                    <label cLabel for="name">Nome:</label>
+                    <small class="text-danger" *ngIf="nameField.invalid && nameField.touched">Il nome è obbligatorio.</small>
+                  </div>
+                </c-col>
+              </c-row>
+          
+              <!-- Campo Cognome -->
+              <c-row [gutter]="{gy: 5}">
+                <c-col>
+                  <div [cFormFloating]="true" class="mb-3">
+                    <input 
+                      cFormControl 
+                      id="surname" 
                       placeholder="Cognome" 
-                      type="Cognome" 
+                      type="text" 
                       class="m-2" 
                       autocomplete="on"
                       [(ngModel)]="surname" 
-                      name="Cognome" 
+                      name="surname" 
+                      #surnameField="ngModel"
                       required
-                      >
-                      <label cLabel for="Cognome">Cognome:</label>
-                    </div>
-                  </c-col>
-                </c-row>              
+                    >
+                    <label cLabel for="surname">Cognome:</label>
+                    <small class="text-danger" *ngIf="surnameField.invalid && surnameField.touched">Il cognome è obbligatorio.</small>
+                  </div>
+                </c-col>
+              </c-row>
+          
+              <!-- Campo Username -->
+              <c-row [gutter]="{gy: 5}">
+                <c-col>
+                  <div [cFormFloating]="true" class="mb-3">
+                    <input 
+                      cFormControl 
+                      id="username" 
+                      placeholder="Username" 
+                      type="text" 
+                      class="m-2" 
+                      [(ngModel)]="username" 
+                      name="username" 
+                      #usernameField="ngModel"
+                      required
+                    >
+                    <label cLabel for="username">Username:</label>
+                    <small class="text-danger" *ngIf="usernameField.invalid && usernameField.touched">L'username è obbligatorio.</small>
+                  </div>
+                </c-col>
+              </c-row>
+          
+              <!-- Campo Password -->
+              <p>!! Importante, non mettere un Password già usata su altri siti. Le password non vengono criptate !!</p>
 
-
-                <c-row [gutter]="{gy: 5}">
-                  <c-col>
-                    <div [cFormFloating]="true" class="mb-3">
-                      <input cFormControl  
-                        class="m-2" 
-                        type="text" 
-                        id="username" 
-                        [(ngModel)]="username" 
-                        name="username" 
-                        placeholder="username"
-                        required
-                      >
-                      <label cLabel for="username">Username:</label>
-                    </div>
-                  </c-col>
-                </c-row>
-
-                <c-row [gutter]="{gy: 5}">
-                  <c-col>
-                    <div [cFormFloating]="true" class="mb-3">
-                      <input cFormControl 
+              <c-row [gutter]="{gy: 5}">
+                <c-col>
+                  <div [cFormFloating]="true" class="mb-3">
+                    <input 
+                      cFormControl 
                       id="password" 
                       placeholder="Password" 
                       type="password" 
                       class="m-2" 
-                      autocomplete="off"
                       [(ngModel)]="password" 
                       name="password" 
+                      #passwordField="ngModel"
                       required
-                      >
-                      <label cLabel for="password">Password:</label>
-                    </div>
-                  </c-col>
-                </c-row>                
-        
-
-                <c-row [gutter]="{gy: 5}">
-                  <c-col>
-                    <div [cFormFloating]="true" class="mb-3">
-                      <input 
-                        cFormControl
-                        type="file" 
-                        class="m-2" 
-                        id="photo" 
-                        name="photo"
-                        (change)="onFileChange($event)"
-                        accept="image/*"
-                        required
-                      >
-                      <label cLabel for="photo">Carica Foto:</label>
-                      <small class="text-danger" *ngIf="photoError">{{ photoError }}</small>
-                    </div>
-                  </c-col>
-                </c-row>
-
-                
+                    >
+                    
+                    <label cLabel for="password">Password:</label>
+                    <small class="text-danger" *ngIf="passwordField.invalid && passwordField.touched">La password è obbligatoria.</small>
+                  </div>
+                </c-col>
+              </c-row>
+          
+              <!-- Campo Foto -->
+              <c-row [gutter]="{gy: 5}">
+                <c-col>
+                  <div [cFormFloating]="true" class="mb-3">
+                    <input 
+                      cFormControl
+                      type="file" 
+                      class="m-2" 
+                      id="photo" 
+                      name="photo"
+                      (change)="onFileChange($event)"
+                      accept="image/*"
+                      required
+                    >
+                    <label cLabel for="photo">Carica Foto:</label>
+                    <small class="text-danger" *ngIf="photoError">{{ photoError }}</small>
+                  </div>
+                </c-col>
+              </c-row>
       
-              </c-container>
-
+            </c-container>
           </c-modal-body>
-        
-
           <c-modal-footer>
             <button [cModalToggle]="verticallyCenteredModal.id" cButton color="secondary">
               Close
             </button>
-            <button cButton class="m-1" color="primary" type="submit" >Registrati</button>
+            <button cButton class="btn btn-primary"  type="submit" [disabled]="registrationForm.invalid" >Registrati</button>
           </c-modal-footer>
-        </form>
+          </form>
+                
+                
+
         </c-modal>
       
       <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>

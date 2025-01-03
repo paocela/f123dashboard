@@ -10,6 +10,7 @@ import { PilotiComponent } from "../piloti/piloti.component";
 import { LeaderboardComponent } from "../../../components/leaderboard/leaderboard.component";
 import { DbDataService } from 'src/app/service/db-data.service';
 
+
 @Component({
   selector: 'app-login',
   standalone: true,
