@@ -10,6 +10,7 @@ import { LeaderboardComponent } from "../../../components/leaderboard/leaderboar
 import { DbDataService } from 'src/app/service/db-data.service';
 import { FantaPlayer } from '../../model/fanta';
 
+
 @Component({
   selector: 'app-login',
   standalone: true,
