@@ -7,9 +7,11 @@ import { FormModule } from '@coreui/angular';
 import { AuthService } from './../../service/auth.service';
 import { GridModule, ButtonDirective, ModalComponent, ModalHeaderComponent, ModalBodyComponent, ModalFooterComponent, ModalToggleDirective} from '@coreui/angular';
 import { LeaderboardComponent } from "../../../components/leaderboard/leaderboard.component";
-import { DbDataService } from 'src/app/service/db-data.service';
+import { DbDataService } from '../../../app/service/db-data.service';
 import { FantaPlayer } from '../../model/fanta';
-
+import { User } from '../../../app/model/user';
+import { cilWarning } from '@coreui/icons';
+import { IconDirective } from '@coreui/icons-angular';
 
 @Component({
   selector: 'app-login',
@@ -26,8 +28,9 @@ import { FantaPlayer } from '../../model/fanta';
     ModalHeaderComponent,
     ModalBodyComponent, 
     ModalFooterComponent,
-    ModalToggleDirective
-],
+    ModalToggleDirective,
+    IconDirective
+  ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
@@ -41,7 +44,13 @@ export class LoginComponent {
   errorMessage = '';
   isLoggedIn : any = 'false';
   photoError: string = '';
+  usernameError: string = '';
+  
+  public warningIcon: string[] = cilWarning;
+
   constructor(private authService: AuthService, private router: Router, private route: ActivatedRoute, private dbData: DbDataService) {}
+
+  users: User[] = this.dbData.getUsers();
 
   onLogin() {
     if (this.authService.login(this.username, this.password)) {
@@ -82,8 +91,14 @@ export class LoginComponent {
 
 
   onRegistration(){
+    console.log(this.username, this.users);
+
+    if (!this.formIsValid(this.username)) {
+      this.usernameError = 'Username già esistente';
+      return;
+    }
+
     if (this.photoError) {
-      alert('Correggi gli errori prima di inviare il form.');
       return;
     }
 
@@ -100,6 +115,10 @@ export class LoginComponent {
 
     window.location.reload()
     window.alert("Registrazione effettuata con successo, ora puoi fare il login con i tuoi dati, Buon Divertimento")
+  }
+
+  formIsValid(username: string): boolean {
+    return !this.users.some(user => user.username == username);
   }
 
   ngOnInit(): void {

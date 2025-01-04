@@ -128,14 +128,21 @@
                       required
                     >
                     <label cLabel for="username">Username:</label>
+                    <small class="text-danger" *ngIf="usernameError">{{ usernameError }}</small>
                     <small class="text-danger" *ngIf="usernameField.invalid && usernameField.touched">L'username è obbligatorio.</small>
                   </div>
                 </c-col>
               </c-row>
           
+              <div>
+                <p>
+                  <svg [cIcon]="warningIcon" style="color: #eed202"></svg>
+                  DISCLAIMER: non usare passwords importanti. Le password non vengono criptate!
+                  <svg [cIcon]="warningIcon" style="color: #eed202"></svg>
+                </p>
+              </div>
+              
               <!-- Campo Password -->
-              <p>!! Importante, non mettere un Password già usata su altri siti. Le password non vengono criptate !!</p>
-
               <c-row [gutter]="{gy: 5}">
                 <c-col>
                   <div [cFormFloating]="true" class="mb-3">
