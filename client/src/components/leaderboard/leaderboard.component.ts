@@ -47,5 +47,7 @@ export class LeaderboardComponent {
       this.leaderBoards.push(newUser);
     });
     this.leaderBoards.sort((a,b) => b.points - a.points );
+
+    console.log(this.leaderBoards)
   }
 }

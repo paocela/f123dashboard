@@ -3,12 +3,15 @@
 
 ### TODO
 - selezione giocatori dinamica: giocatori selezionati già devono scomparire
-- pulsante submit query!!!
-- prendere voti pregressi automaticamente da db, e popolare in base all'utente loggato
-- mandare query con votazione per utente
 - chiudere votazione quando scatta il countdown
 - aggiungere punteggi bonus
-- aggiungere votazione giro veloce
+- sistemare graficamente la pagina Chempionship da smartphone, è inguardabile
+- sistemare graficamente la pagina chempionship standings per smartphone riducendo i caratteri 
+- sistemare scritta immagine rolex da spartphone viene stirata
+- cards piloti da ingrandire scritte delle caratteristiche e provarne a fare stare 2 affiancate da spartphone 
+- scrivere il regolamento per il fanta 
+- rendere più grosse le celle di selezione del fanta nella visualizzazione smartphone (ridurre il carattere dei nomi) 
+
 
 mail:raceforfederica@gmail.com
 password mail: RaceForFederica2024_
