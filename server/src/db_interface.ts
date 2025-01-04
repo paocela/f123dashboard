@@ -1234,7 +1234,7 @@ ON all_session_points.race_id = inner_table.race_id
 
   async setFantaPlayer(player: any): Promise<void> {
     const query = `INSERT INTO "fanta_player" ("username", "name", "surname", "password")
-    VALUES (` + player.username + `, ` + player.name + `, ` + player.surname + `, ` + player.password + `)`;
+    VALUES ('` + player.username + `', '` + player.name + `', '` + player.surname + `', '` + player.password + `')`;
     const result = await this.pool.query(query);
   }
 }
