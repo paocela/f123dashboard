@@ -91,8 +91,6 @@ export class LoginComponent {
 
 
   onRegistration(){
-    console.log(this.username, this.users);
-
     if (!this.formIsValid(this.username)) {
       this.usernameError = 'Username già esistente';
       return;
@@ -111,10 +109,9 @@ export class LoginComponent {
     }
 
     this.dbData.setFantaPlayer(fantaPlayer);
-    console.log("success", fantaPlayer)
 
-    window.location.reload()
     window.alert("Registrazione effettuata con successo, ora puoi fare il login con i tuoi dati, Buon Divertimento")
+    window.location.reload()
   }
 
   formIsValid(username: string): boolean {
