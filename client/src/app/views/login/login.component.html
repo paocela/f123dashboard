@@ -134,7 +134,7 @@
                 </c-col>
               </c-row>
           
-              <div>
+              <div class="avviso">
                 <p>
                   <svg [cIcon]="warningIcon" style="color: #eed202"></svg>
                   DISCLAIMER: non usare passwords importanti. Le password non vengono criptate!
@@ -156,6 +156,7 @@
                       name="password" 
                       #passwordField="ngModel"
                       required
+                      minlength="4"
                     >
                     
                     <label cLabel for="password">Password:</label>
