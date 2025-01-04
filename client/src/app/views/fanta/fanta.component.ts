@@ -199,7 +199,7 @@ export class FantaComponent {
 
   formIsValid(trackId: number): boolean {
     const votoArray = this.votazioni.get(trackId) || [];
-    const hasDuplicates = votoArray.some((v, i) => i != 7 && votoArray.indexOf(v) !== i);
+    const hasDuplicates = votoArray.some((v, i) => i + 1 != 7 && votoArray.indexOf(v) !== i);
     const hasEmptyVotes = votoArray.some((v, i)=> v == 0);
     if(hasDuplicates || hasEmptyVotes || votoArray.length < 6){
       return false;

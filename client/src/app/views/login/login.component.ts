@@ -6,10 +6,9 @@ import { FormsModule } from '@angular/forms';
 import { FormModule } from '@coreui/angular';
 import { AuthService } from './../../service/auth.service';
 import { GridModule, ButtonDirective, ModalComponent, ModalHeaderComponent, ModalBodyComponent, ModalFooterComponent, ModalToggleDirective} from '@coreui/angular';
-import { PilotiComponent } from "../piloti/piloti.component";
 import { LeaderboardComponent } from "../../../components/leaderboard/leaderboard.component";
 import { DbDataService } from 'src/app/service/db-data.service';
-import { Fanta, FantaPlayer } from '../../model/fanta';
+import { FantaPlayer } from '../../model/fanta';
 
 @Component({
   selector: 'app-login',
@@ -87,7 +86,7 @@ export class LoginComponent {
       return;
     }
 
-    const fantaPlayer: FantaPlayer = {
+    let fantaPlayer: FantaPlayer = {
       name: this.name,
       surname: this.surname,
       username: this.username,
