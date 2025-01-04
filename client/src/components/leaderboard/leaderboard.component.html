@@ -1,0 +1,52 @@
+
+    <c-row>
+        <h2 class="text-center">Classifica Fanta</h2>
+    </c-row>
+    <c-row>
+        <table
+        [hover]="true"
+        [responsive]="true"
+        [striped]="true"
+        align="middle"
+        cTable
+        class="mb-3 border rounded custom-table"
+
+        >
+            <thead class="text-nowrap text-truncate">
+            <tr>
+                <th class="col-2 bg-body-tertiary text-center">Posizione</th>
+                <th class="col-2 bg-body-tertiary text-center"><svg cIcon name="cilPeople"></svg></th>
+                <th class="col-4 bg-body-tertiary">Username</th>
+                <th class="col-2 bg-body-tertiary text-center">Punti</th>
+            </tr>
+            </thead>
+            <tbody>
+                @for ( leaderBoard of leaderBoards ; track
+                    leaderBoard.id; let i = $index) {
+                    <tr>
+                        <td>
+                            <div class="text-center fw-semibold">
+                                    <div [class]="">#{{ i+1 }}</div>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <c-avatar
+                                [size]="'md'"
+                                src="./assets/images/fanta_players/{{ leaderBoard.id }}.jpg"
+                            />
+                        </td>
+                        <td>
+                            <div>{{ leaderBoard.username }}</div>
+                            <div class="small text-body-secondary text-nowrap"></div>
+                        </td>
+                        <td>
+                            <div class="fw-semibold text-center">
+                                {{ leaderBoard.points }}
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </c-row>
+

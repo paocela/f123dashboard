@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { DefaultLayoutComponent } from './layout';
+import { authGuard } from './guard/auth.guard';
 
 export const routes: Routes = [
   {
@@ -37,7 +38,12 @@ export const routes: Routes = [
        /* routing fanta */
       {
         path: 'fanta',
-        loadChildren: () => import('./views/fanta/routes').then((m) => m.routes)
+        loadChildren: () => import('./views/fanta/routes').then((m) => m.routes),
+        canActivate: [authGuard]
+      },
+      { 
+        path: 'login', 
+        loadChildren: () => import('./views/login/routes').then((m) => m.routes) 
       }
     ]
   },

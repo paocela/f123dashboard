@@ -100,13 +100,13 @@
               <c-row>
                 <c-col>
                   <div class="small text-body-secondary">
-                    <svg [cIcon]="calendarIcon"></svg>
+                    <svg [cIcon]="calendarIcon" style="color: blue"></svg>
                     <strong> Date:</strong> {{ next_track.date }}
                   </div>
                 </c-col>
                 <c-col class="text-end">
                   <div class="small text-body-secondary">
-                    <svg [cIcon]="fireIcon"></svg>
+                    <svg [cIcon]="fireIcon" style="color: purple"></svg>
                     <strong> Fastest Lap:</strong>
                     {{ next_track.besttime_driver_time }} ({{
                       next_track.username

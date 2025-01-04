@@ -28,8 +28,8 @@ export const navItems: INavData[] = [
     url: '/fanta',
     iconComponent: { name: 'cil-gamepad' },
     badge: {
-      color: 'danger',
-      text: 'Coming Soon'
+      color: 'warning',
+      text: 'BETA'
     }
   }
 ];

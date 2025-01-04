@@ -1,0 +1,23 @@
+.custom-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden; /* Nasconde i bordi sporgenti */
+    padding: 8px;
+  }
+
+  .titolo {
+    margin-top: 60px;
+    margin-bottom: 15px;
+  }
+
+  .storico {
+    margin-bottom: 25px;
+  }
+
+  .cTable {
+    background-color: transparent !important;
+  }
+
+  th, td {
+    padding: 5px;
+  }
