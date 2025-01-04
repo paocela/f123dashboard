@@ -111,7 +111,10 @@ export class LoginComponent {
     this.dbData.setFantaPlayer(fantaPlayer);
 
     window.alert("Registrazione effettuata con successo, ora puoi fare il login con i tuoi dati, Buon Divertimento")
-    window.location.reload()
+    //ritardo aggiunto perchè se no non vengono scritti in tempo i dati nel db
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000); 
   }
 
   formIsValid(username: string): boolean {

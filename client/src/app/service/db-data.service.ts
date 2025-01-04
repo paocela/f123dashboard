@@ -81,6 +81,7 @@ export class DbDataService {
 
   async setFantaPlayer(player: FantaPlayer): Promise<void> {
     await PostgresService.setFantaPlayer(player);
+    console.log("ok fatto")
   }
 
 }
