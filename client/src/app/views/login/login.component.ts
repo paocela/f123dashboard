@@ -48,7 +48,7 @@ export class LoginComponent {
       sessionStorage.setItem('isLoggedIn', 'true'); // Salva lo stato del login
       this.router.navigate(['/fanta']);          // Naviga verso la componente protetta
     } else {
-      this.errorMessage = 'Credenziali non valide!';
+      window.alert("Credenziali non valide!, Ritenta e sarai più fortunarto")
     }
   }
 
@@ -96,6 +96,10 @@ export class LoginComponent {
     }
 
     this.dbData.setFantaPlayer(fantaPlayer);
+    console.log("success", fantaPlayer)
+
+    window.location.reload()
+    window.alert("Registrazione effettuata con successo, ora puoi fare il login con i tuoi dati, Buon Divertimento")
   }
 
   ngOnInit(): void {

@@ -40,8 +40,10 @@ export class AuthService {
     sessionStorage.removeItem('user');
     sessionStorage.removeItem('userId');
     sessionStorage.removeItem('isLoggedIn');
+    window.location.reload();
     this.router.navigateByUrl('/redirect', { skipLocationChange: true }).then(() => {
       this.router.navigate(['/fanta']);
+      
     });
   }
 }
