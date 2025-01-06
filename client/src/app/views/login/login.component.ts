@@ -62,32 +62,32 @@ export class LoginComponent {
   }
 
 
-  onFileChange(event: Event): void {
-    const input = event.target as HTMLInputElement;
+  // onFileChange(event: Event): void {
+  //   const input = event.target as HTMLInputElement;
 
-    if (input.files && input.files[0]) {
-      const file = input.files[0];
-      const fileType = file.type;
-      const maxSize = 5 * 1024 * 1024; // 5 MB
+  //   if (input.files && input.files[0]) {
+  //     const file = input.files[0];
+  //     const fileType = file.type;
+  //     const maxSize = 5 * 1024 * 1024; // 5 MB
 
-      // Controlla che il file sia un'immagine
-      if (!fileType.startsWith('image/')) {
-        this.photoError = 'Il file deve essere un\'immagine.';
-        input.value = ''; // Resetta il campo
-        return;
-      }
+  //     // Controlla che il file sia un'immagine
+  //     if (!fileType.startsWith('image/')) {
+  //       this.photoError = 'Il file deve essere un\'immagine.';
+  //       input.value = ''; // Resetta il campo
+  //       return;
+  //     }
 
-      // Controlla la dimensione massima
-      if (file.size > maxSize) {
-        this.photoError = 'Il file deve essere inferiore a 5 MB.';
-        input.value = ''; // Resetta il campo
-        return;
-      }
+  //     // Controlla la dimensione massima
+  //     if (file.size > maxSize) {
+  //       this.photoError = 'Il file deve essere inferiore a 5 MB.';
+  //       input.value = ''; // Resetta il campo
+  //       return;
+  //     }
 
-      this.photoError = ''; // Nessun errore
-      this.image = file;
-    }
-  }
+  //     this.photoError = ''; // Nessun errore
+  //     this.image = file;
+  //   }
+  // }
 
 
   onRegistration(){

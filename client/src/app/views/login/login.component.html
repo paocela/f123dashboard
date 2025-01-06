@@ -164,26 +164,6 @@
                   </div>
                 </c-col>
               </c-row>
-          
-              <!-- Campo Foto -->
-              <c-row [gutter]="{gy: 5}">
-                <c-col>
-                  <div [cFormFloating]="true" class="mb-3">
-                    <input 
-                      cFormControl
-                      type="file" 
-                      class="m-2" 
-                      id="photo" 
-                      name="photo"
-                      (change)="onFileChange($event)"
-                      accept="image/*"
-                      required
-                    >
-                    <label cLabel for="photo">Carica Foto:</label>
-                    <small class="text-danger" *ngIf="photoError">{{ photoError }}</small>
-                  </div>
-                </c-col>
-              </c-row>
       
             </c-container>
           </c-modal-body>
