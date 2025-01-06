@@ -274,13 +274,15 @@ export class FantaComponent {
   getPunti(pilota: number, trackId: number): number{
     let posizioneArrivo: number = this.getPosizioneArrivo(pilota, trackId);
     let votazione: number = this.getVoto(trackId, posizioneArrivo);
-    return votazione == pilota ? this.fantaService.getCorrectResponsePoint() : 0;  
+    console.log("classifica", trackId, votazione, pilota)
+    return votazione == pilota && votazione != 0 ? this.fantaService.getCorrectResponsePoint() : 0;  
   }
-
+  
   getPuntiFastLap(trackId: number): number{
     let posizioneArrivo: number = this.getFastLap(trackId);
     let votazione: number = this.getVoto(trackId, 7); // 7 is giro veloce
-    return votazione == posizioneArrivo ? this.fantaService.getCorrectResponsePointFastLap() : 0;  
+    console.log("giroVeloce", trackId, votazione, posizioneArrivo)
+    return votazione == posizioneArrivo && votazione != 0 ? this.fantaService.getCorrectResponsePointFastLap() : 0;  
   }
 
   getPuntiGp( trackId: number): number{
