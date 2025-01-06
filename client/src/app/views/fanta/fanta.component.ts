@@ -132,10 +132,27 @@ export class FantaComponent {
     // this.votazioni.set(1, previusVote);
 
     this.nextTracks = this.tracks
-      .filter(item => new Date(item.date) >= new Date())
+    .filter(item => {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Imposta la data corrente a mezzanotte
+    
+      const itemDate = new Date(item.date);
+      itemDate.setHours(0, 0, 0, 0); // Imposta la data dell'item a mezzanotte
+    
+      return itemDate > today;
+    })
       .slice(0,4);
+
     this.previusTracks = this.tracks
-      .filter(item => new Date(item.date) < new Date());
+          .filter(item => {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Imposta la data corrente a mezzanotte
+    
+      const itemDate = new Date(item.date);
+      itemDate.setHours(0, 0, 0, 0); // Imposta la data dell'item a mezzanotte
+    
+      return itemDate <= today;
+    })
 
     this.previusTracks.forEach( track => {
       const previousVote: Fanta | undefined = this.fantaService.getFantaVote(this.userId, track.track_id);

@@ -114,7 +114,7 @@ export class LoginComponent {
     //ritardo aggiunto perchè se no non vengono scritti in tempo i dati nel db
     setTimeout(() => {
       window.location.reload();
-    }, 1000); 
+    }, 500); 
   }
 
   formIsValid(username: string): boolean {
