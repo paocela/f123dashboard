@@ -1,7 +1,7 @@
 <c-row ngPreserveWhitespaces>
     <c-col xs="12" *ngFor="let gp of championship_data; let id_gp = index">
       <c-card class="mb-4">
-        <c-card-header>
+        <c-card-header class="px-1 px-sm-4">
           <c-container>
             <c-row>
               <c-col xs="auto" class="me-auto">
@@ -22,7 +22,7 @@
           </c-row>
         </c-container>
         </c-card-header>
-        <c-card-body>
+        <c-card-body class="px-1 px-sm-4">
             <table [striped]="true" cTable>
               <thead>
                 <tr>
