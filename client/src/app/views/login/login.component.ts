@@ -5,7 +5,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FormModule } from '@coreui/angular';
 import { AuthService } from './../../service/auth.service';
-import { GridModule, ButtonDirective, ModalComponent, ModalHeaderComponent, ModalBodyComponent, ModalFooterComponent, ModalToggleDirective} from '@coreui/angular';
+import { GridModule, ButtonDirective, ModalComponent, ModalHeaderComponent, ModalBodyComponent, ModalFooterComponent, ModalToggleDirective,
+  CardBodyComponent,
+  CardComponent,
+  CardHeaderComponent,
+  CardTextDirective,
+  CardTitleDirective
+} from '@coreui/angular';
 import { LeaderboardComponent } from "../../../components/leaderboard/leaderboard.component";
 import { DbDataService } from '../../../app/service/db-data.service';
 import { FantaPlayer } from '../../model/fanta';
@@ -29,7 +35,12 @@ import { IconDirective } from '@coreui/icons-angular';
     ModalBodyComponent, 
     ModalFooterComponent,
     ModalToggleDirective,
-    IconDirective
+    IconDirective,
+    CardBodyComponent,
+    CardComponent,
+    CardHeaderComponent,
+    CardTextDirective,
+    CardTitleDirective
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
@@ -48,10 +59,14 @@ export class LoginComponent {
   
   public warningIcon: string[] = cilWarning;
 
-  constructor(private authService: AuthService, private router: Router, private route: ActivatedRoute, private dbData: DbDataService) {}
+  public modalVisible = true; // modal is used to load avatars for fanta (via google form)
 
+  
+  constructor(private authService: AuthService, private router: Router, private route: ActivatedRoute, private dbData: DbDataService) {}
+  
   users: User[] = this.dbData.getUsers();
 
+  
   onLogin() {
     if (this.authService.login(this.username, this.password)) {
       sessionStorage.setItem('isLoggedIn', 'true'); // Salva lo stato del login
@@ -120,6 +135,11 @@ export class LoginComponent {
   formIsValid(username: string): boolean {
     return !this.users.some(user => user.username == username);
   }
+
+  toggleModal() {
+    this.modalVisible = !this.modalVisible;
+  }
+
 
   ngOnInit(): void {
     this.isLoggedIn = sessionStorage.getItem('isLoggedIn');

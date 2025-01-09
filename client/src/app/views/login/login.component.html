@@ -53,11 +53,24 @@
       </form>
       <div class="container">
         <button [cModalToggle]="verticallyCenteredModal.id" color="link" cButton>oppure registrati</button>
-        </div>
-
-
-
-
+      </div>
+      <div></div>
+      <div></div>
+      <div>
+        <c-card class="mb-3 text-center">
+          <c-card-header class="bg-warning" style="color:white">
+            <h5>
+              <svg [cIcon]="warningIcon" size="lg" style="color: white"></svg>
+              Carica il tuo avatar
+              <svg [cIcon]="warningIcon" size="lg" style="color: white"></svg>
+            </h5>
+          </c-card-header>
+          <c-card-body class="bg-gradient">
+            <p cCardText>Se vuoi usare una tua immagine come avatar, caricala subito tramite Google Form!</p>
+            <a cButton color="warning" href="https://docs.google.com/forms/d/e/1FAIpQLSd9I8gCbiSNbKz5D9mKvkqX3dxjTRw515Js4WdxQ-yqAYzUcQ/viewform?usp=dialog">Carica Immagine</a>
+          </c-card-body>
+        </c-card>
+      </div>
 
         <c-modal #verticallyCenteredModal alignment="center" id="verticallyCenteredModal">
           <c-modal-header>
@@ -174,11 +187,25 @@
             <button cButton class="btn btn-primary"  type="submit" [disabled]="registrationForm.invalid" >Registrati</button>
           </c-modal-footer>
           </form>
-                
-                
-
         </c-modal>
       <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
   </c-col>
 </c-row>
 </c-container>
+
+<c-modal id="avatarsModal" [visible]="modalVisible">
+  <c-modal-header class="bg-warning">
+      <h5 cModalTitle style="color:white">
+        <svg [cIcon]="warningIcon" size="lg" style="color: white"></svg>
+        Carica il tuo avatar
+        <svg [cIcon]="warningIcon" size="lg" style="color: white"></svg>
+      </h5>
+  </c-modal-header>
+  <c-modal-body>
+    <p>Se vuoi usare una tua immagine come avatar, caricala subito tramite Google Form!</p>
+  </c-modal-body>
+  <c-modal-footer>
+    <button (click)="toggleModal()" cButton color="secondary">Close</button>
+    <a cButton color="warning" style="color:black" href="https://docs.google.com/forms/d/e/1FAIpQLSd9I8gCbiSNbKz5D9mKvkqX3dxjTRw515Js4WdxQ-yqAYzUcQ/viewform?usp=dialog">Carica Immagine</a>
+  </c-modal-footer>
+</c-modal>
