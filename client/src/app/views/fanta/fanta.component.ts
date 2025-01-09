@@ -134,10 +134,10 @@ export class FantaComponent {
     this.nextTracks = this.tracks
     .filter(item => {
       const today = new Date();
-      today.setHours(0, 0, 0, 0); // Imposta la data corrente a mezzanotte
+      //today.setHours(0, 0, 0, 0); // Imposta la data corrente a mezzanotte
     
       const itemDate = new Date(item.date);
-      itemDate.setHours(0, 0, 0, 0); // Imposta la data dell'item a mezzanotte
+      //itemDate.setHours(0, 0, 0, 0); // Imposta la data dell'item a mezzanotte
     
       return itemDate > today;
     })
@@ -146,10 +146,10 @@ export class FantaComponent {
     this.previusTracks = this.tracks
           .filter(item => {
       const today = new Date();
-      today.setHours(0, 0, 0, 0); // Imposta la data corrente a mezzanotte
+     //today.setHours(0, 0, 0, 0); // Imposta la data corrente a mezzanotte
     
       const itemDate = new Date(item.date);
-      itemDate.setHours(0, 0, 0, 0); // Imposta la data dell'item a mezzanotte
+     // itemDate.setHours(0, 0, 0, 0); // Imposta la data dell'item a mezzanotte
     
       return itemDate <= today;
     })
