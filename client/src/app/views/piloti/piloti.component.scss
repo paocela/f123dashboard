@@ -1,8 +1,13 @@
 
 c-chart {
     width: 100% !important; 
-    height: 250px; 
     max-width: 600px; 
     margin: 0 auto; 
   }
   
+  .radar-chart-container {
+    aspect-ratio: 1; /* Mantiene il rapporto 1:1, rendendo il contenitore quadrato */
+    display: flex; /* Per centrare il canvas */
+    justify-content: center;
+    align-items: center;
+  }

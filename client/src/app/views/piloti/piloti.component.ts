@@ -81,7 +81,8 @@ export class PilotiComponent implements OnInit {
 
   // Opzioni comuni per il radar chart
   radarChartOptions: ChartOptions<'radar'> = {
-    maintainAspectRatio: false,
+    responsive: true,
+  maintainAspectRatio: true, // Mantiene il grafico quadrato
     scales: {
       r: {
         beginAtZero: true,
