@@ -90,9 +90,10 @@
                 <c-container>
                   <c-row
                     *ngFor="let posizione of posizioni | keyvalue"
-                    class="m-2"
+                    class="my-2"
+                    [gutter]="{g: 0, sm: {g: 3}}"
                   >
-                    <c-col xs="8">
+                    <c-col xs="4" sm="auto">
                       <strong>
                         @if (posizione.key != 7) {
                           {{ posizione?.value }} posto
@@ -108,7 +109,7 @@
                       />
                       <svg *ngIf="posizione.key == 7" [cIcon]="fireIcon" style="color: purple"></svg>
                     </c-col>
-                    <c-col>
+                    <c-col xs="8" sm="auto" class="ms-auto">
                       <select
                         attr.aria-label="seleziona il pilota che arrivera {{
                           posizione?.value

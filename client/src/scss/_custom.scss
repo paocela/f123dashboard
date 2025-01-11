@@ -6,6 +6,22 @@
 // custom tweaks for scrollbar styling (wip)
 @import "scrollbar";
 
+:root {
+  --font-size-default: 1.1rem;
+  --font-size-sm: 0.7rem;
+}
+
+body {
+  font-size: var(--font-size-default);
+}
+
+@media (max-width: 650px) {
+  body {
+    font-size: var(--font-size-sm);
+  }
+}
+
+
  // custom calendar today cell color
 .calendar-cell.today {
   --cui-calendar-cell-today-color: var(--cui-info) !important;

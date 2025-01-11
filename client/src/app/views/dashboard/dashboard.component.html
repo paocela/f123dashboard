@@ -22,7 +22,7 @@
               <th class="bg-body-tertiary"></th>
               <th class="bg-body-tertiary">Username</th>
               <th class="bg-body-tertiary text-center">Car</th>
-              <th class="bg-body-tertiary">Pilot</th>
+              <th class="bg-body-tertiary pilot">Pilot</th>
               <th class="bg-body-tertiary text-center">Points</th>
             </tr>
           </thead>
@@ -41,7 +41,6 @@
               </td>
               <td>
                 <div>{{ user.driver_username }}</div>
-                <div class="small text-body-secondary text-nowrap"></div>
               </td>
               <td class="text-center">
                 <img
@@ -50,7 +49,7 @@
                   src="./assets/images/constructors/{{ user.car_name }}.svg"
                 />
               </td>
-              <td>
+              <td class="pilot">
                 <div class="text-nowrap">
                   {{ user.pilot_name }} {{ user.pilot_surname }}
                 </div>

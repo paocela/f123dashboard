@@ -5,8 +5,7 @@
         <c-card-body> 
           <c-card [textColor]="pilota.driver_color" style="width: 100%;">
             <img [cCardImg]="'top'" src='./assets/images/avatars/{{pilota.driver_username}}.png' alt="{{ pilota.driver_username }}'s avatar" />
-            <c-card-body >
-              
+            <c-card-body style="height: 120px;">
               <h5 cCardTitle>{{ pilota.driver_username }}</h5>
               <p cCardText>{{ pilota.driver_description }}</p>
             </c-card-body>
