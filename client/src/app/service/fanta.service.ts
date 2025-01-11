@@ -8,20 +8,19 @@ import { LeaderBoard } from '../model/leaderboard';
   providedIn: 'root'
 })
 export class FantaService {
-  fantaData: any[];
   fantaPoints: Map<number,number> = new Map<number,number>();
   fantaVotes:  Fanta[] = [];
   raceResults: RaceResult[] = [];
+  allDrivers: any[] = [];
 
   correctResponsePoint: number = 1;
   correctResponsePointFastLap: number = 2
-  allCorrectResponsePoint: number = 5;
-
+  correctResponsePointDnf: number = 2;
 
   constructor(private dbData: DbDataService) {
-    this.fantaData = this.dbData.getAllFanta();
     this.fantaVotes = this.dbData.getFantaVote();
     this.raceResults = this.dbData.getRaceResoult();
+    this.allDrivers = this.dbData.getAllDrivers();
 
     this.raceResults.forEach(raceResult => {
       const raceVotes = this.fantaVotes.filter(item => item.track_id == raceResult.track_id);
@@ -33,8 +32,6 @@ export class FantaService {
 
     //order by points
     this.fantaPoints = new Map(Array.from(this.fantaPoints.entries()).sort(([, valueA], [, valueB]) => valueA - valueB));
-    console.log(this.fantaPoints)
-
    }
 
    getFantaPoints(userId: number): number{
@@ -61,6 +58,8 @@ export class FantaService {
     points = raceResult.id_5_place === fantaVote.id_5_place ? points + this.correctResponsePoint : points;
     points = raceResult.id_6_place === fantaVote.id_6_place ? points + this.correctResponsePoint : points;
     points = raceResult.id_fast_lap === fantaVote.id_fast_lap ? points + this.correctResponsePointFastLap : points;
+    points = this.isDnfCorrect(raceResult.list_dnf, fantaVote.id_dnf) ? points + this.correctResponsePointDnf : points;
+
     return points;
   }
 
@@ -68,12 +67,17 @@ export class FantaService {
     return this.correctResponsePoint;
   }
 
-  getAllCorrectResponsePoint(): number {
-    return this.allCorrectResponsePoint;
-  }
-
   getCorrectResponsePointFastLap(): number {
     return this.correctResponsePointFastLap;
+  }
+
+  getCorrectResponsePointDnf(): number {
+    return this.correctResponsePointDnf;
+  }
+
+  isDnfCorrect(raceResultDnf: string, fantaVoteDnfId: number) {
+    let fantaVoteDnfUsername: string = this.allDrivers.find(driver => driver.driver_id == fantaVoteDnfId)?.driver_username;
+    return raceResultDnf.includes(fantaVoteDnfUsername);
   }
 
   

@@ -19,7 +19,6 @@ export class DbDataService {
   championship: string = "";
   cumulative_points: string = "";
   tracks: string = "";
-  fanta: string = "";
   fantaVote!: Fanta[];
   raceResult: any[] = [];
   users: User[] = [];
@@ -34,7 +33,6 @@ export class DbDataService {
     this.championship = await PostgresService.getChampionship();
     this.cumulative_points = await PostgresService.getCumulativePoints();
     this.tracks = await PostgresService.getAllTracks();
-    this.fanta = await PostgresService.getAllFanta();
     this.fantaVote = JSON.parse(await PostgresService.getFantaVote());
     this.users = JSON.parse(await PostgresService.getUsers());
     this.raceResult = JSON.parse(await PostgresService.getRaceResoult());
@@ -59,10 +57,6 @@ export class DbDataService {
     return JSON.parse(this.tracks);
   }
 
-  getAllFanta() {
-    return JSON.parse(this.fanta);
-  }
-
   getFantaVote(): Fanta[] {
     return this.fantaVote;
   }
@@ -81,7 +75,6 @@ export class DbDataService {
 
   async setFantaPlayer(player: FantaPlayer): Promise<void> {
     await PostgresService.setFantaPlayer(player);
-    console.log("ok fatto")
   }
 
 }
