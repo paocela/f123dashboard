@@ -1,0 +1,11 @@
+INSERT INTO "race_results" ("id", "1_place_id", "2_place_id", "3_place_id", "4_place_id", "5_place_id", "6_place_id", "session_type_id", "fast_lap_id", "dnf") VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, '');
+INSERT INTO "race_results" ("id", "1_place_id", "2_place_id", "3_place_id", "4_place_id", "5_place_id", "6_place_id", "session_type_id", "fast_lap_id", "dnf") VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, '');
+
+INSERT INTO "qualifying_results" ("id", "1_place_id", "2_place_id", "3_place_id", "4_place_id", "5_place_id", "6_place_id", "session_type_id") VALUES (?, ?, ?, ?, ?, ?, ?, 2);
+INSERT INTO "qualifying_results" ("id", "1_place_id", "2_place_id", "3_place_id", "4_place_id", "5_place_id", "6_place_id", "session_type_id") VALUES (?, ?, ?, ?, ?, ?, ?, 2);
+
+INSERT INTO "free_practice_results" ("id", "1_place_id", "2_place_id", "3_place_id", "4_place_id", "5_place_id", "6_place_id", "session_type_id") VALUES (?, ?, ?, ?, ?, ?, ?, 3);
+INSERT INTO "free_practice_results" ("id", "1_place_id", "2_place_id", "3_place_id", "4_place_id", "5_place_id", "6_place_id", "session_type_id") VALUES (?, ?, ?, ?, ?, ?, ?, 3);
+
+UPDATE "gran_prix" SET "race_results_id"=?, "qualifying_results_id"=?, "free_practice_results_id"=? WHERE id=?;
+UPDATE "gran_prix" SET "race_results_id"=?, "qualifying_results_id"=?, "free_practice_results_id"=? WHERE id=?;
