@@ -155,7 +155,7 @@ export class DashboardChartsData {
       },
       {
         data: this.mainChart['Lil Mvrck'],
-        label: 'Lil Mvrckà',
+        label: 'Lil Mvrck',
         ...colors[5]
       }
     ];
