@@ -125,34 +125,18 @@ export class FantaComponent {
 
     this.userFantaPoints = this.fantaService.getFantaPoints(this.userId);
 
-        //test votazione pregeressa
-    const updatedDate = "2024-12-05T23:00:00.000Z";
-    // this.tracks = this.tracks.map(item => 
-    //   item.track_id === "1" ? { ...item, date: updatedDate } : item
-    // );
-    // const previusVote: number[] = [1,2,3,4,5,6];
-    // this.votazioni.set(1, previusVote);
-
     this.nextTracks = this.tracks
     .filter(item => {
-      const today = new Date();
-      //today.setHours(0, 0, 0, 0); // Imposta la data corrente a mezzanotte
-    
+      const today = new Date();  
       const itemDate = new Date(item.date);
-      //itemDate.setHours(0, 0, 0, 0); // Imposta la data dell'item a mezzanotte
-    
       return itemDate > today;
     })
       .slice(0,4);
 
-    this.previusTracks = this.tracks
+      this.previusTracks = this.tracks
           .filter(item => {
       const today = new Date();
-     //today.setHours(0, 0, 0, 0); // Imposta la data corrente a mezzanotte
-    
       const itemDate = new Date(item.date);
-     // itemDate.setHours(0, 0, 0, 0); // Imposta la data dell'item a mezzanotte
-    
       return itemDate <= today;
     })
 
@@ -192,12 +176,6 @@ export class FantaComponent {
       }
     })
 
-    for (const [key, value] of this.votazioni) {
-      for (let index = 0; index < value.length; index++) {
-       
-        console.log(value[index] + " " + typeof value[index]);
-      }
-    }
   }
 
   toNumber(n: any): number{
@@ -246,9 +224,7 @@ export class FantaComponent {
 
   getVotoPos(trackId: number, pilota: number): number {
     const votoArray = this.votazioni.get(trackId) || [];
-    //console.log(votoArray);
     const posizione = votoArray.indexOf(pilota); // Trova la posizione del pilota nell'array
-    //console.log("piloda:%d posizione:%d", pilota, posizione);
     return posizione >= 0 ? posizione + 1 : 0; // Restituisce la posizione (indice + 1) o 0 se non trovato
   }
 
@@ -303,7 +279,6 @@ export class FantaComponent {
   getPunti(pilota: number, trackId: number): number {
     const posizioneReale: number = this.getPosizioneArrivo(pilota, trackId); // Posizione effettiva del pilota
     const posizioneVotata: number = this.getVotoPos(trackId, pilota); // Posizione votata dall'utente per il pilota
-    //console.log("TRACK:%d Pilota:%d Posizione reale:%d posizioine Votata:%d Punti:%d ",trackId, pilota, posizioneReale, posizioneVotata, this.fantaService.pointsWithAbsoluteDifference(posizioneReale, posizioneVotata));
     return this.fantaService.pointsWithAbsoluteDifference(posizioneReale, posizioneVotata);
   }
   
@@ -326,19 +301,11 @@ export class FantaComponent {
 
   getPuntiGp( trackId: number): number{
     let punti: number = 0;
-    // this.votazioni.get(trackId)?.forEach(i => {
-    //   punti += this.getPunti(i, trackId);
-    //   console.log("I:%d track:%d punti:%d",i ,trackId, punti);
-    //   console.log(typeof i);
-    // });
     for (let i: number = 1; i <= 6; i++) {
       punti += this.getPunti(i, trackId);
-      console.log("I:%d track:%d punti:%d",i ,trackId, punti);
     }
     punti += this.getPuntiFastLap(trackId);
-    console.log("FAST punti:%d", punti);
     punti += this.getPuntiDnf(trackId);
-    console.log("DNF punti:%d", punti);
     return punti;
   }
 
