@@ -84,8 +84,8 @@ export class FantaService {
 
   pointsWithAbsoluteDifference(raceResult: number, fantaVote: number) : number{
     if(raceResult === 0 || fantaVote ===0) return 0
-    let abs_diff = Math.abs(raceResult - fantaVote);
-    return this.CORRET_RESPONSE_POINTS[abs_diff] == undefined ? 0 : this.CORRET_RESPONSE_POINTS[abs_diff]
+    let absDiff = Math.abs(raceResult - fantaVote);
+    return this.CORRET_RESPONSE_POINTS[absDiff] == undefined ? 0 : this.CORRET_RESPONSE_POINTS[absDiff]
   }
   
   
