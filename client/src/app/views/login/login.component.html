@@ -192,20 +192,3 @@
   </c-col>
 </c-row>
 </c-container>
-
-<c-modal id="avatarsModal" [visible]="modalVisible">
-  <c-modal-header class="bg-warning">
-      <h5 cModalTitle style="color:white">
-        <svg [cIcon]="warningIcon" size="lg" style="color: white"></svg>
-        Carica il tuo avatar
-        <svg [cIcon]="warningIcon" size="lg" style="color: white"></svg>
-      </h5>
-  </c-modal-header>
-  <c-modal-body>
-    <p>Se vuoi usare una tua immagine come avatar, caricala subito tramite Google Form!</p>
-  </c-modal-body>
-  <c-modal-footer>
-    <button (click)="toggleModal()" cButton color="secondary">Close</button>
-    <a cButton color="warning" style="color:black" href="https://docs.google.com/forms/d/e/1FAIpQLSd9I8gCbiSNbKz5D9mKvkqX3dxjTRw515Js4WdxQ-yqAYzUcQ/viewform?usp=dialog">Carica Immagine</a>
-  </c-modal-footer>
-</c-modal>
