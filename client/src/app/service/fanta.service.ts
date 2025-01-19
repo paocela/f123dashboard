@@ -13,9 +13,14 @@ export class FantaService {
   raceResults: RaceResult[] = [];
   allDrivers: any[] = [];
 
-  correctResponsePoint: number = 1;
-  correctResponsePointFastLap: number = 5;
-  correctResponsePointDnf: number = 5;
+  CORRECT_RESPONSE_FAST_LAP_POINTS: number = 5;
+  CORRECT_RESPONS_DNF_POINTS: number = 5;
+  CORRET_RESPONSE_POINTS: Readonly<Record<number, number>> = {
+    0: 7,
+    1: 4,
+    2: 2
+  };
+
 
   constructor(private dbData: DbDataService) {
     this.fantaVotes = this.dbData.getFantaVote();
@@ -52,35 +57,24 @@ export class FantaService {
   calculateFantaPoints(raceResult: any, fantaVote: Fanta): number {
     var points: number = 0;
 
-
     points = this.pointsWithAbsoluteDifference(raceResult.id_1_place, fantaVote.id_1_place) + points;
     points = this.pointsWithAbsoluteDifference(raceResult.id_2_place, fantaVote.id_2_place) + points;
     points = this.pointsWithAbsoluteDifference(raceResult.id_3_place, fantaVote.id_3_place) + points;
     points = this.pointsWithAbsoluteDifference(raceResult.id_4_place, fantaVote.id_4_place) + points;
     points = this.pointsWithAbsoluteDifference(raceResult.id_5_place, fantaVote.id_5_place) + points;
     points = this.pointsWithAbsoluteDifference(raceResult.id_6_place, fantaVote.id_6_place) + points;
-    // points = (raceResult.id_1_place === fantaVote.id_1_place && fantaVote.id_1_place != 0) ? points + this.correctResponsePoint : points;
-    // points = (raceResult.id_2_place === fantaVote.id_2_place && fantaVote.id_2_place != 0) ? points + this.correctResponsePoint : points;
-    // points = (raceResult.id_3_place === fantaVote.id_3_place && fantaVote.id_3_place != 0) ? points + this.correctResponsePoint : points;
-    // points = (raceResult.id_4_place === fantaVote.id_4_place && fantaVote.id_4_place != 0) ? points + this.correctResponsePoint : points;
-    // points = (raceResult.id_5_place === fantaVote.id_5_place && fantaVote.id_5_place != 0) ? points + this.correctResponsePoint : points;
-    // points = (raceResult.id_6_place === fantaVote.id_6_place && fantaVote.id_6_place != 0) ? points + this.correctResponsePoint : points;
-    points = (raceResult.id_fast_lap === fantaVote.id_fast_lap && fantaVote.id_fast_lap != 0) ? points + this.correctResponsePointFastLap : points;
-    points = (this.isDnfCorrect(raceResult.list_dnf, fantaVote.id_dnf) && fantaVote.id_dnf != 0) ? points + this.correctResponsePointDnf : points;
+    points = (raceResult.id_fast_lap === fantaVote.id_fast_lap && fantaVote.id_fast_lap != 0) ? points + this.CORRECT_RESPONSE_FAST_LAP_POINTS : points;
+    points = (this.isDnfCorrect(raceResult.list_dnf, fantaVote.id_dnf) && fantaVote.id_dnf != 0) ? points + this.CORRECT_RESPONS_DNF_POINTS : points;
 
     return points;
   }
 
-  getCorrectResponsePoint(): number {
-    return this.correctResponsePoint;
-  }
-
   getCorrectResponsePointFastLap(): number {
-    return this.correctResponsePointFastLap;
+    return this.CORRECT_RESPONSE_FAST_LAP_POINTS;
   }
 
   getCorrectResponsePointDnf(): number {
-    return this.correctResponsePointDnf;
+    return this.CORRECT_RESPONS_DNF_POINTS;
   }
 
   isDnfCorrect(raceResultDnf: string, fantaVoteDnfId: number) {
@@ -88,26 +82,12 @@ export class FantaService {
     return raceResultDnf.includes(fantaVoteDnfUsername);
   }
 
-  pointsWithAbsoluteDifference(race_val: number, fanta_val: number)
-  {
-    if (fanta_val == 0)
-      return 0; // max possible
-
-    let abs_diff = 0;
-    if ( race_val > fanta_val )
-      abs_diff = race_val - fanta_val;
-    else
-      abs_diff = fanta_val - race_val;
-
-      if ( abs_diff == 0 )
-        return 7;
-      else if ( abs_diff == 1 )
-        return 4;
-      else if ( abs_diff == 2 )
-        return 2;
-      else
-        return 0;
+  pointsWithAbsoluteDifference(raceResult: number, fantaVote: number) : number{
+    if(raceResult === 0 || fantaVote ===0) return 0
+    let abs_diff = Math.abs(raceResult - fantaVote);
+    return this.CORRET_RESPONSE_POINTS[abs_diff] == undefined ? 0 : this.CORRET_RESPONSE_POINTS[abs_diff]
   }
+  
   
   
 }

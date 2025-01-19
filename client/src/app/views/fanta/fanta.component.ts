@@ -161,14 +161,14 @@ export class FantaComponent {
       if ( previousVote )
       {
         const previousVoteArray = [
-          previousVote.id_1_place ?? 0, 
-          previousVote.id_2_place ?? 0,
-          previousVote.id_3_place ?? 0,
-          previousVote.id_4_place ?? 0,
-          previousVote.id_5_place ?? 0,
-          previousVote.id_6_place ?? 0,
-          previousVote.id_fast_lap ?? 0,
-          previousVote.id_dnf ?? 0
+          this.toNumber(previousVote.id_1_place),
+          this.toNumber(previousVote.id_2_place),
+          this.toNumber(previousVote.id_3_place),
+          this.toNumber(previousVote.id_4_place),
+          this.toNumber(previousVote.id_5_place),
+          this.toNumber(previousVote.id_6_place),
+          this.toNumber(previousVote.id_fast_lap), 
+          this.toNumber(previousVote.id_dnf)
         ];
         this.votazioni.set(track.track_id, previousVoteArray);
       }
@@ -179,20 +179,30 @@ export class FantaComponent {
       if ( previousVote )
       {
         const previousVoteArray = [
-          previousVote.id_1_place ?? 0, 
-          previousVote.id_2_place ?? 0,
-          previousVote.id_3_place ?? 0,
-          previousVote.id_4_place ?? 0,
-          previousVote.id_5_place ?? 0,
-          previousVote.id_6_place ?? 0,
-          previousVote.id_fast_lap ?? 0,
-          previousVote.id_dnf ?? 0
+          this.toNumber(previousVote.id_1_place),
+          this.toNumber(previousVote.id_2_place),
+          this.toNumber(previousVote.id_3_place),
+          this.toNumber(previousVote.id_4_place),
+          this.toNumber(previousVote.id_5_place),
+          this.toNumber(previousVote.id_6_place),
+          this.toNumber(previousVote.id_fast_lap),
+          this.toNumber(previousVote.id_dnf)
         ];
         this.votazioni.set(track.track_id, previousVoteArray);
       }
     })
+
+    for (const [key, value] of this.votazioni) {
+      for (let index = 0; index < value.length; index++) {
+       
+        console.log(value[index] + " " + typeof value[index]);
+      }
+    }
   }
 
+  toNumber(n: any): number{
+    return  isNaN(+n) ? 0 : +n;
+  }
 
   publishVoto(trackId: number) {
     if(this.formIsValid(trackId)){
@@ -236,7 +246,9 @@ export class FantaComponent {
 
   getVotoPos(trackId: number, pilota: number): number {
     const votoArray = this.votazioni.get(trackId) || [];
+    //console.log(votoArray);
     const posizione = votoArray.indexOf(pilota); // Trova la posizione del pilota nell'array
+    //console.log("piloda:%d posizione:%d", pilota, posizione);
     return posizione >= 0 ? posizione + 1 : 0; // Restituisce la posizione (indice + 1) o 0 se non trovato
   }
 
@@ -261,8 +273,7 @@ export class FantaComponent {
 
   getPosizioneArrivo(pilota: number, trackId: number): number{
     const result: RaceResult | undefined = this.fantaService.getRaceResult(trackId);
-    if (result)
-    {
+    if (result){
       if (result.id_1_place == pilota) return 1;
       if (result.id_2_place == pilota) return 2;
       if (result.id_3_place == pilota) return 3;
@@ -275,8 +286,7 @@ export class FantaComponent {
 
   getFastLap(trackId: number): number {
     const result: RaceResult | undefined = this.fantaService.getRaceResult(trackId);
-    if ( result )
-    {
+    if ( result ){
       return result.id_fast_lap;
     }
     return 0;
@@ -284,41 +294,17 @@ export class FantaComponent {
 
   getDnf(trackId: number): string {
     const result: RaceResult | undefined = this.fantaService.getRaceResult(trackId);
-    if ( result )
-    {
+    if ( result ){
       return result.list_dnf;
     }
     return "";
   }
 
-
-
-
-
-
   getPunti(pilota: number, trackId: number): number {
     const posizioneReale: number = this.getPosizioneArrivo(pilota, trackId); // Posizione effettiva del pilota
     const posizioneVotata: number = this.getVotoPos(trackId, pilota); // Posizione votata dall'utente per il pilota
-
-    if (posizioneVotata === 0) {
-      return 0; // Se il pilota non è stato votato, ritorna 0
-    }
-  
-    const differenza = Math.abs(posizioneReale - posizioneVotata);
-  
-    // Sistema di punteggio
-      if(posizioneReale==0){
-      return 0; // Errore maggiore di 2 posizioni
-    }
-      else if (differenza === 0) {
-      return 7; // Previsione esatta
-    } else if (differenza === 1) {
-      return 4; // Sbagliato di ±1 posizione
-    } else if (differenza === 2) {
-      return 2; // Sbagliato di ±2 posizioni
-    } else {
-      return 0; // Errore maggiore di 2 posizioni
-    }
+    //console.log("TRACK:%d Pilota:%d Posizione reale:%d posizioine Votata:%d Punti:%d ",trackId, pilota, posizioneReale, posizioneVotata, this.fantaService.pointsWithAbsoluteDifference(posizioneReale, posizioneVotata));
+    return this.fantaService.pointsWithAbsoluteDifference(posizioneReale, posizioneVotata);
   }
   
   getPuntiFastLap(trackId: number): number{
@@ -340,14 +326,19 @@ export class FantaComponent {
 
   getPuntiGp( trackId: number): number{
     let punti: number = 0;
-    punti = punti + this.getPunti(1, trackId);
-    punti = punti + this.getPunti(2, trackId);
-    punti = punti + this.getPunti(3, trackId);
-    punti = punti + this.getPunti(4, trackId);
-    punti = punti + this.getPunti(5, trackId);
-    punti = punti + this.getPunti(6, trackId);
-    punti = punti + this.getPuntiFastLap(trackId);
-    punti = punti + this.getPuntiDnf(trackId);
+    // this.votazioni.get(trackId)?.forEach(i => {
+    //   punti += this.getPunti(i, trackId);
+    //   console.log("I:%d track:%d punti:%d",i ,trackId, punti);
+    //   console.log(typeof i);
+    // });
+    for (let i: number = 1; i <= 6; i++) {
+      punti += this.getPunti(i, trackId);
+      console.log("I:%d track:%d punti:%d",i ,trackId, punti);
+    }
+    punti += this.getPuntiFastLap(trackId);
+    console.log("FAST punti:%d", punti);
+    punti += this.getPuntiDnf(trackId);
+    console.log("DNF punti:%d", punti);
     return punti;
   }
 
@@ -358,13 +349,11 @@ export class FantaComponent {
       icon: cilXCircle,
       color: 'red'
     };
-    if (votazione == pilota)
-    {
+
+    if (votazione == pilota){
       status.icon = cilCheckCircle;
       status.color = 'green';
-    }
-    else
-    {
+    } else {
       status.icon = cilXCircle;
       status.color = 'red';
     }
@@ -378,13 +367,11 @@ export class FantaComponent {
       icon: cilXCircle,
       color: 'red'
     };
-    if (votazione == pilota)
-    {
+
+    if (votazione == pilota){
       status.icon = cilCheckCircle;
       status.color = 'green';
-    }
-    else
-    {
+    } else {
       status.icon = cilXCircle;
       status.color = 'red';
     }
@@ -398,13 +385,12 @@ export class FantaComponent {
       icon: cilXCircle,
       color: 'red'
     };
+
     if (this.validateDnf(pilotaList, votazione))
     {
       status.icon = cilCheckCircle;
       status.color = 'green';
-    }
-    else
-    {
+    } else {
       status.icon = cilXCircle;
       status.color = 'red';
     }
