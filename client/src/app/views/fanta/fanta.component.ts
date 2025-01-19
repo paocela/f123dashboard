@@ -125,29 +125,18 @@ export class FantaComponent {
 
     this.userFantaPoints = this.fantaService.getFantaPoints(this.userId);
 
-        //test votazione pregeressa
-    const updatedDate = "2024-12-05T23:00:00.000Z";
-
     this.nextTracks = this.tracks
     .filter(item => {
-      const today = new Date();
-      //today.setHours(0, 0, 0, 0); // Imposta la data corrente a mezzanotte
-    
+      const today = new Date();  
       const itemDate = new Date(item.date);
-      //itemDate.setHours(0, 0, 0, 0); // Imposta la data dell'item a mezzanotte
-    
       return itemDate > today;
     })
       .slice(0,4);
 
-    this.previusTracks = this.tracks
+      this.previusTracks = this.tracks
           .filter(item => {
       const today = new Date();
-     //today.setHours(0, 0, 0, 0); // Imposta la data corrente a mezzanotte
-    
       const itemDate = new Date(item.date);
-     // itemDate.setHours(0, 0, 0, 0); // Imposta la data dell'item a mezzanotte
-    
       return itemDate <= today;
     })
 
@@ -187,12 +176,6 @@ export class FantaComponent {
       }
     })
 
-    for (const [key, value] of this.votazioni) {
-      for (let index = 0; index < value.length; index++) {
-       
-        console.log(value[index] + " " + typeof value[index]);
-      }
-    }
   }
 
   toNumber(n: any): number{
