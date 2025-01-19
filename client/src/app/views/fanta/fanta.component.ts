@@ -18,7 +18,7 @@ import { GridModule } from '@coreui/angular';
 import { DbDataService } from 'src/app/service/db-data.service';
 import { FantaService } from 'src/app/service/fanta.service';
 import { cifAe, cifAt, cifAu, cifAz, cifBe, cifBh, cifBr, cifCa, cifCn, cifEs, cifGb, cifHu, cifIt, 
-    cifJp, cifMc, cifMx, cifNl, cifQa, cifSa, cifSg, cifUs, cilXCircle, cilCheckCircle } from '@coreui/icons';
+    cifJp, cifMc, cifMx, cifNl, cifQa, cifSa, cifSg, cifUs, cilX, cilCheckAlt, cilSwapVertical } from '@coreui/icons';
 import { cilFire, cilPowerStandby } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
 import { Fanta, RaceResult } from '../../model/fanta';
@@ -125,34 +125,18 @@ export class FantaComponent {
 
     this.userFantaPoints = this.fantaService.getFantaPoints(this.userId);
 
-        //test votazione pregeressa
-    const updatedDate = "2024-12-05T23:00:00.000Z";
-    // this.tracks = this.tracks.map(item => 
-    //   item.track_id === "1" ? { ...item, date: updatedDate } : item
-    // );
-    // const previusVote: number[] = [1,2,3,4,5,6];
-    // this.votazioni.set(1, previusVote);
-
     this.nextTracks = this.tracks
     .filter(item => {
-      const today = new Date();
-      //today.setHours(0, 0, 0, 0); // Imposta la data corrente a mezzanotte
-    
+      const today = new Date();  
       const itemDate = new Date(item.date);
-      //itemDate.setHours(0, 0, 0, 0); // Imposta la data dell'item a mezzanotte
-    
       return itemDate > today;
     })
       .slice(0,4);
 
-    this.previusTracks = this.tracks
+      this.previusTracks = this.tracks
           .filter(item => {
       const today = new Date();
-     //today.setHours(0, 0, 0, 0); // Imposta la data corrente a mezzanotte
-    
       const itemDate = new Date(item.date);
-     // itemDate.setHours(0, 0, 0, 0); // Imposta la data dell'item a mezzanotte
-    
       return itemDate <= today;
     })
 
@@ -161,14 +145,14 @@ export class FantaComponent {
       if ( previousVote )
       {
         const previousVoteArray = [
-          previousVote.id_1_place ?? 0, 
-          previousVote.id_2_place ?? 0,
-          previousVote.id_3_place ?? 0,
-          previousVote.id_4_place ?? 0,
-          previousVote.id_5_place ?? 0,
-          previousVote.id_6_place ?? 0,
-          previousVote.id_fast_lap ?? 0,
-          previousVote.id_dnf ?? 0
+          this.toNumber(previousVote.id_1_place),
+          this.toNumber(previousVote.id_2_place),
+          this.toNumber(previousVote.id_3_place),
+          this.toNumber(previousVote.id_4_place),
+          this.toNumber(previousVote.id_5_place),
+          this.toNumber(previousVote.id_6_place),
+          this.toNumber(previousVote.id_fast_lap), 
+          this.toNumber(previousVote.id_dnf)
         ];
         this.votazioni.set(track.track_id, previousVoteArray);
       }
@@ -179,20 +163,24 @@ export class FantaComponent {
       if ( previousVote )
       {
         const previousVoteArray = [
-          previousVote.id_1_place ?? 0, 
-          previousVote.id_2_place ?? 0,
-          previousVote.id_3_place ?? 0,
-          previousVote.id_4_place ?? 0,
-          previousVote.id_5_place ?? 0,
-          previousVote.id_6_place ?? 0,
-          previousVote.id_fast_lap ?? 0,
-          previousVote.id_dnf ?? 0
+          this.toNumber(previousVote.id_1_place),
+          this.toNumber(previousVote.id_2_place),
+          this.toNumber(previousVote.id_3_place),
+          this.toNumber(previousVote.id_4_place),
+          this.toNumber(previousVote.id_5_place),
+          this.toNumber(previousVote.id_6_place),
+          this.toNumber(previousVote.id_fast_lap),
+          this.toNumber(previousVote.id_dnf)
         ];
         this.votazioni.set(track.track_id, previousVoteArray);
       }
     })
+
   }
 
+  toNumber(n: any): number{
+    return  isNaN(+n) ? 0 : +n;
+  }
 
   publishVoto(trackId: number) {
     if(this.formIsValid(trackId)){
@@ -234,6 +222,12 @@ export class FantaComponent {
     return votoArray[index-1] || 0;
   }
 
+  getVotoPos(trackId: number, pilota: number): number {
+    const votoArray = this.votazioni.get(trackId) || [];
+    const posizione = votoArray.indexOf(pilota); // Trova la posizione del pilota nell'array
+    return posizione >= 0 ? posizione + 1 : 0; // Restituisce la posizione (indice + 1) o 0 se non trovato
+  }
+
   getVoti(trackId: number): number[] | undefined{ 
     return this.votazioni.get(trackId);
   }
@@ -255,8 +249,7 @@ export class FantaComponent {
 
   getPosizioneArrivo(pilota: number, trackId: number): number{
     const result: RaceResult | undefined = this.fantaService.getRaceResult(trackId);
-    if (result)
-    {
+    if (result){
       if (result.id_1_place == pilota) return 1;
       if (result.id_2_place == pilota) return 2;
       if (result.id_3_place == pilota) return 3;
@@ -269,8 +262,7 @@ export class FantaComponent {
 
   getFastLap(trackId: number): number {
     const result: RaceResult | undefined = this.fantaService.getRaceResult(trackId);
-    if ( result )
-    {
+    if ( result ){
       return result.id_fast_lap;
     }
     return 0;
@@ -278,17 +270,16 @@ export class FantaComponent {
 
   getDnf(trackId: number): string {
     const result: RaceResult | undefined = this.fantaService.getRaceResult(trackId);
-    if ( result )
-    {
+    if ( result ){
       return result.list_dnf;
     }
     return "";
   }
 
-  getPunti(pilota: number, trackId: number): number{
-    let posizioneArrivo: number = this.getPosizioneArrivo(pilota, trackId);
-    let votazione: number = this.getVoto(trackId, posizioneArrivo);
-    return votazione == pilota && votazione != 0 ? this.fantaService.getCorrectResponsePoint() : 0;  
+  getPunti(pilota: number, trackId: number): number {
+    const posizioneReale: number = this.getPosizioneArrivo(pilota, trackId); // Posizione effettiva del pilota
+    const posizioneVotata: number = this.getVotoPos(trackId, pilota); // Posizione votata dall'utente per il pilota
+    return this.fantaService.pointsWithAbsoluteDifference(posizioneReale, posizioneVotata);
   }
   
   getPuntiFastLap(trackId: number): number{
@@ -310,32 +301,34 @@ export class FantaComponent {
 
   getPuntiGp( trackId: number): number{
     let punti: number = 0;
-    punti = punti + this.getPunti(1, trackId);
-    punti = punti + this.getPunti(2, trackId);
-    punti = punti + this.getPunti(3, trackId);
-    punti = punti + this.getPunti(4, trackId);
-    punti = punti + this.getPunti(5, trackId);
-    punti = punti + this.getPunti(6, trackId);
-    punti = punti + this.getPuntiFastLap(trackId);
-    punti = punti + this.getPuntiDnf(trackId);
+    for (let i: number = 1; i <= 6; i++) {
+      punti += this.getPunti(i, trackId);
+    }
+    punti += this.getPuntiFastLap(trackId);
+    punti += this.getPuntiDnf(trackId);
     return punti;
   }
 
   isCorrect(pilota: number, trackId: number): voteStatus {
-    let posizioneArrivo: number = this.getPosizioneArrivo(pilota, trackId);
-    let votazione: number = this.getVoto(trackId, posizioneArrivo);
+    let posizioneReale: number = this.getPosizioneArrivo(pilota, trackId);
+    let posizioneVotata: number = this.getVotoPos(trackId, pilota);
+    let punti_fatti = this.fantaService.pointsWithAbsoluteDifference(posizioneReale, posizioneVotata)
     let status: voteStatus = {
-      icon: cilXCircle,
+      icon: cilX,
       color: 'red'
     };
-    if (votazione == pilota)
-    {
-      status.icon = cilCheckCircle;
+
+    if (punti_fatti == 7){
+      status.icon = cilCheckAlt;
       status.color = 'green';
-    }
-    else
-    {
-      status.icon = cilXCircle;
+    } else if (punti_fatti == 4 ) {
+      status.icon = cilSwapVertical;
+      status.color = '#FFA600';
+    } else if (punti_fatti == 2) {
+      status.icon = cilSwapVertical;
+      status.color = '#FFA600';
+    } else {
+      status.icon = cilX;
       status.color = 'red';
     }
     return status;
@@ -345,17 +338,15 @@ export class FantaComponent {
     let pilota: number = this.getFastLap(trackId);
     let votazione: number = this.getVoto(trackId, 7);
     let status: voteStatus = {
-      icon: cilXCircle,
+      icon: cilX,
       color: 'red'
     };
-    if (votazione == pilota)
-    {
-      status.icon = cilCheckCircle;
+
+    if (votazione == pilota){
+      status.icon = cilCheckAlt;
       status.color = 'green';
-    }
-    else
-    {
-      status.icon = cilXCircle;
+    } else {
+      status.icon = cilX;
       status.color = 'red';
     }
     return status;
@@ -365,17 +356,16 @@ export class FantaComponent {
     let pilotaList: string = this.getDnf(trackId);
     let votazione: number = this.getVoto(trackId, 8);
     let status: voteStatus = {
-      icon: cilXCircle,
+      icon: cilX,
       color: 'red'
     };
+
     if (this.validateDnf(pilotaList, votazione))
     {
-      status.icon = cilCheckCircle;
+      status.icon = cilCheckAlt;
       status.color = 'green';
-    }
-    else
-    {
-      status.icon = cilXCircle;
+    } else {
+      status.icon = cilX;
       status.color = 'red';
     }
     return status;
