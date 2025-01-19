@@ -18,7 +18,7 @@ import { GridModule } from '@coreui/angular';
 import { DbDataService } from 'src/app/service/db-data.service';
 import { FantaService } from 'src/app/service/fanta.service';
 import { cifAe, cifAt, cifAu, cifAz, cifBe, cifBh, cifBr, cifCa, cifCn, cifEs, cifGb, cifHu, cifIt, 
-    cifJp, cifMc, cifMx, cifNl, cifQa, cifSa, cifSg, cifUs, cilXCircle, cilCheckCircle } from '@coreui/icons';
+    cifJp, cifMc, cifMx, cifNl, cifQa, cifSa, cifSg, cifUs, cilX, cilCheckAlt, cilSwapVertical } from '@coreui/icons';
 import { cilFire, cilPowerStandby } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
 import { Fanta, RaceResult } from '../../model/fanta';
@@ -310,18 +310,25 @@ export class FantaComponent {
   }
 
   isCorrect(pilota: number, trackId: number): voteStatus {
-    let posizioneArrivo: number = this.getPosizioneArrivo(pilota, trackId);
-    let votazione: number = this.getVoto(trackId, posizioneArrivo);
+    let posizioneReale: number = this.getPosizioneArrivo(pilota, trackId);
+    let posizioneVotata: number = this.getVotoPos(trackId, pilota);
+    let punti_fatti = this.fantaService.pointsWithAbsoluteDifference(posizioneReale, posizioneVotata)
     let status: voteStatus = {
-      icon: cilXCircle,
+      icon: cilX,
       color: 'red'
     };
 
-    if (votazione == pilota){
-      status.icon = cilCheckCircle;
+    if (punti_fatti == 7){
+      status.icon = cilCheckAlt;
       status.color = 'green';
+    } else if (punti_fatti == 4 ) {
+      status.icon = cilSwapVertical;
+      status.color = '#FFA600';
+    } else if (punti_fatti == 2) {
+      status.icon = cilSwapVertical;
+      status.color = '#FFA600';
     } else {
-      status.icon = cilXCircle;
+      status.icon = cilX;
       status.color = 'red';
     }
     return status;
@@ -331,15 +338,15 @@ export class FantaComponent {
     let pilota: number = this.getFastLap(trackId);
     let votazione: number = this.getVoto(trackId, 7);
     let status: voteStatus = {
-      icon: cilXCircle,
+      icon: cilX,
       color: 'red'
     };
 
     if (votazione == pilota){
-      status.icon = cilCheckCircle;
+      status.icon = cilCheckAlt;
       status.color = 'green';
     } else {
-      status.icon = cilXCircle;
+      status.icon = cilX;
       status.color = 'red';
     }
     return status;
@@ -349,16 +356,16 @@ export class FantaComponent {
     let pilotaList: string = this.getDnf(trackId);
     let votazione: number = this.getVoto(trackId, 8);
     let status: voteStatus = {
-      icon: cilXCircle,
+      icon: cilX,
       color: 'red'
     };
 
     if (this.validateDnf(pilotaList, votazione))
     {
-      status.icon = cilCheckCircle;
+      status.icon = cilCheckAlt;
       status.color = 'green';
     } else {
-      status.icon = cilXCircle;
+      status.icon = cilX;
       status.color = 'red';
     }
     return status;
