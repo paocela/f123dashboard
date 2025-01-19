@@ -234,6 +234,12 @@ export class FantaComponent {
     return votoArray[index-1] || 0;
   }
 
+  getVotoPos(trackId: number, pilota: number): number {
+    const votoArray = this.votazioni.get(trackId) || [];
+    const posizione = votoArray.indexOf(pilota); // Trova la posizione del pilota nell'array
+    return posizione >= 0 ? posizione + 1 : 0; // Restituisce la posizione (indice + 1) o 0 se non trovato
+  }
+
   getVoti(trackId: number): number[] | undefined{ 
     return this.votazioni.get(trackId);
   }
@@ -285,10 +291,34 @@ export class FantaComponent {
     return "";
   }
 
-  getPunti(pilota: number, trackId: number): number{
-    let posizioneArrivo: number = this.getPosizioneArrivo(pilota, trackId);
-    let votazione: number = this.getVoto(trackId, posizioneArrivo);
-    return votazione == pilota && votazione != 0 ? this.fantaService.getCorrectResponsePoint() : 0;  
+
+
+
+
+
+  getPunti(pilota: number, trackId: number): number {
+    const posizioneReale: number = this.getPosizioneArrivo(pilota, trackId); // Posizione effettiva del pilota
+    const posizioneVotata: number = this.getVotoPos(trackId, pilota); // Posizione votata dall'utente per il pilota
+
+    if (posizioneVotata === 0) {
+      return 0; // Se il pilota non è stato votato, ritorna 0
+    }
+  
+    const differenza = Math.abs(posizioneReale - posizioneVotata);
+  
+    // Sistema di punteggio
+      if(posizioneReale==0){
+      return 0; // Errore maggiore di 2 posizioni
+    }
+      else if (differenza === 0) {
+      return 7; // Previsione esatta
+    } else if (differenza === 1) {
+      return 4; // Sbagliato di ±1 posizione
+    } else if (differenza === 2) {
+      return 2; // Sbagliato di ±2 posizioni
+    } else {
+      return 0; // Errore maggiore di 2 posizioni
+    }
   }
   
   getPuntiFastLap(trackId: number): number{
