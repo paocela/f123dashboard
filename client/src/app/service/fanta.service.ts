@@ -31,6 +31,8 @@ export class FantaService {
       const raceVotes = this.fantaVotes.filter(item => item.track_id == raceResult.track_id);
       raceVotes.forEach(raceVote => {
         const racePoints: number =  this.calculateFantaPoints(raceResult, raceVote);
+        if (raceVote.fanta_player_id == 6)
+          console.log(racePoints, raceResult, raceVote)
         this.fantaPoints.set(Number(raceVote.fanta_player_id), (this.fantaPoints.get(Number(raceVote.fanta_player_id)) ?? 0) + racePoints);
       });
 
@@ -57,12 +59,41 @@ export class FantaService {
   calculateFantaPoints(raceResult: any, fantaVote: Fanta): number {
     var points: number = 0;
 
-    points = this.pointsWithAbsoluteDifference(raceResult.id_1_place, fantaVote.id_1_place) + points;
-    points = this.pointsWithAbsoluteDifference(raceResult.id_2_place, fantaVote.id_2_place) + points;
-    points = this.pointsWithAbsoluteDifference(raceResult.id_3_place, fantaVote.id_3_place) + points;
-    points = this.pointsWithAbsoluteDifference(raceResult.id_4_place, fantaVote.id_4_place) + points;
-    points = this.pointsWithAbsoluteDifference(raceResult.id_5_place, fantaVote.id_5_place) + points;
-    points = this.pointsWithAbsoluteDifference(raceResult.id_6_place, fantaVote.id_6_place) + points;
+    var posReal: number = 0, posVote: number = 0;
+    for (let i = 1; i <= 6; i++)
+    {
+      posReal = 0; posVote = 0;
+      
+      if (raceResult.id_1_place == i)
+        posReal = 1;
+      else if (raceResult.id_2_place == i)
+        posReal = 2;
+      else if (raceResult.id_3_place == i)
+        posReal = 3;
+      else if (raceResult.id_4_place == i)
+        posReal = 4;
+      else if (raceResult.id_5_place == i)
+        posReal = 5;
+      else if (raceResult.id_6_place == i)
+        posReal = 6;
+
+      if (fantaVote.id_1_place == i)
+        posVote = 1;
+      else if (fantaVote.id_2_place == i)
+        posVote = 2;
+      else if (fantaVote.id_3_place == i)
+        posVote = 3;
+      else if (fantaVote.id_4_place == i)
+        posVote = 4;
+      else if (fantaVote.id_5_place == i)
+        posVote = 5;
+      else if (fantaVote.id_6_place == i)
+        posVote = 6;
+
+      points = this.pointsWithAbsoluteDifference(posReal, posVote) + points;
+
+    }
+
     points = (raceResult.id_fast_lap === fantaVote.id_fast_lap && fantaVote.id_fast_lap != 0) ? points + this.CORRECT_RESPONSE_FAST_LAP_POINTS : points;
     points = (this.isDnfCorrect(raceResult.list_dnf, fantaVote.id_dnf) && fantaVote.id_dnf != 0) ? points + this.CORRECT_RESPONS_DNF_POINTS : points;
 
@@ -83,7 +114,7 @@ export class FantaService {
   }
 
   pointsWithAbsoluteDifference(raceResult: number, fantaVote: number) : number{
-    if(raceResult === 0 || fantaVote ===0) return 0;
+    if(raceResult == 0 || fantaVote == 0) return 0;
     let absDiff = Math.abs(raceResult - fantaVote);
     return this.CORRET_RESPONSE_POINTS[absDiff] ?? 0;
   }
