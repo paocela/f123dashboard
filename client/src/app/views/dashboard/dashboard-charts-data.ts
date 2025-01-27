@@ -222,12 +222,12 @@ export class DashboardChartsData {
         grid: {
           color: colorBorderTranslucent
         },
-        max: 250,
+        max: 500,
         beginAtZero: true,
         ticks: {
           color: colorBody,
           maxTicksLimit: 5,
-          stepSize: Math.ceil(250 / 5)
+          stepSize: Math.ceil(500 / 5)
         }
       }
     };
