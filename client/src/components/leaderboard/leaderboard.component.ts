@@ -35,6 +35,7 @@ export class LeaderboardComponent {
 
    users: User[] = this.dbData.getUsers();
    leaderBoards: LeaderBoard[] = [];
+   totNumberVotes: number = this.fantaService.getTotNumberVotes();
   
   ngOnInit(): void {
     //this.users = this.users.filter(u => u.id !== 0); //remove admin user
@@ -42,12 +43,11 @@ export class LeaderboardComponent {
       let newUser: LeaderBoard = {
         id: user.id,
         username: user.username,
-        points: this.fantaService.getFantaPoints(user.id)
+        points: this.fantaService.getFantaPoints(user.id),
+        numberVotes: this.fantaService.getFantaNumberVotes(user.id)
       };
       this.leaderBoards.push(newUser);
     });
     this.leaderBoards.sort((a,b) => b.points - a.points );
-
-    console.log(this.leaderBoards)
   }
 }

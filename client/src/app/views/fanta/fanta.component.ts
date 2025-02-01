@@ -23,6 +23,17 @@ import { cilFire, cilPowerStandby } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
 import { Fanta, RaceResult } from '../../model/fanta';
 import { rest } from 'lodash-es';
+import { LeaderboardComponent } from "../../../components/leaderboard/leaderboard.component";
+import {
+  ButtonCloseDirective,
+  ModalBodyComponent,
+  ModalComponent,
+  ModalFooterComponent,
+  ModalHeaderComponent,
+  ModalTitleDirective,
+  ThemeDirective
+} from '@coreui/angular';
+
 
 interface voteStatus {
   icon: any;
@@ -50,6 +61,8 @@ interface voteStatus {
     AvatarComponent,
     UtilitiesModule,
     BadgeComponent,
+    LeaderboardComponent,
+    ModalComponent, ModalHeaderComponent, ModalTitleDirective, ThemeDirective, ButtonCloseDirective, ModalBodyComponent, ModalFooterComponent
 ],
   templateUrl: './fanta.component.html',
   styleUrl: './fanta.component.scss'
@@ -66,6 +79,7 @@ export class FantaComponent {
   previusTracks: any[] = [];
   //voto: number[] = [];
   votazioni: Map<number, number[]> = new Map<number, number[]>();
+  public modalRankingVisible = false;
 
   public fireIcon: string[] = cilFire;
   public powerIcon: string[] = cilPowerStandby;
@@ -369,6 +383,10 @@ export class FantaComponent {
       status.color = 'red';
     }
     return status;
+  }
+
+  toggleModalRanking() {
+    this.modalRankingVisible = !this.modalRankingVisible;
   }
 
 }

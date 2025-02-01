@@ -29,7 +29,11 @@
           </tr>
         </table>
       </c-col>
-
+      <c-col>
+        <div class="align">
+          <button (click)="toggleModalRanking()" cButton>Classifica Fanta</button>
+        </div>
+      </c-col>
       <c-col xs="auto">
         <div class="align">
           <button cButton (click)="this.authService.logout()">Logout</button>
@@ -353,3 +357,12 @@
     </c-row>
   </c-container>
 </div>
+<c-modal id="liveDemoModal" [visible]="modalRankingVisible">
+  <c-modal-header>
+    <h5 cModalTitle>Classifica Fanta</h5>
+    <button (click)="toggleModalRanking()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>
+    <app-leaderboard></app-leaderboard>
+  </c-modal-body>
+</c-modal>

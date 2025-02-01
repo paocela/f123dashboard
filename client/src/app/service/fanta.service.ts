@@ -2,13 +2,15 @@ import { Injectable } from '@angular/core';
 import { DbDataService } from './db-data.service';
 import { Fanta, RaceResult } from '../model/fanta';
 import { LeaderBoard } from '../model/leaderboard';
+import { size } from 'lodash-es';
 
 
 @Injectable({
   providedIn: 'root'
 })
 export class FantaService {
-  fantaPoints: Map<number,number> = new Map<number,number>();
+  fantaPoints: Map<number,number> = new Map<number,number>(); // track fanta point per player
+  fantaNumberVotes: Map<number, number> = new Map<number, number>(); // track how many times a fanta player voted out of all possible votes
   fantaVotes:  Fanta[] = [];
   raceResults: RaceResult[] = [];
   allDrivers: any[] = [];
@@ -31,8 +33,7 @@ export class FantaService {
       const raceVotes = this.fantaVotes.filter(item => item.track_id == raceResult.track_id);
       raceVotes.forEach(raceVote => {
         const racePoints: number =  this.calculateFantaPoints(raceResult, raceVote);
-        if (raceVote.fanta_player_id == 6)
-          console.log(racePoints, raceResult, raceVote)
+        this.fantaNumberVotes.set(Number(raceVote.fanta_player_id), (this.fantaNumberVotes.get(Number(raceVote.fanta_player_id)) ?? 0) + 1);
         this.fantaPoints.set(Number(raceVote.fanta_player_id), (this.fantaPoints.get(Number(raceVote.fanta_player_id)) ?? 0) + racePoints);
       });
 
@@ -44,6 +45,14 @@ export class FantaService {
 
    getFantaPoints(userId: number): number{
     return this.fantaPoints.get(Number(userId)) ?? 0;
+   }
+
+   getFantaNumberVotes(userId: number): number {
+    return this.fantaNumberVotes.get(Number(userId)) ?? 0;
+   }
+
+   getTotNumberVotes(): number {
+    return size(this.raceResults) - 3;
    }
 
    getFantaVote( userId:number, raceId:number): Fanta | undefined {
