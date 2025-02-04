@@ -12,3 +12,6 @@ Dashboard per il campionato Esport di F1 23
 - Costruttore deve essere assegnato automaticamente in base alla classifica
 - git crypt chiavi db
 - voto pole position x fanta
+- offri un caffè agli sviluppatori
+sviluppatori
+- link a pagina instagram
