@@ -1,8 +1,9 @@
 <p align="center">
   <img src="client/src/assets/images/logo_raceforfederica.png" width="200">
-  <img src="client/src/assets/images/f1_evolution.gif" width="700">
+  <img src="client/src/assets/images/readme/f1_evolution.gif" width="700">
   <img src="client/src/assets/images/logo_raceforfederica.png" width="200">
 </p>
+
 
 # F1 Dashboard RaceForFederica 
 
@@ -18,7 +19,21 @@ Dashboard for the Esport F1 23 championship (friendly, but not so much...)
 
 ## Preview 🧐
 
+| ** Dashboard **                                              | **Championship**                                             |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| ![dashboard](/home/paocela/Documents/Lavoro/Personal/f123dashboard/client/src/assets/images/readme/dashboard.png) | ![championship](/home/paocela/Documents/Lavoro/Personal/f123dashboard/client/src/assets/images/readme/campionato.png) |
+| **Pilots**                                                   | **Fantasy F1**                                               |
+| ![pilots](/home/paocela/Documents/Lavoro/Personal/f123dashboard/client/src/assets/images/readme/piloti.png) | ![fanta](/home/paocela/Documents/Lavoro/Personal/f123dashboard/client/src/assets/images/readme/fanta.png) |
+| **Fantasy F1 Vote**                                          | **Fantasy F1 Result**                                        |
+| ![fanta_voto](/home/paocela/Documents/Lavoro/Personal/f123dashboard/client/src/assets/images/readme/fanta_voto.png) | ![fanta_risultato](/home/paocela/Documents/Lavoro/Personal/f123dashboard/client/src/assets/images/readme/fanta_risultato.png) |
+
 ## Building and Installing 🛠️
+
+The website is hosted on [Genezio](https://genezio.com/). The db as well.
+
+Run `genezio local` to run it locally.
+
+Run `genezio deploy` to deploy remotely on genezio infrastracture.
 
 ## Notes 📋
 
