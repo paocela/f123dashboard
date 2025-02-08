@@ -23,7 +23,7 @@ const { Pool } = pg;
 @GenezioDeploy()
 export class PostgresService {
   pool = new Pool({
-    connectionString: "postgresql://admin:V7DcRKrlmZ0X@ep-silent-sunset-a2kwh1f2-pooler.eu-central-1.aws.neon.tech/raceforfederica-db?sslmode=require",
+    connectionString: process.env.RACEFORFEDERICA_DB_DATABASE_URL,
     ssl: true,
   });
 
