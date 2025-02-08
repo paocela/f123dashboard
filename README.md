@@ -9,14 +9,6 @@
 
 Dashboard for the Esport F1 23 championship (friendly, but not so much...)
 
-**Table of Contents:**
-
-* [Preview](#preview)
-* [Building and Installing](#building-and-installing)
-* [Notes](#notes)
-* [Todo](#todo)
-* [Credits](#credits)
-
 ## Preview 🧐
 
 | **Dashboard**                                              | **Championship**                                             |
