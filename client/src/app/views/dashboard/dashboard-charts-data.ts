@@ -36,6 +36,8 @@ export class DashboardChartsData {
   public championshipTrend: any[] = [];
   public championshipTracks: any[] = [];
 
+  private chartScale: number = 500;
+
   public random(min: number, max: number) {
     return Math.floor(Math.random() * (max - min + 1) + min);
   }
@@ -58,17 +60,13 @@ export class DashboardChartsData {
     this.mainChart["GiannisCorbe"] = [];
     this.mainChart["Lil Mvrck"] = [];
 
-    for (let pippo of this.championshipTrend ){
-      this.mainChart[pippo.driver_username].push(pippo.cumulative_points)
-    }
-
     let labels: string[] = [];
     if (period === 'Month') {
     
       labels = this.championshipTrend
       .filter(item => item.driver_username === 'FASTman') // Filtra i dati per un pilota
       .map(item => item.track_name); // Estrai track_name
-
+      
       //se minore di 8 record prendi le piste da qui 
       if (labels.length<8){
         labels = this.championshipTracks.slice(0, 8).map(track => track.country);
@@ -77,9 +75,43 @@ export class DashboardChartsData {
         labels=labels.slice(labels.length-8, labels.length)
       }
 
+      const driverData: { [key: string]: number[] } = {};
+
+      for (let pippo of this.championshipTrend) {
+        if (!driverData[pippo.driver_username]) {
+          driverData[pippo.driver_username] = [];
+        }
+        driverData[pippo.driver_username].push(pippo.cumulative_points);
+      }
+      let maxDriverValue = 0;
+      for (let driver in driverData) {
+        // Recupero ultimi 8 risultati
+        const data = driverData[driver].slice(-8);
+        // Sottraggo il primo valore a tutti gli altri per avere un grafico che parte da 0
+        const firstValue = data[0];
+        this.mainChart[driver] = data.map(value => value - firstValue);
+        // Trova il valore massimo per ogni driver e aggiorna maxDriverValue se necessario
+        const driverMax = Math.max(...data) - firstValue;
+        if (driverMax > maxDriverValue) {
+          maxDriverValue = driverMax;
+        }
+      }
+
+      // Setta una variabile con il valore massimo arrotondato alle centinaia per eccesso
+      this.chartScale = Math.ceil(maxDriverValue / 100) * 100;
+      
     } else {
       /* tslint:disable:max-line-length */
-      labels = this.championshipTracks.map(track => track.country); ;
+      labels = this.championshipTracks.map(track => track.country);
+
+      for (let pippo of this.championshipTrend ){
+        this.mainChart[pippo.driver_username].push(pippo.cumulative_points)
+      }
+
+      // Trova il valore massimo in championshipTrend
+      const maxTrendValue = Math.max(...this.championshipTrend.map(item => item.cumulative_points));
+      // Arrotonda il valore massimo alle centinaia per eccesso
+      this.chartScale = Math.ceil(maxTrendValue / 100) * 100;
     }
 
     const colors = [
@@ -222,12 +254,12 @@ export class DashboardChartsData {
         grid: {
           color: colorBorderTranslucent
         },
-        max: 500,
+        max: this.chartScale,
         beginAtZero: true,
         ticks: {
           color: colorBody,
           maxTicksLimit: 5,
-          stepSize: Math.ceil(500 / 5)
+          stepSize: Math.ceil(this.chartScale / 5)
         }
       }
     };
