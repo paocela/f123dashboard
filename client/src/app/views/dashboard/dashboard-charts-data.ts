@@ -42,7 +42,7 @@ export class DashboardChartsData {
     return Math.floor(Math.random() * (max - min + 1) + min);
   }
 
-  initMainChart(period: string = 'Month') {
+  initMainChart(period: string = 'Month', numberOfRaces: number = 8) {
     const brandSuccess = getStyle('--cui-success') ?? '#4dbd74';
     const brandInfo = getStyle('--cui-info') ?? '#20a8d8';
     const brandInfoBg = hexToRgba(getStyle('--cui-info') ?? '#20a8d8', 10);
@@ -68,11 +68,11 @@ export class DashboardChartsData {
       .map(item => item.track_name); // Estrai track_name
       
       //se minore di 8 record prendi le piste da qui 
-      if (labels.length<8){
-        labels = this.championshipTracks.slice(0, 8).map(track => track.country);
+      if (labels.length < numberOfRaces){
+        labels = this.championshipTracks.slice(0, numberOfRaces).map(track => track.country);
       }
       else {
-        labels=labels.slice(labels.length-8, labels.length)
+        labels=labels.slice(labels.length - numberOfRaces, labels.length)
       }
 
       const driverData: { [key: string]: number[] } = {};
@@ -86,9 +86,9 @@ export class DashboardChartsData {
       let maxDriverValue = 0;
       for (let driver in driverData) {
         // Recupero ultimi 8 risultati
-        const data = driverData[driver].slice(-8);
-        // Sottraggo il primo valore a tutti gli altri per avere un grafico che parte da 0
-        const firstValue = data[0];
+        const data = driverData[driver].slice(-numberOfRaces);
+        // Sottraggo il primo valore a tutti gli altri per avere un grafico che parte da gara -1
+        const firstValue = driverData[driver][(driverData[driver].length - numberOfRaces) - 1]; 
         this.mainChart[driver] = data.map(value => value - firstValue);
         // Trova il valore massimo per ogni driver e aggiorna maxDriverValue se necessario
         const driverMax = Math.max(...data) - firstValue;
