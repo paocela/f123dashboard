@@ -112,7 +112,7 @@ export class DashboardComponent implements OnInit {
   });
   public chart: Array<IChartProps> = [];
   public trafficRadioGroup = new FormGroup({
-    trafficRadio: new FormControl('Month')
+    trafficRadio: new FormControl('Year')
   });
 
   ngOnInit(): void {
@@ -141,6 +141,23 @@ export class DashboardComponent implements OnInit {
       }
     }
 
+    // Calculate delta points for the last 2 tracks
+    for (let user of this.championship_standings_users) {
+      const userTracks = this.championshipTrend.filter(track => track.driver_username === user.driver_username);
+      if (userTracks.length >= 3) {
+        const lastPoints = userTracks[userTracks.length - 1].cumulative_points;
+        const thirdToLastPoints = userTracks[userTracks.length - 3].cumulative_points;
+        user.gainedPoints = lastPoints - thirdToLastPoints;
+      } else {
+        user.gainedPoints = '-';
+      }
+    }
+
+    //  delta points from the pilot above
+    for (let i = 1; i < this.championship_standings_users.length; i++) {
+      this.championship_standings_users[i].deltaPoints = this.championship_standings_users[i - 1].total_points - this.championship_standings_users[i].total_points;
+    }
+
     // countdown to next gp
 
     this.initCharts();
@@ -151,9 +168,9 @@ export class DashboardComponent implements OnInit {
     this.mainChart = this.#chartsData.mainChart;
   }
 
-  setTrafficPeriod(value: string): void {
-    this.trafficRadioGroup.setValue({ trafficRadio: value });
-    this.#chartsData.initMainChart(value);
+  setTrafficPeriod(value: string, numberOfRaces: number): void {
+    console .log(this.trafficRadioGroup)
+    this.#chartsData.initMainChart(value, numberOfRaces); // Pass numberOfRaces
     this.initCharts();
   }
 

@@ -1,7 +1,7 @@
 <p align="center">
-  <img src="client/src/assets/images/logo_raceforfederica.png" width="200">
-  <img src="client/src/assets/images/readme/f1_evolution.gif" width="700">
-  <img src="client/src/assets/images/logo_raceforfederica.png" width="200">
+  <img src="client/src/assets/images/logo_raceforfederica.png" width="100">
+  <img src="client/src/assets/images/readme/f1_evolution.gif" width="400">
+  <img src="client/src/assets/images/logo_raceforfederica.png" width="100">
 </p>
 
 
@@ -9,23 +9,15 @@
 
 Dashboard for the Esport F1 23 championship (friendly, but not so much...)
 
-**Table of Contents:**
-
-* [Preview](#preview)
-* [Building and Installing](#building-and-installing)
-* [Notes](#notes)
-* [Todo](#todo)
-* [Credits](#credits)
-
 ## Preview 🧐
 
-| ** Dashboard **                                              | **Championship**                                             |
+| **Dashboard**                                              | **Championship**                                             |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| ![dashboard](/home/paocela/Documents/Lavoro/Personal/f123dashboard/client/src/assets/images/readme/dashboard.png) | ![championship](/home/paocela/Documents/Lavoro/Personal/f123dashboard/client/src/assets/images/readme/campionato.png) |
+| ![dashboard](client/src/assets/images/readme/dashboard.png) | ![championship](client/src/assets/images/readme/campionato.png) |
 | **Pilots**                                                   | **Fantasy F1**                                               |
-| ![pilots](/home/paocela/Documents/Lavoro/Personal/f123dashboard/client/src/assets/images/readme/piloti.png) | ![fanta](/home/paocela/Documents/Lavoro/Personal/f123dashboard/client/src/assets/images/readme/fanta.png) |
+| ![pilots](client/src/assets/images/readme/piloti.png) | ![fanta](client/src/assets/images/readme/fanta.png) |
 | **Fantasy F1 Vote**                                          | **Fantasy F1 Result**                                        |
-| ![fanta_voto](/home/paocela/Documents/Lavoro/Personal/f123dashboard/client/src/assets/images/readme/fanta_voto.png) | ![fanta_risultato](/home/paocela/Documents/Lavoro/Personal/f123dashboard/client/src/assets/images/readme/fanta_risultato.png) |
+| ![fanta_voto](client/src/assets/images/readme/fanta_voto.png) | ![fanta_risultato](client/src/assets/images/readme/fanta_risultato.png) |
 
 ## Building and Installing 🛠️
 

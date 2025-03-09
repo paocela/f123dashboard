@@ -24,6 +24,7 @@
               <th class="bg-body-tertiary text-center">Car</th>
               <th class="bg-body-tertiary pilot">Pilot</th>
               <th class="bg-body-tertiary text-center">Points</th>
+              <th class="bg-body-tertiary text-center">Gain/Lost</th>
             </tr>
           </thead>
           <tbody>
@@ -57,6 +58,15 @@
               <td>
                 <div class="fw-semibold text-center">
                   {{ user.total_points }}
+                </div>
+              </td>
+              <td>
+                <div class="fw-semibold text-center" [ngClass]="{
+                  'text-success': (championship_standings_users[i - 1] && (user.gainedPoints - championship_standings_users[i - 1].gainedPoints) > 0),
+                  'text-danger': (championship_standings_users[i - 1] && (user.gainedPoints - championship_standings_users[i - 1].gainedPoints) < 0),
+                  'text-warning': (championship_standings_users[i - 1] && (user.gainedPoints - championship_standings_users[i - 1].gainedPoints) === 0)
+                }">
+                  {{ championship_standings_users[i - 1] ? (user.gainedPoints - championship_standings_users[i - 1].gainedPoints) : '-' }}
                 </div>
               </td>
             </tr>
@@ -136,19 +146,36 @@
               class="btn-check"
               formControlName="trafficRadio"
               type="radio"
-              value="Month"
-              id="radioMonth"
+              value="Month4"
+              id="radio4Month"
             />
             <label
-              (click)="setTrafficPeriod('Month')"
+              (click)="setTrafficPeriod('Month', 4)"
               cButton
               cFormCheckLabel
               color="secondary"
               variant="outline"
-              for="radioMonth"
+              for="radio4Month"
             >
-              Last 8 GP
+              Last 4 GP
             </label>
+            <input
+            class="btn-check"
+            formControlName="trafficRadio"
+            type="radio"
+            value="Month8"
+            id="radio8Month"
+          />
+          <label
+            (click)="setTrafficPeriod('Month', 8)"
+            cButton
+            cFormCheckLabel
+            color="secondary"
+            variant="outline"
+            for="radio8Month"
+          >
+            Last 8 GP
+          </label>
             <input
               class="btn-check"
               formControlName="trafficRadio"
@@ -157,7 +184,7 @@
               id="radioYear"
             />
             <label
-              (click)="setTrafficPeriod('Year')"
+              (click)="setTrafficPeriod('Year', 0)"
               cButton
               cFormCheckLabel
               color="secondary"
