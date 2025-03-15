@@ -65,7 +65,7 @@ export class DashboardChartsData {
     
       labels = this.championshipTrend
       .filter(item => item.driver_username === 'FASTman') // Filtra i dati per un pilota
-      .map(item => item.track_name); // Estrai track_name
+      .map(item => item.track.country); // Estrai country
       
       //se minore di 8 record prendi le piste da qui 
       if (labels.length < numberOfRaces){
