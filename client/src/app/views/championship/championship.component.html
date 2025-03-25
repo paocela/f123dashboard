@@ -16,6 +16,11 @@
                   <c-badge color="info">Sprint</c-badge>
                 </c-col>
               }
+              @if (gp.gran_prix_has_x2 == 1) {
+                <c-col xs="auto">
+                  <c-badge color="danger">Points X2</c-badge>
+                </c-col>
+              }
               <c-col xs="auto">
                 <div class="small">{{gp.gran_prix_date | date: 'dd/MM/yyyy'}}</div>
               </c-col>
@@ -29,7 +34,9 @@
                 <tr>
                   <th scope="col">#</th>
                   <th scope="col">Gara</th>
-                  <th scope="col">Sprint</th>
+                  @if (gp.gran_prix_has_sprint == 1) {
+                    <th scope="col">Sprint</th>
+                  }
                   <th scope="col">Qualifica</th>
                   <th scope="col">Prove Libere</th>
                 </tr>
@@ -43,8 +50,14 @@
                     src="assets/medals/medal_first.svg"
                   />
                   </th>
-                  <td [ngStyle]="{'color':'green'}">{{gp.driver_race_1_place}}</td>
-                  <td [ngStyle]="{'color':'green'}">{{gp.driver_sprint_1_place}}</td>
+                  @if (gp.gran_prix_has_x2 == 1) {
+                    <td [ngStyle]="{'color':'green'}">{{gp.driver_full_race_1_place}}</td>
+                  }@else{
+                    <td [ngStyle]="{'color':'green'}">{{gp.driver_race_1_place}}</td>
+                  }
+                  @if (gp.gran_prix_has_sprint == 1) {
+                    <td [ngStyle]="{'color':'green'}">{{gp.driver_sprint_1_place}}</td>
+                  }
                   <td [ngStyle]="{'color':'green'}">{{gp.driver_qualifying_1_place}}</td>
                   <td [ngStyle]="{'color':'green'}">{{gp.driver_free_practice_1_place}}</td>
                 </tr>
@@ -54,40 +67,74 @@
                     class="cIcon"
                     style="width: 25px"
                     src="assets/medals/medal_second.svg"
-                  />                  <td>{{gp.driver_race_2_place}}</td>
-                  <td>{{gp.driver_sprint_2_place}}</td>
+                  />   
+                  </th>                
+                  @if (gp.gran_prix_has_x2 == 1) {
+                    <td>{{gp.driver_full_race_2_place}}</td>
+                  }@else{
+                    <td>{{gp.driver_race_2_place}}</td>
+                  }                  
+                  @if (gp.gran_prix_has_sprint == 1) {
+                    <td>{{gp.driver_sprint_2_place}}</td>
+                  }
                   <td>{{gp.driver_qualifying_2_place}}</td>
                   <td>{{gp.driver_free_practice_2_place}}</td>
                 </tr>
                 <tr>
-                  <th scope="row" [ngStyle]="{'color':'green'}">
+                  <th scope="row">
                     <img
                     class="cIcon"
                     style="width: 25px"
                     src="assets/medals/medal_third.svg"
-                  />                  <td>{{gp.driver_race_3_place}}</td>
-                  <td>{{gp.driver_sprint_3_place}}</td>
+                  />   
+                  </th>               
+                  @if (gp.gran_prix_has_x2 == 1) {
+                    <td>{{gp.driver_full_race_3_place}}</td>
+                  }@else{
+                    <td>{{gp.driver_race_3_place}}</td>
+                  } 
+                  @if (gp.gran_prix_has_sprint == 1) {
+                    <td>{{gp.driver_sprint_3_place}}</td>
+                  }
                   <td>{{gp.driver_qualifying_3_place}}</td>
                   <td>{{gp.driver_free_practice_3_place}}</td>
                 </tr>
                 <tr>
                   <th scope="row">4</th>
-                  <td>{{gp.driver_race_4_place}}</td>
-                  <td>{{gp.driver_sprint_4_place}}</td>
+                  @if (gp.gran_prix_has_x2 == 1) {
+                    <td>{{gp.driver_full_race_4_place}}</td>
+                  }@else{
+                    <td>{{gp.driver_race_4_place}}</td>
+                  } 
+                  @if (gp.gran_prix_has_sprint == 1) {
+                    <td>{{gp.driver_sprint_4_place}}</td>
+                  }
                   <td>{{gp.driver_qualifying_4_place}}</td>
                   <td>{{gp.driver_free_practice_4_place}}</td>
                 </tr>
                 <tr>
                   <th scope="row">5</th>
-                  <td>{{gp.driver_race_5_place}}</td>
-                  <td>{{gp.driver_sprint_5_place}}</td>
+                  @if (gp.gran_prix_has_x2 == 1) {
+                    <td>{{gp.driver_full_race_5_place}}</td>
+                  }@else{
+                    <td>{{gp.driver_race_5_place}}</td>
+                  } 
+                  @if (gp.gran_prix_has_sprint == 1) {
+                    <td>{{gp.driver_sprint_5_place}}</td>
+                  }
                   <td>{{gp.driver_qualifying_5_place}}</td>
                   <td>{{gp.driver_free_practice_5_place}}</td>
                 </tr>
                 <tr>
                   <th scope="row" [ngStyle]="{'color':'red'}">6</th>
-                  <td [ngStyle]="{'color':'red'}">{{gp.driver_race_6_place}}</td>
-                  <td [ngStyle]="{'color':'red'}">{{gp.driver_sprint_6_place}}</td>
+                  @if (gp.gran_prix_has_x2 == 1) {
+                    <td [ngStyle]="{'color':'red'}">{{gp.driver_full_race_6_place}}</td>
+                  }@else{
+                    <td [ngStyle]="{'color':'red'}">{{gp.driver_race_6_place}}</td>
+                  } 
+                  @if (gp.gran_prix_has_sprint == 1) {
+                    <td [ngStyle]="{'color':'red'}">{{gp.driver_sprint_6_place}}</td>
+                  }
                   <td [ngStyle]="{'color':'red'}">{{gp.driver_qualifying_6_place}}</td>
                   <td [ngStyle]="{'color':'red'}">{{gp.driver_free_practice_6_place}}</td>
                 </tr>
@@ -96,15 +143,27 @@
                     Fast Lap
                     <svg [cIcon]="fireIcon"></svg>
                   </th>
-                  <td [ngStyle]="{'color':'purple'}">{{gp.driver_race_fast_lap}}</td>
-                  <td [ngStyle]="{'color':'purple'}">{{gp.driver_sprint_fast_lap}}</td>
+                  @if (gp.gran_prix_has_x2 == 1) {
+                    <td [ngStyle]="{'color':'purple'}">{{gp.driver_full_race_fast_lap}}</td>
+                  }@else{
+                    <td [ngStyle]="{'color':'purple'}">{{gp.driver_race_fast_lap}}</td>
+                  } 
+                  @if (gp.gran_prix_has_sprint == 1) {
+                    <td [ngStyle]="{'color':'purple'}">{{gp.driver_sprint_fast_lap}}</td>
+                  }
                   <td></td>
                   <td></td>
                 </tr>
                 <tr>
                   <th scope="row">DNF</th>
-                  <td>{{gp.race_dnf}}</td>
-                  <td>{{gp.sprint_dnf}}</td>
+                  @if (gp.gran_prix_has_x2 == 1) {
+                    <td>{{gp.full_race_dnf}}</td>
+                  }@else{
+                    <td>{{gp.race_dnf}}</td>
+                  } 
+                  @if (gp.gran_prix_has_sprint == 1) {
+                    <td>{{gp.sprint_dnf}}</td>
+                  }
                   <td></td>
                   <td></td>
                 </tr>
