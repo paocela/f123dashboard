@@ -1,7 +1,7 @@
 import { DatePipe, NgIf } from '@angular/common';
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';    
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { AccordionComponent, 
     AccordionItemComponent, 
     FormModule, 
@@ -33,6 +33,7 @@ import {
   ModalTitleDirective,
   ThemeDirective
 } from '@coreui/angular';
+import { from } from 'rxjs';
 
 
 interface voteStatus {
@@ -68,8 +69,9 @@ interface voteStatus {
   styleUrl: './fanta.component.scss'
 })
 export class FantaComponent {
-  errorMessage: string = '';
-  successMessage: string = '';
+  // 1 = success, 2 = error
+  formStatus: { [key: number]: number } = {};
+  forms: { [key: number]: NgForm } = {};
   username: string  = '';
   userId!: number;
   userFantaPoints: number = 0;
@@ -196,9 +198,9 @@ export class FantaComponent {
     return  isNaN(+n) ? 0 : +n;
   }
 
-  publishVoto(trackId: number) {
+  publishVoto(trackId: number, form: NgForm): void {
+    this.forms[trackId]= form;
     if(this.formIsValid(trackId)){
-      this.errorMessage = '';
       let fantaVoto: Fanta = {
         fanta_player_id: this.userId,
         username: this.username,
@@ -213,11 +215,9 @@ export class FantaComponent {
         track_id: trackId,
       };
       this.dbData.setFantaVoto(fantaVoto);
-      this.errorMessage = "";
-      this.successMessage = "Preferenze salvate correttamente :)"
+      this.formStatus[trackId] = 1;
     } else {
-      this.successMessage = "";
-      this.errorMessage = 'Errore: piloti assenti, invalidi, o inseriti più volte :(';
+      this.formStatus[trackId] = 2;
     }
   }
 
@@ -246,14 +246,15 @@ export class FantaComponent {
     return this.votazioni.get(trackId);
   }
   
-  setVoto(trackId: number, index: number, valore: number): void {
+  setVoto(trackId: number, index: number, valore: number, form: NgForm): void {
+    this.forms[trackId]= form;
     if(valore){
       let votoArray = this.votazioni.get(trackId);
       if (!votoArray) {
         votoArray = [];
         this.votazioni.set(trackId, votoArray);
       }
-      votoArray[index-1] = valore;
+      votoArray[index-1] = +valore;
     }
   }
 

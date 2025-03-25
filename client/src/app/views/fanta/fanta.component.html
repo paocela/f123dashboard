@@ -81,6 +81,17 @@
                   </c-col>
                   <c-col xs="auto">
                     <div class="small">
+                        <p *ngIf="forms[track.track_id] && (!forms[track.track_id].submitted 
+                            && !forms[track.track_id].touched && formStatus[track.track_id] != 1) || formStatus[track.track_id] == 2" class="error">
+                          <c-badge color="danger">NON SALVATO!</c-badge>
+                        </p>
+                        <p *ngIf="formStatus[track.track_id] == 1" class="success">
+                          <c-badge color="success">Salvato</c-badge>
+                        </p>
+                    </div>
+                  </c-col>
+                  <c-col xs="auto">
+                    <div class="small">
                       {{ track.date | date : "dd/MM/yyyy" }}
                     </div>
                   </c-col>
@@ -90,8 +101,8 @@
           </ng-template>
           <ng-template cTemplateId="accordionBodyTemplate">
             <div class="accordion-body">
-              <form cForm (ngSubmit)="publishVoto(track.track_id)">
-                <c-container>
+              <form #form="ngForm" cForm (ngSubmit)="publishVoto(track.track_id, form)">
+               <c-container>
                   <c-row
                     *ngFor="let posizione of posizioni | keyvalue"
                     class="my-2"
@@ -122,7 +133,7 @@
                         attr.id="{{ track.track_id + posizione.key }}"
                         [ngModel]="getVoto(track.track_id, posizione.key)"
                         (ngModelChange)="
-                          setVoto(track.track_id, posizione.key, $event)
+                          setVoto(track.track_id, posizione.key, $event, form)
                         "
                         name="voto{{ track.track_id + posizione.key }}"
                         cSelect
@@ -143,13 +154,13 @@
                     <c-col></c-col>
                     <c-col class="text-center">
                       <button cButton type="submit" >Conferma</button>
-                    </c-col>
+    	              </c-col>
                     <c-col class="text-center">
-                        <p *ngIf="errorMessage" class="error">
-                          <c-badge color="danger">{{errorMessage}}</c-badge>
+                        <p *ngIf="formStatus[track.track_id] == 2" class="error">
+                          <c-badge color="danger">Errore: piloti assenti, invalidi, o inseriti più volte :(</c-badge>
                         </p>
-                        <p *ngIf="successMessage" class="success">
-                          <c-badge color="success">{{successMessage}}</c-badge>
+                        <p *ngIf="formStatus[track.track_id] == 1" class="success">
+                          <c-badge color="success">Preferenze salvate correttamente :)</c-badge>
                         </p>
                     </c-col>
 
