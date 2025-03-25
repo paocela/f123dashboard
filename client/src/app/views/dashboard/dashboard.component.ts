@@ -134,10 +134,7 @@ export class DashboardComponent implements OnInit {
         this.championshipNextTracks[i] = track;
         this.championshipNextTracks[i]["date"] = db_date.toLocaleDateString("it-CH");
         i++;
-        if (i == 2)
-        {
-          break;
-        }
+        if (i == 2) break;
       }
     }
 
@@ -158,9 +155,7 @@ export class DashboardComponent implements OnInit {
       this.championship_standings_users[i].deltaPoints = this.championship_standings_users[i - 1].total_points - this.championship_standings_users[i].total_points;
     }
 
-    // countdown to next gp
-
-    this.initCharts();
+    this.setTrafficPeriod('Year', 0);
     this.updateChartOnColorModeChange();
   }
 
@@ -169,7 +164,6 @@ export class DashboardComponent implements OnInit {
   }
 
   setTrafficPeriod(value: string, numberOfRaces: number): void {
-    console .log(this.trafficRadioGroup)
     this.#chartsData.initMainChart(value, numberOfRaces); // Pass numberOfRaces
     this.initCharts();
   }

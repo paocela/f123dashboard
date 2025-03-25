@@ -42,7 +42,7 @@ export class DashboardChartsData {
     return Math.floor(Math.random() * (max - min + 1) + min);
   }
 
-  initMainChart(period: string = 'Month', numberOfRaces: number = 8) {
+  initMainChart(period: string = 'all', numberOfRaces: number = 8) {
     const brandSuccess = getStyle('--cui-success') ?? '#4dbd74';
     const brandInfo = getStyle('--cui-info') ?? '#20a8d8';
     const brandInfoBg = hexToRgba(getStyle('--cui-info') ?? '#20a8d8', 10);
@@ -62,17 +62,15 @@ export class DashboardChartsData {
 
     let labels: string[] = [];
     if (period === 'Month') {
-    
-      labels = this.championshipTrend
-      .filter(item => item.driver_username === 'FASTman') // Filtra i dati per un pilota
-      .map(item => item.track.country); // Estrai country
-      
+      console.log(this.championshipTrend);
+
       //se minore di 8 record prendi le piste da qui 
       if (labels.length < numberOfRaces){
         labels = this.championshipTracks.slice(0, numberOfRaces).map(track => track.country);
-      }
-      else {
-        labels=labels.slice(labels.length - numberOfRaces, labels.length)
+      }else {
+        labels=this.championshipTracks
+          .map(track => track.country)
+          .slice(labels.length - numberOfRaces, labels.length);
       }
 
       const driverData: { [key: string]: number[] } = {};
