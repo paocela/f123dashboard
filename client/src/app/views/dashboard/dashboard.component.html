@@ -226,4 +226,41 @@
   </c-card-footer>
 </c-card>
 
+<c-modal  alignment="center" id="championshipResoult"  size="lg" class="modalAnimation"
+      [visible]="resoultModalVisible==1"   backdrop="static">
+  <c-modal-header>
+    <h5 cModalTitle>Risultati Stagione</h5>
+  </c-modal-header>
+  <c-modal-body class="box">
+    <c-row>
+      <img  src="./assets/images/championshipResoult/classifica.png" style="width: 100%; height: auto;">
+    </c-row>
+  </c-modal-body>
+  <c-modal-footer>
+    <button (click)="toggleResoultModalvisible(0)" cButton color="secondary">
+      Chiudi
+    </button>
+    <button (click)="toggleResoultModalvisible(2)" cButton color="primary">Risultati Fanta</button>
+  </c-modal-footer>
+</c-modal>
+
+<c-modal id="FantaResoult" alignment="center" class="modalAnimation"
+    [visible]="resoultModalVisible==2" backdrop="static">
+  <c-modal-header>
+    <h5 cModalTitle>Risultati Fanta</h5>
+  </c-modal-header>
+    <div class="box" class="m-2">
+      <app-leaderboard [maxDisplayable]="8"></app-leaderboard>
+    </div>
+  <c-modal-footer>
+    <button (click)="toggleResoultModalvisible(0)" cButton color="secondary">
+      Chiudi
+    </button>
+    <button (click)="toggleResoultModalvisible(1)" cButton color="primary">
+      Risultati Piloti
+    </button>
+  </c-modal-footer>
+</c-modal>
+
+
 <!-- <app-widgets-brand [withCharts]="true" /> -->

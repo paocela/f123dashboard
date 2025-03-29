@@ -22,3 +22,19 @@
     display: none;
   }
 }
+
+/* Modal animation with slide-in from bottom effect */
+@keyframes slideInFromBottom {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modalAnimation {
+  animation: slideInFromBottom 0.7s ease-in-out;
+}

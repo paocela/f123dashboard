@@ -1,14 +1,13 @@
-    <c-row>
-        <table
+<c-row>
+    <table
         [hover]="true"
         [responsive]="true"
         [striped]="true"
         align="middle"
         cTable
         class="mb-3 border rounded custom-table"
-
-        >
-            <thead class="text-nowrap text-truncate">
+    >
+        <thead class="text-nowrap text-truncate">
             <tr>
                 <th class="col-2 bg-body-tertiary text-center">Posizione</th>
                 <th class="col-2 bg-body-tertiary text-center"><svg cIcon name="cilPeople"></svg></th>
@@ -16,39 +15,38 @@
                 <th class="col-4 bg-body-tertiary text-center">Voti</th>
                 <th class="col-2 bg-body-tertiary text-center">Punti</th>
             </tr>
-            </thead>
-            <tbody>
-                @for ( leaderBoard of leaderBoards ; track
-                    leaderBoard.id; let i = $index) {
-                    <tr>
-                        <td>
-                            <div class="text-center fw-semibold">
-                                    <div [class]="">#{{ i+1 }}</div>
-                            </div>
-                        </td>
-                        <td class="text-center">
-                            <c-avatar
-                                [size]="'md'"
-                                src="./assets/images/avatars_fanta/{{ leaderBoard.id }}.png"
-                            />
-                        </td>
-                        <td>
-                            <div>{{ leaderBoard.username }}</div>
-                            <div class="small text-body-secondary text-nowrap"></div>
-                        </td>
-                        <td>
-                            <div class="text-center">
-                                {{ leaderBoard.numberVotes }} / {{totNumberVotes}}
-                            </div>
-                        </td>
-                        <td>
-                            <div class="fw-semibold text-center">
-                                {{ leaderBoard.points }}
-                            </div>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </c-row>
+        </thead>
+        <tbody>
+            @for (leaderBoard of leaderBoards.slice(0, maxDisplayable); track leaderBoard.id; let i = $index) {
+                <tr>
+                    <td>
+                        <div class="text-center fw-semibold">
+                            <div [class]="">#{{ i+1 }}</div>
+                        </div>
+                    </td>
+                    <td class="text-center">
+                        <c-avatar
+                            [size]="'md'"
+                            src="./assets/images/avatars_fanta/{{ leaderBoard.id }}.png"
+                        />
+                    </td>
+                    <td>
+                        <div>{{ leaderBoard.username }}</div>
+                        <div class="small text-body-secondary text-nowrap"></div>
+                    </td>
+                    <td>
+                        <div class="text-center">
+                            {{ leaderBoard.numberVotes }} / {{totNumberVotes}}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="fw-semibold text-center">
+                            {{ leaderBoard.points }}
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</c-row>
 

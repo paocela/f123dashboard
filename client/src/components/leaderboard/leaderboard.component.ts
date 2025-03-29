@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { GridModule, TableDirective } from '@coreui/angular';
 import { User, USERS } from '../../app/model/user';
 import { LeaderBoard } from '../../app/model/leaderboard'
@@ -28,7 +28,8 @@ import { AvatarComponent, TextColorDirective } from '@coreui/angular';
 })
 
 export class LeaderboardComponent {
-
+  @Input() maxDisplayable: number | undefined = undefined; // Default value set to 10
+  
   public cilPeople: string[] = cilPeople;
 
   constructor(private fantaService: FantaService, private dbData: DbDataService){}
@@ -48,6 +49,7 @@ export class LeaderboardComponent {
       };
       this.leaderBoards.push(newUser);
     });
-    this.leaderBoards.sort((a,b) => b.points - a.points );
+    this.leaderBoards = this.leaderBoards.filter(lb => lb.numberVotes > 0);
+    this.leaderBoards.sort((a, b) => b.points - a.points);
   }
 }

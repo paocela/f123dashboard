@@ -1,9 +1,10 @@
 import { DOCUMENT, formatDate, NgStyle } from '@angular/common';
 import { CommonModule } from '@angular/common'; // Importa CommonModule
-import { Component, DestroyRef, effect, inject, OnInit, Renderer2, signal, WritableSignal } from '@angular/core';
+import { Component, DestroyRef, effect, inject, OnInit, Renderer2, signal, ViewChild, WritableSignal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import {DbDataService} from 'src/app/service/db-data.service';  //aggiunto il servizio per dati db
 import { ChartOptions } from 'chart.js';
+import { ModalModule, ModalComponent } from '@coreui/angular';
 import {
   AvatarComponent,
   ButtonDirective,
@@ -34,7 +35,7 @@ import { IconDirective } from '@coreui/icons-angular';
 import { cilCalendar, cilMap, cilFire } from '@coreui/icons';
 import { cifBh, cifAt, cifMc, cifJp, cifHu, cifCn, cifCa, cifEs, cifGb, cifBe, cifNl, cifAz, cifSg, cifIt, cifUs, cifAu, cifMx, cifBr, cifQa, cifAe, cifSa } from '@coreui/icons';
 import { DatePipe } from '@angular/common';
-
+import { LeaderboardComponent } from "../../../components/leaderboard/leaderboard.component";
 import { DashboardChartsData, IChartProps } from './dashboard-charts-data';
 
 interface ChampionshipStandings {
@@ -56,12 +57,14 @@ interface NextTrack {
 }
 
 @Component({
-  templateUrl: 'dashboard.component.html',
-  styleUrls: ['dashboard.component.scss'],
+  selector: 'app-dashboard',
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.scss'],
   standalone: true,
-  imports: [BadgeComponent, ThemeDirective, CarouselComponent, CarouselIndicatorsComponent, CarouselInnerComponent, CarouselItemComponent, CarouselControlComponent, RouterLink, DatePipe, CommonModule, TextColorDirective, CardComponent, CardBodyComponent, RowComponent, ColComponent, ButtonDirective, IconDirective, ReactiveFormsModule, ButtonGroupComponent, FormCheckLabelDirective, ChartjsComponent, NgStyle, CardFooterComponent, GutterDirective, ProgressBarDirective, ProgressComponent, CardHeaderComponent, TableDirective, AvatarComponent]
+  imports: [LeaderboardComponent, ModalModule, BadgeComponent, ThemeDirective, CarouselComponent, CarouselIndicatorsComponent, CarouselInnerComponent, CarouselItemComponent, CarouselControlComponent, RouterLink, DatePipe, CommonModule, TextColorDirective, CardComponent, CardBodyComponent, RowComponent, ColComponent, ButtonDirective, IconDirective, ReactiveFormsModule, ButtonGroupComponent, FormCheckLabelDirective, ChartjsComponent, NgStyle, CardFooterComponent, GutterDirective, ProgressBarDirective, ProgressComponent, CardHeaderComponent, TableDirective, AvatarComponent]
 })
 export class DashboardComponent implements OnInit {
+  @ViewChild('championshipResoult', { static: true }) championshipResoult!: ModalComponent;
 
   constructor(private dbData: DbDataService) {} //aggiunto il servizio per dati db
 
@@ -114,6 +117,12 @@ export class DashboardComponent implements OnInit {
   public trafficRadioGroup = new FormGroup({
     trafficRadio: new FormControl('Year')
   });
+
+  // 0 = hidden, 1 = modal piloti, 2 = modal fanta
+  public resoultModalVisible = 0;
+  toggleResoultModalvisible(modal: number) {
+    this.resoultModalVisible = modal;
+  }
 
   ngOnInit(): void {
 
