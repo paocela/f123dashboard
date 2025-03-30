@@ -11,8 +11,8 @@
   <meta charset="utf-8">
   <base href="./">
   <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport" />
-  <meta content="CoreUI Free Angular Admin Template" name="description" />
-  <meta content="Łukasz Holeczek" name="author" />
+  <meta content="RaceForFederica Championship Dashboard" name="description" />
+  <meta content="Paolo Celada, Federico Degionanni, Andrea Dominici" name="author" />
   <meta
     content="CoreUI,Bootstrap,Admin,Template,Free,Angular,Dashboard,Typescript"
     name="keyword"
@@ -21,19 +21,90 @@
     pre {
         line-height: 1.1;  /* Decrease the space between lines */
     }
+
+    #lights_container{
+      width: 210;
+      height: fit-content;
+      display: inline-flex;
+    }
+    .bulbs_container{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        margin-right: 10px;
+        height: 120px;
+        width: 55px;
+        background-color: rgb(61, 61, 61);
+        border-radius: 50px;
+    }
+    .bulb_up{
+        background-color: rgb(34, 34, 34);
+        width: 50px;
+        height: 50px;
+        margin-bottom: 10px;
+        border-radius: 50%;
+        border: 3px solid black;
+    }
+    .bulb{
+        background-color: rgb(34, 34, 34);
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        border: 3px solid black;
+        border-top: 13px solid black;
+    }
+    .red_light{
+        background-color: red;
+        transition: all 0 s;
+    }
+    .logo{
+        background-color: transparent;
+        background-size: contain;
+        background-image: url('assets/images/logo_raceforfederica.png');
+        transition: all 0 s;
+    }
+
+    .fade.show {
+      display: flex;
+      justify-content: center; /* Horizontal centering */
+      align-items: center;     /* Vertical centering */
+      text-align: center;      /* Center text inside the div */
+      height: 100vh;           /* Full viewport height */
+    }
+
   </style>
   <link href="assets/images/logo_raceforfederica.png" rel="icon" type="image/x-icon">
   <title>F1 RaceForFederica</title>
 </head>
-<body>
+<body onload="lightUp()">
 
 <noscript>You need to enable JavaScript to run this app.</noscript>
 <app-root>
-  <div class="fade show" style="text-align: center; padding-top: calc(100vh / 2); height: 100vh">
+  <div class="fade show">
     <span class="m-1">
-      <i class="spinner-border text-danger"></i>
-      <span class="m-1"><strong>ASPETTA STRONZO</strong></span>
-      <i class="spinner-border text-danger"></i>
+      <div id="lights_container">
+        <div class="bulbs_container">
+            <div class="bulb_up"></div>
+            <div class="bulb"></div>
+        </div>
+        <div class="bulbs_container">
+            <div class="bulb_up"></div>
+            <div class="bulb"></div>
+        </div>
+        <div class="bulbs_container">
+            <div class="bulb_up"></div>
+            <div class="bulb"></div>
+        </div>
+        <div class="bulbs_container">
+            <div class="bulb_up"></div>
+            <div class="bulb"></div>
+        </div>
+        <div class="bulbs_container">
+            <div class="bulb_up"></div>
+            <div class="bulb"></div>
+        </div>
+      </div>
       <pre><strong>
                         __                                 
                   _.---.  |                                
@@ -49,4 +120,35 @@
   </div>
 </app-root>
 </body>
+
+<script>
+  const bulbs_up = document.querySelectorAll('.bulb_up');
+  const bulbs = document.querySelectorAll('.bulb');
+  let currentIndex = 0;
+
+  function lightUp() {
+      if (currentIndex < bulbs.length) {
+          bulbs_up[currentIndex].classList.add('logo');
+          bulbs[currentIndex].classList.add('red_light');
+          currentIndex++;
+          setTimeout(lightUp, 300); // Call the function again after 1 second
+      }
+
+      if (currentIndex == bulbs.length)
+      {
+          setTimeout(lightOut, 500);
+      }
+  }
+
+  function lightOut() {
+      currentIndex = 0;
+      while ( currentIndex < bulbs.length)
+      {
+          bulbs[currentIndex].classList.remove('red_light');
+          currentIndex++;
+      }
+  }
+
+</script> 
+
 </html>
