@@ -144,7 +144,7 @@ all_full_race_points AS
     SELECT
         full_race_results.id,
         full_race_results."fast_lap_id" AS driver_id,
-        (SELECT "fast_lap_points" FROM session_type WHERE session_type.id = 4) as full_race_point
+        (SELECT "fast_lap_points" FROM session_type WHERE session_type.id = 5) as full_race_point
     FROM full_race_results
 ),
 all_sprint_points AS
