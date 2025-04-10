@@ -1329,6 +1329,27 @@ ORDER BY date ASC
   ) AS inner_table
   ON race_results.id = inner_table.race_results_id
   WHERE session_type_id = 1
+
+  UNION ALL
+
+   SELECT 
+  inner_table.id AS track_id,
+  "1_place_id" AS "id_1_place",
+  "2_place_id" AS "id_2_place",
+  "3_place_id" AS "id_3_place",
+  "4_place_id" AS "id_4_place",
+  "5_place_id" AS "id_5_place",
+  "6_place_id" AS "id_6_place",
+  "fast_lap_id" AS "id_fast_lap",
+  "dnf" as "list_dnf"
+  FROM full_race_results
+  LEFT JOIN 
+  (
+  SELECT id, full_race_results_id, track_id
+  FROM gran_prix
+  ) AS inner_table
+  ON full_race_results.id = inner_table.full_race_results_id
+  WHERE session_type_id = 5
       `);
       return JSON.stringify(result.rows);
   }
