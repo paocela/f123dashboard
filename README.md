@@ -38,11 +38,16 @@ Run `genezio deploy` to deploy remotely on genezio infrastracture.
 
 ## Todo 🎯
 
-- Costruttore deve essere assegnato automaticamente in base alla classifica
 - voto pole position x fanta
 - offri un caffè agli sviluppatori
-sviluppatori
-- link a pagina instagram
+- link a pagina instagram e twitch (con plug-in integrati)
+- gestione stagioni da menu a tendina (e in DB)
+- sicurezza dati utenti fanta
+fanta
+- pagina albo d'oro
+- admin deve poter caricare i risultati delle gare da sito
+- aggiungere descrizione gara nella pagina dei risultati
+- foto nuove piloti
 
 ## Credits 🙇
 Credits for this small but fun project goes to:
