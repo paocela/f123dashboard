@@ -120,7 +120,7 @@ export class DashboardComponent implements OnInit {
   });
 
   // 0 = hidden, 1 = modal piloti, 2 = modal fanta
-  public resoultModalVisible = 0;
+  public resoultModalVisible = 1;
   toggleResoultModalvisible(modal: number) {
     this.resoultModalVisible = modal;
   }
