@@ -76,7 +76,7 @@
       </c-card-body>
     </c-card>
   </c-col>
-  <c-col xs>
+  <c-col class="carousle-height" xs>
     <c-carousel [dark]="false" [touch]="true" >
       <c-carousel-indicators></c-carousel-indicators>
       <c-carousel-inner>
@@ -106,11 +106,13 @@
               </c-row>
             </c-card-header>
             <c-card-body>
-              <img
-                height="flex"
-                width="100%"
-                src="./assets/images/tracks/{{ next_track.track_id }}.png"
-              />
+              <div >
+                <img
+                  height="auto"
+                  width="100%"
+                  src="./assets/images/tracks/{{ next_track.track_id }}.png"
+                />
+              </div>
               <c-row>
                 <c-col>
                   <div class="small text-body-secondary">

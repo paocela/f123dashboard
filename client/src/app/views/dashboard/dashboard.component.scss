@@ -21,6 +21,9 @@
   .pilot {
     display: none;
   }
+  .carousel-height {
+    height: 400px; 
+  }
 }
 
 /* Modal animation with slide-in from bottom effect */
@@ -37,4 +40,15 @@
 
 .modalAnimation {
   animation: slideInFromBottom 0.7s ease-in-out;
+}
+
+
+
+.carousel-inner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Mantiene le proporzioni ritagliando l'immagine se necessario */
+}
+.carousel-height {
+  height: 500px; /* Imposta l'altezza desiderata per il carosello */
 }

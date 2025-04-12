@@ -50,6 +50,7 @@ export class DashboardChartsData {
 
     this.championshipTrend = this.dbData.getCumulativePoints() ;
     this.championshipTracks = this.dbData.getAllTracks();
+    const screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 
     // mainChart
     this.mainChart['elements'] = period === 'Month' ? 12 : 27;
@@ -62,8 +63,6 @@ export class DashboardChartsData {
 
     let labels: string[] = [];
     if (period === 'Month') {
-      console.log(this.championshipTrend);
-
       //se minore di 8 record prendi le piste da qui 
       if (labels.length < numberOfRaces){
         labels = this.championshipTracks.slice(0, numberOfRaces).map(track => track.country);
@@ -202,7 +201,7 @@ export class DashboardChartsData {
     };
 
     const scales = this.getScales();
-
+    const radius = screenWidth > 900 ? 900 : screenWidth;
     const options: ChartOptions = {
       maintainAspectRatio: false,
       plugins: {
@@ -214,10 +213,10 @@ export class DashboardChartsData {
           tension: 0
         },
         point: {
-          radius: 3.5,
-          hitRadius: 10,
-          hoverRadius: 4,
-          hoverBorderWidth: 3
+          radius: radius / 350,
+          hitRadius: radius / 200,
+          hoverRadius:  radius / 250,
+          hoverBorderWidth: radius / 300
         }
       }
     };

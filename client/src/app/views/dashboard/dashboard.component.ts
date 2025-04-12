@@ -72,6 +72,7 @@ export class DashboardComponent implements OnInit {
   readonly #document: Document = inject(DOCUMENT);
   readonly #renderer: Renderer2 = inject(Renderer2);
   readonly #chartsData: DashboardChartsData = inject(DashboardChartsData);
+  public screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 
   public championship_standings_users: any[] = [];
   public championshipTrend: any[] = [];
@@ -204,5 +205,23 @@ export class DashboardComponent implements OnInit {
     }
   }
 
+
+  // calculateMaxHeight(): number {
+  //   const img1 = new Image();
+  //   const img2 = new Image();
+
+  //   img1.src = `./assets/images/tracks/${this.championshipNextTracks[0].track_id}.png`;
+  //   img2.src = `./assets/images/tracks/${this.championshipNextTracks[1].track_id}.png`;
+
+  //   let maxHeight = 0;
+  //   img1.onload = () => {
+  //     img2.onload = () => {
+  //       console.log("img1", img1.height, "img2", img2.height);
+  //       maxHeight = Math.max(img1.height, img2.height);
+  //     };
+  //   };
+  //   console.log("maxHeight", maxHeight);
+  //   return maxHeight;
+  // }
 
 }
