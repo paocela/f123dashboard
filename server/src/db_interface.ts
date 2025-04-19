@@ -1385,4 +1385,9 @@ ORDER BY date ASC
     VALUES ('` + player.username + `', '` + player.name + `', '` + player.surname + `', '` + player.password + `')`;
     const result = await this.pool.query(query);
   }
+
+  async getAllSeasons(): Promise<string> {
+    const resoult = await this.pool.query(` SELECT id, description, start_date, end_date FROM seasons`);
+    return JSON.stringify(resoult.rows);
+  }
 }

@@ -109,7 +109,9 @@ export class DashboardComponent implements OnInit {
     private dbData: DbDataService,
     private twitchApiService: TwitchApiService,
     public loadingService: LoadingService
-  ) {} 
+  ) {
+    
+  } 
 
   readonly #destroyRef: DestroyRef = inject(DestroyRef);
   readonly #document: Document = inject(DOCUMENT);
@@ -125,6 +127,7 @@ export class DashboardComponent implements OnInit {
   public championshipTrend: any[] = [];
   public championshipTracks: any[] = [];
   public championshipNextTracks: any[] = [];
+  public isLive: boolean = true;
 
   public allFlags: {[key: string]: any} = {
     "Bahrain": cifBh,
@@ -177,6 +180,7 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     //richiesta dati al db
+    this.isLive = this.twitchApiService.isLive();
     this.championship_standings_users = this.dbData.getAllDrivers() ;
     this.championshipTrend = this.dbData.getCumulativePoints() ;
     this.championshipTracks = this.dbData.getAllTracks();
@@ -216,7 +220,6 @@ export class DashboardComponent implements OnInit {
 
     this.setTrafficPeriod('Year', 0);
     this.updateChartOnColorModeChange();
-    this.initTwitch();
   }
 
   initCharts(): void {
@@ -253,41 +256,6 @@ export class DashboardComponent implements OnInit {
         this.mainChartRef().update();
       });
     }
-  }
-
-  initTwitch() {
-    this.loadingService.show();
-    this.twitchApiService.initializeClient().then(() => {
-      this.twitchApiService.getAccessToken().subscribe({
-        next: (response: any) => {
-          console.log(response);
-          this.twitchApiService.setAccessToken(response.access_token);
-          this.twitchApiService.getStreamInfo('dreandos').subscribe({
-            next: (streamInfo: any) => {
-              if (streamInfo.data.length > 0) {
-                this.isLive$.next(true);
-                this.streamTitle$.next(streamInfo.data[0].title);
-              } else {
-                this.isLive$.next(false);
-              }
-              console.log('getStreamInfo', streamInfo);
-              console.log('isLive', this.isLive$.getValue());
-            },
-            error: (err: any) => {
-              console.error('Error fetching stream info:', err);
-              this.isLive$.next(false);
-            }
-          });
-        },
-        error: (err: any) => {
-          console.error('Error retrieving access token:', err);
-        }
-      });
-    }).catch((err: any) => {
-      console.error('Error initializing Twitch client:', err);
-    }).finally(() => {
-      this.loadingService.hide();
-    });
   }
 
 }
