@@ -99,10 +99,11 @@
     </c-card>
   </c-col>
   <c-col class="carousle-height" xs>
-    <c-carousel [dark]="false" [touch]="true" >
+    <c-carousel [dark]="false" [touch]="true" *ngIf="championshipNextTracks.length > 0">
+      
       <c-carousel-indicators></c-carousel-indicators>
       <c-carousel-inner>
-               <c-carousel-item *ngFor="let next_track of championshipNextTracks">
+        <c-carousel-item *ngFor="let next_track of championshipNextTracks">
           <c-card class="mb-4">
             <c-card-header>
               <c-row>
@@ -159,6 +160,14 @@
       <c-carousel-control [routerLink] caption="Previous" direction="prev"></c-carousel-control>
       <c-carousel-control [routerLink] caption="Next" direction="next"></c-carousel-control>
     </c-carousel>
+    <c-card *ngIf="championshipNextTracks.length === 0">
+      <c-card-header>
+        <h4 class="card-title mb-0" id="traffic">Fanta Standings</h4>
+      </c-card-header>
+      <c-card-body>
+        <app-leaderboard [maxDisplayable]="6" ></app-leaderboard>
+      </c-card-body>
+    </c-card>
   </c-col>
 </c-row>
 <div id="twitch-embed"></div>
