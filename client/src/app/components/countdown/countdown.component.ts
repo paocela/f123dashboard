@@ -27,11 +27,8 @@ interface timeInterface {
   standalone: true,
   imports: [
     CommonModule,
-    RowComponent,
-    ColComponent,
-    IconDirective,
-    CardComponent, CardHeaderComponent, CardBodyComponent, CardTitleDirective, CardTextDirective
-  ],
+    CardComponent, CardBodyComponent
+],
   templateUrl: './countdown.component.html',
   styleUrl: './countdown.component.scss'
 })
@@ -67,7 +64,8 @@ export class CountdownComponent implements OnInit, OnDestroy {
       }
     }
 
-    this.startCountdown();
+    if (this.targetDate) this.startCountdown();
+   
   }
 
   startCountdown(): void {

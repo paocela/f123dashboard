@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node src/db_interface.ts"
+    "start": "ts-node src/db_interface.ts src/twitter_interface.ts"
   },
   "author": "",
   "license": "ISC",

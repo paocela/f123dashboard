@@ -15,7 +15,7 @@ import {DbDataService} from 'src/app/service/db-data.service';  //aggiunto il se
   selector: 'app-root',
   template: '<router-outlet />',
   standalone: true,
-  imports: [RouterOutlet]
+  imports: [RouterOutlet,]
 })
 export class AppComponent implements OnInit {
   title = 'F1 RaceForFederica';

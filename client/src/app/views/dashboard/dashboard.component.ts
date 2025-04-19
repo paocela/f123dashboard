@@ -37,6 +37,12 @@ import { cifBh, cifAt, cifMc, cifJp, cifHu, cifCn, cifCa, cifEs, cifGb, cifBe, c
 import { DatePipe } from '@angular/common';
 import { LeaderboardComponent } from "../../../components/leaderboard/leaderboard.component";
 import { DashboardChartsData, IChartProps } from './dashboard-charts-data';
+import { TwitchApiService } from '../../service/twitch-api.service';
+import { BehaviorSubject } from 'rxjs';
+import { LoadingService } from '../../service/loading.service';
+import { LoadingSpinnerComponent } from '../../../components/loading-spinner/loading-spinner.component';
+
+declare const Twitch: any;
 
 interface ChampionshipStandings {
   username: string;
@@ -61,12 +67,49 @@ interface NextTrack {
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
   standalone: true,
-  imports: [LeaderboardComponent, ModalModule, BadgeComponent, ThemeDirective, CarouselComponent, CarouselIndicatorsComponent, CarouselInnerComponent, CarouselItemComponent, CarouselControlComponent, RouterLink, DatePipe, CommonModule, TextColorDirective, CardComponent, CardBodyComponent, RowComponent, ColComponent, ButtonDirective, IconDirective, ReactiveFormsModule, ButtonGroupComponent, FormCheckLabelDirective, ChartjsComponent, NgStyle, CardFooterComponent, GutterDirective, ProgressBarDirective, ProgressComponent, CardHeaderComponent, TableDirective, AvatarComponent]
+  imports: [
+    LoadingSpinnerComponent,
+    LeaderboardComponent, 
+    ModalModule, 
+    BadgeComponent, 
+    ThemeDirective, 
+    CarouselComponent, 
+    CarouselIndicatorsComponent, 
+    CarouselInnerComponent, 
+    CarouselItemComponent, 
+    CarouselControlComponent, 
+    RouterLink, 
+    DatePipe, 
+    CommonModule, 
+    TextColorDirective, 
+    CardComponent, 
+    CardBodyComponent, 
+    RowComponent, 
+    ColComponent, 
+    ButtonDirective, 
+    IconDirective, 
+    ReactiveFormsModule, 
+    ButtonGroupComponent, 
+    FormCheckLabelDirective, 
+    ChartjsComponent, 
+    NgStyle, 
+    CardFooterComponent, 
+    GutterDirective, 
+    ProgressBarDirective, 
+    ProgressComponent, 
+    CardHeaderComponent, 
+    TableDirective, 
+    AvatarComponent
+  ]
 })
 export class DashboardComponent implements OnInit {
   @ViewChild('championshipResoult', { static: true }) championshipResoult!: ModalComponent;
 
-  constructor(private dbData: DbDataService) {} //aggiunto il servizio per dati db
+  constructor(
+    private dbData: DbDataService,
+    private twitchApiService: TwitchApiService,
+    public loadingService: LoadingService
+  ) {} 
 
   readonly #destroyRef: DestroyRef = inject(DestroyRef);
   readonly #document: Document = inject(DOCUMENT);
@@ -80,7 +123,7 @@ export class DashboardComponent implements OnInit {
   public championshipNextTracks: any[] = [];
 
   public allFlags: {[key: string]: any} = {
-    "Barhain": cifBh,
+    "Bahrain": cifBh,
     "Arabia Saudita": cifSa,
     "Australia": cifAu,
     "Giappone": cifJp,
@@ -120,13 +163,15 @@ export class DashboardComponent implements OnInit {
   });
 
   // 0 = hidden, 1 = modal piloti, 2 = modal fanta
-  public resoultModalVisible = 1;
+  public resoultModalVisible = 0;
   toggleResoultModalvisible(modal: number) {
     this.resoultModalVisible = modal;
   }
 
-  ngOnInit(): void {
+  public isLive$ = new BehaviorSubject<boolean>(false);
+  public streamTitle$ = new BehaviorSubject<string>('');
 
+  ngOnInit(): void {
     //richiesta dati al db
     this.championship_standings_users = this.dbData.getAllDrivers() ;
     this.championshipTrend = this.dbData.getCumulativePoints() ;
@@ -167,6 +212,7 @@ export class DashboardComponent implements OnInit {
 
     this.setTrafficPeriod('Year', 0);
     this.updateChartOnColorModeChange();
+    this.initTwitch();
   }
 
   initCharts(): void {
@@ -205,23 +251,39 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-
-  // calculateMaxHeight(): number {
-  //   const img1 = new Image();
-  //   const img2 = new Image();
-
-  //   img1.src = `./assets/images/tracks/${this.championshipNextTracks[0].track_id}.png`;
-  //   img2.src = `./assets/images/tracks/${this.championshipNextTracks[1].track_id}.png`;
-
-  //   let maxHeight = 0;
-  //   img1.onload = () => {
-  //     img2.onload = () => {
-  //       console.log("img1", img1.height, "img2", img2.height);
-  //       maxHeight = Math.max(img1.height, img2.height);
-  //     };
-  //   };
-  //   console.log("maxHeight", maxHeight);
-  //   return maxHeight;
-  // }
+  initTwitch() {
+    this.loadingService.show();
+    this.twitchApiService.initializeClient().then(() => {
+      this.twitchApiService.getAccessToken().subscribe({
+        next: (response: any) => {
+          console.log(response);
+          this.twitchApiService.setAccessToken(response.access_token);
+          this.twitchApiService.getStreamInfo('dreandos').subscribe({
+            next: (streamInfo: any) => {
+              if (streamInfo.data.length > 0) {
+                this.isLive$.next(true);
+                this.streamTitle$.next(streamInfo.data[0].title);
+              } else {
+                this.isLive$.next(false);
+              }
+              console.log('getStreamInfo', streamInfo);
+              console.log('isLive', this.isLive$.getValue());
+            },
+            error: (err: any) => {
+              console.error('Error fetching stream info:', err);
+              this.isLive$.next(false);
+            }
+          });
+        },
+        error: (err: any) => {
+          console.error('Error retrieving access token:', err);
+        }
+      });
+    }).catch((err: any) => {
+      console.error('Error initializing Twitch client:', err);
+    }).finally(() => {
+      this.loadingService.hide();
+    });
+  }
 
 }

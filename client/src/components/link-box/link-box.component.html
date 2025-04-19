@@ -1,0 +1,10 @@
+<button cButton 
+    (click)="goTo()" 
+    class="my-3 mx-sm-2 mx-1" 
+    [ngStyle]="{'max-width.px': 540, 'background-color': color}" 
+    textColor="white" 
+    [size]="isLargeScreen ? 'lg' : 'sm'"
+>
+    <svg [cIcon]="icon" [class.me-2]="linkName && isLargeScreen"></svg>
+    <span class="link-name">{{ linkName }}</span>
+</button>
