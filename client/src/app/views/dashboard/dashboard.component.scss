@@ -52,3 +52,10 @@
 .carousel-height {
   height: 500px; /* Imposta l'altezza desiderata per il carosello */
 }
+
+.table-responsive {
+  overflow: hidden !important; 
+}
+.card-body{
+  padding: 1vw;
+}

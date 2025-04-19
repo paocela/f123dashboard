@@ -43,8 +43,8 @@
               </th>
               <th class="bg-body-tertiary"></th>
               <th class="bg-body-tertiary">Username</th>
-              <th class="bg-body-tertiary text-center">Car</th>
-              <th class="bg-body-tertiary pilot">Pilot</th>
+              <th class="bg-body-tertiary text-center" *ngIf="showColumn()">Car</th>
+              <th class="bg-body-tertiary pilot" *ngIf="showColumn()">Pilot</th>
               <th class="bg-body-tertiary text-center">Points</th>
               <th class="bg-body-tertiary text-center">Gain/Lost</th>
             </tr>
@@ -65,14 +65,14 @@
               <td>
                 <div>{{ user.driver_username }}</div>
               </td>
-              <td class="text-center">
+              <td class="text-center" *ngIf="showColumn()">
                 <img
                   width="100%"
                   height="40px"
                   src="./assets/images/constructors/{{ user.car_name }}.svg"
                 />
               </td>
-              <td class="pilot">
+              <td class="pilot" *ngIf="showColumn()">
                 <div class="text-nowrap">
                   {{ user.pilot_name }} {{ user.pilot_surname }}
                 </div>
@@ -98,7 +98,7 @@
       </c-card-body>
     </c-card>
   </c-col>
-  <c-col class="carousle-height" xs>
+  <c-col class="carousle-height" xs="12" md="6">
     <c-carousel [dark]="false" [touch]="true" *ngIf="championshipNextTracks.length > 0">
       
       <c-carousel-indicators></c-carousel-indicators>
@@ -165,7 +165,7 @@
         <h4 class="card-title mb-0" id="traffic">Fanta Standings</h4>
       </c-card-header>
       <c-card-body>
-        <app-leaderboard [maxDisplayable]="6" ></app-leaderboard>
+        <app-leaderboard [maxDisplayable]="6" [showVotes]="showColumn()" ></app-leaderboard>
       </c-card-body>
     </c-card>
   </c-col>
