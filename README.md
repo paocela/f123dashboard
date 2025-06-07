@@ -19,9 +19,11 @@ Dashboard for the Esport F1 23 championship (friendly, but not so much...)
 | **Fantasy F1 Vote**                                          | **Fantasy F1 Result**                                        |
 | ![fanta_voto](client/src/assets/images/readme/fanta_voto.png) | ![fanta_risultato](client/src/assets/images/readme/fanta_risultato.png) |
 
-## Building and Installing 🛠️
+## Building and Running 🛠️
 
 The website is hosted on [Genezio](https://genezio.com/). The db as well.
+
+Build both the client and server with `npm install`.
 
 Run `genezio local` to run it locally.
 
