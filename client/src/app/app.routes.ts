@@ -41,6 +41,11 @@ export const routes: Routes = [
         loadChildren: () => import('./views/fanta/routes').then((m) => m.routes),
         canActivate: [authGuard]
       },
+      /* routing admin */
+      {
+        path: 'admin',
+        loadChildren: () => import('./views/admin/routes').then((m) => m.routes),
+      },
       { 
         path: 'login', 
         loadChildren: () => import('./views/login/routes').then((m) => m.routes) 
