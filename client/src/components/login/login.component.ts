@@ -4,7 +4,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';    
 import { FormsModule } from '@angular/forms';
 import { FormModule } from '@coreui/angular';
-import { AuthService } from './../../service/auth.service';
+import { AuthService } from '../../app/service/auth.service';
 import { GridModule, ButtonDirective, ModalComponent, ModalHeaderComponent, ModalBodyComponent, ModalFooterComponent, ModalToggleDirective,
   CardBodyComponent,
   CardComponent,
@@ -12,10 +12,9 @@ import { GridModule, ButtonDirective, ModalComponent, ModalHeaderComponent, Moda
   CardTextDirective,
   CardTitleDirective
 } from '@coreui/angular';
-import { LeaderboardComponent } from "../../../components/leaderboard/leaderboard.component";
-import { DbDataService } from '../../../app/service/db-data.service';
-import { FantaPlayer } from '../../model/fanta';
-import { User } from '../../../app/model/user';
+import { DbDataService } from '../../app/service/db-data.service';
+import { FantaPlayer } from '../../app/model/fanta';
+import { User } from '../../app/model/user';
 import { cilWarning } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
 
@@ -29,7 +28,6 @@ import { IconDirective } from '@coreui/icons-angular';
     FormModule,
     ButtonDirective,
     GridModule,
-    LeaderboardComponent,
     ModalComponent,
     ModalHeaderComponent,
     ModalBodyComponent, 

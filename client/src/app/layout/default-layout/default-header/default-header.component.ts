@@ -28,7 +28,7 @@ import {
 
 import { IconDirective } from '@coreui/icons-angular';
 
-import { CountdownComponent } from 'src/app/components/countdown/countdown.component'
+import { CountdownComponent } from '../../../../components/countdown/countdown.component'
 
 @Component({
   selector: 'app-default-header',

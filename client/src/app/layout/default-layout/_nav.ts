@@ -25,7 +25,7 @@ export const navItems: INavData[] = [
   },
   {
     name: 'Fanta',
-    url: '/fanta',
+    url: '/fanta-dashboard',
     iconComponent: { name: 'cil-gamepad' },
   },
   {

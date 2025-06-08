@@ -35,6 +35,11 @@ export const routes: Routes = [
         path: 'championship',
         loadChildren: () => import('./views/championship/routes').then((m) => m.routes)
       },
+      /* routing fanta dashboard */
+      { 
+        path: 'fanta-dashboard', 
+        loadChildren: () => import('./views/fanta-dashboard/routes').then((m) => m.routes) 
+      },
        /* routing fanta */
       {
         path: 'fanta',
@@ -45,10 +50,6 @@ export const routes: Routes = [
       {
         path: 'admin',
         loadChildren: () => import('./views/admin/routes').then((m) => m.routes),
-      },
-      { 
-        path: 'login', 
-        loadChildren: () => import('./views/login/routes').then((m) => m.routes) 
       }
     ]
   },
