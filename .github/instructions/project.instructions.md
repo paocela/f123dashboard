@@ -12,6 +12,7 @@ applyTo: '**'
 - Place new services in `src/app/service/`.
 - Use strict typing and follow the existing TypeScript conventions.
 - Use CoreUI components and directives where possible (see imports in existing components).
+- Use `CoreUI` and project-specific SCSS variables and mixins.
 - Use `standalone: true` in all new components.
 - Use `ChangeDetectionStrategy.OnPush` for performance in components that do not require default change detection.
 - Use Angular CLI commands for scaffolding (e.g., `ng generate component`, `ng generate service`).
@@ -140,6 +141,10 @@ applyTo: '**'
 - Reference issues and breaking changes in the footer as needed.
 - See the `.github/COMMIT_CONVENTION.md` file for detailed examples and rules.
 
+## Genezio 
+- in `server/` there is the genezio backend, which is used to connect to the database and other service like twitch.
+- in `client/` there is the genezio client, witch is the angular application.
+- 
 ---
 
 These instructions are designed to help AI agents generate code that fits seamlessly into this Angular project.
