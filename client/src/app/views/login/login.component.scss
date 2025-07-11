@@ -11,3 +11,13 @@
     margin-left: 10px;
     margin-bottom: 0px;
   }
+
+  .errorMessage {
+    color: var(--cui-danger);
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    text-align: center;
+    padding: 8px;
+  }

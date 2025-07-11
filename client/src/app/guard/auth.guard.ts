@@ -1,15 +1,24 @@
 import { CanActivateFn, Router } from '@angular/router';
 import { inject } from '@angular/core';
+import { AuthService } from '../service/auth.service';
+import { map, take } from 'rxjs/operators';
 
 export const authGuard: CanActivateFn = (route, state) => {
-  const isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
+  const authService = inject(AuthService);
   const router = inject(Router);
 
-  if (!isLoggedIn) {
-    router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
-    return false; // Rifiuta l'accesso alla rotta protetta
-  }
-  return true; // Permette l'accesso
+  return authService.isAuthenticated$.pipe(
+    take(1),
+    map(isAuthenticated => {
+      if (!isAuthenticated) {
+        // Store the attempted URL for redirecting after login
+        sessionStorage.setItem('returnUrl', state.url);
+        router.navigate(['/login']);
+        return false;
+      }
+      return true;
+    })
+  );
 };
 
 

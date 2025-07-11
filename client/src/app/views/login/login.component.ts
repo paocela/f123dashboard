@@ -47,107 +47,159 @@ import { IconDirective } from '@coreui/icons-angular';
 })
 
 export class LoginComponent {
-  name: string = '';
-  surname: string = '';
+  // Login form fields
   username: string = '';
   password: string = '';
-  image: File = new File([], "empty.txt", {type: "text/plain"});
-  errorMessage = '';
-  isLoggedIn : any = 'false';
-  photoError: string = '';
+  
+  // Registration form fields
+  name: string = '';
+  surname: string = '';
+  regUsername: string = '';
+  regPassword: string = '';
+  confirmPassword: string = '';
+  
+  // State management
+  isLoading: boolean = false;
+  singInErrorMessage: string = '';
+  errorMessage: string = '';
+  successMessage: string = '';
+  showRegistration: boolean = false;
+  
+  // Validation errors
   usernameError: string = '';
+  passwordError: string = '';
   
   public warningIcon: string[] = cilWarning;
 
-  public modalVisible = true; // modal is used to load avatars for fanta (via google form)
-
-  
-  constructor(private authService: AuthService, private router: Router, private route: ActivatedRoute, private dbData: DbDataService) {}
-  
-  users: User[] = this.dbData.getUsers();
-
-  
-  onLogin() {
-    if (this.authService.login(this.username, this.password)) {
-      sessionStorage.setItem('isLoggedIn', 'true'); // Salva lo stato del login
-      this.router.navigate(['/fanta']);          // Naviga verso la componente protetta
-    } else {
-      window.alert("Credenziali non valide!, Ritenta e sarai più fortunarto")
-    }
-  }
-
-
-  // onFileChange(event: Event): void {
-  //   const input = event.target as HTMLInputElement;
-
-  //   if (input.files && input.files[0]) {
-  //     const file = input.files[0];
-  //     const fileType = file.type;
-  //     const maxSize = 5 * 1024 * 1024; // 5 MB
-
-  //     // Controlla che il file sia un'immagine
-  //     if (!fileType.startsWith('image/')) {
-  //       this.photoError = 'Il file deve essere un\'immagine.';
-  //       input.value = ''; // Resetta il campo
-  //       return;
-  //     }
-
-  //     // Controlla la dimensione massima
-  //     if (file.size > maxSize) {
-  //       this.photoError = 'Il file deve essere inferiore a 5 MB.';
-  //       input.value = ''; // Resetta il campo
-  //       return;
-  //     }
-
-  //     this.photoError = ''; // Nessun errore
-  //     this.image = file;
-  //   }
-  // }
-
-
-  onRegistration(){
-    if (!this.formIsValid(this.username)) {
-      this.usernameError = 'Username già esistente';
-      return;
-    }
-
-    if (this.photoError) {
-      return;
-    }
-
-    let fantaPlayer: FantaPlayer = {
-      name: this.name,
-      surname: this.surname,
-      username: this.username,
-      password: this.password,
-      image: this.image
-    }
-
-    this.dbData.setFantaPlayer(fantaPlayer);
-
-    window.alert("Registrazione effettuata con successo, ora puoi fare il login con i tuoi dati, Buon Divertimento")
-    //ritardo aggiunto perchè se no non vengono scritti in tempo i dati nel db
-    setTimeout(() => {
-      window.location.reload();
-    }, 500); 
-  }
-
-  formIsValid(username: string): boolean {
-    return !this.users.some(user => user.username == username);
-  }
-
-  toggleModal() {
-    this.modalVisible = !this.modalVisible;
-  }
-
+  constructor(
+    private authService: AuthService, 
+    private router: Router, 
+    private route: ActivatedRoute,
+    private dbData: DbDataService
+  ) {}
 
   ngOnInit(): void {
-    this.isLoggedIn = sessionStorage.getItem('isLoggedIn');
-    if( this.isLoggedIn === 'true'){
-      this.router.navigate(['/fanta']);
+    // Check if user is already logged in
+    this.authService.isAuthenticated$.subscribe(isAuth => {
+      if (isAuth) {
+        this.router.navigate(['/fanta']);
+      }
+    });
+  }
+
+  async onLogin() {
+    if (!this.validateLoginForm()) {
+      return;
+    }
+
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    try {
+      const response = await this.authService.login({
+        username: this.username,
+        password: this.password
+      });
+
+      if (response.success) {
+        this.successMessage = 'Login successful! Redirecting...';
+        // Navigation is handled by the auth service
+      } else {
+        this.errorMessage = response.message || 'Login failed. Please try again.';
+      }
+    } catch (error) {
+      this.errorMessage = 'An error occurred during login. Please try again.';
+      console.error('Login error:', error);
+    } finally {
+      this.isLoading = false;
     }
   }
 
+  async onRegistration() {
+    if (!this.validateRegistrationForm()) {
+      return;
+    }
 
+    this.isLoading = true;
+    this.singInErrorMessage = '';
+
+    try {
+      const response = await this.authService.register({
+        username: this.regUsername,
+        name: this.name,
+        surname: this.surname,
+        password: this.regPassword
+      });
+
+      if (response.success) {
+        this.successMessage = 'Registration successful!';
+      } else {
+        this.singInErrorMessage = response.message || 'Registration failed. Please try again.';
+      }
+    } catch (error) {
+      this.singInErrorMessage = 'An error occurred during registration. Please try again.';
+      console.error('Registration error:', error);
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  private validateLoginForm(): boolean {
+    this.usernameError = '';
+    this.passwordError = '';
+
+    if (!this.username ) {
+      this.usernameError = 'Username is required';
+      return false;
+    }
+
+    if (!this.password) {
+      this.passwordError = 'Password is required';
+      return false;
+    }
+
+    return true;
+  }
+
+  private validateRegistrationForm(): boolean {
+    this.singInErrorMessage = '';
+
+    if (!this.name || !this.surname || !this.regUsername || !this.regPassword) {
+      this.singInErrorMessage = 'All fields are required';
+      return false;
+    }
+
+    if (this.regUsername.length < 3) {
+      this.singInErrorMessage = 'Username must be at least 3 characters long';
+      return false;
+    }
+
+    if (this.regPassword.length < 8) {
+      this.singInErrorMessage = 'Password must be at least 8 characters long';
+      return false;
+    }
+
+    if (this.regPassword !== this.confirmPassword) {
+      this.singInErrorMessage = 'Passwords do not match';
+      return false;
+    }
+
+    // Password strength validation
+    if (!this.isPasswordStrong(this.regPassword)) {
+      this.singInErrorMessage = 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character';
+      return false;
+    }
+
+    return true;
+  }
+
+  private isPasswordStrong(password: string): boolean {
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumbers = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+    return hasUpperCase && hasLowerCase && hasNumbers && hasSpecialChar;
+  }
 
 }
