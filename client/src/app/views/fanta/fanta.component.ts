@@ -22,7 +22,6 @@ import { cifAe, cifAt, cifAu, cifAz, cifBe, cifBh, cifBr, cifCa, cifCn, cifEs, c
 import { cilFire, cilPowerStandby } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
 import { Fanta, RaceResult } from '../../model/fanta';
-import { rest } from 'lodash-es';
 import { LeaderboardComponent } from "../../../components/leaderboard/leaderboard.component";
 import {
   ButtonCloseDirective,
@@ -33,7 +32,7 @@ import {
   ModalTitleDirective,
   ThemeDirective
 } from '@coreui/angular';
-import { from } from 'rxjs';
+import { User } from '../../model/auth';
 
 
 interface voteStatus {
@@ -72,7 +71,7 @@ export class FantaComponent {
   // 1 = success, 2 = error
   formStatus: { [key: number]: number } = {};
   forms: { [key: number]: NgForm } = {};
-  username: string  = '';
+  user!: User;
   userId!: number;
   userFantaPoints: number = 0;
   piloti: any[] = [];
@@ -132,7 +131,8 @@ export class FantaComponent {
 
   ngOnInit(): void {
     
-    this.username = sessionStorage.getItem('user') ?? "";
+    const userString = sessionStorage.getItem('user');
+    this.user = userString ? JSON.parse(userString) as User : {} as User;
     this.userId = Number(sessionStorage.getItem('userId'));
     
     this.piloti  = this.dbData.getAllDrivers();
@@ -203,7 +203,7 @@ export class FantaComponent {
     if(this.formIsValid(trackId)){
       let fantaVoto: Fanta = {
         fanta_player_id: this.userId,
-        username: this.username,
+        username: this.user.username,
         id_1_place: this.getVoto(trackId,1),
         id_2_place: this.getVoto(trackId,2),
         id_3_place: this.getVoto(trackId,3),

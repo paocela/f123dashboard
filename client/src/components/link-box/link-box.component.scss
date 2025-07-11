@@ -1,0 +1,30 @@
+.list-group-item {
+    display: flex;
+    align-items: center;
+    transition: background-color 0.2s;
+    padding: 0.75rem 1.25rem;
+    border: none;
+    background-color: transparent;
+    color: var(--cui-white);
+
+    &:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: var(--cui-white);
+    }
+
+    svg {
+        width: 1.2rem;
+        height: 1.2rem;
+        color: var(--cui-white);
+    }
+}
+
+.link-name {
+    display: none;
+}
+
+@media (min-width: 1000px) {
+    .link-name {
+        display: inline;
+    }
+}

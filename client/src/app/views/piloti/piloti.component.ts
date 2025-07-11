@@ -124,9 +124,6 @@ export class PilotiComponent implements OnInit {
     //richiesta di dati dal servizio
     this.piloti = this.dbData.getAllDrivers();
 
-    console.log(this.piloti);
-
-
     this.initializeRadarChartData();
   }
 

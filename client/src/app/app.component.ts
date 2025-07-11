@@ -9,13 +9,15 @@ import { IconSetService } from '@coreui/icons-angular';
 import { iconSubset } from './icons/icon-subset';
 
 import { ChangeDetectorRef } from '@angular/core';
-import {DbDataService} from 'src/app/service/db-data.service';  //aggiunto il servizio per dati db
+import { DbDataService } from 'src/app/service/db-data.service';  //aggiunto il servizio per dati db
+import { SeasonService } from 'src/app/service/season.service';
+import { TwitchApiService } from './service/twitch-api.service';  
 
 @Component({
   selector: 'app-root',
   template: '<router-outlet />',
   standalone: true,
-  imports: [RouterOutlet]
+  imports: [RouterOutlet,]
 })
 export class AppComponent implements OnInit {
   title = 'F1 RaceForFederica';
@@ -28,7 +30,12 @@ export class AppComponent implements OnInit {
   readonly #colorModeService = inject(ColorModeService);
   readonly #iconSetService = inject(IconSetService);
 
-  constructor(private dbData: DbDataService, private cdr: ChangeDetectorRef) {
+  constructor(
+    private dbData: DbDataService, 
+    private cdr: ChangeDetectorRef, 
+    private seasonsService: SeasonService,
+     private twitchApiService: TwitchApiService
+  ) {
     this.#titleService.setTitle(this.title);
     // iconSet singleton
     this.#iconSetService.icons = { ...iconSubset };
@@ -60,7 +67,6 @@ export class AppComponent implements OnInit {
       )
       .subscribe();
 
-    this.dbData.AllData();
     this.cdr.detectChanges();
   }
 

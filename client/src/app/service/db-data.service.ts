@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { PostgresService } from "@genezio-sdk/f123dashboard" 
+import { PostgresService, FantaService } from "@genezio-sdk/f123dashboard" 
 import { Fanta, FantaPlayer } from '../model/fanta';
 import { User } from '../model/user';
 
@@ -33,7 +33,7 @@ export class DbDataService {
     this.championship = await PostgresService.getChampionship();
     this.cumulative_points = await PostgresService.getCumulativePoints();
     this.tracks = await PostgresService.getAllTracks();
-    this.fantaVote = JSON.parse(await PostgresService.getFantaVote());
+    this.fantaVote = JSON.parse(await FantaService.getFantaVote());
     this.users = JSON.parse(await PostgresService.getUsers());
     this.raceResult = JSON.parse(await PostgresService.getRaceResoult());
   } 
@@ -70,11 +70,25 @@ export class DbDataService {
   }
 
   async setFantaVoto(voto: Fanta): Promise<void> {
-    await PostgresService.setFantaVoto(voto);
+    await FantaService.setFantaVoto(
+      voto.fanta_player_id,
+      voto.track_id,
+      voto.id_1_place,
+      voto.id_2_place,
+      voto.id_3_place,
+      voto.id_4_place,
+      voto.id_5_place,
+      voto.id_6_place,
+      voto.id_fast_lap,
+      voto.id_dnf
+    );
   }
 
   async setFantaPlayer(player: FantaPlayer): Promise<void> {
-    await PostgresService.setFantaPlayer(player);
+    await FantaService.setFantaPlayer(player.username, 
+      player.name, 
+      player.surname, 
+      player.password);
   }
 
 }

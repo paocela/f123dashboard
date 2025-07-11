@@ -5,14 +5,14 @@
         [striped]="true"
         align="middle"
         cTable
-        class="mb-3 border rounded custom-table"
+        class="mb-0 border rounded custom-table"
     >
         <thead class="text-nowrap text-truncate">
             <tr>
                 <th class="col-2 bg-body-tertiary text-center">Posizione</th>
                 <th class="col-2 bg-body-tertiary text-center"><svg cIcon name="cilPeople"></svg></th>
                 <th class="col-4 bg-body-tertiary">Username</th>
-                <th class="col-4 bg-body-tertiary text-center">Voti</th>
+                <th class="col-4 bg-body-tertiary text-center" *ngIf="showVotes">Voti</th>
                 <th class="col-2 bg-body-tertiary text-center">Punti</th>
             </tr>
         </thead>
@@ -34,7 +34,7 @@
                         <div>{{ leaderBoard.username }}</div>
                         <div class="small text-body-secondary text-nowrap"></div>
                     </td>
-                    <td>
+                    <td *ngIf="showVotes">
                         <div class="text-center">
                             {{ leaderBoard.numberVotes }} / {{totNumberVotes}}
                         </div>

@@ -25,7 +25,7 @@
                   placeholder="username"
                   required
                 >
-                <label cLabel for="username">Username:</label>
+                <label cLabel for="SignInUsername">Username:</label>
               </div>
             </c-col>
           </c-row>
@@ -42,6 +42,7 @@
                 name="password" 
                 required
                 >
+                <p *ngIf="errorMessage" class="errorMessage">{{ errorMessage }}</p>
                 <label cLabel for="password">Password:</label>
               </div>
             </c-col>
@@ -134,11 +135,11 @@
                   <div [cFormFloating]="true" class="mb-3">
                     <input 
                       cFormControl 
-                      id="username" 
+                      id="SignInUsername" 
                       placeholder="Username" 
                       type="text" 
                       class="m-2" 
-                      [(ngModel)]="username" 
+                      [(ngModel)]="regUsername" 
                       name="username" 
                       #usernameField="ngModel"
                       required
@@ -164,19 +165,40 @@
                   <div [cFormFloating]="true" class="mb-3">
                     <input 
                       cFormControl 
-                      id="password" 
+                      id="SignInPassword" 
                       placeholder="Password" 
                       type="password" 
                       class="m-2" 
-                      [(ngModel)]="password" 
+                      [(ngModel)]="regPassword" 
                       name="password" 
                       #passwordField="ngModel"
                       required
                       minlength="4"
                     >
                     
-                    <label cLabel for="password">Password:</label>
+                    <label cLabel for="SignInPassword">Password:</label>
                     <small class="text-danger" *ngIf="passwordField.invalid && passwordField.touched">La password è obbligatoria.</small>
+                  </div>
+                </c-col>
+              </c-row>
+
+              <c-row [gutter]="{gy: 5}">
+                <c-col>
+                  <div [cFormFloating]="true" class="mb-3">
+                    <input 
+                      cFormControl 
+                      id="confirmPassword" 
+                      placeholder="Password" 
+                      type="password" 
+                      class="m-2" 
+                      [(ngModel)]="confirmPassword" 
+                      name="confirmPassword" 
+                      #confirmPasswordField="ngModel"
+                      required
+                      minlength="4"
+                    >
+                    <label cLabel for="confirmPassword">Conferma Password:</label>
+                    <small class="text-danger" *ngIf="confirmPasswordField.invalid && confirmPasswordField.touched">La password è obbligatoria.</small>
                   </div>
                 </c-col>
               </c-row>
@@ -184,6 +206,7 @@
             </c-container>
           </c-modal-body>
           <c-modal-footer>
+             <p *ngIf="singInErrorMessage" class="errorMessage">{{ singInErrorMessage }}</p>
             <button [cModalToggle]="verticallyCenteredModal.id" cButton color="secondary">
               Close
             </button>
@@ -191,7 +214,6 @@
           </c-modal-footer>
           </form>
         </c-modal>
-      <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
   </c-col>
 </c-row>
 </c-container>

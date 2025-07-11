@@ -1,7 +1,6 @@
 import express, { Application, Request, Response } from 'express';
 import { GenezioDeploy } from "@genezio/types";
 import pg from "pg";
-import fs from "fs";
 const { Pool } = pg;
 // const { FileSystem } = fs;
 
@@ -1286,29 +1285,6 @@ ORDER BY date ASC
     return JSON.stringify(result.rows);
   }
 
-  /* All fanta vote */
-  async getFantaVote(): Promise<string> {
-      const result = await this.pool.query (`
-  SELECT
-  fp_table.id AS fanta_player_id,
-  f_table.race_id AS track_id,
-  fp_table.username AS username,
-  f_table."1_place_id" AS "id_1_place",
-  f_table."2_place_id" AS "id_2_place",
-  f_table."3_place_id" AS "id_3_place",
-  f_table."4_place_id" AS "id_4_place",
-  f_table."5_place_id" AS "id_5_place",
-  f_table."6_place_id" AS "id_6_place",
-  f_table."fast_lap_id" AS "id_fast_lap",
-  f_table."dnf_id" AS "id_dnf"
-  FROM fanta_player fp_table
-  JOIN fanta f_table
-  ON fp_table.id = f_table.fanta_player_id
-  ORDER BY fp_table.id, f_table.race_id;
-      `);
-      return JSON.stringify(result.rows);
-  }
-
   async getRaceResoult(): Promise<string> {
       const result = await this.pool.query (`
   SELECT 
@@ -1362,27 +1338,8 @@ ORDER BY date ASC
       return JSON.stringify(result.rows);
   }
 
-  async setFantaVoto(voto: any): Promise<void> {
-      const result = await this.pool.query(`
-  INSERT INTO "fanta" ("fanta_player_id", "race_id", "1_place_id", "2_place_id", "3_place_id", "4_place_id", "5_place_id", "6_place_id", "fast_lap_id", "dnf_id") 
-  VALUES (` + voto.fanta_player_id + `, ` + voto.track_id + `, ` + voto.id_1_place + `, ` + voto.id_2_place + `, ` + voto.id_3_place + `, ` + voto.id_4_place + `, ` + voto.id_5_place + `, ` + voto.id_6_place + `, ` + voto.id_fast_lap + `, ` + voto.id_dnf + `)
-  ON CONFLICT ("fanta_player_id", "race_id")
-  DO
-  UPDATE SET
-  "1_place_id" = ` + voto.id_1_place + `,
-  "2_place_id" = ` + voto.id_2_place + `,
-  "3_place_id" = ` + voto.id_3_place + `,
-  "4_place_id" = ` + voto.id_4_place + `,
-  "5_place_id" = ` + voto.id_5_place + `,
-  "6_place_id" = ` + voto.id_6_place + `,
-  "fast_lap_id" = ` + voto.id_fast_lap + `,
-  "dnf_id" = ` + voto.id_dnf + `
-          `);
-  }
-
-  async setFantaPlayer(player: any): Promise<void> {
-    const query = `INSERT INTO "fanta_player" ("username", "name", "surname", "password")
-    VALUES ('` + player.username + `', '` + player.name + `', '` + player.surname + `', '` + player.password + `')`;
-    const result = await this.pool.query(query);
+  async getAllSeasons(): Promise<string> {
+    const resoult = await this.pool.query(` SELECT id, description, start_date, end_date FROM seasons`);
+    return JSON.stringify(resoult.rows);
   }
 }
