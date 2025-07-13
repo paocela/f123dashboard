@@ -118,8 +118,14 @@ export class FantaService {
   }
 
   isDnfCorrect(raceResultDnf: string, fantaVoteDnfId: number) {
-    let fantaVoteDnfUsername: string = this.allDrivers.find(driver => driver.driver_id == fantaVoteDnfId)?.driver_username;
-    return raceResultDnf.includes(fantaVoteDnfUsername);
+    //let fantaVoteDnfUsername: string = this.allDrivers.find(driver => driver.driver_id == fantaVoteDnfId)?.driver_username;
+    //return raceResultDnf.includes(fantaVoteDnfUsername) ;
+    // now list_dnf contains the driver_id, so we can check directly
+    if (!raceResultDnf || !fantaVoteDnfId) return false;
+    // raceResultDnf is a string like "{1,4}", so extract numbers
+    const ids = raceResultDnf.replace(/[{}]/g, '').split(',').map(id => Number(id.trim()));
+    return ids.includes(fantaVoteDnfId);
+    
   }
 
   pointsWithAbsoluteDifference(raceResult: number, fantaVote: number) : number{

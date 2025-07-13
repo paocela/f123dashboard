@@ -34,327 +34,8 @@ export class PostgresService {
 // 1) restituisce tutti i dati legati al pilota 
     async getAllDrivers(): Promise<string> {
         const result = await this.pool.query(`
-WITH all_race_points AS
-(
-    SELECT
-        race_results.id,
-        race_results."1_place_id" AS driver_id,
-        (SELECT "1_points" FROM session_type WHERE session_type.id = 1) as race_point
-    FROM race_results
-
-    UNION ALL
-
-    SELECT
-        race_results.id,
-        race_results."2_place_id" AS driver_id,
-        (SELECT "2_points" FROM session_type WHERE session_type.id = 1) as race_point
-    FROM race_results
-
-    UNION ALL
-
-    SELECT
-        race_results.id,
-        race_results."3_place_id" AS driver_id,
-        (SELECT "3_points" FROM session_type WHERE session_type.id = 1) as race_point
-    FROM race_results
-
-    UNION ALL
-
-    SELECT
-        race_results.id,
-        race_results."4_place_id" AS driver_id,
-        (SELECT "4_points" FROM session_type WHERE session_type.id = 1) as race_point
-    FROM race_results
-
-    UNION ALL
-
-    SELECT
-        race_results.id,
-        race_results."5_place_id" AS driver_id,
-        (SELECT "5_points" FROM session_type WHERE session_type.id = 1) as race_point
-    FROM race_results
-
-    UNION ALL
-
-    SELECT
-        race_results.id,
-        race_results."6_place_id" AS driver_id,
-        (SELECT "6_points" FROM session_type WHERE session_type.id = 1) as race_point
-    FROM race_results
-
-    UNION ALL
-
-    SELECT
-        race_results.id,
-        race_results."fast_lap_id" AS driver_id,
-        (SELECT "fast_lap_points" FROM session_type WHERE session_type.id = 1) as race_point
-    FROM race_results
-),
-all_full_race_points AS
-(
-    SELECT
-    full_race_results.id,
-    full_race_results."1_place_id" AS driver_id,
-    (SELECT "1_points" FROM session_type WHERE session_type.id = 5) as full_race_point
-    FROM full_race_results
-
-    UNION ALL
-
-    SELECT
-        full_race_results.id,
-        full_race_results."2_place_id" AS driver_id,
-        (SELECT "2_points" FROM session_type WHERE session_type.id = 5) as full_race_point
-    FROM full_race_results
-
-    UNION ALL
-
-    SELECT
-        full_race_results.id,
-        full_race_results."3_place_id" AS driver_id,
-        (SELECT "3_points" FROM session_type WHERE session_type.id = 5) as full_race_point
-    FROM full_race_results
-
-    UNION ALL
-
-    SELECT
-        full_race_results.id,
-        full_race_results."4_place_id" AS driver_id,
-        (SELECT "4_points" FROM session_type WHERE session_type.id = 5) as full_race_point
-    FROM full_race_results
-
-    UNION ALL
-
-    SELECT
-        full_race_results.id,
-        full_race_results."5_place_id" AS driver_id,
-        (SELECT "5_points" FROM session_type WHERE session_type.id = 5) as full_race_point
-    FROM full_race_results
-
-    UNION ALL
-
-    SELECT
-        full_race_results.id,
-        full_race_results."6_place_id" AS driver_id,
-        (SELECT "6_points" FROM session_type WHERE session_type.id = 5) as full_race_point
-    FROM full_race_results
-
-    UNION ALL
-
-    SELECT
-        full_race_results.id,
-        full_race_results."fast_lap_id" AS driver_id,
-        (SELECT "fast_lap_points" FROM session_type WHERE session_type.id = 5) as full_race_point
-    FROM full_race_results
-),
-all_sprint_points AS
-(
-    SELECT
-        sprint_results.id,
-        sprint_results."1_place_id" AS driver_id,
-        (SELECT "1_points" FROM session_type WHERE session_type.id = 4) as sprint_point
-    FROM sprint_results
-
-    UNION ALL
-
-    SELECT
-        sprint_results.id,
-        sprint_results."2_place_id" AS driver_id,
-        (SELECT "2_points" FROM session_type WHERE session_type.id = 4) as sprint_point
-    FROM sprint_results
-
-    UNION ALL
-
-    SELECT
-        sprint_results.id,
-        sprint_results."3_place_id" AS driver_id,
-        (SELECT "3_points" FROM session_type WHERE session_type.id = 4) as sprint_point
-    FROM sprint_results
-
-    UNION ALL
-
-    SELECT
-        sprint_results.id,
-        sprint_results."4_place_id" AS driver_id,
-        (SELECT "4_points" FROM session_type WHERE session_type.id = 4) as sprint_point
-    FROM sprint_results
-
-    UNION ALL
-
-    SELECT
-        sprint_results.id,
-        sprint_results."5_place_id" AS driver_id,
-        (SELECT "5_points" FROM session_type WHERE session_type.id = 4) as sprint_point
-    FROM sprint_results
-
-    UNION ALL
-
-    SELECT
-        sprint_results.id,
-        sprint_results."6_place_id" AS driver_id,
-        (SELECT "6_points" FROM session_type WHERE session_type.id = 4) as sprint_point
-    FROM sprint_results
-
-    UNION ALL
-
-    SELECT
-        sprint_results.id,
-        sprint_results."fast_lap_id" AS driver_id,
-        (SELECT "fast_lap_points" FROM session_type WHERE session_type.id = 4) as sprint_point
-    FROM sprint_results
-),
-all_qualifying_points AS
-(
-    SELECT
-    qualifying_results.id,
-    qualifying_results."1_place_id" AS driver_id,
-    (SELECT "1_points" FROM session_type WHERE session_type.id = 2) as qualifying_point
-    FROM qualifying_results
-
-    UNION ALL
-
-    SELECT
-        qualifying_results.id,
-        qualifying_results."2_place_id" AS driver_id,
-        (SELECT "2_points" FROM session_type WHERE session_type.id = 2) as qualifying_point
-    FROM qualifying_results
-
-    UNION ALL
-
-    SELECT
-        qualifying_results.id,
-        qualifying_results."3_place_id" AS driver_id,
-        (SELECT "3_points" FROM session_type WHERE session_type.id = 2) as qualifying_point
-    FROM qualifying_results
-
-    UNION ALL
-
-    SELECT
-        qualifying_results.id,
-        qualifying_results."4_place_id" AS driver_id,
-        (SELECT "4_points" FROM session_type WHERE session_type.id = 2) as qualifying_point
-    FROM qualifying_results
-
-    UNION ALL
-
-    SELECT
-        qualifying_results.id,
-        qualifying_results."5_place_id" AS driver_id,
-        (SELECT "5_points" FROM session_type WHERE session_type.id = 2) as qualifying_point
-    FROM qualifying_results
-
-    UNION ALL
-
-    SELECT
-        qualifying_results.id,
-        qualifying_results."6_place_id" AS driver_id,
-        (SELECT "6_points" FROM session_type WHERE session_type.id = 2) as qualifying_point
-    FROM qualifying_results
-),
-all_free_practice_points AS
-(
-    SELECT
-    free_practice_results.id,
-    free_practice_results."1_place_id" AS driver_id,
-    (SELECT "1_points" FROM session_type WHERE session_type.id = 3) as free_practice_point
-    FROM free_practice_results
-
-    UNION ALL
-
-    SELECT
-        free_practice_results.id,
-        free_practice_results."2_place_id" AS driver_id,
-        (SELECT "2_points" FROM session_type WHERE session_type.id = 3) as free_practice_point
-    FROM free_practice_results
-
-    UNION ALL
-
-    SELECT
-        free_practice_results.id,
-        free_practice_results."3_place_id" AS driver_id,
-        (SELECT "3_points" FROM session_type WHERE session_type.id = 3) as free_practice_point
-    FROM free_practice_results
-
-    UNION ALL
-
-    SELECT
-        free_practice_results.id,
-        free_practice_results."4_place_id" AS driver_id,
-        (SELECT "4_points" FROM session_type WHERE session_type.id = 3) as free_practice_point
-    FROM free_practice_results
-
-    UNION ALL
-
-    SELECT
-        free_practice_results.id,
-        free_practice_results."5_place_id" AS driver_id,
-        (SELECT "5_points" FROM session_type WHERE session_type.id = 3) as free_practice_point
-    FROM free_practice_results
-
-    UNION ALL
-
-    SELECT
-        free_practice_results.id,
-        free_practice_results."6_place_id" AS driver_id,
-        (SELECT "6_points" FROM session_type WHERE session_type.id = 3) as free_practice_point
-    FROM free_practice_results
-),
-all_drivers
-AS
-(
-    SELECT drivers.id AS driver_id, drivers.username AS driver_username, drivers.name AS driver_name, drivers.surname AS driver_surname, drivers.description as driver_description, drivers.license_pt AS driver_license_pt,
-    drivers.consistency_pt AS driver_consistency_pt, drivers.fast_lap_pt AS driver_fast_lap_pt, drivers.dangerous_pt AS drivers_dangerous_pt, drivers.ingenuity_pt AS driver_ingenuity_pt,
-    drivers.strategy_pt AS driver_strategy_pt, drivers.color AS driver_color, inner_table.pilot_name AS pilot_name, inner_table.pilot_surname AS pilot_surname, inner_table.car_name AS car_name,
-    inner_table.car_overall_score AS car_overall_score
-    FROM drivers
-    INNER JOIN
-    (
-        SELECT pilots.id AS pilot_id, pilots.name AS pilot_name, pilots.surname AS pilot_surname, cars.name AS car_name, cars.overall_score AS car_overall_score
-        FROM pilots
-        INNER JOIN cars
-        ON pilots.car_id = cars.id
-    ) AS inner_table
-    ON drivers.pilot_id = inner_table.pilot_id
-)
-
-SELECT *, (inner_table.total_full_race_points + inner_table.total_free_practice_points + inner_table.total_qualifying_points + inner_table.total_sprint_points + inner_table.total_race_points) AS total_points
-FROM all_drivers
-INNER JOIN
-(
-    SELECT all_sprint_points.driver_id, SUM(all_sprint_points.sprint_point) AS total_sprint_points, COALESCE(inner_table_0.total_free_practice_points,0) AS total_free_practice_points, inner_table_0.total_qualifying_points, inner_table_0.total_full_race_points, inner_table_0.total_race_points
-    FROM all_sprint_points
-    LEFT JOIN
-    (
-        SELECT all_free_practice_points.driver_id AS driver_id, SUM(all_free_practice_points.free_practice_point) AS total_free_practice_points, COALESCE(inner_table_1.total_qualifying_points,0) AS total_qualifying_points, inner_table_1.total_full_race_points, inner_table_1.total_race_points
-        FROM all_free_practice_points
-        LEFT JOIN
-        (
-            SELECT all_qualifying_points.driver_id AS driver_id, SUM(all_qualifying_points.qualifying_point) AS total_qualifying_points, COALESCE(inner_table_2.total_full_race_points,0) AS total_full_race_points, COALESCE(inner_table_2.total_race_points,0) AS total_race_points
-            FROM all_qualifying_points
-            LEFT JOIN
-            (
-                SELECT all_race_points.driver_id AS driver_id, SUM(all_race_points.race_point) AS total_race_points, COALESCE(inner_table_3.total_full_race_points,0) AS total_full_race_points
-                FROM all_race_points
-                LEFT JOIN
-                (
-                    SELECT all_full_race_points.driver_id AS driver_id, SUM(all_full_race_points.full_race_point) AS total_full_race_points
-                    FROM all_full_race_points
-                    GROUP BY all_full_race_points.driver_id
-                ) AS inner_table_3
-                ON inner_table_3.driver_id = all_race_points.driver_id
-                GROUP BY all_race_points.driver_id, inner_table_3.total_full_race_points
-            ) AS inner_table_2
-            ON inner_table_2.driver_id = all_qualifying_points.driver_id
-            GROUP BY all_qualifying_points.driver_id, inner_table_2.total_race_points, inner_table_2.total_full_race_points
-        ) AS inner_table_1
-        ON inner_table_1.driver_id = all_free_practice_points.driver_id
-        GROUP BY all_free_practice_points.driver_id, inner_table_1.total_race_points, inner_table_1.total_full_race_points, inner_table_1.total_qualifying_points
-    )AS inner_table_0
-    ON inner_table_0.driver_id = all_sprint_points.driver_id
-    GROUP BY all_sprint_points.driver_id, inner_table_0.total_race_points, inner_table_0.total_full_race_points, inner_table_0.total_qualifying_points, inner_table_0.total_free_practice_points
-) AS inner_table
-ON all_drivers.driver_id = inner_table.driver_id
-ORDER BY total_points DESC
-
+            SELECT driver_id, driver_username, driver_name, driver_surname, driver_description, driver_license_pt, driver_consistency_pt, driver_fast_lap_pt, drivers_dangerous_pt, driver_ingenuity_pt, driver_strategy_pt, driver_color, pilot_name, pilot_surname, car_name, car_overall_score, total_sprint_points, total_free_practice_points, total_qualifying_points, total_full_race_points, total_race_points, total_points
+            FROM public.all_race_points;
         `);
         return JSON.stringify(result.rows);
     }
@@ -362,304 +43,139 @@ ORDER BY total_points DESC
   /* All tracks and standings (for Championship page) */
   async getChampionship(): Promise<string> {
     const result = await this.pool.query(`
-SELECT inner_table_tracks.name AS track_name, gran_prix.date AS gran_prix_date, gran_prix.has_sprint AS gran_prix_has_sprint, gran_prix.has_x2 AS gran_prix_has_x2, inner_table_tracks.country AS track_country,
-inner_table_race."1_place_username" AS driver_race_1_place, inner_table_race."2_place_username" AS driver_race_2_place, inner_table_race."3_place_username" AS driver_race_3_place, inner_table_race."4_place_username" AS driver_race_4_place, inner_table_race."5_place_username" AS driver_race_5_place, inner_table_race."6_place_username" AS driver_race_6_place, inner_table_race."fast_lap_username" AS driver_race_fast_lap, inner_table_race.race_dnf AS race_dnf,
-inner_table_full_race."1_place_username" AS driver_full_race_1_place, inner_table_full_race."2_place_username" AS driver_full_race_2_place, inner_table_full_race."3_place_username" AS driver_full_race_3_place, inner_table_full_race."4_place_username" AS driver_full_race_4_place, inner_table_full_race."5_place_username" AS driver_full_race_5_place, inner_table_full_race."6_place_username" AS driver_full_race_6_place, inner_table_full_race."fast_lap_username" AS driver_full_race_fast_lap, inner_table_full_race.full_race_dnf AS full_race_dnf,
-inner_table_sprint."1_place_username" AS driver_sprint_1_place, inner_table_sprint."2_place_username" AS driver_sprint_2_place, inner_table_sprint."3_place_username" AS driver_sprint_3_place, inner_table_sprint."4_place_username" AS driver_sprint_4_place, inner_table_sprint."5_place_username" AS driver_sprint_5_place, inner_table_sprint."6_place_username" AS driver_sprint_6_place, inner_table_sprint."fast_lap_username" AS driver_sprint_fast_lap, inner_table_sprint.sprint_dnf AS sprint_dnf,
-inner_table_qualifying."1_place_username" AS driver_qualifying_1_place, inner_table_qualifying."2_place_username" AS driver_qualifying_2_place, inner_table_qualifying."3_place_username" AS driver_qualifying_3_place, inner_table_qualifying."4_place_username" AS driver_qualifying_4_place, inner_table_qualifying."5_place_username" AS driver_qualifying_5_place, inner_table_qualifying."6_place_username" AS driver_qualifying_6_place,
-inner_table_free_practice."1_place_username" AS driver_free_practice_1_place, inner_table_free_practice."2_place_username" AS driver_free_practice_2_place, inner_table_free_practice."3_place_username" AS driver_free_practice_3_place, inner_table_free_practice."4_place_username" AS driver_free_practice_4_place, inner_table_free_practice."5_place_username" AS driver_free_practice_5_place, inner_table_free_practice."6_place_username" AS driver_free_practice_6_place
-FROM gran_prix
-LEFT JOIN
-(
-    SELECT first_table.race_id, first_table.race_dnf, first_table."1_place_username", second_table."2_place_username", third_table."3_place_username", fourth_table."4_place_username", fifth_table."5_place_username", sixth_table."6_place_username", fast_lap_table."fast_lap_username"
-    FROM
-    (
-        SELECT race_results.id AS race_id, race_results.dnf AS race_dnf, drivers.username AS "1_place_username"
-        FROM race_results
-        LEFT JOIN drivers 
-        ON race_results."1_place_id" = drivers.id
-    ) AS first_table
-    INNER JOIN
-    (
-        SELECT race_results.id AS race_id, drivers.username AS "2_place_username"
-        FROM race_results
-        LEFT JOIN drivers 
-        ON race_results."2_place_id" = drivers.id
-    ) AS second_table
-    ON first_table.race_id = second_table.race_id
-    INNER JOIN
-    (
-        SELECT race_results.id AS race_id, drivers.username AS "3_place_username"
-        FROM race_results
-        LEFT JOIN drivers 
-        ON race_results."3_place_id" = drivers.id
-    ) AS third_table
-    ON first_table.race_id = third_table.race_id
-    INNER JOIN
-    (
-        SELECT race_results.id AS race_id, drivers.username AS "4_place_username"
-        FROM race_results
-        LEFT JOIN drivers 
-        ON race_results."4_place_id" = drivers.id
-    ) AS fourth_table
-    ON first_table.race_id = fourth_table.race_id
-    INNER JOIN
-    (
-        SELECT race_results.id AS race_id, drivers.username AS "5_place_username"
-        FROM race_results
-        LEFT JOIN drivers 
-        ON race_results."5_place_id" = drivers.id
-    ) AS fifth_table
-    ON first_table.race_id = fifth_table.race_id
-    INNER JOIN
-    (
-        SELECT race_results.id AS race_id, drivers.username AS "6_place_username"
-        FROM race_results
-        LEFT JOIN drivers 
-        ON race_results."6_place_id" = drivers.id
-    ) AS sixth_table
-    ON first_table.race_id = sixth_table.race_id
-    INNER JOIN
-    (
-        SELECT race_results.id AS race_id, drivers.username AS "fast_lap_username"
-        FROM race_results
-        LEFT JOIN drivers 
-        ON race_results."fast_lap_id" = drivers.id
-    ) AS fast_lap_table
-    ON first_table.race_id = fast_lap_table.race_id
-) AS inner_table_race
-ON gran_prix.race_results_id = inner_table_race.race_id
-LEFT JOIN
-(
-    SELECT first_table.full_race_id, first_table.full_race_dnf, first_table."1_place_username", second_table."2_place_username", third_table."3_place_username", fourth_table."4_place_username", fifth_table."5_place_username", sixth_table."6_place_username", fast_lap_table."fast_lap_username"
-    FROM
-    (
-        SELECT full_race_results.id AS full_race_id, full_race_results.dnf AS full_race_dnf, drivers.username AS "1_place_username"
-        FROM full_race_results
-        LEFT JOIN drivers 
-        ON full_race_results."1_place_id" = drivers.id
-    ) AS first_table
-    INNER JOIN
-    (
-        SELECT full_race_results.id AS full_race_id, drivers.username AS "2_place_username"
-        FROM full_race_results
-        LEFT JOIN drivers 
-        ON full_race_results."2_place_id" = drivers.id
-    ) AS second_table
-    ON first_table.full_race_id = second_table.full_race_id
-    INNER JOIN
-    (
-        SELECT full_race_results.id AS full_race_id, drivers.username AS "3_place_username"
-        FROM full_race_results
-        LEFT JOIN drivers 
-        ON full_race_results."3_place_id" = drivers.id
-    ) AS third_table
-    ON first_table.full_race_id = third_table.full_race_id
-    INNER JOIN
-    (
-        SELECT full_race_results.id AS full_race_id, drivers.username AS "4_place_username"
-        FROM full_race_results
-        LEFT JOIN drivers 
-        ON full_race_results."4_place_id" = drivers.id
-    ) AS fourth_table
-    ON first_table.full_race_id = fourth_table.full_race_id
-    INNER JOIN
-    (
-        SELECT full_race_results.id AS full_race_id, drivers.username AS "5_place_username"
-        FROM full_race_results
-        LEFT JOIN drivers 
-        ON full_race_results."5_place_id" = drivers.id
-    ) AS fifth_table
-    ON first_table.full_race_id = fifth_table.full_race_id
-    INNER JOIN
-    (
-        SELECT full_race_results.id AS full_race_id, drivers.username AS "6_place_username"
-        FROM full_race_results
-        LEFT JOIN drivers 
-        ON full_race_results."6_place_id" = drivers.id
-    ) AS sixth_table
-    ON first_table.full_race_id = sixth_table.full_race_id
-    INNER JOIN
-    (
-        SELECT full_race_results.id AS full_race_id, drivers.username AS "fast_lap_username"
-        FROM full_race_results
-        LEFT JOIN drivers 
-        ON full_race_results."fast_lap_id" = drivers.id
-    ) AS fast_lap_table
-    ON first_table.full_race_id = fast_lap_table.full_race_id
-) AS inner_table_full_race
-ON gran_prix.full_race_results_id = inner_table_full_race.full_race_id
-LEFT JOIN
-(
-    SELECT first_table.sprint_id, first_table.sprint_dnf, first_table."1_place_username", second_table."2_place_username", third_table."3_place_username", fourth_table."4_place_username", fifth_table."5_place_username", sixth_table."6_place_username", fast_lap_table."fast_lap_username"
-    FROM
-    (
-        SELECT sprint_results.id AS sprint_id, sprint_results.dnf AS sprint_dnf, drivers.username AS "1_place_username"
-        FROM sprint_results
-        LEFT JOIN drivers 
-        ON sprint_results."1_place_id" = drivers.id
-    ) AS first_table
-    INNER JOIN
-    (
-        SELECT sprint_results.id AS sprint_id, drivers.username AS "2_place_username"
-        FROM sprint_results
-        LEFT JOIN drivers 
-        ON sprint_results."2_place_id" = drivers.id
-    ) AS second_table
-    ON first_table.sprint_id = second_table.sprint_id
-    INNER JOIN
-    (
-        SELECT sprint_results.id AS sprint_id, drivers.username AS "3_place_username"
-        FROM sprint_results
-        LEFT JOIN drivers 
-        ON sprint_results."3_place_id" = drivers.id
-    ) AS third_table
-    ON first_table.sprint_id = third_table.sprint_id
-    INNER JOIN
-    (
-        SELECT sprint_results.id AS sprint_id, drivers.username AS "4_place_username"
-        FROM sprint_results
-        LEFT JOIN drivers 
-        ON sprint_results."4_place_id" = drivers.id
-    ) AS fourth_table
-    ON first_table.sprint_id = fourth_table.sprint_id
-    INNER JOIN
-    (
-        SELECT sprint_results.id AS sprint_id, drivers.username AS "5_place_username"
-        FROM sprint_results
-        LEFT JOIN drivers 
-        ON sprint_results."5_place_id" = drivers.id
-    ) AS fifth_table
-    ON first_table.sprint_id = fifth_table.sprint_id
-    INNER JOIN
-    (
-        SELECT sprint_results.id AS sprint_id, drivers.username AS "6_place_username"
-        FROM sprint_results
-        LEFT JOIN drivers 
-        ON sprint_results."6_place_id" = drivers.id
-    ) AS sixth_table
-    ON first_table.sprint_id = sixth_table.sprint_id
-    INNER JOIN
-    (
-        SELECT sprint_results.id AS sprint_id, drivers.username AS "fast_lap_username"
-        FROM sprint_results
-        LEFT JOIN drivers 
-        ON sprint_results."fast_lap_id" = drivers.id
-    ) AS fast_lap_table
-    ON first_table.sprint_id = fast_lap_table.sprint_id
-) AS inner_table_sprint
-ON gran_prix.sprint_results_id = inner_table_sprint.sprint_id
-LEFT JOIN
-(
-    SELECT first_table.qualifying_id, first_table."1_place_username", second_table."2_place_username", third_table."3_place_username", fourth_table."4_place_username", fifth_table."5_place_username", sixth_table."6_place_username"
-    FROM
-    (
-        SELECT qualifying_results.id AS qualifying_id, drivers.username AS "1_place_username"
-        FROM qualifying_results
-        LEFT JOIN drivers 
-        ON qualifying_results."1_place_id" = drivers.id
-    ) AS first_table
-    INNER JOIN
-    (
-        SELECT qualifying_results.id AS qualifying_id, drivers.username AS "2_place_username"
-        FROM qualifying_results
-        LEFT JOIN drivers 
-        ON qualifying_results."2_place_id" = drivers.id
-    ) AS second_table
-    ON first_table.qualifying_id = second_table.qualifying_id
-    INNER JOIN
-    (
-        SELECT qualifying_results.id AS qualifying_id, drivers.username AS "3_place_username"
-        FROM qualifying_results
-        LEFT JOIN drivers 
-        ON qualifying_results."3_place_id" = drivers.id
-    ) AS third_table
-    ON first_table.qualifying_id = third_table.qualifying_id
-    INNER JOIN
-    (
-        SELECT qualifying_results.id AS qualifying_id, drivers.username AS "4_place_username"
-        FROM qualifying_results
-        LEFT JOIN drivers 
-        ON qualifying_results."4_place_id" = drivers.id
-    ) AS fourth_table
-    ON first_table.qualifying_id = fourth_table.qualifying_id
-    INNER JOIN
-    (
-        SELECT qualifying_results.id AS qualifying_id, drivers.username AS "5_place_username"
-        FROM qualifying_results
-        LEFT JOIN drivers 
-        ON qualifying_results."5_place_id" = drivers.id
-    ) AS fifth_table
-    ON first_table.qualifying_id = fifth_table.qualifying_id
-    INNER JOIN
-    (
-        SELECT qualifying_results.id AS qualifying_id, drivers.username AS "6_place_username"
-        FROM qualifying_results
-        LEFT JOIN drivers 
-        ON qualifying_results."6_place_id" = drivers.id
-    ) AS sixth_table
-    ON first_table.qualifying_id = sixth_table.qualifying_id
-) AS inner_table_qualifying
-ON gran_prix.qualifying_results_id = inner_table_qualifying.qualifying_id
-LEFT JOIN
-(
-    SELECT first_table.free_practice_id, first_table."1_place_username", second_table."2_place_username", third_table."3_place_username", fourth_table."4_place_username", fifth_table."5_place_username", sixth_table."6_place_username"
-    FROM
-    (
-        SELECT free_practice_results.id AS free_practice_id, drivers.username AS "1_place_username"
-        FROM free_practice_results
-        LEFT JOIN drivers 
-        ON free_practice_results."1_place_id" = drivers.id
-    ) AS first_table
-    INNER JOIN
-    (
-        SELECT free_practice_results.id AS free_practice_id, drivers.username AS "2_place_username"
-        FROM free_practice_results
-        LEFT JOIN drivers 
-        ON free_practice_results."2_place_id" = drivers.id
-    ) AS second_table
-    ON first_table.free_practice_id = second_table.free_practice_id
-    INNER JOIN
-    (
-        SELECT free_practice_results.id AS free_practice_id, drivers.username AS "3_place_username"
-        FROM free_practice_results
-        LEFT JOIN drivers 
-        ON free_practice_results."3_place_id" = drivers.id
-    ) AS third_table
-    ON first_table.free_practice_id = third_table.free_practice_id
-    INNER JOIN
-    (
-        SELECT free_practice_results.id AS free_practice_id, drivers.username AS "4_place_username"
-        FROM free_practice_results
-        LEFT JOIN drivers 
-        ON free_practice_results."4_place_id" = drivers.id
-    ) AS fourth_table
-    ON first_table.free_practice_id = fourth_table.free_practice_id
-    INNER JOIN
-    (
-        SELECT free_practice_results.id AS free_practice_id, drivers.username AS "5_place_username"
-        FROM free_practice_results
-        LEFT JOIN drivers 
-        ON free_practice_results."5_place_id" = drivers.id
-    ) AS fifth_table
-    ON first_table.free_practice_id = fifth_table.free_practice_id
-    INNER JOIN
-    (
-        SELECT free_practice_results.id AS free_practice_id, drivers.username AS "6_place_username"
-        FROM free_practice_results
-        LEFT JOIN drivers 
-        ON free_practice_results."6_place_id" = drivers.id
-    ) AS sixth_table
-    ON first_table.free_practice_id = sixth_table.free_practice_id
-) AS inner_table_free_practice
-ON gran_prix.free_practice_results_id = inner_table_free_practice.free_practice_id
-LEFT JOIN
-(
-    SELECT *
-    FROM tracks
-) AS inner_table_tracks
-ON gran_prix.track_id = inner_table_tracks.id
-ORDER BY gran_prix.date ASC
+SELECT
+    t.name AS track_name,
+    gp.date AS gran_prix_date,
+    gp.has_sprint AS gran_prix_has_sprint,
+    gp.has_x2 AS gran_prix_has_x2,
+    t.country AS track_country,
+
+    -- Race Results
+    race_results.driver_1_place,
+    race_results.driver_2_place,
+    race_results.driver_3_place,
+    race_results.driver_4_place,
+    race_results.driver_5_place,
+    race_results.driver_6_place,
+    race_results.fast_lap_username AS driver_race_fast_lap,
+    race_results.dnf_usernames AS race_dnf,
+
+    -- Full Race Results
+    full_race_results.driver_1_place AS driver_full_race_1_place,
+    full_race_results.driver_2_place AS driver_full_race_2_place,
+    full_race_results.driver_3_place AS driver_full_race_3_place,
+    full_race_results.driver_4_place AS driver_full_race_4_place,
+    full_race_results.driver_5_place AS driver_full_race_5_place,
+    full_race_results.driver_6_place AS driver_full_race_6_place,
+    full_race_results.fast_lap_username AS driver_full_race_fast_lap,
+    full_race_results.dnf_usernames AS full_race_dnf,
+
+    -- Sprint Results
+    sprint_results.driver_1_place AS driver_sprint_1_place,
+    sprint_results.driver_2_place AS driver_sprint_2_place,
+    sprint_results.driver_3_place AS driver_sprint_3_place,
+    sprint_results.driver_4_place AS driver_sprint_4_place,
+    sprint_results.driver_5_place AS driver_sprint_5_place,
+    sprint_results.driver_6_place AS driver_sprint_6_place,
+    sprint_results.fast_lap_username AS driver_sprint_fast_lap,
+    sprint_results.dnf_usernames AS sprint_dnf,
+
+    -- Qualifying Results
+    qualifying_results.driver_1_place AS driver_qualifying_1_place,
+    qualifying_results.driver_2_place AS driver_qualifying_2_place,
+    qualifying_results.driver_3_place AS driver_qualifying_3_place,
+    qualifying_results.driver_4_place AS driver_qualifying_4_place,
+    qualifying_results.driver_5_place AS driver_qualifying_5_place,
+    qualifying_results.driver_6_place AS driver_qualifying_6_place,
+
+    -- Free Practice Results
+    free_practice_results.driver_1_place AS driver_free_practice_1_place,
+    free_practice_results.driver_2_place AS driver_free_practice_2_place,
+    free_practice_results.driver_3_place AS driver_free_practice_3_place,
+    free_practice_results.driver_4_place AS driver_free_practice_4_place,
+    free_practice_results.driver_5_place AS driver_free_practice_5_place,
+    free_practice_results.driver_6_place AS driver_free_practice_6_place
+
+FROM gran_prix gp
+JOIN tracks t ON gp.track_id = t.id
+
+-- Race Results
+LEFT JOIN LATERAL (
+    SELECT
+        MAX(CASE WHEN rre.position = 1 THEN d.username END) AS driver_1_place,
+        MAX(CASE WHEN rre.position = 2 THEN d.username END) AS driver_2_place,
+        MAX(CASE WHEN rre.position = 3 THEN d.username END) AS driver_3_place,
+        MAX(CASE WHEN rre.position = 4 THEN d.username END) AS driver_4_place,
+        MAX(CASE WHEN rre.position = 5 THEN d.username END) AS driver_5_place,
+        MAX(CASE WHEN rre.position = 6 THEN d.username END) AS driver_6_place,
+        MAX(CASE WHEN rre.fast_lap = true THEN d.username END) AS fast_lap_username,
+        STRING_AGG(d.username, ', ') FILTER (WHERE rre.position = 0) AS dnf_usernames
+    FROM race_result_entries rre
+    JOIN drivers d ON rre.pilot_id = d.id
+    WHERE rre.race_results_id = gp.race_results_id
+) race_results ON true
+
+-- Full Race Results
+LEFT JOIN LATERAL (
+    SELECT
+        MAX(CASE WHEN frre.position = 1 THEN d.username END) AS driver_1_place,
+        MAX(CASE WHEN frre.position = 2 THEN d.username END) AS driver_2_place,
+        MAX(CASE WHEN frre.position = 3 THEN d.username END) AS driver_3_place,
+        MAX(CASE WHEN frre.position = 4 THEN d.username END) AS driver_4_place,
+        MAX(CASE WHEN frre.position = 5 THEN d.username END) AS driver_5_place,
+        MAX(CASE WHEN frre.position = 6 THEN d.username END) AS driver_6_place,
+        MAX(CASE WHEN frre.fast_lap = true THEN d.username END) AS fast_lap_username,
+        STRING_AGG(d.username, ', ') FILTER (WHERE frre.position = 0) AS dnf_usernames
+    FROM full_race_result_entries frre
+    JOIN drivers d ON frre.pilot_id = d.id
+    WHERE frre.race_results_id = gp.full_race_results_id
+) full_race_results ON true
+
+-- Sprint Results
+LEFT JOIN LATERAL (
+    SELECT
+        MAX(CASE WHEN sre.position = 1 THEN d.username END) AS driver_1_place,
+        MAX(CASE WHEN sre.position = 2 THEN d.username END) AS driver_2_place,
+        MAX(CASE WHEN sre.position = 3 THEN d.username END) AS driver_3_place,
+        MAX(CASE WHEN sre.position = 4 THEN d.username END) AS driver_4_place,
+        MAX(CASE WHEN sre.position = 5 THEN d.username END) AS driver_5_place,
+        MAX(CASE WHEN sre.position = 6 THEN d.username END) AS driver_6_place,
+        MAX(CASE WHEN sre.fast_lap = true THEN d.username END) AS fast_lap_username,
+        STRING_AGG(d.username, ', ') FILTER (WHERE sre.position = 0) AS dnf_usernames
+    FROM sprint_result_entries sre
+    JOIN drivers d ON sre.pilot_id = d.id
+    WHERE sre.sprint_results_id = gp.sprint_results_id
+) sprint_results ON true
+
+-- Qualifying Results
+LEFT JOIN LATERAL (
+    SELECT
+        MAX(CASE WHEN qre.position = 1 THEN d.username END) AS driver_1_place,
+        MAX(CASE WHEN qre.position = 2 THEN d.username END) AS driver_2_place,
+        MAX(CASE WHEN qre.position = 3 THEN d.username END) AS driver_3_place,
+        MAX(CASE WHEN qre.position = 4 THEN d.username END) AS driver_4_place,
+        MAX(CASE WHEN qre.position = 5 THEN d.username END) AS driver_5_place,
+        MAX(CASE WHEN qre.position = 6 THEN d.username END) AS driver_6_place
+    FROM qualifying_result_entries qre
+    JOIN drivers d ON qre.pilot_id = d.id
+    WHERE qre.qualifying_results_id = gp.qualifying_results_id
+) qualifying_results ON true
+
+-- Free Practice Results
+LEFT JOIN LATERAL (
+    SELECT
+        MAX(CASE WHEN fpre.position = 1 THEN d.username END) AS driver_1_place,
+        MAX(CASE WHEN fpre.position = 2 THEN d.username END) AS driver_2_place,
+        MAX(CASE WHEN fpre.position = 3 THEN d.username END) AS driver_3_place,
+        MAX(CASE WHEN fpre.position = 4 THEN d.username END) AS driver_4_place,
+        MAX(CASE WHEN fpre.position = 5 THEN d.username END) AS driver_5_place,
+        MAX(CASE WHEN fpre.position = 6 THEN d.username END) AS driver_6_place
+    FROM free_practice_result_entries fpre
+    JOIN drivers d ON fpre.pilot_id = d.id
+    WHERE fpre.free_practice_results_id = gp.free_practice_results_id
+) free_practice_results ON true
+
+ORDER BY gp.date ASC;
       `);
     return JSON.stringify(result.rows);
   }
@@ -667,593 +183,31 @@ ORDER BY gran_prix.date ASC
   /* All driver championship's cumulative points (for trend graph)*/
   async getCumulativePoints(): Promise<string> {
     const result = await this.pool.query(`
-WITH all_race_points AS
-(
-    SELECT outer_table.date, outer_table.track_name, outer_table.id, outer_table.driver_id, outer_table.race_point, 
-    drivers.username AS driver_username, drivers.color AS driver_color
-    FROM drivers
-    RIGHT JOIN
-    (
-        SELECT gran_prix.date, gran_prix.track_name, inner_table.id, inner_table.driver_id, inner_table.race_point
-        FROM 
-        (
-            SELECT *, track_table.name AS track_name
-            FROM gran_prix
-            LEFT JOIN
-            (
-                SELECT *
-                FROM tracks
-            ) AS track_table
-            ON gran_prix.track_id = track_table.id
-        ) AS gran_prix
-        RIGHT JOIN
-        (
-            SELECT 
-            race_results.id,
-            race_results."1_place_id" AS driver_id,
-            (SELECT "1_points" FROM session_type WHERE session_type.id = 1) as race_point
-            FROM race_results
-
-            UNION ALL
-
-            SELECT 
-                race_results.id,
-                race_results."2_place_id" AS driver_id,
-                (SELECT "2_points" FROM session_type WHERE session_type.id = 1) as race_point
-            FROM race_results
-
-            UNION ALL
-
-            SELECT 
-                race_results.id,
-                race_results."3_place_id" AS driver_id,
-                (SELECT "3_points" FROM session_type WHERE session_type.id = 1) as race_point
-            FROM race_results
-
-            UNION ALL
-
-            SELECT 
-                race_results.id,
-                race_results."4_place_id" AS driver_id,
-                (SELECT "4_points" FROM session_type WHERE session_type.id = 1) as race_point
-            FROM race_results
-
-            UNION ALL
-
-            SELECT 
-                race_results.id,
-                race_results."5_place_id" AS driver_id,
-                (SELECT "5_points" FROM session_type WHERE session_type.id = 1) as race_point
-            FROM race_results
-
-            UNION ALL
-
-            SELECT 
-                race_results.id,
-                race_results."6_place_id" AS driver_id,
-                (SELECT "6_points" FROM session_type WHERE session_type.id = 1) as race_point
-            FROM race_results
-
-            UNION ALL
-
-            SELECT 
-                race_results.id,
-                race_results."fast_lap_id" AS driver_id,
-                (SELECT "fast_lap_points" FROM session_type WHERE session_type.id = 1) as race_point
-            FROM race_results
-        ) AS inner_table
-        ON gran_prix.race_results_id = inner_table.id
-    ) AS outer_table
-    ON drivers.id = outer_table.driver_id
-), 
-all_full_race_points AS
-(
-    SELECT outer_table.date, outer_table.track_name, outer_table.id, outer_table.driver_id, outer_table.full_race_point, 
-    drivers.username AS driver_username, drivers.color AS driver_color
-    FROM drivers
-    RIGHT JOIN
-    (
-        SELECT gran_prix.date, gran_prix.track_name, inner_table.id, inner_table.driver_id, inner_table.full_race_point
-        FROM 
-        (
-            SELECT *, track_table.name AS track_name
-            FROM gran_prix
-            LEFT JOIN
-            (
-                SELECT *
-                FROM tracks
-            ) AS track_table
-            ON gran_prix.track_id = track_table.id
-        ) AS gran_prix
-        RIGHT JOIN
-        (
-            SELECT 
-            full_race_results.id,
-            full_race_results."1_place_id" AS driver_id,
-            (SELECT "1_points" FROM session_type WHERE session_type.id = 1) as full_race_point
-            FROM full_race_results
-
-            UNION ALL
-
-            SELECT 
-                full_race_results.id,
-                full_race_results."2_place_id" AS driver_id,
-                (SELECT "2_points" FROM session_type WHERE session_type.id = 1) as full_race_point
-            FROM full_race_results
-
-            UNION ALL
-
-            SELECT 
-                full_race_results.id,
-                full_race_results."3_place_id" AS driver_id,
-                (SELECT "3_points" FROM session_type WHERE session_type.id = 1) as full_race_point
-            FROM full_race_results
-
-            UNION ALL
-
-            SELECT 
-                full_race_results.id,
-                full_race_results."4_place_id" AS driver_id,
-                (SELECT "4_points" FROM session_type WHERE session_type.id = 1) as full_race_point
-            FROM full_race_results
-
-            UNION ALL
-
-            SELECT 
-                full_race_results.id,
-                full_race_results."5_place_id" AS driver_id,
-                (SELECT "5_points" FROM session_type WHERE session_type.id = 1) as full_race_point
-            FROM full_race_results
-
-            UNION ALL
-
-            SELECT 
-                full_race_results.id,
-                full_race_results."6_place_id" AS driver_id,
-                (SELECT "6_points" FROM session_type WHERE session_type.id = 1) as full_race_point
-            FROM full_race_results
-
-            UNION ALL
-
-            SELECT 
-                full_race_results.id,
-                full_race_results."fast_lap_id" AS driver_id,
-                (SELECT "fast_lap_points" FROM session_type WHERE session_type.id = 1) as full_race_point
-            FROM full_race_results
-        ) AS inner_table
-        ON gran_prix.full_race_results_id = inner_table.id
-    ) AS outer_table
-    ON drivers.id = outer_table.driver_id
-), 
-all_sprint_points AS
-(
-    SELECT outer_table.date, outer_table.track_name, outer_table.id, outer_table.driver_id, outer_table.sprint_point,
-    drivers.username AS driver_username, drivers.color AS driver_color
-    FROM drivers
-    RIGHT JOIN
-    (
-        SELECT gran_prix.date, gran_prix.track_name, inner_table.id, inner_table.driver_id, inner_table.sprint_point
-        FROM 
-        (
-            SELECT *, track_table.name AS track_name
-            FROM gran_prix
-            LEFT JOIN
-            (
-                SELECT *
-                FROM tracks
-            ) AS track_table
-            ON gran_prix.track_id = track_table.id
-        ) AS gran_prix
-        RIGHT JOIN
-        (
-            SELECT 
-            sprint_results.id,
-            sprint_results."1_place_id" AS driver_id,
-            (SELECT "1_points" FROM session_type WHERE session_type.id = 4) as sprint_point
-            FROM sprint_results
-
-            UNION ALL
-
-            SELECT 
-                sprint_results.id,
-                sprint_results."2_place_id" AS driver_id,
-                (SELECT "2_points" FROM session_type WHERE session_type.id = 4) as sprint_point
-            FROM sprint_results
-
-            UNION ALL
-
-            SELECT 
-                sprint_results.id,
-                sprint_results."3_place_id" AS driver_id,
-                (SELECT "3_points" FROM session_type WHERE session_type.id = 4) as sprint_point
-            FROM sprint_results
-
-            UNION ALL
-
-            SELECT 
-                sprint_results.id,
-                sprint_results."4_place_id" AS driver_id,
-                (SELECT "4_points" FROM session_type WHERE session_type.id = 4) as sprint_point
-            FROM sprint_results
-
-            UNION ALL
-
-            SELECT 
-                sprint_results.id,
-                sprint_results."5_place_id" AS driver_id,
-                (SELECT "5_points" FROM session_type WHERE session_type.id = 4) as sprint_point
-            FROM sprint_results
-
-            UNION ALL
-
-            SELECT 
-                sprint_results.id,
-                sprint_results."6_place_id" AS driver_id,
-                (SELECT "6_points" FROM session_type WHERE session_type.id = 4) as sprint_point
-            FROM sprint_results
-
-            UNION ALL
-
-            SELECT 
-                sprint_results.id,
-                sprint_results."fast_lap_id" AS driver_id,
-                (SELECT "fast_lap_points" FROM session_type WHERE session_type.id = 4) as sprint_point
-            FROM sprint_results
-        ) AS inner_table
-        ON gran_prix.sprint_results_id = inner_table.id
-    ) AS outer_table
-    ON drivers.id = outer_table.driver_id
-), 
-all_qualifying_points AS 
-(
-    SELECT outer_table.date, outer_table.track_name, outer_table.id, outer_table.driver_id, outer_table.qualifying_point, 
-    drivers.username AS driver_username, drivers.color AS driver_color
-    FROM drivers
-    RIGHT JOIN
-    (
-        SELECT gran_prix.date, gran_prix.track_name, inner_table.id, inner_table.driver_id, inner_table.qualifying_point
-        FROM 
-        (
-            SELECT *, track_table.name AS track_name
-            FROM gran_prix
-            LEFT JOIN
-            (
-                SELECT *
-                FROM tracks
-            ) AS track_table
-            ON gran_prix.track_id = track_table.id
-        ) AS gran_prix
-        RIGHT JOIN
-        (
-            SELECT 
-            qualifying_results.id,
-            qualifying_results."1_place_id" AS driver_id,
-            (SELECT "1_points" FROM session_type WHERE session_type.id = 2) as qualifying_point
-            FROM qualifying_results
-
-            UNION ALL
-
-            SELECT 
-                qualifying_results.id,
-                qualifying_results."2_place_id" AS driver_id,
-                (SELECT "2_points" FROM session_type WHERE session_type.id = 2) as qualifying_point
-            FROM qualifying_results
-
-            UNION ALL
-
-            SELECT 
-                qualifying_results.id,
-                qualifying_results."3_place_id" AS driver_id,
-                (SELECT "3_points" FROM session_type WHERE session_type.id = 2) as qualifying_point
-            FROM qualifying_results
-
-            UNION ALL
-
-            SELECT 
-                qualifying_results.id,
-                qualifying_results."4_place_id" AS driver_id,
-                (SELECT "4_points" FROM session_type WHERE session_type.id = 2) as qualifying_point
-            FROM qualifying_results
-
-            UNION ALL
-
-            SELECT 
-                qualifying_results.id,
-                qualifying_results."5_place_id" AS driver_id,
-                (SELECT "5_points" FROM session_type WHERE session_type.id = 2) as qualifying_point
-            FROM qualifying_results
-
-            UNION ALL
-
-            SELECT 
-                qualifying_results.id,
-                qualifying_results."6_place_id" AS driver_id,
-                (SELECT "6_points" FROM session_type WHERE session_type.id = 2) as qualifying_point
-            FROM qualifying_results
-        ) AS inner_table
-        ON gran_prix.qualifying_results_id = inner_table.id
-    ) AS outer_table
-    ON drivers.id = outer_table.driver_id
-), 
-all_free_practice_points AS 
-(
-    SELECT outer_table.date, outer_table.track_name, outer_table.id, outer_table.driver_id, outer_table.free_practice_point, 
-    drivers.username AS driver_username, drivers.color AS driver_color
-    FROM drivers
-    RIGHT JOIN
-    (
-        SELECT gran_prix.date, gran_prix.track_name, inner_table.id, inner_table.driver_id, inner_table.free_practice_point
-        FROM 
-        (
-            SELECT *, track_table.name AS track_name
-            FROM gran_prix
-            LEFT JOIN
-            (
-                SELECT *
-                FROM tracks
-            ) AS track_table
-            ON gran_prix.track_id = track_table.id
-        ) AS gran_prix
-        RIGHT JOIN
-        (
-            SELECT 
-            free_practice_results.id,
-            free_practice_results."1_place_id" AS driver_id,
-            (SELECT "1_points" FROM session_type WHERE session_type.id = 3) as free_practice_point
-            FROM free_practice_results
-
-            UNION ALL
-
-            SELECT 
-                free_practice_results.id,
-                free_practice_results."2_place_id" AS driver_id,
-                (SELECT "2_points" FROM session_type WHERE session_type.id = 3) as free_practice_point
-            FROM free_practice_results
-
-            UNION ALL
-
-            SELECT 
-                free_practice_results.id,
-                free_practice_results."3_place_id" AS driver_id,
-                (SELECT "3_points" FROM session_type WHERE session_type.id = 3) as free_practice_point
-            FROM free_practice_results
-
-            UNION ALL
-
-            SELECT 
-                free_practice_results.id,
-                free_practice_results."4_place_id" AS driver_id,
-                (SELECT "4_points" FROM session_type WHERE session_type.id = 3) as free_practice_point
-            FROM free_practice_results
-
-            UNION ALL
-            
-            SELECT 
-                free_practice_results.id,
-                free_practice_results."5_place_id" AS driver_id,
-                (SELECT "5_points" FROM session_type WHERE session_type.id = 3) as free_practice_point
-            FROM free_practice_results
-
-            UNION ALL
-            
-            SELECT 
-                free_practice_results.id,
-                free_practice_results."6_place_id" AS driver_id,
-                (SELECT "6_points" FROM session_type WHERE session_type.id = 3) as free_practice_point
-            FROM free_practice_results
-        ) AS inner_table
-        ON gran_prix.free_practice_results_id = inner_table.id
-    ) AS outer_table
-    ON drivers.id = outer_table.driver_id
-)
-
-SELECT *
-FROM
-(
-    SELECT date, track_name, driver_id, driver_username, driver_color, SUM(session_point) OVER (ORDER BY date, track_name) AS cumulative_points
-    FROM
-    (
-        SELECT date, track_name, driver_id, driver_username, driver_color, race_point AS session_point
-        FROM all_race_points
-
-        UNION ALL 
-
-        SELECT date, track_name, driver_id, driver_username, driver_color, full_race_point AS session_point
-        FROM all_full_race_points
-
-        UNION ALL 
-
-        SELECT date, track_name, driver_id, driver_username, driver_color, sprint_point AS session_point
-        FROM all_sprint_points
-
-        UNION ALL
-
-        SELECT date, track_name, driver_id, driver_username, driver_color, qualifying_point AS session_point
-        FROM all_qualifying_points
-
-        UNION ALL
-
-        SELECT date, track_name, driver_id, driver_username, driver_color, free_practice_point AS session_point
-        FROM all_free_practice_points
+    WITH all_session_points AS (
+        SELECT
+            dgp.grand_prix_date AS date,
+            dgp.track_name,
+            dgp.pilot_id AS driver_id,
+            dgp.pilot_username AS driver_username,
+            dgp.pilot_id, -- for later reference
+            dgp.position_points + dgp.fast_lap_points AS session_point
+        FROM public.driver_grand_prix_points dgp
+    ),
+    driver_colors AS (
+        SELECT id AS driver_id, color AS driver_color
+        FROM drivers
     )
-    WHERE driver_id = 1
-)
-GROUP BY date, track_name, driver_id, driver_username, driver_color, cumulative_points
-
-UNION ALL
-
-SELECT *
-FROM
-(
-    SELECT date, track_name, driver_id, driver_username, driver_color, SUM(session_point) OVER (ORDER BY date, track_name) AS cumulative_points
-    FROM
-    (
-        SELECT date, track_name, driver_id, driver_username, driver_color, race_point AS session_point
-        FROM all_race_points
-
-        UNION ALL 
-
-        SELECT date, track_name, driver_id, driver_username, driver_color, full_race_point AS session_point
-        FROM all_full_race_points
-
-        UNION ALL 
-
-        SELECT date, track_name, driver_id, driver_username, driver_color, sprint_point AS session_point
-        FROM all_sprint_points
-
-        UNION ALL
-
-        SELECT date, track_name, driver_id, driver_username, driver_color, qualifying_point AS session_point
-        FROM all_qualifying_points
-
-        UNION ALL
-
-        SELECT date, track_name, driver_id, driver_username, driver_color, free_practice_point AS session_point
-        FROM all_free_practice_points
-    )
-    WHERE driver_id = 2
-)
-GROUP BY date, track_name, driver_id, driver_username, driver_color, cumulative_points
-
-UNION ALL
-
-SELECT *
-FROM
-(
-    SELECT date, track_name, driver_id, driver_username, driver_color, SUM(session_point) OVER (ORDER BY date, track_name) AS cumulative_points
-    FROM
-    (
-        SELECT date, track_name, driver_id, driver_username, driver_color, race_point AS session_point
-        FROM all_race_points
-
-        UNION ALL 
-
-        SELECT date, track_name, driver_id, driver_username, driver_color, full_race_point AS session_point
-        FROM all_full_race_points
-
-        UNION ALL 
-
-        SELECT date, track_name, driver_id, driver_username, driver_color, sprint_point AS session_point
-        FROM all_sprint_points
-
-        UNION ALL
-
-        SELECT date, track_name, driver_id, driver_username, driver_color, qualifying_point AS session_point
-        FROM all_qualifying_points
-
-        UNION ALL
-
-        SELECT date, track_name, driver_id, driver_username, driver_color, free_practice_point AS session_point
-        FROM all_free_practice_points
-    )
-    WHERE driver_id = 3
-)
-GROUP BY date, track_name, driver_id, driver_username, driver_color, cumulative_points
-
-UNION ALL
-
-SELECT *
-FROM
-(
-    SELECT date, track_name, driver_id, driver_username, driver_color, SUM(session_point) OVER (ORDER BY date, track_name) AS cumulative_points
-    FROM
-    (
-        SELECT date, track_name, driver_id, driver_username, driver_color, race_point AS session_point
-        FROM all_race_points
-
-        UNION ALL 
-
-        SELECT date, track_name, driver_id, driver_username, driver_color, full_race_point AS session_point
-        FROM all_full_race_points
-
-        UNION ALL 
-
-        SELECT date, track_name, driver_id, driver_username, driver_color, sprint_point AS session_point
-        FROM all_sprint_points
-
-        UNION ALL
-
-        SELECT date, track_name, driver_id, driver_username, driver_color, qualifying_point AS session_point
-        FROM all_qualifying_points
-
-        UNION ALL
-
-        SELECT date, track_name, driver_id, driver_username, driver_color, free_practice_point AS session_point
-        FROM all_free_practice_points
-    )
-    WHERE driver_id = 4
-)
-GROUP BY date, track_name, driver_id, driver_username, driver_color, cumulative_points
-
-UNION ALL
-
-SELECT *
-FROM
-(
-    SELECT date, track_name, driver_id, driver_username, driver_color, SUM(session_point) OVER (ORDER BY date, track_name) AS cumulative_points
-    FROM
-    (
-        SELECT date, track_name, driver_id, driver_username, driver_color, race_point AS session_point
-        FROM all_race_points
-
-        UNION ALL 
-
-        SELECT date, track_name, driver_id, driver_username, driver_color, full_race_point AS session_point
-        FROM all_full_race_points
-
-        UNION ALL 
-
-        SELECT date, track_name, driver_id, driver_username, driver_color, sprint_point AS session_point
-        FROM all_sprint_points
-
-        UNION ALL
-
-        SELECT date, track_name, driver_id, driver_username, driver_color, qualifying_point AS session_point
-        FROM all_qualifying_points
-
-        UNION ALL
-
-        SELECT date, track_name, driver_id, driver_username, driver_color, free_practice_point AS session_point
-        FROM all_free_practice_points
-    )
-    WHERE driver_id = 5
-)
-GROUP BY date, track_name, driver_id, driver_username, driver_color, cumulative_points
-
-UNION ALL
-
-SELECT *
-FROM
-(
-    SELECT date, track_name, driver_id, driver_username, driver_color, SUM(session_point) OVER (ORDER BY date, track_name) AS cumulative_points
-    FROM
-    (
-        SELECT date, track_name, driver_id, driver_username, driver_color, race_point AS session_point
-        FROM all_race_points
-
-        UNION ALL 
-
-        SELECT date, track_name, driver_id, driver_username, driver_color, full_race_point AS session_point
-        FROM all_full_race_points
-
-        UNION ALL 
-
-        SELECT date, track_name, driver_id, driver_username, driver_color, sprint_point AS session_point
-        FROM all_sprint_points
-
-        UNION ALL
-
-        SELECT date, track_name, driver_id, driver_username, driver_color, qualifying_point AS session_point
-        FROM all_qualifying_points
-
-        UNION ALL
-
-        SELECT date, track_name, driver_id, driver_username, driver_color, free_practice_point AS session_point
-        FROM all_free_practice_points
-    )
-    WHERE driver_id = 6
-)
-GROUP BY date, track_name, driver_id, driver_username, driver_color, cumulative_points
+    SELECT
+        asp.date,
+        asp.track_name,
+        asp.driver_id,
+        asp.driver_username,
+        dc.driver_color,
+        SUM(asp.session_point) OVER (PARTITION BY asp.driver_id ORDER BY asp.date, asp.track_name) AS cumulative_points
+    FROM all_session_points asp
+    LEFT JOIN driver_colors dc ON asp.driver_id = dc.driver_id
+    GROUP BY asp.date, asp.track_name, asp.driver_id, asp.driver_username, dc.driver_color, asp.session_point
+    ORDER BY asp.driver_id, asp.date, asp.track_name;
       `);
     return JSON.stringify(result.rows);
   }
@@ -1286,46 +240,38 @@ ORDER BY date ASC
   }
 
   async getRaceResoult(): Promise<string> {
-      const result = await this.pool.query (`
-  SELECT 
-  inner_table.id AS track_id,
-  "1_place_id" AS "id_1_place",
-  "2_place_id" AS "id_2_place",
-  "3_place_id" AS "id_3_place",
-  "4_place_id" AS "id_4_place",
-  "5_place_id" AS "id_5_place",
-  "6_place_id" AS "id_6_place",
-  "fast_lap_id" AS "id_fast_lap",
-  "dnf" as "list_dnf"
-  FROM race_results
-  LEFT JOIN 
-  (
-  SELECT id, race_results_id, track_id
-  FROM gran_prix
-  ) AS inner_table
-  ON race_results.id = inner_table.race_results_id
-  WHERE session_type_id = 1
+      const result = await this.pool.query(`
+        SELECT
+          gp.id AS track_id,
+          MAX(CASE WHEN rre.position = 1 THEN rre.pilot_id END) AS id_1_place,
+          MAX(CASE WHEN rre.position = 2 THEN rre.pilot_id END) AS id_2_place,
+          MAX(CASE WHEN rre.position = 3 THEN rre.pilot_id END) AS id_3_place,
+          MAX(CASE WHEN rre.position = 4 THEN rre.pilot_id END) AS id_4_place,
+          MAX(CASE WHEN rre.position = 5 THEN rre.pilot_id END) AS id_5_place,
+          MAX(CASE WHEN rre.position = 6 THEN rre.pilot_id END) AS id_6_place,
+          MAX(CASE WHEN rre.fast_lap THEN rre.pilot_id END) AS id_fast_lap,
+          ARRAY_AGG(rre.pilot_id) FILTER (WHERE rre.position = 0) AS list_dnf
+        FROM gran_prix gp
+        LEFT JOIN race_results_entries rre ON gp.race_results_id = rre.race_results_id
+        WHERE gp.race_results_id IS NOT NULL
+        GROUP BY gp.id
 
-  UNION ALL
+        UNION ALL
 
-   SELECT 
-  inner_table.id AS track_id,
-  "1_place_id" AS "id_1_place",
-  "2_place_id" AS "id_2_place",
-  "3_place_id" AS "id_3_place",
-  "4_place_id" AS "id_4_place",
-  "5_place_id" AS "id_5_place",
-  "6_place_id" AS "id_6_place",
-  "fast_lap_id" AS "id_fast_lap",
-  "dnf" as "list_dnf"
-  FROM full_race_results
-  LEFT JOIN 
-  (
-  SELECT id, full_race_results_id, track_id
-  FROM gran_prix
-  ) AS inner_table
-  ON full_race_results.id = inner_table.full_race_results_id
-  WHERE session_type_id = 5
+        SELECT
+          gp.id AS track_id,
+          MAX(CASE WHEN frre.position = 1 THEN frre.pilot_id END) AS id_1_place,
+          MAX(CASE WHEN frre.position = 2 THEN frre.pilot_id END) AS id_2_place,
+          MAX(CASE WHEN frre.position = 3 THEN frre.pilot_id END) AS id_3_place,
+          MAX(CASE WHEN frre.position = 4 THEN frre.pilot_id END) AS id_4_place,
+          MAX(CASE WHEN frre.position = 5 THEN frre.pilot_id END) AS id_5_place,
+          MAX(CASE WHEN frre.position = 6 THEN frre.pilot_id END) AS id_6_place,
+          MAX(CASE WHEN frre.fast_lap THEN frre.pilot_id END) AS id_fast_lap,
+          ARRAY_AGG(frre.pilot_id) FILTER (WHERE frre.position = 0) AS list_dnf
+        FROM gran_prix gp
+        LEFT JOIN full_race_result_entries frre ON gp.full_race_results_id = frre.race_results_id
+        WHERE gp.full_race_results_id IS NOT NULL
+        GROUP BY gp.id
       `);
       return JSON.stringify(result.rows);
   }
