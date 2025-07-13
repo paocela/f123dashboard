@@ -306,12 +306,7 @@ export class FantaComponent {
   getPuntiDnf(trackId: number): number {
     let listDnf: string = this.getDnf(trackId);
     let votazione: number = this.getVoto(trackId, 8); // 8 is dnf
-    return this.validateDnf(listDnf, votazione) && votazione != 0 ? this.fantaService.getCorrectResponsePointDnf() : 0;
-  }
-
-  validateDnf(raceResultDnf: string, fantaVoteDnfId: number) {
-    let fantaVoteDnfUsername: string = this.piloti.find(driver => driver.driver_id == fantaVoteDnfId)?.driver_username;
-    return raceResultDnf.includes(fantaVoteDnfUsername);
+    return this.fantaService.isDnfCorrect(listDnf, votazione) && votazione != 0 ? this.fantaService.getCorrectResponsePointDnf() : 0;
   }
 
   getPuntiGp( trackId: number): number{
@@ -375,7 +370,7 @@ export class FantaComponent {
       color: 'red'
     };
 
-    if (this.validateDnf(pilotaList, votazione))
+    if (this.fantaService.isDnfCorrect(pilotaList, votazione))
     {
       status.icon = cilCheckAlt;
       status.color = 'green';

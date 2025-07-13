@@ -123,7 +123,8 @@ export class FantaService {
     // now list_dnf contains the driver_id, so we can check directly
     if (!raceResultDnf || !fantaVoteDnfId) return false;
     // raceResultDnf is a string like "{1,4}", so extract numbers
-    const ids = raceResultDnf.replace(/[{}]/g, '').split(',').map(id => Number(id.trim()));
+    const dnfStr = typeof raceResultDnf === 'string' ? raceResultDnf : String(raceResultDnf ?? '');
+    const ids = dnfStr.replace(/[{}]/g, '').split(',').map(id => Number(id.trim())).filter(id => !isNaN(id));
     return ids.includes(fantaVoteDnfId);
     
   }

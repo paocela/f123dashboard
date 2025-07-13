@@ -301,7 +301,7 @@
                               </div>
                             } @else {
                               <div class="fw-semibold text-center">
-                                @if (validateDnf(getDnf(track.track_id), voto))
+                                @if (fantaService.isDnfCorrect(getDnf(track.track_id), voto))
                                 {
                                   SI
                                 } @else {

@@ -1,5 +1,4 @@
 import { GenezioDeploy } from "@genezio/types";
-import { Observable } from 'rxjs';
 import axios from 'axios';
 
 interface TwitchTokenResponse {
@@ -34,6 +33,9 @@ export class DreandosTwitchInterface {
     private async getAccessToken(): Promise<string> {
         if (this.accessToken && Date.now() < this.tokenExpiration) {
             return this.accessToken;
+        }
+        if( !this.clientSecret ) {
+            throw new Error("Twitch client secret is not set.");
         }
 
         const body = new URLSearchParams();

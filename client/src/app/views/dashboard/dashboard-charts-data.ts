@@ -43,10 +43,10 @@ export class DashboardChartsData {
   }
 
   initMainChart(period: string = 'all', numberOfRaces: number = 8) {
-    const brandSuccess = getStyle('--cui-success') ?? '#4dbd74';
-    const brandInfo = getStyle('--cui-info') ?? '#20a8d8';
-    const brandInfoBg = hexToRgba(getStyle('--cui-info') ?? '#20a8d8', 10);
-    const brandDanger = getStyle('--cui-danger') ?? '#f86c6b';
+    // const brandSuccess = getStyle('--cui-success') ?? '#4dbd74';
+    // const brandInfo = getStyle('--cui-info') ?? '#20a8d8';
+    // const brandInfoBg = hexToRgba(getStyle('--cui-info') ?? '#20a8d8', 10);
+    // const brandDanger = getStyle('--cui-danger') ?? '#f86c6b';
 
     this.championshipTrend = this.dbData.getCumulativePoints() ;
     this.championshipTracks = this.dbData.getAllTracks();

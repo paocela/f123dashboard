@@ -51,12 +51,12 @@ SELECT
     t.country AS track_country,
 
     -- Race Results
-    race_results.driver_1_place,
-    race_results.driver_2_place,
-    race_results.driver_3_place,
-    race_results.driver_4_place,
-    race_results.driver_5_place,
-    race_results.driver_6_place,
+    race_results.driver_1_place AS driver_race_1_place,
+    race_results.driver_2_place AS driver_race_2_place,
+    race_results.driver_3_place AS driver_race_3_place,
+    race_results.driver_4_place AS driver_race_4_place,
+    race_results.driver_5_place AS driver_race_5_place,
+    race_results.driver_6_place AS driver_race_6_place,
     race_results.fast_lap_username AS driver_race_fast_lap,
     race_results.dnf_usernames AS race_dnf,
 
@@ -252,7 +252,7 @@ ORDER BY date ASC
           MAX(CASE WHEN rre.fast_lap THEN rre.pilot_id END) AS id_fast_lap,
           ARRAY_AGG(rre.pilot_id) FILTER (WHERE rre.position = 0) AS list_dnf
         FROM gran_prix gp
-        LEFT JOIN race_results_entries rre ON gp.race_results_id = rre.race_results_id
+        LEFT JOIN race_result_entries rre ON gp.race_results_id = rre.race_results_id
         WHERE gp.race_results_id IS NOT NULL
         GROUP BY gp.id
 
