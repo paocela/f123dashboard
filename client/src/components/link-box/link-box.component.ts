@@ -5,15 +5,14 @@ import { ButtonModule } from '@coreui/angular';
 import { cibInstagram, cibTwitch } from '@coreui/icons';
 
 @Component({
-  selector: 'app-link-box',
-  standalone: true,
-  imports: [
-    CommonModule,
-    IconDirective,
-    ButtonModule
-],
-  templateUrl: './link-box.component.html',
-  styleUrl: './link-box.component.scss'
+    selector: 'app-link-box',
+    imports: [
+        CommonModule,
+        IconDirective,
+        ButtonModule
+    ],
+    templateUrl: './link-box.component.html',
+    styleUrl: './link-box.component.scss'
 })
 
 export class LinkBoxComponent implements OnDestroy {

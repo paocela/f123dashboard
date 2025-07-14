@@ -36,42 +36,41 @@ import { ChangeDetectorRef } from '@angular/core';
 
 
 @Component({
-  selector: 'app-cards',
-  templateUrl: './piloti.component.html',
-  styleUrls: ['./piloti.component.scss'],
-  standalone: true,
-  changeDetection: ChangeDetectionStrategy.OnPush,  // Utilizzo di OnPush
-  imports: [
-    CommonModule,
-    RowComponent,
-    ColComponent,
-    TextColorDirective,
-    CardComponent,
-    CardHeaderComponent,
-    CardBodyComponent,
-    DocsExampleComponent,
-    NgTemplateOutlet,
-    CardTitleDirective,
-    CardTextDirective,
-    ButtonDirective,
-    CardSubtitleDirective,
-    CardLinkDirective,
-    RouterLink,
-    ListGroupDirective,
-    ListGroupItemDirective,
-    CardFooterComponent,
-    BorderDirective,
-    CardGroupComponent,
-    GutterDirective,
-    CardImgDirective,
-    TabsComponent,
-    TabsListComponent,
-    IconDirective,
-    TabDirective,
-    TabsContentComponent,
-    TabPanelComponent,
-    ChartjsComponent  // Aggiungi il modulo per i grafici
-  ]
+    selector: 'app-cards',
+    templateUrl: './piloti.component.html',
+    styleUrls: ['./piloti.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush, // Utilizzo di OnPush
+    imports: [
+        CommonModule,
+        RowComponent,
+        ColComponent,
+        TextColorDirective,
+        CardComponent,
+        CardHeaderComponent,
+        CardBodyComponent,
+        DocsExampleComponent,
+        NgTemplateOutlet,
+        CardTitleDirective,
+        CardTextDirective,
+        ButtonDirective,
+        CardSubtitleDirective,
+        CardLinkDirective,
+        RouterLink,
+        ListGroupDirective,
+        ListGroupItemDirective,
+        CardFooterComponent,
+        BorderDirective,
+        CardGroupComponent,
+        GutterDirective,
+        CardImgDirective,
+        TabsComponent,
+        TabsListComponent,
+        IconDirective,
+        TabDirective,
+        TabsContentComponent,
+        TabPanelComponent,
+        ChartjsComponent // Aggiungi il modulo per i grafici
+    ]
 })
 export class PilotiComponent implements OnInit {
 
