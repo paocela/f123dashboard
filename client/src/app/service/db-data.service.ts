@@ -29,13 +29,31 @@ export class DbDataService {
 /****************************************************************/
 
   async AllData() {
-    this.drivers = await PostgresService.getAllDrivers();
-    this.championship = await PostgresService.getChampionship();
-    this.cumulative_points = await PostgresService.getCumulativePoints();
-    this.tracks = await PostgresService.getAllTracks();
-    this.fantaVote = JSON.parse(await FantaService.getFantaVote());
-    this.users = JSON.parse(await PostgresService.getUsers());
-    this.raceResult = JSON.parse(await PostgresService.getRaceResoult());
+    const [
+      drivers,
+      championship,
+      cumulativePoints,
+      tracks,
+      fantaVote,
+      users,
+      raceResult
+    ] = await Promise.all([
+      PostgresService.getAllDrivers(),
+      PostgresService.getChampionship(),
+      PostgresService.getCumulativePoints(),
+      PostgresService.getAllTracks(),
+      FantaService.getFantaVote(),
+      PostgresService.getUsers(),
+      PostgresService.getRaceResoult()
+    ]);
+
+    this.drivers = drivers;
+    this.championship = championship;
+    this.cumulative_points = cumulativePoints;
+    this.tracks = tracks;
+    this.fantaVote = JSON.parse(fantaVote);
+    this.users = JSON.parse(users);
+    this.raceResult = JSON.parse(raceResult);
   } 
 
 /****************************************************************/

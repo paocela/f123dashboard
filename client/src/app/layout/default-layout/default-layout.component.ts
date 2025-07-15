@@ -35,7 +35,6 @@ function isOverflown(element: HTMLElement) {
         SidebarHeaderComponent,
         SidebarBrandComponent,
         RouterLink,
-        IconDirective,
         NgScrollbar,
         SidebarNavComponent,
         SidebarFooterComponent,

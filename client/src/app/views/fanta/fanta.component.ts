@@ -61,7 +61,7 @@ interface voteStatus {
         UtilitiesModule,
         BadgeComponent,
         LeaderboardComponent,
-        ModalComponent, ModalHeaderComponent, ModalTitleDirective, ThemeDirective, ButtonCloseDirective, ModalBodyComponent, ModalFooterComponent
+        ModalComponent, ModalHeaderComponent, ModalTitleDirective, ThemeDirective, ButtonCloseDirective, ModalBodyComponent
     ],
     templateUrl: './fanta.component.html',
     styleUrl: './fanta.component.scss'

@@ -9,7 +9,7 @@ import {DbDataService} from 'src/app/service/db-data.service';  //aggiunto il se
 
 @Component({
     selector: 'app-championship',
-    imports: [BadgeComponent, ContainerComponent, IconDirective, CommonModule, IconDirective, RowComponent, ColComponent, TextColorDirective, CardComponent, CardHeaderComponent, CardBodyComponent, DocsExampleComponent, TableDirective, TableColorDirective, TableActiveDirective, BorderDirective, AlignDirective],
+    imports: [BadgeComponent, ContainerComponent, IconDirective, CommonModule, IconDirective, RowComponent, ColComponent, TextColorDirective, CardComponent, CardHeaderComponent, CardBodyComponent, TableDirective],
     templateUrl: './championship.component.html',
     styleUrl: './championship.component.scss'
 })
