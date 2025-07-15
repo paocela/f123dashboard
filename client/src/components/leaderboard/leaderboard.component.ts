@@ -13,18 +13,17 @@ import { AvatarComponent, TextColorDirective } from '@coreui/angular';
 
 
 @Component({
-  selector: 'app-leaderboard',
-  standalone: true,
-  imports: [
-    CommonModule,
-    GridModule,
-    TableDirective,
-    IconDirective,
-    TextColorDirective, 
-    AvatarComponent
-  ],
-  templateUrl: './leaderboard.component.html',
-  styleUrl: './leaderboard.component.scss',
+    selector: 'app-leaderboard',
+    imports: [
+        CommonModule,
+        GridModule,
+        TableDirective,
+        IconDirective,
+        TextColorDirective,
+        AvatarComponent
+    ],
+    templateUrl: './leaderboard.component.html',
+    styleUrl: './leaderboard.component.scss'
 })
 
 export class LeaderboardComponent {

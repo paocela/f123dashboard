@@ -1,5 +1,5 @@
-import { ApplicationConfig, importProvidersFrom, APP_INITIALIZER  } from '@angular/core';
-import { provideAnimations } from '@angular/platform-browser/animations';
+import { ApplicationConfig, importProvidersFrom, inject, provideAppInitializer } from '@angular/core';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideHttpClient } from '@angular/common/http';
 import {DbDataService} from 'src/app/service/db-data.service';
 import {
@@ -39,16 +39,14 @@ export const appConfig: ApplicationConfig = {
     ),
     importProvidersFrom(SidebarModule, DropdownModule),
     IconSetService,
-    provideAnimations(),
+    provideAnimationsAsync(),
 
     provideHttpClient(),
     DbDataService,
     TwitchApiService,
-    {
-      provide: APP_INITIALIZER,
-      useFactory: initializeApp,
-      deps: [DbDataService, TwitchApiService],
-      multi: true
-    }
+    provideAppInitializer(() => {
+        const initializerFn = (initializeApp)(inject(DbDataService), inject(TwitchApiService));
+        return initializerFn();
+      })
   ]
 };

@@ -14,10 +14,9 @@ import { SeasonService } from 'src/app/service/season.service';
 import { TwitchApiService } from './service/twitch-api.service';  
 
 @Component({
-  selector: 'app-root',
-  template: '<router-outlet />',
-  standalone: true,
-  imports: [RouterOutlet,]
+    selector: 'app-root',
+    template: '<router-outlet />',
+    imports: [RouterOutlet,]
 })
 export class AppComponent implements OnInit {
   title = 'F1 RaceForFederica';
