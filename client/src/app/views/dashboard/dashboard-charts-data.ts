@@ -4,13 +4,9 @@ import {
   ChartDataset,
   ChartOptions,
   ChartType,
-  PluginOptionsByType,
-  ScaleOptions,
-  TooltipLabelStyle
-} from 'chart.js';
+  ScaleOptions} from 'chart.js';
 
-import { DeepPartial } from './utils';
-import { getStyle, hexToRgba } from '@coreui/utils';
+import { getStyle } from '@coreui/utils';
 import {DbDataService} from 'src/app/service/db-data.service';  //aggiunto il servizio per dati db
 
 export interface IChartProps {

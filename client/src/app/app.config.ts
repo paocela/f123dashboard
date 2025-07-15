@@ -18,8 +18,10 @@ import { TwitchApiService } from './service/twitch-api.service';
 
 export function initializeApp(dbDataService: DbDataService, twitchApiService: TwitchApiService) {
   return async () => {
-    await dbDataService.AllData();
-    await twitchApiService.checkStreamStatus();
+    await Promise.all([
+      dbDataService.AllData(),
+      twitchApiService.checkStreamStatus()
+    ]);
   };
 }
 
