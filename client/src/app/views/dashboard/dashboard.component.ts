@@ -1,6 +1,6 @@
-import { DOCUMENT, formatDate, NgStyle } from '@angular/common';
+import { formatDate, NgStyle } from '@angular/common';
 import { CommonModule } from '@angular/common'; // Importa CommonModule
-import { Component, DestroyRef, effect, inject, OnInit, Renderer2, signal, ViewChild, WritableSignal } from '@angular/core';
+import { Component, DestroyRef, effect, inject, OnInit, Renderer2, signal, ViewChild, WritableSignal, DOCUMENT } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import {DbDataService} from 'src/app/service/db-data.service';  //aggiunto il servizio per dati db
 import { ChartOptions } from 'chart.js';
