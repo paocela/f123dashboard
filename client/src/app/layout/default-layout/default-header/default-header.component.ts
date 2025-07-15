@@ -32,10 +32,9 @@ import { CountdownComponent } from 'src/app/components/countdown/countdown.compo
 import { LinkBoxComponent, icons } from "../../../../components/link-box/link-box.component";
 
 @Component({
-  selector: 'app-default-header',
-  templateUrl: './default-header.component.html',
-  standalone: true,
-  imports: [CountdownComponent, ContainerComponent, HeaderTogglerDirective, SidebarToggleDirective, IconDirective, HeaderNavComponent, NavItemComponent, NavLinkDirective, RouterLink, RouterLinkActive, NgTemplateOutlet, BreadcrumbRouterComponent, ThemeDirective, DropdownComponent, DropdownToggleDirective, DropdownMenuDirective, DropdownItemDirective, LinkBoxComponent]
+    selector: 'app-default-header',
+    templateUrl: './default-header.component.html',
+    imports: [CountdownComponent, ContainerComponent, HeaderTogglerDirective, SidebarToggleDirective, IconDirective, HeaderNavComponent, NavItemComponent, NavLinkDirective, RouterLink, RouterLinkActive, NgTemplateOutlet, BreadcrumbRouterComponent, ThemeDirective, DropdownComponent, DropdownToggleDirective, DropdownMenuDirective, DropdownItemDirective, LinkBoxComponent]
 })
 export class DefaultHeaderComponent extends HeaderComponent {
 

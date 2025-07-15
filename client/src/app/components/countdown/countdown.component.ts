@@ -23,14 +23,13 @@ interface timeInterface {
 }
 
 @Component({
-  selector: 'countdown-component',
-  standalone: true,
-  imports: [
-    CommonModule,
-    CardComponent, CardBodyComponent
-],
-  templateUrl: './countdown.component.html',
-  styleUrl: './countdown.component.scss'
+    selector: 'countdown-component',
+    imports: [
+        CommonModule,
+        CardComponent, CardBodyComponent
+    ],
+    templateUrl: './countdown.component.html',
+    styleUrl: './countdown.component.scss'
 })
 export class CountdownComponent implements OnInit, OnDestroy {
 

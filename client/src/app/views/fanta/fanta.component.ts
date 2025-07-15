@@ -41,31 +41,30 @@ interface voteStatus {
 }
 
 @Component({
-  selector: 'app-fanta',
-  standalone: true,
-  imports: [
-    NgIf,
-    CommonModule,
-    FormsModule,
-    FormModule,
-    ButtonDirective,
-    GridModule,
-    SharedModule,
-    AccordionComponent,
-    AccordionItemComponent,
-    TemplateIdDirective,
-    AccordionButtonDirective,
-    IconDirective,
-    DatePipe,
-    TableDirective,
-    AvatarComponent,
-    UtilitiesModule,
-    BadgeComponent,
-    LeaderboardComponent,
-    ModalComponent, ModalHeaderComponent, ModalTitleDirective, ThemeDirective, ButtonCloseDirective, ModalBodyComponent, ModalFooterComponent
-],
-  templateUrl: './fanta.component.html',
-  styleUrl: './fanta.component.scss'
+    selector: 'app-fanta',
+    imports: [
+        NgIf,
+        CommonModule,
+        FormsModule,
+        FormModule,
+        ButtonDirective,
+        GridModule,
+        SharedModule,
+        AccordionComponent,
+        AccordionItemComponent,
+        TemplateIdDirective,
+        AccordionButtonDirective,
+        IconDirective,
+        DatePipe,
+        TableDirective,
+        AvatarComponent,
+        UtilitiesModule,
+        BadgeComponent,
+        LeaderboardComponent,
+        ModalComponent, ModalHeaderComponent, ModalTitleDirective, ThemeDirective, ButtonCloseDirective, ModalBodyComponent, ModalFooterComponent
+    ],
+    templateUrl: './fanta.component.html',
+    styleUrl: './fanta.component.scss'
 })
 export class FantaComponent {
   // 1 = success, 2 = error

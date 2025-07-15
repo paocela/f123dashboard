@@ -1,6 +1,6 @@
-import { DOCUMENT, formatDate, NgStyle } from '@angular/common';
+import { formatDate, NgStyle } from '@angular/common';
 import { CommonModule } from '@angular/common'; // Importa CommonModule
-import { Component, DestroyRef, effect, inject, OnInit, Renderer2, signal, ViewChild, WritableSignal } from '@angular/core';
+import { Component, DestroyRef, effect, inject, OnInit, Renderer2, signal, ViewChild, WritableSignal, DOCUMENT } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import {DbDataService} from 'src/app/service/db-data.service';  //aggiunto il servizio per dati db
 import { ChartOptions } from 'chart.js';
@@ -63,44 +63,43 @@ interface NextTrack {
 }
 
 @Component({
-  selector: 'app-dashboard',
-  templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss'],
-  standalone: true,
-  imports: [
-    LoadingSpinnerComponent,
-    LeaderboardComponent, 
-    ModalModule, 
-    BadgeComponent, 
-    ThemeDirective, 
-    CarouselComponent, 
-    CarouselIndicatorsComponent, 
-    CarouselInnerComponent, 
-    CarouselItemComponent, 
-    CarouselControlComponent, 
-    RouterLink, 
-    DatePipe, 
-    CommonModule, 
-    TextColorDirective, 
-    CardComponent, 
-    CardBodyComponent, 
-    RowComponent, 
-    ColComponent, 
-    ButtonDirective, 
-    IconDirective, 
-    ReactiveFormsModule, 
-    ButtonGroupComponent, 
-    FormCheckLabelDirective, 
-    ChartjsComponent, 
-    NgStyle, 
-    CardFooterComponent, 
-    GutterDirective, 
-    ProgressBarDirective, 
-    ProgressComponent, 
-    CardHeaderComponent, 
-    TableDirective, 
-    AvatarComponent
-  ]
+    selector: 'app-dashboard',
+    templateUrl: './dashboard.component.html',
+    styleUrls: ['./dashboard.component.scss'],
+    imports: [
+        LoadingSpinnerComponent,
+        LeaderboardComponent,
+        ModalModule,
+        BadgeComponent,
+        ThemeDirective,
+        CarouselComponent,
+        CarouselIndicatorsComponent,
+        CarouselInnerComponent,
+        CarouselItemComponent,
+        CarouselControlComponent,
+        RouterLink,
+        DatePipe,
+        CommonModule,
+        TextColorDirective,
+        CardComponent,
+        CardBodyComponent,
+        RowComponent,
+        ColComponent,
+        ButtonDirective,
+        IconDirective,
+        ReactiveFormsModule,
+        ButtonGroupComponent,
+        FormCheckLabelDirective,
+        ChartjsComponent,
+        NgStyle,
+        CardFooterComponent,
+        GutterDirective,
+        ProgressBarDirective,
+        ProgressComponent,
+        CardHeaderComponent,
+        TableDirective,
+        AvatarComponent
+    ]
 })
 export class DashboardComponent implements OnInit {
   @ViewChild('championshipResoult', { static: true }) championshipResoult!: ModalComponent;

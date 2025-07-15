@@ -8,11 +8,10 @@ import { IconDirective } from '@coreui/icons-angular';
 import {DbDataService} from 'src/app/service/db-data.service';  //aggiunto il servizio per dati db
 
 @Component({
-  selector: 'app-championship',
-  standalone: true,
-  imports: [BadgeComponent, ContainerComponent, IconDirective, CommonModule, IconDirective, RowComponent, ColComponent, TextColorDirective, CardComponent, CardHeaderComponent, CardBodyComponent, DocsExampleComponent, TableDirective, TableColorDirective, TableActiveDirective, BorderDirective, AlignDirective],
-  templateUrl: './championship.component.html',
-  styleUrl: './championship.component.scss'
+    selector: 'app-championship',
+    imports: [BadgeComponent, ContainerComponent, IconDirective, CommonModule, IconDirective, RowComponent, ColComponent, TextColorDirective, CardComponent, CardHeaderComponent, CardBodyComponent, DocsExampleComponent, TableDirective, TableColorDirective, TableActiveDirective, BorderDirective, AlignDirective],
+    templateUrl: './championship.component.html',
+    styleUrl: './championship.component.scss'
 })
 export class ChampionshipComponent implements OnInit{
 

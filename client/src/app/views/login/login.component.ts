@@ -20,30 +20,29 @@ import { cilWarning } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
 
 @Component({
-  selector: 'app-login',
-  standalone: true,
-  imports: [
-    NgIf,
-    CommonModule,
-    FormsModule,
-    FormModule,
-    ButtonDirective,
-    GridModule,
-    LeaderboardComponent,
-    ModalComponent,
-    ModalHeaderComponent,
-    ModalBodyComponent, 
-    ModalFooterComponent,
-    ModalToggleDirective,
-    IconDirective,
-    CardBodyComponent,
-    CardComponent,
-    CardHeaderComponent,
-    CardTextDirective,
-    CardTitleDirective
-  ],
-  templateUrl: './login.component.html',
-  styleUrl: './login.component.scss'
+    selector: 'app-login',
+    imports: [
+        NgIf,
+        CommonModule,
+        FormsModule,
+        FormModule,
+        ButtonDirective,
+        GridModule,
+        LeaderboardComponent,
+        ModalComponent,
+        ModalHeaderComponent,
+        ModalBodyComponent,
+        ModalFooterComponent,
+        ModalToggleDirective,
+        IconDirective,
+        CardBodyComponent,
+        CardComponent,
+        CardHeaderComponent,
+        CardTextDirective,
+        CardTitleDirective
+    ],
+    templateUrl: './login.component.html',
+    styleUrl: './login.component.scss'
 })
 
 export class LoginComponent {
