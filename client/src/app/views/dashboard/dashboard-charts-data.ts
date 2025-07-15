@@ -9,7 +9,7 @@ import {
   TooltipLabelStyle
 } from 'chart.js';
 
-import { DeepPartial } from 'chart.js/dist/types/utils';
+import { DeepPartial } from './utils';
 import { getStyle, hexToRgba } from '@coreui/utils';
 import {DbDataService} from 'src/app/service/db-data.service';  //aggiunto il servizio per dati db
 
@@ -43,10 +43,6 @@ export class DashboardChartsData {
   }
 
   initMainChart(period: string = 'all', numberOfRaces: number = 8) {
-    const brandSuccess = getStyle('--cui-success') ?? '#4dbd74';
-    const brandInfo = getStyle('--cui-info') ?? '#20a8d8';
-    const brandInfoBg = hexToRgba(getStyle('--cui-info') ?? '#20a8d8', 10);
-    const brandDanger = getStyle('--cui-danger') ?? '#f86c6b';
 
     this.championshipTrend = this.dbData.getCumulativePoints() ;
     this.championshipTracks = this.dbData.getAllTracks();
@@ -189,16 +185,6 @@ export class DashboardChartsData {
       }
     ];
 
-    const plugins: DeepPartial<PluginOptionsByType<any>> = {
-      legend: {
-        display: false
-      },
-      tooltip: {
-        callbacks: {
-          labelColor: (context) => ({ backgroundColor: context.dataset.borderColor } as TooltipLabelStyle)
-        }
-      }
-    };
 
     const scales = this.getScales();
     const radius = screenWidth > 900 ? 900 : screenWidth;
