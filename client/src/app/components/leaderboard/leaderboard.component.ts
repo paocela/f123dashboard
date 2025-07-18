@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, input, Input } from '@angular/core';
 import { GridModule, TableDirective } from '@coreui/angular';
-import { User, USERS } from '../../app/model/user';
-import { LeaderBoard } from '../../app/model/leaderboard'
+import { User, USERS } from '../../../app/model/user';
+import { LeaderBoard } from '../../../app/model/leaderboard'
 import { forEach } from 'lodash-es';
 import { ReturnStatement } from '@angular/compiler';
 import { FantaService } from 'src/app/service/fanta.service';

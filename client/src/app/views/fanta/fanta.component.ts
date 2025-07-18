@@ -22,7 +22,7 @@ import { cifAe, cifAt, cifAu, cifAz, cifBe, cifBh, cifBr, cifCa, cifCn, cifEs, c
 import { cilFire, cilPowerStandby } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
 import { Fanta, RaceResult } from '../../model/fanta';
-import { LeaderboardComponent } from "../../../components/leaderboard/leaderboard.component";
+import { LeaderboardComponent } from "../../components/leaderboard/leaderboard.component";
 import {
   ButtonCloseDirective,
   ModalBodyComponent,

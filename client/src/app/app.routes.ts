@@ -35,15 +35,16 @@ export const routes: Routes = [
         path: 'championship',
         loadChildren: () => import('./views/championship/routes').then((m) => m.routes)
       },
-       /* routing fanta */
+      /* routing fanta-dashboard */
       {
-        path: 'fanta',
-        loadChildren: () => import('./views/fanta/routes').then((m) => m.routes),
-        canActivate: [authGuard]
+        path: 'fanta-dashboard',
+        loadChildren: () => import('./views/fanta-dashboard/routes').then((m) => m.routes),
       },
-      { 
-        path: 'login', 
-        loadChildren: () => import('./views/login/routes').then((m) => m.routes) 
+      /* routing fanta */
+      {
+      path: 'fanta',
+      loadChildren: () => import('./views/fanta/routes').then((m) => m.routes),
+      canActivate: [authGuard]
       }
     ]
   },
