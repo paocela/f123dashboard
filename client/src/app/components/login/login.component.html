@@ -54,14 +54,16 @@
       <ul cDropdownMenu>
         <li>
           <a cDropdownItem>
-            <c-row class="align-items-center">
-              <c-col>
-                <button cButton (click)="onLogout()" color="transparent">Logout</button>
-              </c-col>
-              <c-col cols="auto">
-                <svg [cIcon]="logoutIcon" style="width: 1rem; height: 1rem;"></svg>
-              </c-col>
-            </c-row>
+            <button cButton (click)="onLogout()" color="transparent">
+              <c-row class="align-items-center">
+                <c-col>
+                  Logout
+                </c-col>
+                <c-col cols="auto">
+                  <svg [cIcon]="logoutIcon" style="width: 1rem; height: 1rem;"></svg>
+                </c-col>
+              </c-row>
+            </button>
           </a>
         </li>
       </ul>

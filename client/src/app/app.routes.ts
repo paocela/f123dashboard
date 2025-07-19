@@ -42,9 +42,15 @@ export const routes: Routes = [
       },
       /* routing fanta */
       {
-      path: 'fanta',
-      loadChildren: () => import('./views/fanta/routes').then((m) => m.routes),
-      canActivate: [authGuard]
+        path: 'fanta',
+        loadChildren: () => import('./views/fanta/routes').then((m) => m.routes),
+        canActivate: [authGuard]
+      },
+      /* routing admin */
+      {
+        path: 'admin',
+        loadChildren: () => import('./views/admin/routes').then((m) => m.routes),
+        canActivate: [authGuard]
       }
     ]
   },

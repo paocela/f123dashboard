@@ -26,7 +26,12 @@ export const navItems: INavData[] = [
   {
     name: 'Fanta',
     url: '/fanta',
-    iconComponent: { name: 'cil-gamepad' },
+    iconComponent: { name: 'cil-gamepad' }
+  },
+  {
+    name: 'Admin',
+    url: '/admin',
+    iconComponent: { name: 'cil-settings' },
     badge: {
       color: 'warning',
       text: 'BETA'

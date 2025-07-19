@@ -10,11 +10,26 @@ export const authGuard: CanActivateFn = (route, state) => {
   return authService.isAuthenticated$.pipe(
     take(1),
     map(isAuthenticated => {
+      const currentUser = authService.getCurrentUser();
+
       if (!isAuthenticated) {
-        // Store the attempted URL for redirecting after login
         sessionStorage.setItem('returnUrl', state.url);
-        router.navigate(['/login']);
-        return false;
+
+        if (state.url === '/fanta') {
+          return router.createUrlTree(['/fanta-dashboard']);
+        } else if (state.url === '/admin') {
+          return router.createUrlTree(['/dashboard']);
+        }
+
+        return router.createUrlTree(['/login']); // default fallback
+      } else {
+        if (state.url === '/admin') {
+          if (currentUser?.username === 'admin') {
+            return true; // allow access
+          } else {
+            return router.createUrlTree(['/dashboard']); // redirect if not admin
+          }
+        }
       }
       return true;
     })
