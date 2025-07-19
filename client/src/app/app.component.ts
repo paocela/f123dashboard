@@ -7,6 +7,7 @@ import { delay, filter, map, tap } from 'rxjs/operators';
 import { ColorModeService } from '@coreui/angular';
 import { IconSetService } from '@coreui/icons-angular';
 import { iconSubset } from './icons/icon-subset';
+import { cilCoffee } from '@coreui/icons';
 
 import { ChangeDetectorRef } from '@angular/core';
 import { DbDataService } from 'src/app/service/db-data.service';  //aggiunto il servizio per dati db
@@ -37,7 +38,7 @@ export class AppComponent implements OnInit {
   ) {
     this.#titleService.setTitle(this.title);
     // iconSet singleton
-    this.#iconSetService.icons = { ...iconSubset };
+    this.#iconSetService.icons = { ...iconSubset, cilCoffee };
     this.#colorModeService.localStorageItemName.set('coreui-free-angular-admin-template-theme-default');
     this.#colorModeService.eventName.set('ColorSchemeChange');
   }

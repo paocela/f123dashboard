@@ -51,6 +51,11 @@ export const routes: Routes = [
         path: 'admin',
         loadChildren: () => import('./views/admin/routes').then((m) => m.routes),
         canActivate: [authGuard]
+      },
+      /* routing credits */
+      {
+        path: 'credits',
+        loadChildren: () => import('./views/credits/routes').then((m) => m.routes)
       }
     ]
   },
