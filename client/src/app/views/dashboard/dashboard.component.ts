@@ -35,7 +35,7 @@ import { IconDirective } from '@coreui/icons-angular';
 import { cilCalendar, cilMap, cilFire } from '@coreui/icons';
 import { cifBh, cifAt, cifMc, cifJp, cifHu, cifCn, cifCa, cifEs, cifGb, cifBe, cifNl, cifAz, cifSg, cifIt, cifUs, cifAu, cifMx, cifBr, cifQa, cifAe, cifSa } from '@coreui/icons';
 import { DatePipe } from '@angular/common';
-import { LeaderboardComponent } from "../../../components/leaderboard/leaderboard.component";
+import { LeaderboardComponent } from "../../components/leaderboard/leaderboard.component";
 import { DashboardChartsData, IChartProps } from './dashboard-charts-data';
 import { TwitchApiService } from '../../service/twitch-api.service';
 import { BehaviorSubject } from 'rxjs';

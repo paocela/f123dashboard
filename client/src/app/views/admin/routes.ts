@@ -3,11 +3,10 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: '',
-    loadComponent: () => import('./login.component').then(m => m.LoginComponent),
+    loadComponent: () => import('./admin.component').then(m => m.AdminComponent),
     data: {
-      title: `Fanta`
+      title: $localize`Admin`
     }
   }
 ];
 
-  

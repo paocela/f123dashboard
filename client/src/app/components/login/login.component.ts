@@ -1,26 +1,18 @@
 import { NgIf } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, ViewChild} from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';    
 import { FormsModule } from '@angular/forms';
 import { FormModule } from '@coreui/angular';
 import { AuthService } from './../../service/auth.service';
-import { GridModule, ButtonDirective, ModalComponent, ModalHeaderComponent, ModalBodyComponent, ModalFooterComponent, ModalToggleDirective,
-  CardBodyComponent,
-  CardComponent,
-  CardHeaderComponent,
-  CardTextDirective,
-  CardTitleDirective
-} from '@coreui/angular';
-import { LeaderboardComponent } from "../../../components/leaderboard/leaderboard.component";
+import {   AvatarComponent, DropdownCloseDirective, DropdownComponent, DropdownItemDirective, DropdownMenuDirective, DropdownToggleDirective, GridModule, ButtonDirective, ModalComponent, ModalHeaderComponent, ModalBodyComponent, ModalFooterComponent, ModalToggleDirective} from '@coreui/angular';
 import { DbDataService } from '../../../app/service/db-data.service';
-import { FantaPlayer } from '../../model/fanta';
-import { User } from '../../../app/model/user';
-import { cilWarning } from '@coreui/icons';
+import { cilWarning, cilAccountLogout } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
+import { User } from 'src/app/model/user';
 
 @Component({
-    selector: 'app-login',
+    selector: 'login-component',
     imports: [
     NgIf,
     CommonModule,
@@ -28,23 +20,27 @@ import { IconDirective } from '@coreui/icons-angular';
     FormModule,
     ButtonDirective,
     GridModule,
-    LeaderboardComponent,
     ModalComponent,
     ModalHeaderComponent,
     ModalBodyComponent,
     ModalFooterComponent,
     ModalToggleDirective,
     IconDirective,
-    CardBodyComponent,
-    CardComponent,
-    CardHeaderComponent,
-    CardTextDirective
+    DropdownComponent,
+    DropdownToggleDirective,
+    DropdownMenuDirective,
+    DropdownItemDirective,
+    DropdownCloseDirective,
+    AvatarComponent
 ],
     templateUrl: './login.component.html',
     styleUrl: './login.component.scss'
 })
 
 export class LoginComponent {
+  // Current user id
+  loggedUserId: string = 'default';
+
   // Login form fields
   username: string = '';
   password: string = '';
@@ -58,6 +54,7 @@ export class LoginComponent {
   
   // State management
   isLoading: boolean = false;
+  isLoggedIn: boolean = false;
   singInErrorMessage: string = '';
   errorMessage: string = '';
   successMessage: string = '';
@@ -68,6 +65,9 @@ export class LoginComponent {
   passwordError: string = '';
   
   public warningIcon: string[] = cilWarning;
+  public logoutIcon: string[] = cilAccountLogout;
+
+  @ViewChild('loginDropdown') dropdown!: DropdownComponent;
 
   constructor(
     private authService: AuthService, 
@@ -75,12 +75,14 @@ export class LoginComponent {
     private route: ActivatedRoute,
     private dbData: DbDataService
   ) {}
+  
 
   ngOnInit(): void {
     // Check if user is already logged in
     this.authService.isAuthenticated$.subscribe(isAuth => {
       if (isAuth) {
         this.router.navigate(['/fanta']);
+        this.loggedUserId = String(this.authService.getCurrentUserId());
       }
     });
   }
@@ -101,6 +103,8 @@ export class LoginComponent {
 
       if (response.success) {
         this.successMessage = 'Login successful! Redirecting...';
+        this.dropdown.toggleDropdown();
+        this.isLoggedIn = true;
         // Navigation is handled by the auth service
       } else {
         this.errorMessage = response.message || 'Login failed. Please try again.';
@@ -110,6 +114,16 @@ export class LoginComponent {
       console.error('Login error:', error);
     } finally {
       this.isLoading = false;
+    }
+  }
+
+  async onLogout() {
+    try {
+      const response = await this.authService.logout();
+      this.isLoggedIn = false;
+      this.loggedUserId = 'default';
+    } catch (error) {
+    } finally {
     }
   }
 

@@ -1,16 +1,11 @@
 import { NgStyle, NgTemplateOutlet } from '@angular/common';
 import { Component, computed, inject, input } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-
 import {
-  AvatarComponent,
-  BadgeComponent,
   BreadcrumbRouterComponent,
   ColorModeService,
   ContainerComponent,
   DropdownComponent,
-  DropdownDividerDirective,
-  DropdownHeaderDirective,
   DropdownItemDirective,
   DropdownMenuDirective,
   DropdownToggleDirective,
@@ -19,22 +14,20 @@ import {
   HeaderTogglerDirective,
   NavItemComponent,
   NavLinkDirective,
-  ProgressBarDirective,
-  ProgressComponent,
   SidebarToggleDirective,
-  TextColorDirective,
   ThemeDirective
 } from '@coreui/angular';
 
 import { IconDirective } from '@coreui/icons-angular';
 
 import { CountdownComponent } from 'src/app/components/countdown/countdown.component'
+import { LoginComponent } from 'src/app/components/login/login.component'
 import { LinkBoxComponent, icons } from "../../../../components/link-box/link-box.component";
 
 @Component({
     selector: 'app-default-header',
     templateUrl: './default-header.component.html',
-    imports: [CountdownComponent, ContainerComponent, HeaderTogglerDirective, SidebarToggleDirective, IconDirective, HeaderNavComponent, NavItemComponent, NavLinkDirective, RouterLink, RouterLinkActive, NgTemplateOutlet, BreadcrumbRouterComponent, ThemeDirective, DropdownComponent, DropdownToggleDirective, DropdownMenuDirective, DropdownItemDirective, LinkBoxComponent]
+    imports: [LoginComponent, CountdownComponent, ContainerComponent, HeaderTogglerDirective, SidebarToggleDirective, IconDirective, HeaderNavComponent, NavItemComponent, NavLinkDirective, RouterLink, RouterLinkActive, NgTemplateOutlet, BreadcrumbRouterComponent, ThemeDirective, DropdownComponent, DropdownToggleDirective, DropdownMenuDirective, DropdownItemDirective, LinkBoxComponent]
 })
 export class DefaultHeaderComponent extends HeaderComponent {
 

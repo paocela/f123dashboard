@@ -27,6 +27,9 @@
       <c-nav-item>
         <a cNavLink routerLink="/fanta" routerLinkActive="fanta">Fanta</a>
       </c-nav-item>
+      <c-nav-item>
+        <a cNavLink routerLink="/admin" routerLinkActive="admin">Admin</a>
+      </c-nav-item>
     </c-header-nav>
 
     <c-header-nav class="d-none d-md-flex ms-auto "></c-header-nav>
@@ -57,6 +60,11 @@
         <div class="vr h-100 mx-2 text-body text-opacity-75"></div>
       </div>
     </c-header-nav>
+
+  <div class="login">
+    <login-component ></login-component>
+  </div>
+    
 
   </c-container>
   <c-container [fluid]="true" class="px-4">

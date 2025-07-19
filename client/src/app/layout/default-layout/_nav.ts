@@ -1,4 +1,5 @@
 import { INavData } from '@coreui/angular';
+import { cilCoffee } from '@coreui/icons';
 
 
 export const navItems: INavData[] = [
@@ -26,7 +27,21 @@ export const navItems: INavData[] = [
   {
     name: 'Fanta',
     url: '/fanta',
-    iconComponent: { name: 'cil-gamepad' },
+    iconComponent: { name: 'cil-gamepad' }
+  },
+  {
+    name: 'Admin',
+    url: '/admin',
+    iconComponent: { name: 'cil-settings' },
+    badge: {
+      color: 'warning',
+      text: 'BETA'
+    }
+  },
+  {
+    name: 'Credits',
+    url: '/credits',
+    iconComponent: { name: 'cil-coffee' },
     badge: {
       color: 'warning',
       text: 'BETA'

@@ -69,9 +69,8 @@ export class AuthService {
         this.setAuthenticatedUser(response.user);
         this.scheduleTokenRefresh();
         
-        // Navigate to dashboard or return URL
-        const returnUrl = sessionStorage.getItem('returnUrl') || '/dashboard';
-        sessionStorage.removeItem('returnUrl');
+        // Navigate to fanta or admin page
+        const returnUrl = loginData.username == 'admin' ? '/admin' : '/fanta';
         this.router.navigate([returnUrl]);
       }
       
