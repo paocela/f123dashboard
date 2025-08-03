@@ -1,38 +1,21 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common'; 
-import { RouterLink } from '@angular/router';
-import { NgTemplateOutlet } from '@angular/common';
-import { DocsExampleComponent } from '@docs-components/public-api';
 import {DbDataService} from 'src/app/service/db-data.service';  //aggiunto il servizio per dati db
-import { ChartData, ChartOptions } from 'chart.js';  // Import per i grafici
+import { ChartOptions } from 'chart.js';  // Import per i grafici
 import { 
   BorderDirective,
-  ButtonDirective,
   CardBodyComponent,
   CardComponent,
-  CardFooterComponent,
-  CardGroupComponent,
-  CardHeaderComponent,
   CardImgDirective,
-  CardLinkDirective,
-  CardSubtitleDirective,
   CardTextDirective,
   CardTitleDirective,
   ColComponent,
-  GutterDirective,
   ListGroupDirective,
   ListGroupItemDirective,
   RowComponent,
-  TabDirective,
-  TabPanelComponent,
-  TabsComponent,
-  TabsContentComponent,
-  TabsListComponent,
   TextColorDirective
 } from '@coreui/angular';
 import { ChartjsComponent } from '@coreui/angular-chartjs';  // Import per il componente grafici
-import { IconDirective } from '@coreui/icons-angular';
-import { ChangeDetectorRef } from '@angular/core';
 
 
 @Component({
