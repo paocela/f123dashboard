@@ -3,10 +3,10 @@ import {
   CardBodyComponent,
   CardComponent,
   CardImgDirective,
-  CardTextDirective,
   CardTitleDirective,
   ColComponent,
-  RowComponent
+  RowComponent,
+  ButtonDirective
 } from '@coreui/angular'
 
 @Component({
@@ -15,10 +15,10 @@ import {
     CardComponent,
     CardBodyComponent,
     CardTitleDirective,
-    CardTextDirective,
     CardImgDirective,
     ColComponent,
-    RowComponent
+    RowComponent,
+    ButtonDirective
   ],
   templateUrl: './credits.component.html',
   styleUrl: './credits.component.scss'
