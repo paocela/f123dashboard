@@ -1,1 +1,144 @@
-<p>admin works!</p>
+<div>
+    <c-container>
+        <c-row>
+            <h2 class="mt-4 text-center">Votazioni gare future</h2>
+            <p class="lead text-center">
+                In questa sezione puoi inserire i risultati per un GP
+            </p>
+        </c-row>
+        <c-row>
+            <c-accordion>
+                <c-accordion-item
+                    #item0="cAccordionItem"
+                    [visible]="false"
+                    *ngFor="let track of tracks"
+                >
+                    <strong>{{ track.name }}</strong>
+                    <ng-template cTemplateId="accordionHeaderTemplate">
+                        <button
+                          (click)="item0.toggleItem()"
+                          [collapsed]="!item0.visible"
+                          cAccordionButton
+                        >
+                            <c-container>
+                                <c-row>
+                                <c-col xs="auto" class="me-auto">
+                                    <h5 class="card-title mb-0" id="traffic">
+                                    <svg
+                                        class="mx-1"
+                                        size="lg"
+                                        [cIcon]="allFlags[track.country]"
+                                    ></svg>
+                                    <strong>{{ track.name }}</strong>
+                                    <svg
+                                        class="mx-1"
+                                        size="lg"
+                                        [cIcon]="allFlags[track.country]"
+                                    ></svg>
+                                    </h5>
+                                </c-col>
+                                <c-col xs="auto">
+                                    <div class="small">
+                                    {{ track.date | date : "dd/MM/yyyy" }}
+                                    </div>
+                                </c-col>
+                                </c-row>
+                            </c-container>
+                        </button>
+                    </ng-template>
+                    <ng-template cTemplateId="accordionBodyTemplate">
+                        <div class="accordion-body">
+                            <c-container>
+                                <c-row>
+                                    <c-col>
+                                        <table
+                                            [hover]="true"
+                                            [responsive]="true"
+                                            [striped]="true"
+                                            align="middle"
+                                            cTable
+                                            class="mb-0 border"
+                                        >
+                                            <thead class="text-nowrap text-truncate">
+                                                <tr>
+                                                    <th class="bg-body-tertiary text-center">Gara</th>
+                                                    <th class="bg-body-tertiary text-center">Sprint</th>
+                                                    <th class="bg-body-tertiary text-center">Qualifica</th>
+                                                    <th class="bg-body-tertiary text-center">Prove Libere</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <form #form="ngForm" cForm (ngSubmit)="publishResult(track.track_id, form)">
+                                                    <c-container>
+                                                       <c-row
+                                                         *ngFor="let posizione of posizioni | keyvalue"
+                                                         class="my-2"
+                                                         [gutter]="{g: 0, sm: {g: 3}}"
+                                                       >
+                                                         <c-col xs="4" sm="auto">
+                                                           <strong>
+                                                             @if (posizione.key < 7) {
+                                                               {{ posizione?.value }} posto
+                                                             } @else {
+                                                               {{posizione?.value}}
+                                                             }
+                                                           </strong>
+                                                           <img
+                                                             *ngIf="posizione.key <= 3"
+                                                             class="cIcon"
+                                                             style="width: 25px"
+                                                             attr.src="assets/medals/{{ medals.get(posizione.key) }}"
+                                                           />
+                                                           <svg *ngIf="posizione.key == 7" [cIcon]="fireIcon" style="color: purple"></svg>
+                                                           <svg *ngIf="posizione.key == 8" [cIcon]="powerIcon" style="color: red"></svg>
+                                                         </c-col>
+                                                         <c-col xs="8" sm="auto" class="ms-auto">
+                                                           <select
+                                                             attr.aria-label="seleziona il pilota che arrivera {{
+                                                               posizione?.value
+                                                             }}"
+                                                             attr.id="{{ track.track_id + posizione.key }}"
+                                                             name=""
+                                                             cSelect
+                                                             cFormControl
+                                                             required="true"
+                                                           >
+                                                             <option value="0">-- Seleziona un pilota --</option>
+                                                             <option
+                                                               *ngFor="let pilota of piloti"
+                                                               attr.value="{{ pilota.driver_id }}"
+                                                             >
+                                                               {{ pilota.driver_username }}
+                                                             </option>
+                                                           </select>
+                                                         </c-col>
+                                                       </c-row>
+                                                       <c-row>
+                                                         <c-col></c-col>
+                                                         <c-col class="text-center">
+                                                           <button cButton type="submit" >Conferma</button>
+                                                           </c-col>
+                                                         <c-col class="text-center">
+                                                             <p *ngIf="formStatus[track.track_id] == 2" class="error">
+                                                               <c-badge color="danger">Errore: piloti assenti, invalidi, o inseriti più volte :(</c-badge>
+                                                             </p>
+                                                             <p *ngIf="formStatus[track.track_id] == 1" class="success">
+                                                               <c-badge color="success">Preferenze salvate correttamente :)</c-badge>
+                                                             </p>
+                                                         </c-col>
+                                     
+                                                       </c-row>
+                                                    </c-container>
+                                                </form>
+                                            </tbody>
+                                        </table>
+                                    </c-col>
+                                </c-row>
+                            </c-container>
+                        </div>
+                      </ng-template>
+                </c-accordion-item>
+            </c-accordion>
+        </c-row>
+    </c-container>
+</div>

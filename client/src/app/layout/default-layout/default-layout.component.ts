@@ -16,8 +16,9 @@ import {
 } from '@coreui/angular';
 
 import { DefaultFooterComponent, DefaultHeaderComponent } from './';
-import { navItems } from './_nav';
+import { getNavItems } from './_nav';
 import { LoadingSpinnerComponent } from '../../../components/loading-spinner/loading-spinner.component';
+import { AuthService } from './../../service/auth.service';
 
 function isOverflown(element: HTMLElement) {
   return (
@@ -49,11 +50,22 @@ function isOverflown(element: HTMLElement) {
     ]
 })
 export class DefaultLayoutComponent {
-  public navItems = navItems;
+  
+  constructor(
+    private authService: AuthService, 
+  ) {}
 
+  
+  public navItems = getNavItems(true);
+  
   onScrollbarUpdate($event: any) {
     // if ($event.verticalUsed) {
     // console.log('verticalUsed', $event.verticalUsed);
     // }
+  }
+
+  updateNavItems()
+  {
+    this.navItems = getNavItems(this.authService.getCurrentUser()?.username == "admin");
   }
 }

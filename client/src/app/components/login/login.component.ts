@@ -4,12 +4,12 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';    
 import { FormsModule } from '@angular/forms';
 import { FormModule } from '@coreui/angular';
-import { AuthService } from './../../service/auth.service';
 import {   AvatarComponent, DropdownCloseDirective, DropdownComponent, DropdownItemDirective, DropdownMenuDirective, DropdownToggleDirective, GridModule, ButtonDirective, ModalComponent, ModalHeaderComponent, ModalBodyComponent, ModalFooterComponent, ModalToggleDirective} from '@coreui/angular';
-import { DbDataService } from '../../../app/service/db-data.service';
 import { cilWarning, cilAccountLogout } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
 import { User } from 'src/app/model/user';
+import { AuthService } from './../../service/auth.service';
+import { DbDataService } from '../../../app/service/db-data.service';
 
 @Component({
     selector: 'login-component',
