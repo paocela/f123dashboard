@@ -1,4 +1,3 @@
-import { NgIf } from '@angular/common';
 import { Component, ViewChild} from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';    
@@ -9,12 +8,10 @@ import {   AvatarComponent, DropdownCloseDirective, DropdownComponent, DropdownI
 import { DbDataService } from '../../../app/service/db-data.service';
 import { cilWarning, cilAccountLogout } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
-import { User } from 'src/app/model/user';
 
 @Component({
     selector: 'login-component',
     imports: [
-    NgIf,
     CommonModule,
     FormsModule,
     FormModule,
@@ -30,7 +27,6 @@ import { User } from 'src/app/model/user';
     DropdownToggleDirective,
     DropdownMenuDirective,
     DropdownItemDirective,
-    DropdownCloseDirective,
     AvatarComponent
 ],
     templateUrl: './login.component.html',
