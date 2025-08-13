@@ -18,7 +18,7 @@
     "test": "ng test"
   },
   "private": true,
-   "dependencies": {
+  "dependencies": {
     "@angular/animations": "^20.1.0",
     "@angular/cdk": "^20.1.0",
     "@angular/common": "^20.1.0",
@@ -46,6 +46,7 @@
     "genezio": "^2.6.3",
     "lodash-es": "^4.17.21",
     "ngx-scrollbar": "^13.0.3",
+    "parse5": "^8.0.0",
     "rxjs": "~7.8.2",
     "tslib": "^2.8.1",
     "zone.js": "~0.15.1"

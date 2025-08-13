@@ -9,7 +9,7 @@ import {   AvatarComponent, DropdownCloseDirective, DropdownComponent, DropdownI
 import { DbDataService } from '../../../app/service/db-data.service';
 import { cilWarning, cilAccountLogout } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
-import { User } from 'src/app/model/user';
+import { User } from '../../model/user';
 
 @Component({
     selector: 'login-component',
