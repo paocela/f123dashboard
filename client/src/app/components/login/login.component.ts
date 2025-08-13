@@ -1,4 +1,3 @@
-import { NgIf } from '@angular/common';
 import { Component, ViewChild} from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';    
@@ -14,7 +13,6 @@ import { User } from '../../model/user';
 @Component({
     selector: 'login-component',
     imports: [
-    NgIf,
     CommonModule,
     FormsModule,
     FormModule,
@@ -30,7 +28,6 @@ import { User } from '../../model/user';
     DropdownToggleDirective,
     DropdownMenuDirective,
     DropdownItemDirective,
-    DropdownCloseDirective,
     AvatarComponent
 ],
     templateUrl: './login.component.html',

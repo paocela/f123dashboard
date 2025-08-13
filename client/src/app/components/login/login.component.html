@@ -2,7 +2,8 @@
   <button cButton cDropdownToggle color="transparent">
     <c-avatar [size]="'md'" [src]="'./assets/images/avatars_fanta/' + loggedUserId + '.png'"/>
   </button>
-  <div *ngIf="!isLoggedIn">
+  @if (!isLoggedIn) {
+  <div>
       <ul cDropdownMenu [ngStyle]="{'min-width.px': 300}">
       <form cForm (ngSubmit)="onLogin()">
         <c-container breakpoint="md" class="px-4">
@@ -35,7 +36,7 @@
                 name="password" 
                 required
                 >
-                <p *ngIf="errorMessage" class="errorMessage">{{ errorMessage }}</p>
+                @if (errorMessage) { <p class="errorMessage">{{ errorMessage }}</p> }
                 <label cLabel for="password">Password:</label>
               </div>
             </c-col>
@@ -50,7 +51,9 @@
       </div>
     </ul>
     </div>
-    <div *ngIf="isLoggedIn">
+  }
+  @if (isLoggedIn) {
+    <div>
       <ul cDropdownMenu>
         <li>
           <a cDropdownItem>
@@ -68,6 +71,7 @@
         </li>
       </ul>
     </div>
+  }
 </c-dropdown>
   
 <c-modal #verticallyCenteredModal alignment="center" id="verticallyCenteredModal">
@@ -96,7 +100,7 @@
               required
             >
             <label cLabel for="name">Nome:</label>
-            <small class="text-danger" *ngIf="nameField.invalid && nameField.touched">Il nome è obbligatorio.</small>
+            @if (nameField.invalid && nameField.touched) { <small class="text-danger">Il nome è obbligatorio.</small> }
           </div>
         </c-col>
       </c-row>
@@ -118,7 +122,7 @@
               required
             >
             <label cLabel for="surname">Cognome:</label>
-            <small class="text-danger" *ngIf="surnameField.invalid && surnameField.touched">Il cognome è obbligatorio.</small>
+            @if (surnameField.invalid && surnameField.touched) { <small class="text-danger">Il cognome è obbligatorio.</small> }
           </div>
         </c-col>
       </c-row>
@@ -139,8 +143,8 @@
               required
             >
             <label cLabel for="username">Username:</label>
-            <small class="text-danger" *ngIf="usernameError">{{ usernameError }}</small>
-            <small class="text-danger" *ngIf="usernameField.invalid && usernameField.touched">L'username è obbligatorio.</small>
+            @if (usernameError) { <small class="text-danger">{{ usernameError }}</small> }
+            @if (usernameField.invalid && usernameField.touched) { <small class="text-danger">L'username è obbligatorio.</small> }
           </div>
         </c-col>
       </c-row>
@@ -171,7 +175,7 @@
             >
             
             <label cLabel for="SignInPassword">Password:</label>
-            <small class="text-danger" *ngIf="passwordField.invalid && passwordField.touched">La password è obbligatoria.</small>
+            @if (passwordField.invalid && passwordField.touched) { <small class="text-danger">La password è obbligatoria.</small> }
           </div>
         </c-col>
       </c-row>
@@ -192,7 +196,7 @@
               minlength="4"
             >
             <label cLabel for="confirmPassword">Conferma Password:</label>
-            <small class="text-danger" *ngIf="confirmPasswordField.invalid && confirmPasswordField.touched">La password è obbligatoria.</small>
+            @if (confirmPasswordField.invalid && confirmPasswordField.touched) { <small class="text-danger">La password è obbligatoria.</small> }
           </div>
         </c-col>
       </c-row>
@@ -200,7 +204,7 @@
     </c-container>
   </c-modal-body>
   <c-modal-footer>
-      <p *ngIf="singInErrorMessage" class="errorMessage">{{ singInErrorMessage }}</p>
+      @if (singInErrorMessage) { <p class="errorMessage">{{ singInErrorMessage }}</p> }
     <button [cModalToggle]="verticallyCenteredModal.id" cButton color="secondary">
       Close
     </button>
