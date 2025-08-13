@@ -3,7 +3,7 @@
     @if (isLoggedIn){
       <c-avatar size="md" [src]="'./assets/images/avatars_fanta/' + loggedUserId + '.png'"/>
     }@else {
-      <svg [cIcon]="icons.cilUser" width="39px" height="39px"></svg>
+      <svg [cIcon]="icons.cilUser" width="20px" height="20px"></svg>
     }
   </button>
   @if (!isLoggedIn) {
