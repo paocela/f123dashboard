@@ -1,11 +1,20 @@
 <c-dropdown #loginDropdown [autoClose]="'outside'">
-  <button cButton cDropdownToggle color="transparent">
-    @if (isLoggedIn){
+  
+  <button cButton 
+    cDropdownToggle
+    class="transparent-button" 
+>
+ @if (isLoggedIn){
       <c-avatar size="md" [src]="'./assets/images/avatars_fanta/' + loggedUserId + '.png'"/>
     }@else {
-      <svg [cIcon]="icons.cilUser" width="20px" height="20px"></svg>
+      <svg [cIcon]="icons.cilUser" size="sm" class="social-icon"></svg>
     }
-  </button>
+</button>
+
+
+
+
+
   @if (!isLoggedIn) {
   <div>
       <ul cDropdownMenu [ngStyle]="{'min-width.px': 300}">
