@@ -4,11 +4,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FormModule } from '@coreui/angular';
 import { AuthService } from './../../service/auth.service';
-import {   AvatarComponent, DropdownCloseDirective, DropdownComponent, DropdownItemDirective, DropdownMenuDirective, DropdownToggleDirective, GridModule, ButtonDirective, ModalComponent, ModalHeaderComponent, ModalBodyComponent, ModalFooterComponent, ModalToggleDirective} from '@coreui/angular';
+import {   AvatarComponent, DropdownComponent, DropdownItemDirective, DropdownMenuDirective, DropdownToggleDirective, GridModule, ButtonDirective, ModalComponent, ModalHeaderComponent, ModalBodyComponent, ModalFooterComponent, ModalToggleDirective} from '@coreui/angular';
 import { DbDataService } from '../../../app/service/db-data.service';
 import { cilWarning, cilAccountLogout } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
-import { User } from '../../model/user';
+import { cilUser } from '@coreui/icons';
 
 @Component({
     selector: 'login-component',
@@ -35,6 +35,8 @@ import { User } from '../../model/user';
 })
 
 export class LoginComponent {
+
+  icons = { cilUser };
   // Current user id
   loggedUserId: string = 'default';
 

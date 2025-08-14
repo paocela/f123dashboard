@@ -1,6 +1,10 @@
 <c-dropdown #loginDropdown [autoClose]="'outside'">
   <button cButton cDropdownToggle color="transparent">
-    <c-avatar [size]="'md'" [src]="'./assets/images/avatars_fanta/' + loggedUserId + '.png'"/>
+    @if (isLoggedIn){
+      <c-avatar size="md" [src]="'./assets/images/avatars_fanta/' + loggedUserId + '.png'"/>
+    }@else {
+      <svg [cIcon]="icons.cilUser" width="20px" height="20px"></svg>
+    }
   </button>
   @if (!isLoggedIn) {
   <div>
@@ -51,8 +55,7 @@
       </div>
     </ul>
     </div>
-  }
-  @if (isLoggedIn) {
+  } @else {
     <div>
       <ul cDropdownMenu>
         <li>
