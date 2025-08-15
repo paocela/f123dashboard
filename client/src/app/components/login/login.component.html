@@ -5,7 +5,7 @@
     class="transparent-button" 
 >
  @if (isLoggedIn){
-      <c-avatar size="md" [src]="'./assets/images/avatars_fanta/' + loggedUserId + '.png'"/>
+      <c-avatar size="sm" [src]="'./assets/images/avatars_fanta/' + loggedUserId + '.png'"/>
     }@else {
       <svg [cIcon]="icons.cilUser" size="sm" class="social-icon"></svg>
     }
