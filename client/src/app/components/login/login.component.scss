@@ -21,3 +21,38 @@
     text-align: center;
     padding: 8px;
   }
+
+.transparent-button {
+    background: transparent !important;
+    border: none !important;
+    padding: 0.5rem 1rem;
+    margin: 0;
+    transition: all 0.3s ease;
+    color: var(--cui-nav-link-color, #8a93a2) !important;
+
+    &:hover {
+        background: transparent !important;
+        color: rgb(26, 131, 0) !important;
+
+        .social-icon {
+            color: rgb(26, 131, 0) !important;
+        }
+    }
+
+    .social-icon {
+        width: 1.2rem;
+        height: 1.2rem;
+        transition: color 0.3s ease;
+        color: var(--cui-nav-link-color, #8a93a2);
+    }
+}
+
+.link-name {
+    display: none;
+}
+
+@media (min-width: 1000px) {
+    .link-name {
+        display: inline;
+    }
+}

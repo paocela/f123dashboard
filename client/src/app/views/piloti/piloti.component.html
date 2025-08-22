@@ -1,15 +1,15 @@
 <div *ngIf="piloti.length; else goto_loading">
-  <c-row ngPreserveWhitespaces class="g-1"> <!-- Aggiunto margine tra le colonne -->
-    <c-col *ngFor="let pilota of piloti; index as i" xs="6" md="4" lg="3"> <!-- Modificato per avere un layout responsivo e risolvere problema dimensioni su telefoni -->
-      <c-card [cBorder]="pilota.driver_color"  [textColor]="pilota.driver_color" class="mb-4 text-center" >
-        <c-card-body> 
+  <c-row ngPreserveWhitespaces class="g-0">
+    <c-col *ngFor="let pilota of piloti; index as i" xs="6" md="4" lg="2">
+      <c-card [cBorder]="pilota.driver_color" [textColor]="pilota.driver_color" class="pilot-card text-center">
+        <c-card-body class="card-header"> 
           <c-card [textColor]="pilota.driver_color" style="width: 100%;">
             <img [cCardImg]="'top'" src='./assets/images/avatars/{{pilota.driver_username}}.png' alt="{{ pilota.driver_username }}'s avatar" />
-            <c-card-body style="height: 120px;">
+            <c-card-body>
               <h5 cCardTitle>{{ pilota.driver_username }}</h5>
               <p cCardText>{{ pilota.driver_description }}</p>
             </c-card-body>
-            <ul [flush]="true" cListGroup>
+            <ul [flush]="true" cListGroup class="stats-list">
               <li cListGroupItem>
                 <div class="row">
                   <div class="col-7 border-end"><strong>Posizione:</strong></div>
@@ -61,13 +61,13 @@
             </ul>
 
             <!-- Radar Chart -->
-            <c-card-body>
+            <div class="radar-chart-container">
               <c-chart 
                 type="radar" 
                 [data]="pilota.radarChartData" 
                 [options]="radarChartOptions">
               </c-chart>
-            </c-card-body>
+            </div>
 
           </c-card>
         </c-card-body>
@@ -78,7 +78,7 @@
 
 
 <ng-template #goto_loading>
-  <div class="fade show" style="text-align: center; padding-top: calc(100vh / 2); height: 100vh">
+  <div class="loading-container fade show">
     <i class="spinner-border text-danger"></i>
     <span class="m-1"><strong>ASPETTA STRONZO</strong></span>
     <i class="spinner-border text-danger"></i>

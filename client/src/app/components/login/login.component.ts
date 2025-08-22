@@ -1,20 +1,18 @@
-import { NgIf } from '@angular/common';
 import { Component, ViewChild} from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';    
 import { FormsModule } from '@angular/forms';
 import { FormModule } from '@coreui/angular';
-import {   AvatarComponent, DropdownCloseDirective, DropdownComponent, DropdownItemDirective, DropdownMenuDirective, DropdownToggleDirective, GridModule, ButtonDirective, ModalComponent, ModalHeaderComponent, ModalBodyComponent, ModalFooterComponent, ModalToggleDirective} from '@coreui/angular';
+import { AuthService } from './../../service/auth.service';
+import {   AvatarComponent, DropdownComponent, DropdownItemDirective, DropdownMenuDirective, DropdownToggleDirective, GridModule, ButtonDirective, ModalComponent, ModalHeaderComponent, ModalBodyComponent, ModalFooterComponent, ModalToggleDirective} from '@coreui/angular';
+import { DbDataService } from '../../../app/service/db-data.service';
 import { cilWarning, cilAccountLogout } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
-import { User } from 'src/app/model/user';
-import { AuthService } from './../../service/auth.service';
-import { DbDataService } from '../../../app/service/db-data.service';
+import { cilUser } from '@coreui/icons';
 
 @Component({
     selector: 'login-component',
     imports: [
-    NgIf,
     CommonModule,
     FormsModule,
     FormModule,
@@ -30,7 +28,6 @@ import { DbDataService } from '../../../app/service/db-data.service';
     DropdownToggleDirective,
     DropdownMenuDirective,
     DropdownItemDirective,
-    DropdownCloseDirective,
     AvatarComponent
 ],
     templateUrl: './login.component.html',
@@ -38,6 +35,8 @@ import { DbDataService } from '../../../app/service/db-data.service';
 })
 
 export class LoginComponent {
+
+  icons = { cilUser };
   // Current user id
   loggedUserId: string = 'default';
 

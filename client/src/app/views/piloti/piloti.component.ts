@@ -1,7 +1,9 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common'; 
-import {DbDataService} from 'src/app/service/db-data.service';  //aggiunto il servizio per dati db
-import { ChartOptions } from 'chart.js';  // Import per i grafici
+import { RouterLink } from '@angular/router';
+import { NgTemplateOutlet } from '@angular/common';
+import { DbDataService } from '../../service/db-data.service';  // aggiunto il servizio per dati db
+import { ChartData, ChartOptions } from 'chart.js';  // Import per i grafici
 import { 
   BorderDirective,
   CardBodyComponent,
@@ -45,29 +47,43 @@ export class PilotiComponent implements OnInit {
   pilotChart: any[] = [];
 
 
+  // Variabili per la personalizzazione del radar chart
+  private readonly CHART_TEXT_COLOR = 'rgba(130, 130, 130, 1)';
+  private readonly CHART_TEXT_SIZE = 12;
+
   // Opzioni comuni per il radar chart
   radarChartOptions: ChartOptions<'radar'> = {
     responsive: true,
-  maintainAspectRatio: true, // Mantiene il grafico quadrato
+    maintainAspectRatio: false, // Mantiene il grafico quadrato
     scales: {
       r: {
         beginAtZero: true,
         max: 5,
         grid: {
-          color: 'rgba(200, 200, 200, 1)', // Cambia il colore delle linee di base
-          lineWidth: 2, // Imposta la larghezza delle linee
+          color: 'rgba(130, 130, 130, 1)', // Cambia il colore delle linee di base
+          lineWidth: 1, // Imposta la larghezza delle linee
         },
         ticks: {
           display: false, // Rimuove i numeri
-          stepSize:1,
+          stepSize: 1,
+        },
+        pointLabels: {
+          color: this.CHART_TEXT_COLOR, // Colore del testo configurabile
+          font: {
+            size: this.CHART_TEXT_SIZE, // Dimensione del testo configurabile
+            weight: 'normal'
+          }
         }
       }
     },
     
     elements: {
       line: {
-        borderWidth: 3
+        borderWidth: 1,
       }
+    },
+    layout: {
+      padding: 5 // Aggiunge un margine di 5 pixel intorno al grafico
     },
     plugins: {
       legend: {
@@ -101,7 +117,7 @@ export class PilotiComponent implements OnInit {
   initializeRadarChartData(): void {
     this.piloti.forEach(pilota => {
       pilota.radarChartData = {
-        labels: ['Consistenza', 'Giro Veloce', 'Pericolosità', 'Ingenuità', 'Strategia'],
+        labels: ['Costanza', 'Veloce', 'Rischio', 'Errori', 'Tattica'],
         datasets: [
           {
             label: pilota.pilot,

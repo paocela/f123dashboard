@@ -23,7 +23,7 @@
   <c-col xs="12" md="6">
     <c-card class="mb-4">
       <c-card-header>
-        <h4 class="card-title mb-0" id="traffic">Championship Standings</h4>
+        <h4 class="card-title mb-0" id="traffic">Classifica Campionato</h4>
         <strong></strong>
       </c-card-header>
       <c-card-body>
@@ -37,15 +37,13 @@
         >
           <thead class="text-nowrap text-truncate">
             <tr>
-              <th class="bg-body-tertiary text-center">
-                <svg cIcon name="cilPeople"></svg>
-              </th>
-              <th class="bg-body-tertiary"></th>
+              <th class="bg-body-tertiary text-center">Pos.</th>
+              <th class="bg-body-tertiary text-center"><svg cIcon name="cilPeople"></svg></th>
               <th class="bg-body-tertiary">Username</th>
-              <th class="bg-body-tertiary text-center" *ngIf="showColumn()">Car</th>
-              <th class="bg-body-tertiary pilot" *ngIf="showColumn()">Pilot</th>
-              <th class="bg-body-tertiary text-center">Points</th>
-              <th class="bg-body-tertiary text-center">Gain/Lost</th>
+              <th class="bg-body-tertiary text-center" *ngIf="showColumn()">Scuderia</th>
+              <th class="bg-body-tertiary pilot" *ngIf="showColumn()">Pilota</th>
+              <th class="bg-body-tertiary text-center">Punti</th>
+              <th class="bg-body-tertiary text-center">+/-</th>
             </tr>
           </thead>
           <tbody>
@@ -161,7 +159,7 @@
     </c-carousel>
     <c-card *ngIf="championshipNextTracks.length === 0">
       <c-card-header>
-        <h4 class="card-title mb-0" id="traffic">Fanta Standings</h4>
+        <h4 class="card-title mb-0" id="traffic">Classifica Fanta</h4>
       </c-card-header>
       <c-card-body>
         <app-leaderboard [maxDisplayable]="6" [showVotes]="showColumn()" ></app-leaderboard>
@@ -175,8 +173,8 @@
   <c-card-body>
     <c-row>
       <c-col sm="5">
-        <h4 class="card-title mb-0" id="traffic">Championship Fight</h4>
-        <div class="small text-body-secondary">Pilots trend after every GP</div>
+        <h4 class="card-title mb-0" id="traffic">Andamento Campionato</h4>
+        <div class="small text-body-secondary">Trend dei piloti per ogni GP</div>
       </c-col>
       <c-col sm="7">
         <form [formGroup]="trafficRadioGroup">
@@ -196,7 +194,7 @@
               variant="outline"
               for="radio4Month"
             >
-              Last 4 GP
+              Ultimi 4 GP
             </label>
             <input
             class="btn-check"
@@ -213,7 +211,7 @@
             variant="outline"
             for="radio8Month"
           >
-            Last 8 GP
+            Ultimi 8 GP
           </label>
             <input
               class="btn-check"
@@ -230,7 +228,7 @@
               variant="outline"
               for="radioYear"
             >
-              All
+              Tutti i GP
             </label>
           </c-button-group>
         </form>

@@ -68,3 +68,5 @@ node_modules/@genezio-sdk/f123dashboard/node_modules/genezio-remote/dist/lib/rem
 package-lock.json
 package.json
 node_modules
+vars.ps1
+script.ps1
