@@ -11,7 +11,7 @@
   },
   "scripts": {
     "ng": "ng",
-    "start": "ng serve -o",
+    "start": "ng serve -o --host 0.0.0.0",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
@@ -19,13 +19,14 @@
   "private": true,
   "dependencies": {
     "@angular/animations": "^20.1.0",
-    "@angular/cdk": "^20.1.0",
+    "@angular/cdk": "^20.2.0",
     "@angular/common": "^20.1.0",
     "@angular/compiler": "^20.1.0",
     "@angular/core": "^20.1.0",
     "@angular/forms": "^20.1.0",
     "@angular/language-service": "^20.1.0",
     "@angular/localize": "^20.1.0",
+    "@angular/material": "^20.2.0",
     "@angular/platform-browser": "^20.1.0",
     "@angular/platform-browser-dynamic": "^20.1.0",
     "@angular/router": "^20.1.0",
@@ -72,3 +73,4 @@
     "npm": ">= 9"
   }
 }
+

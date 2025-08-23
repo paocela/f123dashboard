@@ -288,4 +288,66 @@ ORDER BY date ASC
     const resoult = await this.pool.query(` SELECT id, description, start_date, end_date FROM seasons`);
     return JSON.stringify(resoult.rows);
   }
+
+  async setGpResult(
+    track_id: number,
+    hasSprint: boolean,
+    raceResult: number[],
+    raceDnfResult: number[],
+    sprintResult: number[],
+    sprintDnfResult: number[],
+    qualiResult: number[],
+    fpResult: number[]
+  ): Promise<string> {
+    try {
+    //   const query = `
+    //     INSERT INTO "fanta" (
+    //       "fanta_player_id", "race_id", "1_place_id", "2_place_id", "3_place_id", 
+    //       "4_place_id", "5_place_id", "6_place_id", "fast_lap_id", "dnf_id"
+    //     ) 
+    //     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+    //     ON CONFLICT ("fanta_player_id", "race_id")
+    //     DO UPDATE SET
+    //       "1_place_id" = EXCLUDED."1_place_id",
+    //       "2_place_id" = EXCLUDED."2_place_id",
+    //       "3_place_id" = EXCLUDED."3_place_id",
+    //       "4_place_id" = EXCLUDED."4_place_id",
+    //       "5_place_id" = EXCLUDED."5_place_id",
+    //       "6_place_id" = EXCLUDED."6_place_id",
+    //       "fast_lap_id" = EXCLUDED."fast_lap_id",
+    //       "dnf_id" = EXCLUDED."dnf_id"
+    //   `;
+    const query = `SELECT * from ...`;
+
+
+    //   const values = [
+    //     fanta_player_id,
+    //     track_id,
+    //     id_1_place,
+    //     id_2_place,
+    //     id_3_place,
+    //     id_4_place,
+    //     id_5_place,
+    //     id_6_place,
+    //     id_fast_lap,
+    //     id_dnf
+    //   ];
+
+
+      await this.pool.query(query, values);
+      
+      console.log(`Successfully saved race result`);
+      
+      return JSON.stringify({
+        success: true,
+        message: 'Race result saved successfully'
+      });
+    } catch (error) {
+      console.error('Error saving race result:', error);
+      return JSON.stringify({
+        success: false,
+        message: `Failed to save race result: ${error instanceof Error ? error.message : 'Unknown error'}`
+      });
+    }
+  }
 }

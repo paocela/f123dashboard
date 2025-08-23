@@ -16,8 +16,7 @@
 
 
   @if (!isLoggedIn) {
-  <div>
-      <ul cDropdownMenu [ngStyle]="{'min-width.px': 300}">
+    <ul cDropdownMenu [ngStyle]="{'min-width.px': 300}">
       <form cForm (ngSubmit)="onLogin()">
         <c-container breakpoint="md" class="px-4">
           <c-row [gutter]="{gy: 5}">
@@ -60,167 +59,27 @@
         </c-container>
       </form>
       <div class="container">
-        <button [cModalToggle]="registrationModal.id" color="link" cButton>oppure registrati</button>
+        <button (click)="openRegistrationModal()" color="link" cButton>oppure registrati</button>
       </div>
     </ul>
-    </div>
   } @else {
-    <div>
-      <ul cDropdownMenu>
-        <li>
-          <a cDropdownItem>
-            <button cButton (click)="onLogout()" color="transparent">
-              <c-row class="align-items-center">
-                <c-col>
-                  Logout
-                </c-col>
-                <c-col cols="auto">
-                  <svg [cIcon]="logoutIcon" style="width: 1rem; height: 1rem;"></svg>
-                </c-col>
-              </c-row>
-            </button>
-          </a>
-        </li>
-      </ul>
-    </div>
+    <ul cDropdownMenu>
+      <li>
+        <a cDropdownItem>
+          <button cButton (click)="onLogout()" color="transparent">
+            <c-row class="align-items-center">
+              <c-col>
+                Logout
+              </c-col>
+              <c-col cols="auto">
+                <svg [cIcon]="logoutIcon" style="width: 1rem; height: 1rem;"></svg>
+              </c-col>
+            </c-row>
+          </button>
+        </a>
+      </li>
+    </ul>
   }
 </c-dropdown>
-  
-<c-modal #registrationModal alignment="center" id="registrationModal" [backdrop]="false" [fullscreen]="true">
-  <c-modal-header>
-    <h5 cModalTitle>Registrati</h5>
-  </c-modal-header>
 
-  <form cForm (ngSubmit)="onRegistration()" #registrationForm="ngForm">
-    <c-modal-body>
-    <c-container breakpoint="md" class="px-4">
-      
-      <!-- Campo Nome -->
-      <c-row [gutter]="{gy: 5}">
-        <c-col>
-          <div [cFormFloating]="true" class="mb-3">
-            <input 
-              cFormControl 
-              id="name" 
-              placeholder="Nome" 
-              type="text" 
-              class="m-2" 
-              autocomplete="on"
-              [(ngModel)]="name" 
-              name="name" 
-              #nameField="ngModel"
-              required
-            >
-            <label cLabel for="name">Nome:</label>
-            @if (nameField.invalid && nameField.touched) { <small class="text-danger">Il nome è obbligatorio.</small> }
-          </div>
-        </c-col>
-      </c-row>
-  
-      <!-- Campo Cognome -->
-      <c-row [gutter]="{gy: 5}">
-        <c-col>
-          <div [cFormFloating]="true" class="mb-3">
-            <input 
-              cFormControl 
-              id="surname" 
-              placeholder="Cognome" 
-              type="text" 
-              class="m-2" 
-              autocomplete="on"
-              [(ngModel)]="surname" 
-              name="surname" 
-              #surnameField="ngModel"
-              required
-            >
-            <label cLabel for="surname">Cognome:</label>
-            @if (surnameField.invalid && surnameField.touched) { <small class="text-danger">Il cognome è obbligatorio.</small> }
-          </div>
-        </c-col>
-      </c-row>
-  
-      <!-- Campo Username -->
-      <c-row [gutter]="{gy: 5}">
-        <c-col>
-          <div [cFormFloating]="true" class="mb-3">
-            <input 
-              cFormControl 
-              id="SignInUsername" 
-              placeholder="Username" 
-              type="text" 
-              class="m-2" 
-              [(ngModel)]="regUsername" 
-              name="username" 
-              #usernameField="ngModel"
-              required
-            >
-            <label cLabel for="username">Username:</label>
-            @if (usernameError) { <small class="text-danger">{{ usernameError }}</small> }
-            @if (usernameField.invalid && usernameField.touched) { <small class="text-danger">L'username è obbligatorio.</small> }
-          </div>
-        </c-col>
-      </c-row>
-  
-      <div class="avviso">
-        <p>
-          <svg [cIcon]="warningIcon" style="color: #eed202"></svg>
-          DISCLAIMER: non usare passwords importanti. Le password non vengono criptate
-          <svg [cIcon]="warningIcon" style="color: #eed202"></svg>
-        </p>
-      </div>
-      
-      <!-- Campo Password -->
-      <c-row [gutter]="{gy: 5}">
-        <c-col>
-          <div [cFormFloating]="true" class="mb-3">
-            <input 
-              cFormControl 
-              id="SignInPassword" 
-              placeholder="Password" 
-              type="password" 
-              class="m-2" 
-              [(ngModel)]="regPassword" 
-              name="password" 
-              #passwordField="ngModel"
-              required
-              minlength="4"
-            >
-            
-            <label cLabel for="SignInPassword">Password:</label>
-            @if (passwordField.invalid && passwordField.touched) { <small class="text-danger">La password è obbligatoria.</small> }
-          </div>
-        </c-col>
-      </c-row>
-
-      <c-row [gutter]="{gy: 5}">
-        <c-col>
-          <div [cFormFloating]="true" class="mb-3">
-            <input 
-              cFormControl 
-              id="confirmPassword" 
-              placeholder="Password" 
-              type="password" 
-              class="m-2" 
-              [(ngModel)]="confirmPassword" 
-              name="confirmPassword" 
-              #confirmPasswordField="ngModel"
-              required
-              minlength="4"
-            >
-            <label cLabel for="confirmPassword">Conferma Password:</label>
-            @if (confirmPasswordField.invalid && confirmPasswordField.touched) { <small class="text-danger">La password è obbligatoria.</small> }
-          </div>
-        </c-col>
-      </c-row>
-
-    </c-container>
-  </c-modal-body>
-  <c-modal-footer>
-      @if (singInErrorMessage) { <p class="errorMessage">{{ singInErrorMessage }}</p> }
-    <button [cModalToggle]="registrationModal.id" cButton color="secondary">
-      Close
-    </button>
-    <button cButton class="btn btn-primary"  type="submit" [disabled]="registrationForm.invalid" >Registrati</button>
-  </c-modal-footer>
-  </form>
-</c-modal>
+<app-registration-modal #registrationModal></app-registration-modal>

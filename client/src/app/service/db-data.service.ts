@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { PostgresService, FantaService } from "@genezio-sdk/f123dashboard" 
 import { Fanta, FantaPlayer } from '../model/fanta';
 import { User } from '../model/user';
+import { GpResult } from '../model/championship'
 
 
 
@@ -107,6 +108,17 @@ export class DbDataService {
       player.name, 
       player.surname, 
       player.password);
+  }
+
+  async setGpResult(trackId: Number, gpResult: GpResult): Promise<void> {
+    await PostgresService.setGpResult(+trackId,
+                                  gpResult.hasSprint,
+                                  gpResult.raceResult,
+                                  gpResult.raceDnfResult,
+                                  gpResult.sprintResult,
+                                  gpResult.sprintDnfResult,
+                                  gpResult.qualiResult,
+                                  gpResult.fpResult);
   }
 
 }
