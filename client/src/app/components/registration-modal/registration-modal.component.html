@@ -1,96 +1,153 @@
-<c-modal #verticallyCenteredModal alignment="center" id="verticallyCenteredModal">
+<div class="custom-backdrop" *ngIf="modal?.visible"></div>
+<c-modal
+  #verticallyCenteredModal
+  alignment="center"
+  id="verticallyCenteredModal"
+  [backdrop]="false"
+>
   <c-modal-header>
-    <h5 cModalTitle>Registrazione</h5>
-    <button cButtonClose></button>
+    <h5 cModalTitle class="text-center w-100">Registrazione</h5>
   </c-modal-header>
   <c-modal-body>
-    <form cForm (ngSubmit)="onRegistration()">
+    <form cForm (ngSubmit)="onRegistration()" class="custom-form">
       <c-container breakpoint="md" class="px-4">
-        <c-row [gutter]="{gy: 5}">
+        <c-row [gutter]="{ gy: 5 }">
           <c-col>
             <div [cFormFloating]="true" class="mb-3">
-              <input cFormControl
-                     class="m-2"
-                     type="text"
-                     id="name"
-                     [(ngModel)]="name"
-                     name="name"
-                     placeholder="Nome"
-                     required>
+              <input
+                cFormControl
+                class="m-2"
+                type="text"
+                id="name"
+                [(ngModel)]="name"
+                name="name"
+                placeholder="Nome"
+                required
+              />
               <label cLabel for="name">Nome:</label>
             </div>
           </c-col>
         </c-row>
-        <c-row [gutter]="{gy: 5}">
+        <c-row [gutter]="{ gy: 5 }">
           <c-col>
             <div [cFormFloating]="true" class="mb-3">
-              <input cFormControl
-                     class="m-2"
-                     type="text"
-                     id="surname"
-                     [(ngModel)]="surname"
-                     name="surname"
-                     placeholder="Cognome"
-                     required>
+              <input
+                cFormControl
+                class="m-2"
+                type="text"
+                id="surname"
+                [(ngModel)]="surname"
+                name="surname"
+                placeholder="Cognome"
+                required
+              />
               <label cLabel for="surname">Cognome:</label>
             </div>
           </c-col>
         </c-row>
-        <c-row [gutter]="{gy: 5}">
+        <c-row [gutter]="{ gy: 5 }">
           <c-col>
             <div [cFormFloating]="true" class="mb-3">
-              <input cFormControl
-                     class="m-2"
-                     type="text"
-                     id="regUsername"
-                     [(ngModel)]="regUsername"
-                     name="regUsername"
-                     placeholder="Username"
-                     required>
+              <input
+                cFormControl
+                class="m-2"
+                type="text"
+                id="regUsername"
+                [(ngModel)]="regUsername"
+                name="regUsername"
+                placeholder="Username"
+                required
+              />
               <label cLabel for="regUsername">Username:</label>
             </div>
           </c-col>
         </c-row>
-        <c-row [gutter]="{gy: 5}">
+        <c-row [gutter]="{ gy: 5 }">
           <c-col>
             <div [cFormFloating]="true" class="mb-3">
-              <input cFormControl
-                     id="regPassword"
-                     placeholder="Password"
-                     type="password"
-                     class="m-2"
-                     autocomplete="off"
-                     [(ngModel)]="regPassword"
-                     name="regPassword"
-                     required>
+              <input
+                cFormControl
+                id="regPassword"
+                placeholder="Password"
+                type="password"
+                class="m-2"
+                autocomplete="off"
+                [(ngModel)]="regPassword"
+                name="regPassword"
+                required
+              />
               <label cLabel for="regPassword">Password:</label>
             </div>
           </c-col>
         </c-row>
-        <c-row [gutter]="{gy: 5}">
+        <c-row [gutter]="{ gy: 5 }">
           <c-col>
             <div [cFormFloating]="true" class="mb-3">
-              <input cFormControl
-                     id="confirmPassword"
-                     placeholder="Conferma Password"
-                     type="password"
-                     class="m-2"
-                     autocomplete="off"
-                     [(ngModel)]="confirmPassword"
-                     name="confirmPassword"
-                     required>
+              <input
+                cFormControl
+                id="confirmPassword"
+                placeholder="Conferma Password"
+                type="password"
+                class="m-2"
+                autocomplete="off"
+                [(ngModel)]="confirmPassword"
+                name="confirmPassword"
+                required
+              />
               <label cLabel for="confirmPassword">Conferma Password:</label>
             </div>
           </c-col>
         </c-row>
-        @if (singInErrorMessage) { <p class="errorMessage">{{ singInErrorMessage }}</p> }
-        @if (successMessage) { <p class="successMessage">{{ successMessage }}</p> }
+        <c-row [gutter]="{ gy: 5 }">
+          <c-col>
+            <div [cFormFloating]="true" class="mb-3">
+              <input
+                cFormControl
+                id="email"
+                placeholder="Email"
+                type="email"
+                class="m-2"
+                autocomplete="off"
+                [(ngModel)]="email"
+                name="email"
+                required
+              />
+              <label cLabel for="email">Email:</label>
+            </div>
+          </c-col>
+        </c-row>
+        <c-row [gutter]="{ gy: 5 }">
+          <c-col>
+            <div class="mb-3">
+              <label cLabel for="profileImage">Immagine del profilo:</label>
+              <input
+                cFormControl
+                id="profileImage"
+                type="file"
+                class="m-2"
+                accept="image/*"
+                (change)="onFileSelected($event)"
+                name="profileImage"
+              />
+            </div>
+          </c-col>
+        </c-row>
+        @if (singInErrorMessage) {
+        <p class="errorMessage">{{ singInErrorMessage }}</p>
+        } @if (successMessage) {
+        <p class="successMessage">{{ successMessage }}</p>
+        }
         <div class="container">
-          <button cButton class="m-1" color="primary" type="submit" [disabled]="isLoading">
+          <button
+            cButton
+            class="m-1"
+            color="primary"
+            type="submit"
+            [disabled]="isLoading"
+          >
             @if (isLoading) {
-              <c-spinner aria-hidden="true" size="sm"></c-spinner>
-            }
-            Registrati
+            <c-spinner aria-hidden="true" size="sm"></c-spinner>
+            } Registrati
           </button>
         </div>
       </c-container>

@@ -36,6 +36,9 @@ export class RegistrationModalComponent {
   regUsername: string = '';
   regPassword: string = '';
   confirmPassword: string = '';
+  email: string = '';
+  selectedFile: File | null = null;
+
 
   // State management
   isLoading: boolean = false;
@@ -48,6 +51,14 @@ export class RegistrationModalComponent {
 
   constructor(private authService: AuthService) {}
 
+
+onFileSelected(event: Event) {
+  const input = event.target as HTMLInputElement;
+  if (input.files && input.files.length > 0) {
+    this.selectedFile = input.files[0];
+    console.log("File selezionato:", this.selectedFile);
+  }
+}
   async onRegistration() {
     if (!this.validateRegistrationForm()) {
       return;
@@ -83,28 +94,28 @@ export class RegistrationModalComponent {
     this.singInErrorMessage = '';
 
     if (!this.name || !this.surname || !this.regUsername || !this.regPassword) {
-      this.singInErrorMessage = 'All fields are required';
+      this.singInErrorMessage = 'Tutti i campi sono obbligatori';
       return false;
     }
 
     if (this.regUsername.length < 3) {
-      this.singInErrorMessage = 'Username must be at least 3 characters long';
+      this.singInErrorMessage = 'L\'username deve contenere almeno 3 caratteri';
       return false;
     }
 
     if (this.regPassword.length < 8) {
-      this.singInErrorMessage = 'Password must be at least 8 characters long';
+      this.singInErrorMessage = 'La password deve contenere almeno 8 caratteri';
       return false;
     }
 
     if (this.regPassword !== this.confirmPassword) {
-      this.singInErrorMessage = 'Passwords do not match';
+      this.singInErrorMessage = 'Le password non corrispondono';
       return false;
     }
 
     // Password strength validation
     if (!this.isPasswordStrong(this.regPassword)) {
-      this.singInErrorMessage = 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character';
+      this.singInErrorMessage = 'La password deve contenere almeno una lettera maiuscola, una lettera minuscola, un numero e un carattere speciale';
       return false;
     }
 

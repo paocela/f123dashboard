@@ -1,2 +1,24 @@
+.custom-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.63);
+  z-index: 1054;
+}
 
 
+/* Riduce l’altezza degli input */
+.custom-form .form-control,
+.custom-form [cFormControl] {
+  padding-top: 0.5rem;   /* aumenta lo spazio sopra */
+  padding-bottom: 0rem; /* riduce quello sotto */
+  font-size: 0.875rem;       /* font leggermente più piccolo */
+  height: 3rem;              /* altezza fissa più bassa */
+}
+
+/* Diminuisce lo spazio fra i campi */
+.custom-form .mb-3 {
+  margin-bottom: 0.2rem !important; /* invece di 1rem */
+}

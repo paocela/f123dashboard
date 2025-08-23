@@ -16,8 +16,7 @@
 
 
   @if (!isLoggedIn) {
-  <div>
-      <ul cDropdownMenu [ngStyle]="{'min-width.px': 300}">
+    <ul cDropdownMenu [ngStyle]="{'min-width.px': 300}">
       <form cForm (ngSubmit)="onLogin()">
         <c-container breakpoint="md" class="px-4">
           <c-row [gutter]="{gy: 5}">
@@ -63,26 +62,23 @@
         <button (click)="openRegistrationModal()" color="link" cButton>oppure registrati</button>
       </div>
     </ul>
-    </div>
   } @else {
-    <div>
-      <ul cDropdownMenu>
-        <li>
-          <a cDropdownItem>
-            <button cButton (click)="onLogout()" color="transparent">
-              <c-row class="align-items-center">
-                <c-col>
-                  Logout
-                </c-col>
-                <c-col cols="auto">
-                  <svg [cIcon]="logoutIcon" style="width: 1rem; height: 1rem;"></svg>
-                </c-col>
-              </c-row>
-            </button>
-          </a>
-        </li>
-      </ul>
-    </div>
+    <ul cDropdownMenu>
+      <li>
+        <a cDropdownItem>
+          <button cButton (click)="onLogout()" color="transparent">
+            <c-row class="align-items-center">
+              <c-col>
+                Logout
+              </c-col>
+              <c-col cols="auto">
+                <svg [cIcon]="logoutIcon" style="width: 1rem; height: 1rem;"></svg>
+              </c-col>
+            </c-row>
+          </button>
+        </a>
+      </li>
+    </ul>
   }
 </c-dropdown>
 
