@@ -1,0 +1,12 @@
+/* Apply to the dropdown via your panelClass */
+.multi-select-option,
+.multi-select-option.mat-mdc-option-active,
+.multi-select-option.mdc-list-item--activated {
+  background-color: white; 
+  color: black; /* black text */
+}
+
+.multi-select-option:hover
+{
+    background-color: #E9E9ED;
+}
