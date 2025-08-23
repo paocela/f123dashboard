@@ -49,8 +49,9 @@ import { GpResult } from '../../model/championship'
 export class AdminComponent {
   // VARIABLE DEFINITIONS
   tracks: any[] = [];
-  formStatus: { [key: number]: number } = {};
   piloti: any[] = [];
+  championshipData: any[] = [];
+  formStatus: { [key: number]: number } = {};
   raceResults: Map<number, any[]> = new Map<number, any[]>(); // [track_id, array_of_results]
   sprintResults: Map<number, any[]> = new Map<number, any[]>();
   qualiResults: Map<number, any[]> = new Map<number, any[]>();
@@ -110,6 +111,88 @@ export class AdminComponent {
   ngOnInit(): void {
     this.tracks = this.dbData.getAllTracks();
     this.piloti  = this.dbData.getAllDrivers();
+    this.championshipData = this.dbData.getChampionship();
+
+    this.initializeResults();
+  }
+
+  initializeResults() {
+    let pilotiMap: Map<string, Number> = new Map<string, Number>(); // map to quickly search driver_id given its driver_username
+    for (let pilota of this.piloti) {
+      pilotiMap.set(pilota.driver_username, pilota.driver_id);
+    }
+
+    for (let gp of this.championshipData) {
+      let track_id = this.tracks.find(t => t.name == gp.track_name).track_id;
+      let race: any[] = [];
+      if ( gp.gran_prix_has_x2 == 1) {
+        race = [pilotiMap.get(gp.driver_full_race_1_place)!,
+                pilotiMap.get(gp.driver_full_race_2_place)!,
+                pilotiMap.get(gp.driver_full_race_3_place)!,
+                pilotiMap.get(gp.driver_full_race_4_place)!,
+                pilotiMap.get(gp.driver_full_race_5_place)!,
+                pilotiMap.get(gp.driver_full_race_6_place)!,
+                pilotiMap.get(gp.driver_full_race_fast_lap)!,
+                []]
+
+        if ( gp.full_race_dnf != null ) {
+          race[7] = race[7].concat(
+            gp.full_race_dnf.split(",").flatMap((x: string) => pilotiMap.get(x.trim()) ?? [])
+          );
+        }
+      } else {
+        race = [pilotiMap.get(gp.driver_race_1_place)!,
+                pilotiMap.get(gp.driver_race_2_place)!,
+                pilotiMap.get(gp.driver_race_3_place)!,
+                pilotiMap.get(gp.driver_race_4_place)!,
+                pilotiMap.get(gp.driver_race_5_place)!,
+                pilotiMap.get(gp.driver_race_6_place)!,
+                pilotiMap.get(gp.driver_race_fast_lap)!,
+                []]
+
+        if ( gp.race_dnf != null ) {
+          race[7] = race[7].concat(
+            gp.race_dnf.split(",").flatMap((x: string) => pilotiMap.get(x.trim()) ?? [])
+          );
+        }
+      }
+      let sprint: any[] = [];
+      if ( gp.gran_prix_has_sprint == 1) {
+        sprint = [pilotiMap.get(gp.driver_sprint_1_place)!,
+                  pilotiMap.get(gp.driver_sprint_2_place)!,
+                  pilotiMap.get(gp.driver_sprint_3_place)!,
+                  pilotiMap.get(gp.driver_sprint_4_place)!,
+                  pilotiMap.get(gp.driver_sprint_5_place)!,
+                  pilotiMap.get(gp.driver_sprint_6_place)!,
+                  pilotiMap.get(gp.driver_sprint_fast_lap)!,
+                  []];
+
+        if ( gp.sprint_dnf != null ) {
+          sprint[7] = sprint[7].concat(
+            gp.sprint_dnf.split(",").flatMap((x: string) => pilotiMap.get(x.trim()) ?? [])
+          );
+        }
+      }
+      let quali: any[] = [];
+      quali = [pilotiMap.get(gp.driver_qualifying_1_place)!,
+               pilotiMap.get(gp.driver_qualifying_2_place)!,
+               pilotiMap.get(gp.driver_qualifying_3_place)!,
+               pilotiMap.get(gp.driver_qualifying_4_place)!,
+               pilotiMap.get(gp.driver_qualifying_5_place)!,
+               pilotiMap.get(gp.driver_qualifying_6_place)!]
+      let fp: any[] = [];
+      fp = [pilotiMap.get(gp.driver_free_practice_1_place)!,
+            pilotiMap.get(gp.driver_free_practice_2_place)!,
+            pilotiMap.get(gp.driver_free_practice_3_place)!,
+            pilotiMap.get(gp.driver_free_practice_4_place)!,
+            pilotiMap.get(gp.driver_free_practice_5_place)!,
+            pilotiMap.get(gp.driver_free_practice_6_place)!]
+
+      this.raceResults.set(track_id, race);
+      this.sprintResults.set(track_id, sprint);
+      this.qualiResults.set(track_id, quali);
+      this.fpResults.set(track_id, fp);
+    }
   }
 
 
@@ -134,10 +217,8 @@ export class AdminComponent {
         fpResult: Array.from(this.fpResults.get(trackId)!.values()).map(x => Number(x))
       }
 
-      console.log(gpResult)
+      this.dbData.setGpResult(trackId, gpResult);
       this.formStatus[trackId] = 1;
-      // this.dbData.setGpResult(trackId, gpResult)
-      // PUBLISH
     }
     else {
       this.formStatus[trackId] = 2;
