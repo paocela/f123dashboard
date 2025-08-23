@@ -150,10 +150,6 @@ export class EmailService {
                             <div style="background-color: #f8f9fa; padding: 15px; border-radius: 0 0 10px 10px; text-align: center; font-size: 12px; color: #666;">
                                 <p style="margin: 0;">
                                     Questa è una email automatica. Non rispondere a questo messaggio.
-                                    <br>
-                                    Per disiscriverti: <a href="https://f123dashboard.app.genez.io/unsubscribe" style="color: #666;">clicca qui</a>
-                                    <br>
-                                    Race for Federica - Via del Fantasy F1, 123 - Milano, Italia
                                 </p>
                             </div>
                         </body>
@@ -182,7 +178,6 @@ Buona fortuna e che vinca il pilota più veloce!
 ---
 Team Race for Federica
 Questa è una email automatica. Non rispondere a questo messaggio.
-Per disiscriverti: https://f123dashboard.app.genez.io/unsubscribe
 Race for Federica 
                     `;
                     
