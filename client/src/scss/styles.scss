@@ -20,3 +20,16 @@
 // Examples
 // We use those styles to show code examples, you should remove them in your application.
 @use "examples";
+
+body.modal-open {
+  /* Disable pointer events for everything by default */
+  pointer-events: none;
+}
+
+body.modal-open .modal { /* Target the CoreUI modal */
+  pointer-events: auto; /* Re-enable pointer events for the modal */
+}
+
+body.modal-open .modal * { /* Re-enable pointer events for modal content */
+  pointer-events: auto;
+}
