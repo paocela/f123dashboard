@@ -52,6 +52,7 @@ This document describes the project database schema.
 - **last_login**: Timestamp of last login
 - **password_updated_at**: Timestamp of last password update (default: NOW())
 - **is_active**: Boolean indicating if account is active (default: TRUE)
+- **mail**: varchar 
 
 ---
 

@@ -60,7 +60,7 @@
         </c-container>
       </form>
       <div class="container">
-        <button [cModalToggle]="verticallyCenteredModal.id" color="link" cButton>oppure registrati</button>
+        <button [cModalToggle]="registrationModal.id" color="link" cButton>oppure registrati</button>
       </div>
     </ul>
     </div>
@@ -86,7 +86,7 @@
   }
 </c-dropdown>
   
-<c-modal #verticallyCenteredModal alignment="center" id="verticallyCenteredModal">
+<c-modal #registrationModal alignment="center" id="registrationModal" [backdrop]="false" [fullscreen]="true">
   <c-modal-header>
     <h5 cModalTitle>Registrati</h5>
   </c-modal-header>
@@ -217,7 +217,7 @@
   </c-modal-body>
   <c-modal-footer>
       @if (singInErrorMessage) { <p class="errorMessage">{{ singInErrorMessage }}</p> }
-    <button [cModalToggle]="verticallyCenteredModal.id" cButton color="secondary">
+    <button [cModalToggle]="registrationModal.id" cButton color="secondary">
       Close
     </button>
     <button cButton class="btn btn-primary"  type="submit" [disabled]="registrationForm.invalid" >Registrati</button>
