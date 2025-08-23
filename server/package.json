@@ -1,6 +1,7 @@
 {
   "name": "server",
   "version": "1.0.0",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "start": "ts-node src/db_interface.ts src/twitter_interface.ts"
@@ -16,6 +17,7 @@
     "typescript": "^5.6.3"
   },
   "dependencies": {
+    "@genezio/email-service": "^1.0.2",
     "@genezio/types": "^1.0.19",
     "@types/bcrypt": "^5.0.2",
     "@types/jsonwebtoken": "^9.0.10",

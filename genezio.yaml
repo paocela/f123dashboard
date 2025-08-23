@@ -1,6 +1,8 @@
 name: f123dashboard
 region: eu-central-1
 yamlVersion: 2
+services:
+  email: true
 frontend:
     path: ./client
     publish: dist/browser
