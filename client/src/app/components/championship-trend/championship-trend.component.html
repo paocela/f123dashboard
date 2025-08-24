@@ -1,0 +1,90 @@
+<c-card class="my-4">
+  <c-card-body>
+    <c-row>
+      <c-col sm="5">
+        <h4 class="card-title mb-0" id="traffic">Andamento Campionato</h4>
+        <div class="small text-body-secondary">
+          Trend dei piloti per ogni GP
+        </div>
+      </c-col>
+      <c-col sm="7">
+        <form [formGroup]="trafficRadioGroup">
+          <c-button-group class="float-end me-3" role="group">
+            <input
+              class="btn-check"
+              formControlName="trafficRadio"
+              type="radio"
+              value="Month4"
+              id="radio4Month"
+            />
+            <label
+              (click)="setTrafficPeriod('Month', 4)"
+              cButton
+              cFormCheckLabel
+              color="secondary"
+              variant="outline"
+              for="radio4Month"
+            >
+              Ultimi 4 GP
+            </label>
+            <input
+              class="btn-check"
+              formControlName="trafficRadio"
+              type="radio"
+              value="Month8"
+              id="radio8Month"
+            />
+            <label
+              (click)="setTrafficPeriod('Month', 8)"
+              cButton
+              cFormCheckLabel
+              color="secondary"
+              variant="outline"
+              for="radio8Month"
+            >
+              Ultimi 8 GP
+            </label>
+            <input
+              class="btn-check"
+              formControlName="trafficRadio"
+              type="radio"
+              value="Year"
+              id="radioYear"
+            />
+            <label
+              (click)="setTrafficPeriod('Year', 0)"
+              cButton
+              cFormCheckLabel
+              color="secondary"
+              variant="outline"
+              for="radioYear"
+            >
+              Tutti i GP
+            </label>
+          </c-button-group>
+        </form>
+      </c-col>
+    </c-row>
+    <c-chart
+      [data]="mainChart.data"
+      [height]="300"
+      [ngStyle]="{ 'marginTop.px': 40 }"
+      [options]="mainChart.options"
+      [type]="mainChart.type"
+      (chartRef)="handleChartRef($event)"
+    >
+      Main chart
+    </c-chart>
+  </c-card-body>
+  <c-card-footer>
+    <c-row
+      class="text-center mb-2"
+      [xl]="5"
+      [lg]="4"
+      [sm]="2"
+      [xs]="1"
+      [gutter]="4"
+    >
+    </c-row>
+  </c-card-footer>
+</c-card>
