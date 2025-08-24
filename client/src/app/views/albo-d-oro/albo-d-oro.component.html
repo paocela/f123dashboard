@@ -1,51 +1,16 @@
-<c-card class="albo-container">
-  <!-- Header -->
-  <header class="albo-header">
-    <h1>Campionato 2024-25</h1>
-  </header>
-
-  <!-- Podio -->
-  <section class="podio">
-    <div
-      class="podio-card"
-      *ngFor="let pilota of podio"
-      [class.first]="pilota.posizione === 1"
-      [class.second]="pilota.posizione === 2"
-      [class.third]="pilota.posizione === 3"
-      [style.background]=" 'linear-gradient(to bottom,' + pilota.colore + ', #111)' "
-      
-    >
-      <div class="numero">{{ pilota.posizione }}</div>
-      <img
-        [src]="pilota.img"
-        [alt]="pilota.nome"
-        class="pilota-img"
-        [ngClass]="{
-          'img-first': pilota.posizione === 1,
-          'img-small': pilota.posizione !== 1
-        }"
-      />
-      <div class="info">
-        <span class="nome">{{ pilota.nome }}</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- Classifica 4–6 -->
-  <section class="classifica">
-    <h2>Posizioni 4–6</h2>
-    <table
-          [hover]="true"
-          [responsive]="true"
-          [striped]="true"
-          align="middle"
-          cTable
-          class="mb-0 border"
-          >
-      <tr *ngFor="let p of classifica">
-        <td class="pos">{{ p.posizione }}</td>
-        <td class="nome-table">{{ p.nome }}</td>
-      </tr>
-    </table>
-  </section>
-</c-card>
+<c-row>
+  <c-col>
+    <app-podium-card
+        [podio]="podio"
+        [classifica]="classifica"
+        [championshipTitle]="'Campionato piloti 2024-25'">
+    </app-podium-card>
+  </c-col>
+  <c-col>
+    <app-podium-card
+        [podio]="podio"
+        [classifica]="classifica"
+        [championshipTitle]="'Fanta 2024-25'">
+    </app-podium-card>
+  </c-col>
+</c-row>

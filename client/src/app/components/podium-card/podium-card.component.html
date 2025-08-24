@@ -1,0 +1,52 @@
+<c-card class="albo-container">
+  <!-- Header -->
+  <header class="albo-header">
+    <h1>{{ championshipTitle }}</h1>
+  </header>
+
+  <!-- Podio -->
+  <section class="podio">
+    <div
+      class="podio-card"
+      *ngFor="let pilota of podio"
+      [class.first]="pilota.posizione === 1"
+      [class.second]="pilota.posizione === 2"
+      [class.third]="pilota.posizione === 3"
+      [style.background]=" 'linear-gradient(to bottom,' + pilota.colore + ', #111)' "
+      
+    >
+      <div class="numero">{{ pilota.posizione }}</div>
+      <img
+        [src]="pilota.img"
+        [alt]="pilota.nome"
+        class="pilota-img"
+        [ngClass]="{
+          'img-first': pilota.posizione === 1,
+          'img-small': pilota.posizione !== 1
+        }"
+      />
+      <div class="info">
+        <span class="nome">{{ pilota.nome }}</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Classifica 4–6 -->
+  <section class="classifica">
+        <table
+          [hover]="true"
+          [responsive]="true"
+          [striped]="true"
+          align="middle"
+          cTable
+          class="mb-0 border"
+        >
+        <tbody>
+          <tr *ngFor="let p of classifica">
+            <td class="pos">{{ p.posizione }}</td>
+            <td class="nome-table">{{ p.nome }}</td>
+          </tr>
+        </tbody>
+    </table>
+  </section>
+</c-card>

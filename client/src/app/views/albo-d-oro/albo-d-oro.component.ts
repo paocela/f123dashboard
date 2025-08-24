@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 // Import CoreUI Card
-import { CardModule, TableModule } from '@coreui/angular';
+import { PodiumCardComponent } from '../../components/podium-card/podium-card.component';
+import { GridModule } from '@coreui/angular';
 
 @Component({
   selector: 'app-albo-d-oro',
   standalone: true,
-  imports: [CommonModule, CardModule, TableModule],
+  imports: [CommonModule, PodiumCardComponent, GridModule],
   templateUrl: './albo-d-oro.component.html',
   styleUrls: ['./albo-d-oro.component.scss']
 })
@@ -18,8 +19,8 @@ export class AlboDOroComponent {
   ];
 
   classifica = [
-    { posizione: 4, nome: 'HeavyButt' },
-    { posizione: 5, nome: 'FASTman' },
-    { posizione: 6, nome: 'Marcogang96' }
+    { posizione: "#4", nome: 'HeavyButt' },
+    { posizione: "#5", nome: 'FASTman' },
+    { posizione: "#6", nome: 'Marcogang96' }
   ];
 }
