@@ -31,6 +31,15 @@ export const getNavItems = (isAdmin: boolean): INavData[] => {
       iconComponent: { name: 'cil-gamepad' }
     },
     {
+      name: 'Albo D\'oro',
+      url: '/albo-d-oro',
+      iconComponent: { name: 'cil-star' },
+      badge: {
+        color: 'warning',
+        text: 'BETA'
+      }
+    },
+    {
       name: 'Credits',
       url: '/credits',
       iconComponent: { name: 'cil-coffee' },

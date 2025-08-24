@@ -56,6 +56,11 @@ export const routes: Routes = [
       {
         path: 'credits',
         loadChildren: () => import('./views/credits/routes').then((m) => m.routes)
+      },
+      /* routing albo d'oro */
+      {
+        path: 'albo-d-oro',
+        loadChildren: () => import('./views/albo-d-oro/routes').then((m) => m.routes)
       }
     ]
   },

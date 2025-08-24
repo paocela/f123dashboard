@@ -1,23 +1,27 @@
-<c-row *ngIf="isLive" >
+<c-row *ngIf="isLive">
   <c-card class="mb-4">
     <c-card-header>
-      <h4 class="card-title mb-0" >
-        {{streamTitle$ | async}}
+      <h4 class="card-title mb-0">
+        {{ streamTitle$ | async }}
       </h4>
     </c-card-header>
     <c-card-body>
-      <div class="twitch-embed-container" style="aspect-ratio:16/9;max-width:none;min-width:100%!important;">
-        <iframe src="https://player.twitch.tv/?channel=dreandos&parent=localhost&autoplay=false&muted=false&time=0s" 
-          width="100%" 
-          height="100%" 
-          frameborder="0" 
-          allowfullscreen>
+      <div
+        class="twitch-embed-container"
+        style="aspect-ratio: 16/9; max-width: none; min-width: 100% !important"
+      >
+        <iframe
+          src="https://player.twitch.tv/?channel=dreandos&parent=localhost&autoplay=false&muted=false&time=0s"
+          width="100%"
+          height="100%"
+          frameborder="0"
+          allowfullscreen
+        >
         </iframe>
       </div>
-    </c-card-body> 
+    </c-card-body>
   </c-card>
 </c-row>
-
 
 <c-row>
   <c-col xs="12" md="6">
@@ -38,10 +42,16 @@
           <thead class="text-nowrap text-truncate">
             <tr>
               <th class="bg-body-tertiary text-center">Pos.</th>
-              <th class="bg-body-tertiary text-center"><svg cIcon name="cilPeople"></svg></th>
+              <th class="bg-body-tertiary text-center">
+                <svg cIcon name="cilPeople"></svg>
+              </th>
               <th class="bg-body-tertiary">Username</th>
-              <th class="bg-body-tertiary text-center" *ngIf="showColumn()">Scuderia</th>
-              <th class="bg-body-tertiary pilot" *ngIf="showColumn()">Pilota</th>
+              <th class="bg-body-tertiary text-center" *ngIf="showColumn()">
+                Scuderia
+              </th>
+              <th class="bg-body-tertiary pilot" *ngIf="showColumn()">
+                Pilota
+              </th>
               <th class="bg-body-tertiary text-center">Punti</th>
               <th class="bg-body-tertiary text-center">+/-</th>
             </tr>
@@ -80,12 +90,32 @@
                 </div>
               </td>
               <td>
-                <div class="fw-semibold text-center" [ngClass]="{
-                  'text-success': (championship_standings_users[i - 1] && (user.gainedPoints - championship_standings_users[i - 1].gainedPoints) > 0),
-                  'text-danger': (championship_standings_users[i - 1] && (user.gainedPoints - championship_standings_users[i - 1].gainedPoints) < 0),
-                  'text-warning': (championship_standings_users[i - 1] && (user.gainedPoints - championship_standings_users[i - 1].gainedPoints) === 0)
-                }">
-                  {{ championship_standings_users[i - 1] ? (user.gainedPoints - championship_standings_users[i - 1].gainedPoints) : '-' }}
+                <div
+                  class="fw-semibold text-center"
+                  [ngClass]="{
+                    'text-success':
+                      championship_standings_users[i - 1] &&
+                      user.gainedPoints -
+                        championship_standings_users[i - 1].gainedPoints >
+                        0,
+                    'text-danger':
+                      championship_standings_users[i - 1] &&
+                      user.gainedPoints -
+                        championship_standings_users[i - 1].gainedPoints <
+                        0,
+                    'text-warning':
+                      championship_standings_users[i - 1] &&
+                      user.gainedPoints -
+                        championship_standings_users[i - 1].gainedPoints ===
+                        0
+                  }"
+                >
+                  {{
+                    championship_standings_users[i - 1]
+                      ? user.gainedPoints -
+                        championship_standings_users[i - 1].gainedPoints
+                      : "-"
+                  }}
                 </div>
               </td>
             </tr>
@@ -96,8 +126,11 @@
     </c-card>
   </c-col>
   <c-col class="carousle-height" xs="12" md="6">
-    <c-carousel [dark]="false" [touch]="true" *ngIf="championshipNextTracks.length > 0">
-      
+    <c-carousel
+      [dark]="false"
+      [touch]="true"
+      *ngIf="championshipNextTracks.length > 0"
+    >
       <c-carousel-indicators></c-carousel-indicators>
       <c-carousel-inner>
         <c-carousel-item *ngFor="let next_track of championshipNextTracks">
@@ -107,26 +140,22 @@
                 <c-col xs="auto">
                   <h4 class="card-title mb-0" id="traffic">
                     Next Track: {{ next_track.name }}
-                    <svg
-                      size="lg"
-                      [cIcon]="allFlags[next_track.country]"
-                    ></svg>
+                    <svg size="lg" [cIcon]="allFlags[next_track.country]"></svg>
                   </h4>
                 </c-col>
                 @if (next_track.has_sprint == 1) {
-                    <c-col xs="auto">
-                      <c-badge color="info">Sprint</c-badge>
-                    </c-col>
-                  }
-                @if (next_track.has_x2 == 1) {
-                    <c-col xs="auto">
-                      <c-badge color="danger">Points X2</c-badge>
-                    </c-col>
-                  }
+                <c-col xs="auto">
+                  <c-badge color="info">Sprint</c-badge>
+                </c-col>
+                } @if (next_track.has_x2 == 1) {
+                <c-col xs="auto">
+                  <c-badge color="danger">Points X2</c-badge>
+                </c-col>
+                }
               </c-row>
             </c-card-header>
             <c-card-body>
-              <div >
+              <div>
                 <img
                   height="auto"
                   width="100%"
@@ -154,15 +183,26 @@
           </c-card>
         </c-carousel-item>
       </c-carousel-inner>
-      <c-carousel-control [routerLink] caption="Previous" direction="prev"></c-carousel-control>
-      <c-carousel-control [routerLink] caption="Next" direction="next"></c-carousel-control>
+      <c-carousel-control
+        [routerLink]
+        caption="Previous"
+        direction="prev"
+      ></c-carousel-control>
+      <c-carousel-control
+        [routerLink]
+        caption="Next"
+        direction="next"
+      ></c-carousel-control>
     </c-carousel>
     <c-card *ngIf="championshipNextTracks.length === 0">
       <c-card-header>
         <h4 class="card-title mb-0" id="traffic">Classifica Fanta</h4>
       </c-card-header>
       <c-card-body>
-        <app-leaderboard [maxDisplayable]="6" [showVotes]="showColumn()" ></app-leaderboard>
+        <app-leaderboard
+          [maxDisplayable]="6"
+          [showVotes]="showColumn()"
+        ></app-leaderboard>
       </c-card-body>
     </c-card>
   </c-col>
@@ -174,7 +214,9 @@
     <c-row>
       <c-col sm="5">
         <h4 class="card-title mb-0" id="traffic">Andamento Campionato</h4>
-        <div class="small text-body-secondary">Trend dei piloti per ogni GP</div>
+        <div class="small text-body-secondary">
+          Trend dei piloti per ogni GP
+        </div>
       </c-col>
       <c-col sm="7">
         <form [formGroup]="trafficRadioGroup">
@@ -197,22 +239,22 @@
               Ultimi 4 GP
             </label>
             <input
-            class="btn-check"
-            formControlName="trafficRadio"
-            type="radio"
-            value="Month8"
-            id="radio8Month"
-          />
-          <label
-            (click)="setTrafficPeriod('Month', 8)"
-            cButton
-            cFormCheckLabel
-            color="secondary"
-            variant="outline"
-            for="radio8Month"
-          >
-            Ultimi 8 GP
-          </label>
+              class="btn-check"
+              formControlName="trafficRadio"
+              type="radio"
+              value="Month8"
+              id="radio8Month"
+            />
+            <label
+              (click)="setTrafficPeriod('Month', 8)"
+              cButton
+              cFormCheckLabel
+              color="secondary"
+              variant="outline"
+              for="radio8Month"
+            >
+              Ultimi 8 GP
+            </label>
             <input
               class="btn-check"
               formControlName="trafficRadio"
@@ -258,32 +300,48 @@
   </c-card-footer>
 </c-card>
 
-<c-modal  alignment="center" id="championshipResoult"  size="lg" class="modalAnimation"
-      [visible]="resoultModalVisible==1"   backdrop="static">
+<c-modal
+  alignment="center"
+  id="championshipResoult"
+  size="lg"
+  class="modalAnimation"
+  [visible]="resoultModalVisible == 1"
+  backdrop="static"
+>
   <c-modal-header>
     <h5 cModalTitle>Risultati Stagione</h5>
   </c-modal-header>
   <c-modal-body class="box">
     <c-row>
-      <img  src="./assets/images/championshipResoult/classifica2025.jpg" style="width: 100%; height: auto;">
+      <img
+        src="./assets/images/championshipResoult/classifica2025.jpg"
+        style="width: 100%; height: auto"
+      />
     </c-row>
   </c-modal-body>
   <c-modal-footer>
     <button (click)="toggleResoultModalvisible(0)" cButton color="secondary">
       Chiudi
     </button>
-    <button (click)="toggleResoultModalvisible(2)" cButton color="primary">Risultati Fanta</button>
+    <button (click)="toggleResoultModalvisible(2)" cButton color="primary">
+      Risultati Fanta
+    </button>
   </c-modal-footer>
 </c-modal>
 
-<c-modal id="FantaResoult" alignment="center" class="modalAnimation"
-    [visible]="resoultModalVisible==2" backdrop="static">
+<c-modal
+  id="FantaResoult"
+  alignment="center"
+  class="modalAnimation"
+  [visible]="resoultModalVisible == 2"
+  backdrop="static"
+>
   <c-modal-header>
     <h5 cModalTitle>Risultati Fanta</h5>
   </c-modal-header>
-    <div class="box" class="m-2">
-      <app-leaderboard [maxDisplayable]="8"></app-leaderboard>
-    </div>
+  <div class="box" class="m-2">
+    <app-leaderboard [maxDisplayable]="8"></app-leaderboard>
+  </div>
   <c-modal-footer>
     <button (click)="toggleResoultModalvisible(0)" cButton color="secondary">
       Chiudi
