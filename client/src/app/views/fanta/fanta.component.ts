@@ -15,8 +15,8 @@ import { AccordionComponent,
     BadgeComponent} from '@coreui/angular';
 import { AuthService } from './../../service/auth.service';
 import { GridModule } from '@coreui/angular';
-import { DbDataService } from 'src/app/service/db-data.service';
-import { FantaService } from 'src/app/service/fanta.service';
+import { DbDataService } from './../../service/db-data.service';
+import { FantaService } from './../../service/fanta.service';
 import { cifAe, cifAt, cifAu, cifAz, cifBe, cifBh, cifBr, cifCa, cifCn, cifEs, cifGb, cifHu, cifIt, 
     cifJp, cifMc, cifMx, cifNl, cifQa, cifSa, cifSg, cifUs, cilX, cilCheckAlt, cilSwapVertical } from '@coreui/icons';
 import { cilFire, cilPowerStandby } from '@coreui/icons';
@@ -71,7 +71,6 @@ export class FantaComponent {
   formStatus: { [key: number]: number } = {};
   forms: { [key: number]: NgForm } = {};
   user!: User;
-  userId!: number;
   userFantaPoints: number = 0;
   piloti: any[] = [];
   tracks: any[] = [];
@@ -132,13 +131,10 @@ export class FantaComponent {
     
     const userString = sessionStorage.getItem('user');
     this.user = userString ? JSON.parse(userString) as User : {} as User;
-    this.userId = Number(sessionStorage.getItem('userId'));
-    
+
     this.piloti  = this.dbData.getAllDrivers();
-
     this.tracks = this.dbData.getAllTracks();
-
-    this.userFantaPoints = this.fantaService.getFantaPoints(this.userId);
+    this.userFantaPoints = this.fantaService.getFantaPoints(this.user.id);
 
     this.nextTracks = this.tracks
     .filter(item => {
@@ -148,15 +144,15 @@ export class FantaComponent {
     })
       .slice(0,4);
 
-      this.previusTracks = this.tracks
-          .filter(item => {
+    this.previusTracks = this.tracks
+        .filter(item => {
       const today = new Date();
       const itemDate = new Date(item.date);
       return itemDate <= today;
     })
 
     this.previusTracks.forEach( track => {
-      const previousVote: Fanta | undefined = this.fantaService.getFantaVote(this.userId, track.track_id);
+      const previousVote: Fanta | undefined = this.user?.id ? this.fantaService.getFantaVote(this.user.id, track.track_id) : undefined;
       if ( previousVote )
       {
         const previousVoteArray = [
@@ -174,7 +170,7 @@ export class FantaComponent {
     });
 
     this.nextTracks.forEach( track => {
-      const previousVote: Fanta | undefined = this.fantaService.getFantaVote(this.userId, track.track_id);
+      const previousVote: Fanta | undefined = this.user?.id ? this.fantaService.getFantaVote(this.user.id, track.track_id) : undefined;
       if ( previousVote )
       {
         const previousVoteArray = [
@@ -199,9 +195,9 @@ export class FantaComponent {
 
   publishVoto(trackId: number, form: NgForm): void {
     this.forms[trackId]= form;
-    if(this.formIsValid(trackId)){
+    if(this.formIsValid(trackId) && this.user?.id){
       let fantaVoto: Fanta = {
-        fanta_player_id: this.userId,
+        fanta_player_id: this.user.id,
         username: this.user.username,
         id_1_place: this.getVoto(trackId,1),
         id_2_place: this.getVoto(trackId,2),
