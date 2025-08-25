@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { DbDataService } from './db-data.service';
 import { Fanta, RaceResult } from '../model/fanta';
-import { LeaderBoard } from '../model/leaderboard';
 import { size } from 'lodash-es';
 
 

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { PostgresService, FantaService } from "@genezio-sdk/f123dashboard" 
 import { Fanta, FantaPlayer } from '../model/fanta';
-import { User } from '../model/user';
+import { User } from '../model/auth';
 import { GpResult } from '../model/championship'
 
 
@@ -111,14 +111,27 @@ export class DbDataService {
   }
 
   async setGpResult(trackId: Number, gpResult: GpResult): Promise<void> {
-    await PostgresService.setGpResult(+trackId,
-                                  gpResult.hasSprint,
-                                  gpResult.raceResult,
-                                  gpResult.raceDnfResult,
-                                  gpResult.sprintResult,
-                                  gpResult.sprintDnfResult,
-                                  gpResult.qualiResult,
-                                  gpResult.fpResult);
+    // await PostgresService.setGpResult(+trackId,
+    //                               gpResult.hasSprint,
+    //                               gpResult.raceResult,
+    //                               gpResult.raceDnfResult,
+    //                               gpResult.sprintResult,
+    //                               gpResult.sprintDnfResult,
+    //                               gpResult.qualiResult,
+    //                               gpResult.fpResult);
+  }
+
+  getAvatarSrc(user: User | null): string {
+    if (user?.image) {
+      // Check if it's already a data URL (base64)
+      if (user.image.startsWith('data:')) {
+        return user.image;
+      }
+      // If it's base64 without data URL prefix, add it
+      return `data:image/jpeg;base64,${user.image}`;
+    }
+    // Fallback to file path
+    return `./assets/images/avatars_fanta/${user?.id || 'default'}.png`;
   }
 
 }

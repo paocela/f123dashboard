@@ -379,5 +379,9 @@ export class FantaComponent {
   toggleModalRanking() {
     this.modalRankingVisible = !this.modalRankingVisible;
   }
+  
+  get avatarSrc(): string {
+    return this.dbData.getAvatarSrc(this.user);
+  }
 
 }

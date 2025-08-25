@@ -1,4 +1,5 @@
-import { GenezioDeploy } from "@genezio/types";
+import { GenezioDeploy, GenezioMethod  } from "@genezio/types";
+import { GenezioHttpResponse, GenezioHttpRequest } from "@genezio/types";
 import pg from "pg";
 import { createHash, randomBytes } from "crypto";
 import jwt from "jsonwebtoken";
@@ -78,14 +79,14 @@ export class AuthService {
     return jwtToken;
   }
 
-  private async validateSession(jwtToken: string): Promise<{ valid: boolean; userId?: number; username?: string }> {
+  private async validateSession(jwtToken: string): Promise<{ valid: boolean; userId?: number; username?: string; name?: string; surname?: string; mail?: string; image?: string; }> {
     try {
       // Verify JWT token
       const decoded = jwt.verify(jwtToken, this.jwtSecret) as any;
       
       // Check if user still exists and is active
       const result = await this.pool.query(
-        'SELECT id, username, is_active FROM fanta_player WHERE id = $1',
+        'SELECT id, username, is_active, name, surname, mail, encode(image, \'escape\') as image FROM fanta_player WHERE id = $1',
         [decoded.userId]
       );
 
@@ -134,8 +135,12 @@ export class AuthService {
 
       return {
         valid: true,
-        userId: decoded.userId,
-        username: decoded.username
+        userId: user.id,
+        username: user.username,
+        name: user.name,
+        surname: user.surname,
+        mail: user.mail,
+        image: user.image
       };
 
     } catch (error) {
@@ -195,7 +200,7 @@ export class AuthService {
 
       // Get user from database
       const result = await this.pool.query(
-        'SELECT id, username, name, surname, password, is_active FROM fanta_player WHERE username = $1',
+        'SELECT id, username, name, surname, password, mail, encode(image, \'escape\') as image, is_active FROM fanta_player WHERE username = $1',
         [username]
       );
 
@@ -242,7 +247,9 @@ export class AuthService {
           id: user.id,
           username: user.username,
           name: user.name,
-          surname: user.surname
+          surname: user.surname,
+          mail: user.mail,
+          image: user.image
         },
         token: jwtToken
       });
@@ -256,9 +263,14 @@ export class AuthService {
     }
   }
 
-  async register(username: string, name: string, surname: string, password: string, userAgent?: string): Promise<string> {
-    try {
-      this.validateRegisterInput(username, name, surname, password);
+  @GenezioMethod({ type: "http" })
+  async register(request: GenezioHttpRequest): Promise<GenezioHttpResponse> {
+    try {   
+      const { username, name, surname, password, mail, image } = request.body;
+      const userAgent = request.headers['user-agent'];
+
+      // Validate input
+      this.validateRegisterInput(username, name, surname, password, mail, image);
 
       // Check if username already exists
       const existingUser = await this.pool.query(
@@ -267,10 +279,31 @@ export class AuthService {
       );
 
       if (existingUser.rows.length > 0) {
-        return JSON.stringify({
-          success: false,
-          message: 'Username already exists'
-        });
+        return {
+          statusCode: "409",
+          body: JSON.stringify({
+            success: false,
+            message: 'Username already exists'
+          }),
+          headers: { 'Content-Type': 'application/json' }
+        };
+      }
+
+      // Check if email already exists
+      const existingEmail = await this.pool.query(
+        'SELECT mail FROM fanta_player WHERE mail = $1',
+        [mail]
+      );
+
+      if (existingEmail.rows.length > 0) {
+        return {
+          statusCode: "409",
+          body: JSON.stringify({
+            success: false,
+            message: 'Email already exists'
+          }),
+          headers: { 'Content-Type': 'application/json' }
+        };
       }
 
       // Hash password
@@ -278,8 +311,8 @@ export class AuthService {
 
       // Insert new user
       const result = await this.pool.query(
-        'INSERT INTO fanta_player (username, name, surname, password, created_at) VALUES ($1, $2, $3, $4, NOW()) RETURNING id, username, name, surname',
-        [username, name, surname, hashedPassword]
+        'INSERT INTO fanta_player (username, name, surname, password, mail, image, created_at) VALUES ($1, $2, $3, $4, $5, $6, NOW()) RETURNING id, username, name, surname, mail, image',
+        [username, name, surname, hashedPassword, mail, image || null]
       );
 
       const newUser = result.rows[0];
@@ -287,24 +320,53 @@ export class AuthService {
       // Create session and get JWT token
       const jwtToken = await this.createSession(newUser.id, userAgent);
 
-      return JSON.stringify({
-        success: true,
-        message: 'Registration successful',
-        user: {
-          id: newUser.id,
-          username: newUser.username,
-          name: newUser.name,
-          surname: newUser.surname
-        },
-        token: jwtToken
-      });
+      return {
+        statusCode: "201",
+        body: JSON.stringify({
+          success: true,
+          message: 'Registration successful',
+          user: {
+            id: newUser.id,
+            username: newUser.username,
+            name: newUser.name,
+            surname: newUser.surname,
+            mail: newUser.mail,
+            image: newUser.image
+          },
+          token: jwtToken
+        }),
+        headers: { 'Content-Type': 'application/json' }
+      };
 
     } catch (error) {
       console.error('Registration error:', error);
-      return JSON.stringify({
-        success: false,
-        message: 'An error occurred during registration'
-      });
+      
+      // Handle validation errors with specific status codes
+      if (error instanceof Error) {
+        if (error.message.includes('required') || 
+            error.message.includes('must be') || 
+            error.message.includes('characters') ||
+            error.message.includes('valid email') ||
+            error.message.includes('contain')) {
+          return {
+            statusCode: "400",
+            body: JSON.stringify({
+              success: false,
+              message: error.message
+            }),
+            headers: { 'Content-Type': 'application/json' }
+          };
+        }
+      }
+
+      return {
+        statusCode: "500",
+        body: JSON.stringify({
+          success: false,
+          message: 'An error occurred during registration'
+        }),
+        headers: { 'Content-Type': 'application/json' }
+      };
     }
   }
 
@@ -319,7 +381,11 @@ export class AuthService {
       return JSON.stringify({
         valid: true,
         userId: sessionData.userId,
-        username: sessionData.username
+        username: sessionData.username,
+        name: sessionData.name,
+        surname: sessionData.surname,
+        mail: sessionData.mail,
+        image: sessionData.image
       });
 
     } catch (error) {
@@ -521,6 +587,174 @@ export class AuthService {
     }
   }
 
+  @GenezioMethod({ type: "http" })
+  async updateUserInfo(request: GenezioHttpRequest): Promise<GenezioHttpResponse> {
+    try {
+      const { jwtToken, updates } = request.body;
+
+      if (!jwtToken || !updates) {
+        return {
+          statusCode: "400",
+          body: JSON.stringify({
+            success: false,
+            message: 'JWT token and updates are required'
+          }),
+          headers: { 'Content-Type': 'application/json' }
+        };
+      }
+
+      // Validate JWT token
+      const sessionData = await this.validateSession(jwtToken);
+      
+      if (!sessionData.valid) {
+        return {
+          statusCode: "401",
+          body: JSON.stringify({
+            success: false,
+            message: 'Invalid session'
+          }),
+          headers: { 'Content-Type': 'application/json' }
+        };
+      }
+
+      // Validate updates
+      this.validateUpdateUserInfoInput(updates);
+
+      // If email is being updated, check if it already exists
+      if (updates.mail) {
+        const existingEmail = await this.pool.query(
+          'SELECT id FROM fanta_player WHERE mail = $1 AND id != $2',
+          [updates.mail, sessionData.userId]
+        );
+
+        if (existingEmail.rows.length > 0) {
+          return {
+            statusCode: "409",
+            body: JSON.stringify({
+              success: false,
+              message: 'Email already exists'
+            }),
+            headers: { 'Content-Type': 'application/json' }
+          };
+        }
+      }
+
+      // Build dynamic query
+      const updateFields: string[] = [];
+      const values: any[] = [];
+      let parameterIndex = 1;
+
+      if (updates.name !== undefined) {
+        updateFields.push(`name = $${parameterIndex}`);
+        values.push(updates.name);
+        parameterIndex++;
+      }
+
+      if (updates.surname !== undefined) {
+        updateFields.push(`surname = $${parameterIndex}`);
+        values.push(updates.surname);
+        parameterIndex++;
+      }
+
+      if (updates.mail !== undefined) {
+        updateFields.push(`mail = $${parameterIndex}`);
+        values.push(updates.mail);
+        parameterIndex++;
+      }
+
+      if (updates.image !== undefined) {
+        updateFields.push(`image = $${parameterIndex}`);
+        values.push(updates.image);
+        parameterIndex++;
+      }
+
+      // If no fields to update
+      if (updateFields.length === 0) {
+        return {
+          statusCode: "400",
+          body: JSON.stringify({
+            success: false,
+            message: 'No valid fields to update'
+          }),
+          headers: { 'Content-Type': 'application/json' }
+        };
+      }
+
+      // Add user ID to values
+      values.push(sessionData.userId);
+
+      // Execute update query
+      const query = `
+        UPDATE fanta_player 
+        SET ${updateFields.join(', ')} 
+        WHERE id = $${parameterIndex} 
+        RETURNING id, username, name, surname, mail, encode(image, 'escape') as image
+      `;
+
+      const result = await this.pool.query(query, values);
+
+      if (result.rows.length === 0) {
+        return {
+          statusCode: "404",
+          body: JSON.stringify({
+            success: false,
+            message: 'User not found'
+          }),
+          headers: { 'Content-Type': 'application/json' }
+        };
+      }
+
+      const updatedUser = result.rows[0];
+
+      return {
+        statusCode: "200",
+        body: JSON.stringify({
+          success: true,
+          message: 'User information updated successfully',
+          user: {
+            id: updatedUser.id,
+            username: updatedUser.username,
+            name: updatedUser.name,
+            surname: updatedUser.surname,
+            mail: updatedUser.mail,
+            image: updatedUser.image
+          }
+        }),
+        headers: { 'Content-Type': 'application/json' }
+      };
+
+    } catch (error) {
+      console.error('Update user info error:', error);
+      
+      // Handle validation errors with specific status codes
+      if (error instanceof Error) {
+        if (error.message.includes('required') || 
+            error.message.includes('must be') || 
+            error.message.includes('characters') ||
+            error.message.includes('valid email') ||
+            error.message.includes('contain')) {
+          return {
+            statusCode: "400",
+            body: JSON.stringify({
+              success: false,
+              message: error.message
+            }),
+            headers: { 'Content-Type': 'application/json' }
+          };
+        }
+      }
+
+      return {
+        statusCode: "500",
+        body: JSON.stringify({
+          success: false,
+          message: 'An error occurred while updating user information'
+        }),
+        headers: { 'Content-Type': 'application/json' }
+      };
+    }
+  }
+
   private validateLoginInput(username: string, password: string): void {
     if (!username || !password) {
       throw new Error('Username and password are required');
@@ -531,9 +765,9 @@ export class AuthService {
     }
   }
 
-  private validateRegisterInput(username: string, name: string, surname: string, password: string): void {
-    if (!username || !name || !surname || !password) {
-      throw new Error('All fields are required');
+  private validateRegisterInput(username: string, name: string, surname: string, password: string, mail: string, image: string): void {
+    if (!username || !name || !surname || !password || !mail || !image) {
+      throw new Error('All fields are required including profile image');
     }
 
     if (username.length < 3 || username.length > 30) {
@@ -542,6 +776,33 @@ export class AuthService {
 
     if (password.length < 8) {
       throw new Error('Password must be at least 8 characters long');
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(mail)) {
+      throw new Error('Please enter a valid email address');
+    }
+
+    // Image validation
+    if (image.length > 5000000) { // 5MB limit
+      throw new Error('Image size is too large (max 5MB)');
+    }
+
+    // Check if image is a valid base64 string
+    const base64Regex = /^[A-Za-z0-9+/]*={0,2}$/;
+    let cleanImage = image;
+    
+    // Remove data URL prefix if present
+    if (image.startsWith('data:')) {
+      const commaIndex = image.indexOf(',');
+      if (commaIndex !== -1) {
+        cleanImage = image.substring(commaIndex + 1);
+      }
+    }
+    
+    if (!base64Regex.test(cleanImage)) {
+      throw new Error('Invalid image format. Please provide a valid base64 encoded image');
     }
 
     // Password strength validation
@@ -582,6 +843,82 @@ export class AuthService {
 
     if (!hasUpperCase || !hasLowerCase || !hasNumbers || !hasSpecialChar) {
       throw new Error('New password must contain at least one uppercase letter, one lowercase letter, one number, and one special character');
+    }
+  }
+
+  private validateUpdateUserInfoInput(updates: {
+    name?: string;
+    surname?: string;
+    mail?: string;
+    image?: string;
+  }): void {
+    // Check if at least one field is provided
+    if (!updates || Object.keys(updates).length === 0) {
+      throw new Error('At least one field must be provided for update');
+    }
+
+    // Validate name if provided
+    if (updates.name !== undefined) {
+      if (typeof updates.name !== 'string') {
+        throw new Error('Name must be a string');
+      }
+      if (updates.name.trim().length === 0) {
+        throw new Error('Name cannot be empty');
+      }
+      if (updates.name.length > 50) {
+        throw new Error('Name must be 50 characters or less');
+      }
+    }
+
+    // Validate surname if provided
+    if (updates.surname !== undefined) {
+      if (typeof updates.surname !== 'string') {
+        throw new Error('Surname must be a string');
+      }
+      if (updates.surname.trim().length === 0) {
+        throw new Error('Surname cannot be empty');
+      }
+      if (updates.surname.length > 50) {
+        throw new Error('Surname must be 50 characters or less');
+      }
+    }
+
+    // Validate email if provided
+    if (updates.mail !== undefined) {
+      if (typeof updates.mail !== 'string') {
+        throw new Error('Email must be a string');
+      }
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(updates.mail)) {
+        throw new Error('Please enter a valid email address');
+      }
+    }
+
+    // Validate image if provided
+    if (updates.image !== undefined) {
+      if (typeof updates.image !== 'string') {
+        throw new Error('Image must be a string');
+      }
+      
+      if (updates.image.length > 5000000) { // 5MB limit
+        throw new Error('Image size is too large (max 5MB)');
+      }
+
+      // Check if image is a valid base64 string
+      const base64Regex = /^[A-Za-z0-9+/]*={0,2}$/;
+      let cleanImage = updates.image;
+      
+      // Remove data URL prefix if present
+      if (updates.image.startsWith('data:')) {
+        const commaIndex = updates.image.indexOf(',');
+        if (commaIndex !== -1) {
+          cleanImage = updates.image.substring(commaIndex + 1);
+        }
+      }
+      
+      if (!base64Regex.test(cleanImage)) {
+        throw new Error('Invalid image format. Please provide a valid base64 encoded image');
+      }
     }
   }
 }

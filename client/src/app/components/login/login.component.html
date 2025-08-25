@@ -1,13 +1,13 @@
-<c-dropdown #loginDropdown [autoClose]="'outside'">
+<c-dropdown #loginDropdown [autoClose]="'outside'" class="login-dropdown">
   
   <button cButton 
     cDropdownToggle
-    class="transparent-button" 
+    class="login-toggle-button" 
 >
- @if (isLoggedIn){
-      <c-avatar size="sm" [src]="'./assets/images/avatars_fanta/' + loggedUserId + '.png'"/>
+ @if (isLoggedIn && currentUser){
+      <c-avatar size="sm" [src]="avatarSrc" class="user-avatar"/>
     }@else {
-      <svg [cIcon]="icons.cilUser" size="sm" class="social-icon"></svg>
+      <svg [cIcon]="icons.cilUser" size="sm" class="login-icon"></svg>
     }
 </button>
 
@@ -16,70 +16,119 @@
 
 
   @if (!isLoggedIn) {
-    <ul cDropdownMenu [ngStyle]="{'min-width.px': 300}">
-      <form cForm (ngSubmit)="onLogin()">
-        <c-container breakpoint="md" class="px-4">
-          <c-row [gutter]="{gy: 5}">
+    <ul cDropdownMenu class="login-dropdown-menu" [ngStyle]="{'min-width.px': 320}">
+      <li class="dropdown-header">
+        <h6 class="login-title">Accedi al tuo account</h6>
+      </li>
+      <li><hr cDropdownDivider></li>
+      <form cForm (ngSubmit)="onLogin()" class="login-form">
+        <c-container breakpoint="md" class="login-container">
+          <c-row [gutter]="{gy: 3}">
             <c-col>
-              <div [cFormFloating]="true" class="mb-3">
+              <div cFormFloating class="input-floating">
                 <input cFormControl  
-                  class="m-2" 
+                  class="login-input" 
                   type="text" 
                   id="username" 
                   [(ngModel)]="username" 
                   name="username" 
-                  placeholder="username"
+                  placeholder="Username"
+                  autocomplete="username"
                   required
                 >
-                <label cLabel for="SignInUsername">Username:</label>
+                <label cLabel for="username" class="input-label">Username</label>
               </div>
             </c-col>
           </c-row>
-          <c-row [gutter]="{gy: 5}">
+          <c-row [gutter]="{gy: 3}">
             <c-col>
-              <div [cFormFloating]="true" class="mb-3">
+              <div cFormFloating class="input-floating">
                 <input cFormControl 
                 id="password" 
                 placeholder="Password" 
                 type="password" 
-                class="m-2" 
-                autocomplete="off"
+                class="login-input" 
+                autocomplete="current-password"
                 [(ngModel)]="password" 
                 name="password" 
                 required
                 >
-                @if (errorMessage) { <p class="errorMessage">{{ errorMessage }}</p> }
-                <label cLabel for="password">Password:</label>
+                <label cLabel for="password" class="input-label">Password</label>
               </div>
+              @if (errorMessage) { 
+                <div class="error-message">
+                  <svg [cIcon]="warningIcon" class="error-icon"></svg>
+                  {{ errorMessage }}
+                </div> 
+              }
             </c-col>
           </c-row>
-          <div class="container">
-            <button cButton class="m-1" color="primary" type="submit">Accedi</button>
+          <div class="login-actions">
+            <button cButton class="login-button" color="primary" type="submit" [disabled]="isLoading">
+              @if (isLoading) {
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              }
+              Accedi
+            </button>
           </div>
         </c-container>
       </form>
-      <div class="container">
-        <button (click)="openRegistrationModal()" color="link" cButton>oppure registrati</button>
+      <li><hr cDropdownDivider></li>
+      <div class="register-section">
+        <button (click)="openRegistrationModal()" color="link" cButton class="register-button">
+          Non hai un account? Registrati
+        </button>
       </div>
     </ul>
   } @else {
-    <ul cDropdownMenu>
+    <ul cDropdownMenu class="user-dropdown-menu">
+      @if (currentUser) {
+        <li class="user-info-header">
+          <div class="user-info">
+            <c-avatar size="md" [src]="avatarSrc" class="user-avatar-large"/>
+            <div class="user-details">
+              <h6 class="user-name">{{ userDisplayName }}</h6>
+              <span class="username">@{{ currentUser.username }}</span>
+            </div>
+          </div>
+        </li>
+        <li><hr cDropdownDivider></li>
+      }
       <li>
-        <a cDropdownItem>
-          <button cButton (click)="onLogout()" color="transparent">
-            <c-row class="align-items-center">
-              <c-col>
-                Logout
-              </c-col>
-              <c-col cols="auto">
-                <svg [cIcon]="logoutIcon" style="width: 1rem; height: 1rem;"></svg>
-              </c-col>
-            </c-row>
-          </button>
+        <a cDropdownItem class="profile-item" (click)="openUserProfileModal()">
+          <div class="profile-content">
+            <span class="profile-text">Modifica profilo</span>
+            <svg [cIcon]="icons.cilUser" class="profile-icon"></svg>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a cDropdownItem class="password-item" (click)="openPasswordChangeModal()">
+          <div class="password-content">
+            <span class="password-text">Cambia password</span>
+            <svg [cIcon]="icons.cilLockLocked" class="password-icon"></svg>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a cDropdownItem class="logout-item" (click)="onLogout()">
+          <div class="logout-content">
+            <span class="logout-text">Logout</span>
+            <svg [cIcon]="logoutIcon" class="logout-icon"></svg>
+          </div>
         </a>
       </li>
     </ul>
   }
 </c-dropdown>
 
-<app-registration-modal #registrationModal></app-registration-modal>
+<app-registration-modal 
+  #registrationModal 
+  (registrationSuccess)="onRegistrationSuccess()"
+  (updateSuccess)="onUpdateSuccess()">
+</app-registration-modal>
+
+<app-password-change-modal 
+  #passwordChangeModal 
+  (passwordChanged)="onPasswordChanged()">
+</app-password-change-modal>

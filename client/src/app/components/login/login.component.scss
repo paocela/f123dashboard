@@ -1,50 +1,309 @@
-.container {
-    display: flex;
-    justify-content: center; 
-    align-items: center; 
+// Import common floating form styles
+@use '../../../scss/floating-forms';
+
+// Login Dropdown Container
+.login-dropdown {
+  position: relative;
+}
+
+// Login Toggle Button
+.login-toggle-button {
+  background: transparent !important;
+  border: none !important;
+  padding: 0.5rem 0.75rem;
+  margin: 0;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+  color: var(--cui-nav-link-color, #8a93a2) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  min-height: 40px;
+
+  &:hover {
+    background: rgba(var(--cui-primary-rgb), 0.1) !important;
+    color: var(--cui-primary) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    .login-icon, .user-avatar {
+      transform: scale(1.1);
+    }
   }
 
-  .avviso {
-    display: flex;
-    font-weight: bold;
-    margin-top:10px;
-    margin-left: 10px;
-    margin-bottom: 0px;
+  &:focus {
+    box-shadow: 0 0 0 2px rgba(var(--cui-primary-rgb), 0.25);
+    outline: none;
   }
 
-  .errorMessage {
-    color: var(--cui-danger);
-    font-size: 14px;
-    font-weight: 500;
-    margin-top: 8px;
-    margin-bottom: 8px;
-    text-align: center;
-    padding: 8px;
-  }
-
-.transparent-button {
-    background: transparent !important;
-    border: none !important;
-    padding: 0.5rem 1rem;
-    margin: 0;
+  .login-icon {
+    width: 1.25rem;
+    height: 1.25rem;
     transition: all 0.3s ease;
-    color: var(--cui-nav-link-color, #8a93a2) !important;
+    color: inherit;
+  }
+
+  .user-avatar {
+    transition: all 0.3s ease;
+    border: 2px solid rgba(var(--cui-primary-rgb), 0.2);
+  }
+}
+
+// Login Dropdown Menu
+.login-dropdown-menu {
+  @extend .modal-dropdown-container;
+  min-width: 320px !important;
+  padding: 0;
+  margin-top: 8px;
+
+  .dropdown-header {
+    @extend .gradient-header;
+    
+    .login-title {
+      @extend .title;
+    }
+  }
+
+  .login-container {
+    padding: 1.5rem;
+  }
+
+  .input-group {
+    @extend .floating-input-group;
+    margin-bottom: 1rem; // Specific spacing for login dropdown
+  }
+
+  .error-message {
+    @extend .form-error-message;
+  }
+
+  .login-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+
+    .login-button {
+      @extend .enhanced-button;
+      width: 100%;
+      font-size: 0.95rem;
+    }
+  }
+
+  .register-section {
+    padding: 1rem 1.5rem 1.5rem;
+    text-align: center;
+    background: var(--cui-tertiary-bg);
+
+    .register-button {
+      color: var(--cui-primary);
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+
+      &:hover {
+        background: rgba(var(--cui-primary-rgb), 0.1);
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+ // CoreUI Floating Input Groups
+.input-floating {
+    @extend .floating-input-group;
+}
+
+// User Dropdown Menu
+.user-dropdown-menu {
+  @extend .modal-dropdown-container;
+  min-width: 280px !important;
+  padding: 0;
+  margin-top: 8px;
+
+  .user-info-header {
+    @extend .gradient-header;
+    padding: 1.5rem; // Override for user info layout
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+
+      .user-avatar-large {
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        flex-shrink: 0;
+      }
+
+      .user-details {
+        .user-name {
+          margin: 0 0 0.25rem 0;
+          font-size: 1.1rem;
+          font-weight: 600;
+          color: white;
+          
+          &.clickable-username {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            margin: -0.25rem -0.5rem 0 -0.5rem;
+            display: inline-block;
+            
+            &:hover {
+              background: rgba(255, 255, 255, 0.15);
+              transform: translateY(-1px);
+              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            
+            &:active {
+              transform: translateY(0);
+            }
+          }
+        }
+
+        .username {
+          font-size: 0.9rem;
+          opacity: 0.9;
+          color: rgba(255, 255, 255, 0.8);
+        }
+      }
+    }
+  }
+
+  .profile-item {
+    padding: 1rem 1.5rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+    background: none;
+    width: 100%;
+    display: block;
 
     &:hover {
-        background: transparent !important;
-        color: rgb(26, 131, 0) !important;
-
-        .social-icon {
-            color: rgb(26, 131, 0) !important;
-        }
+      background: rgba(var(--cui-primary-rgb), 0.1);
+      color: var(--cui-primary);
     }
 
-    .social-icon {
-        width: 1.2rem;
-        height: 1.2rem;
-        transition: color 0.3s ease;
-        color: var(--cui-nav-link-color, #8a93a2);
+    .profile-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      .profile-text {
+        font-weight: 500;
+        font-size: 0.95rem;
+      }
+
+      .profile-icon {
+        width: 1.1rem;
+        height: 1.1rem;
+        transition: transform 0.3s ease;
+      }
     }
+
+    &:hover .profile-icon {
+      transform: translateX(4px);
+    }
+  }
+
+  .password-item {
+    padding: 1rem 1.5rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+    background: none;
+    width: 100%;
+    display: block;
+
+    &:hover {
+      background: rgba(var(--cui-warning-rgb), 0.1);
+      color: var(--cui-warning);
+    }
+
+    .password-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      .password-text {
+        font-weight: 500;
+        font-size: 0.95rem;
+      }
+
+      .password-icon {
+        width: 1.1rem;
+        height: 1.1rem;
+        transition: transform 0.3s ease;
+      }
+    }
+
+    &:hover .password-icon {
+      transform: translateX(4px);
+    }
+  }
+
+  .logout-item {
+    padding: 1rem 1.5rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+    background: none;
+    width: 100%;
+    display: block;
+
+    &:hover {
+      background: rgba(var(--cui-danger-rgb), 0.1);
+      color: var(--cui-danger);
+    }
+
+    .logout-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      .logout-text {
+        font-weight: 500;
+        font-size: 0.95rem;
+      }
+
+      .logout-icon {
+        width: 1.1rem;
+        height: 1.1rem;
+        transition: transform 0.3s ease;
+      }
+    }
+
+    &:hover .logout-icon {
+      transform: translateX(4px);
+    }
+  }
+}
+
+// Legacy styles for backward compatibility
+.container {
+  display: flex;
+  justify-content: center; 
+  align-items: center; 
+}
+
+.avviso {
+  display: flex;
+  font-weight: bold;
+  margin-top: 10px;
+  margin-left: 10px;
+  margin-bottom: 0px;
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .login-dropdown-menu,
+  .user-dropdown-menu {
+    min-width: 280px !important;
+    margin-left: -120px;
+  }
 }
 
 .link-name {

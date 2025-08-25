@@ -3,20 +3,31 @@
   #verticallyCenteredModal
   alignment="center"
   id="verticallyCenteredModal"
-  [backdrop]="false"
+  [backdrop]="isEmailCompletion ? 'static' : false"
+  class="registration-modal"
 >
-  <c-modal-header>
-    <h5 cModalTitle class="text-center w-100">Registrazione</h5>
+  <c-modal-header class="modal-header-custom">
+    <h5 cModalTitle class="modal-title-custom">
+      {{ getModalTitle() }}
+    </h5>
   </c-modal-header>
-  <c-modal-body>
-    <form cForm (ngSubmit)="onRegistration()" class="custom-form">
-      <c-container breakpoint="md" class="px-4">
-        <c-row [gutter]="{ gy: 5 }">
-          <c-col>
-            <div [cFormFloating]="true" class="mb-3">
+  <c-modal-body class="modal-body-custom">
+    <!-- Email completion message -->
+    <c-alert *ngIf="isEmailCompletion" color="info" class="mb-3">
+      <strong>Profilo incompleto!</strong> Per accedere alle funzionalità complete dell'applicazione, è necessario fornire un indirizzo email valido.
+    </c-alert>
+    
+    <form cForm (ngSubmit)="onRegistration()" class="registration-form">
+      <!-- Hidden username field for accessibility -->
+      <input type="text" name="username" autocomplete="username" style="display: none;" [value]="regUsername" readonly>
+      
+      <c-container breakpoint="md" class="registration-container">
+        <c-row [gutter]="{ gy: 3 }">
+          <c-col xs="12" md="6">
+            <div cFormFloating class="input-floating">
               <input
                 cFormControl
-                class="m-2"
+                class="registration-input"
                 type="text"
                 id="name"
                 [(ngModel)]="name"
@@ -24,16 +35,14 @@
                 placeholder="Nome"
                 required
               />
-              <label cLabel for="name">Nome:</label>
+              <label cLabel for="name" class="input-label">Nome</label>
             </div>
           </c-col>
-        </c-row>
-        <c-row [gutter]="{ gy: 5 }">
-          <c-col>
-            <div [cFormFloating]="true" class="mb-3">
+          <c-col xs="12" md="6">
+            <div cFormFloating class="input-floating">
               <input
                 cFormControl
-                class="m-2"
+                class="registration-input"
                 type="text"
                 id="surname"
                 [(ngModel)]="surname"
@@ -41,113 +50,151 @@
                 placeholder="Cognome"
                 required
               />
-              <label cLabel for="surname">Cognome:</label>
+              <label cLabel for="surname" class="input-label">Cognome</label>
             </div>
           </c-col>
         </c-row>
-        <c-row [gutter]="{ gy: 5 }">
-          <c-col>
-            <div [cFormFloating]="true" class="mb-3">
+        
+        <c-row [gutter]="{ gy: 3 }">
+          <c-col xs="12">
+            <div cFormFloating class="input-floating">
               <input
                 cFormControl
-                class="m-2"
+                class="registration-input"
                 type="text"
                 id="regUsername"
                 [(ngModel)]="regUsername"
                 name="regUsername"
                 placeholder="Username"
+                [readonly]="mode === 'update'"
+                [class.readonly-input]="mode === 'update'"
                 required
               />
-              <label cLabel for="regUsername">Username:</label>
+              <label cLabel for="regUsername" class="input-label">Username</label>
             </div>
           </c-col>
         </c-row>
-        <c-row [gutter]="{ gy: 5 }">
-          <c-col>
-            <div [cFormFloating]="true" class="mb-3">
+        
+        <c-row [gutter]="{ gy: 3 }">
+          <c-col xs="12">
+            <div cFormFloating class="input-floating">
               <input
                 cFormControl
-                id="regPassword"
-                placeholder="Password"
-                type="password"
-                class="m-2"
-                autocomplete="off"
-                [(ngModel)]="regPassword"
-                name="regPassword"
-                required
-              />
-              <label cLabel for="regPassword">Password:</label>
-            </div>
-          </c-col>
-        </c-row>
-        <c-row [gutter]="{ gy: 5 }">
-          <c-col>
-            <div [cFormFloating]="true" class="mb-3">
-              <input
-                cFormControl
-                id="confirmPassword"
-                placeholder="Conferma Password"
-                type="password"
-                class="m-2"
-                autocomplete="off"
-                [(ngModel)]="confirmPassword"
-                name="confirmPassword"
-                required
-              />
-              <label cLabel for="confirmPassword">Conferma Password:</label>
-            </div>
-          </c-col>
-        </c-row>
-        <c-row [gutter]="{ gy: 5 }">
-          <c-col>
-            <div [cFormFloating]="true" class="mb-3">
-              <input
-                cFormControl
-                id="email"
-                placeholder="Email"
+                class="registration-input"
                 type="email"
-                class="m-2"
-                autocomplete="off"
+                id="email"
                 [(ngModel)]="email"
                 name="email"
+                placeholder="Email"
                 required
               />
-              <label cLabel for="email">Email:</label>
+              <label cLabel for="email" class="input-label">Email</label>
             </div>
           </c-col>
         </c-row>
-        <c-row [gutter]="{ gy: 5 }">
-          <c-col>
-            <div class="mb-3">
-              <label cLabel for="profileImage">Immagine del profilo:</label>
+        
+        <!-- Password fields only shown in register mode -->
+        @if (mode === 'register') {
+          <c-row [gutter]="{ gy: 3 }">
+            <c-col xs="12" md="6">
+              <div cFormFloating class="input-floating">
+                <input
+                  cFormControl
+                  id="regPassword"
+                  placeholder="Password"
+                  type="password"
+                  class="registration-input"
+                  autocomplete="new-password"
+                  [(ngModel)]="regPassword"
+                  name="regPassword"
+                  required
+                />
+                <label cLabel for="regPassword" class="input-label">Password</label>
+              </div>
+            </c-col>
+            <c-col xs="12" md="6">
+              <div cFormFloating class="input-floating">
+                <input
+                  cFormControl
+                  id="confirmPassword"
+                  placeholder="Conferma Password"
+                  type="password"
+                  class="registration-input"
+                  autocomplete="new-password"
+                  [(ngModel)]="confirmPassword"
+                  name="confirmPassword"
+                  required
+                />
+                <label cLabel for="confirmPassword" class="input-label">Conferma Password</label>
+              </div>
+            </c-col>
+          </c-row>
+        }
+        
+        <c-row [gutter]="{ gy: 3 }">
+          <c-col xs="12">
+            <div class="file-input-group">
+              <label cLabel for="profileImage" class="file-label">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" class="file-icon">
+                  <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                  <path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z"/>
+                </svg>
+                Immagine del profilo
+              </label>
               <input
                 cFormControl
                 id="profileImage"
                 type="file"
-                class="m-2"
-                accept="image/*"
+                class="file-input"
+                accept="image/jpeg,image/jpg,.jpg,.jpeg"
                 (change)="onFileSelected($event)"
                 name="profileImage"
               />
+              @if (selectedFile) {
+                <div class="file-selected">
+                  <div class="image-preview-container">
+                    <img [src]="imagePreviewUrl" alt="Profile preview" class="image-preview" />
+                  </div>
+                  <div class="file-info">
+                    <span class="file-name">{{ selectedFile.name }}</span>
+                    <button type="button" class="remove-file" (click)="removeSelectedFile()">×</button>
+                  </div>
+                </div>
+              }
             </div>
           </c-col>
         </c-row>
+
         @if (singInErrorMessage) {
-        <p class="errorMessage">{{ singInErrorMessage }}</p>
-        } @if (successMessage) {
-        <p class="successMessage">{{ successMessage }}</p>
+          <div class="error-message">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="error-icon">
+              <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+            </svg>
+            {{ singInErrorMessage }}
+          </div>
         }
-        <div class="container">
+        
+        @if (successMessage) {
+          <div class="success-message">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="success-icon">
+              <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.061L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+            </svg>
+            {{ successMessage }}
+          </div>
+        }
+        
+        <div class="registration-actions">
           <button
             cButton
-            class="m-1"
+            class="registration-button"
             color="primary"
             type="submit"
             [disabled]="isLoading"
           >
             @if (isLoading) {
-            <c-spinner aria-hidden="true" size="sm"></c-spinner>
-            } Registrati
+              <c-spinner aria-hidden="true" size="sm" class="me-2"></c-spinner>
+            }
+            {{ mode === 'register' ? 'Registrati' : 'Aggiorna Profilo' }}
           </button>
         </div>
       </c-container>

@@ -1,24 +1,262 @@
+// Import common floating form styles
+@use '../../../scss/floating-forms';
+
+// Custom backdrop
 .custom-backdrop {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.63);
+  background-color: rgba(0, 0, 0, 0.6);
   z-index: 1054;
+  backdrop-filter: blur(4px);
 }
 
+// Registration Modal
+.registration-modal {
+  .modal-dialog {
+    max-width: 600px;
+    margin: 2rem auto;
+  }
 
-/* Riduce l’altezza degli input */
-.custom-form .form-control,
-.custom-form [cFormControl] {
-  padding-top: 0.5rem;   /* aumenta lo spazio sopra */
-  padding-bottom: 0rem; /* riduce quello sotto */
-  font-size: 0.875rem;       /* font leggermente più piccolo */
-  height: 3rem;              /* altezza fissa più bassa */
+  .modal-content {
+    @extend .modal-dropdown-container;
+    @extend .enhanced;
+  }
 }
 
-/* Diminuisce lo spazio fra i campi */
-.custom-form .mb-3 {
-  margin-bottom: 0.2rem !important; /* invece di 1rem */
+// Modal Header
+.modal-header-custom {
+  @extend .gradient-header;
+  padding: 2rem 2rem 1rem;
+
+  .modal-title-custom {
+    @extend .title;
+    font-size: 1.5rem;
+    width: 100%;
+  }
+}
+
+// Modal Body
+.modal-body-custom {
+  padding: 0;
+}
+
+// Registration Form
+.registration-form {
+  .registration-container {
+    padding: 2rem;
+  }
+
+  // CoreUI Floating Input Groups
+  .input-floating {
+    @extend .floating-input-group;
+    
+    // Readonly input styling for update mode
+    .readonly-input {
+      background-color: var(--cui-gray-100) !important;
+      color: var(--cui-gray-600) !important;
+      cursor: not-allowed;
+      opacity: 0.8;
+      
+      &:focus {
+        box-shadow: none !important;
+        border-color: var(--cui-gray-300) !important;
+      }
+    }
+  }
+
+  // Legacy input-group class for compatibility
+  .input-group {
+    @extend .floating-input-group;
+  }
+
+  // File Input Styling
+  .file-input-group {
+    @extend .file-input-group;
+  }
+
+  // File Selected with Preview
+  .file-selected {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.75rem;
+    padding: 0.75rem;
+    background: rgba(var(--cui-primary-rgb), 0.1);
+    border: 2px solid rgba(var(--cui-primary-rgb), 0.3);
+    border-radius: 0.75rem;
+
+    .image-preview-container {
+      flex-shrink: 0;
+
+      .image-preview {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid rgba(var(--cui-primary-rgb), 0.5);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      }
+    }
+
+    .file-info {
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      .file-name {
+        color: var(--cui-body-color);
+        font-size: 0.875rem;
+        font-weight: 500;
+        word-break: break-word;
+      }
+
+      .remove-file {
+        background: rgba(var(--cui-danger-rgb), 0.1);
+        color: var(--cui-danger);
+        border: none;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+
+        &:hover {
+          background: var(--cui-danger);
+          color: white;
+          transform: scale(1.1);
+        }
+      }
+    }
+  }
+
+  // Error Messages
+  .error-message {
+    @extend .form-error-message;
+    margin: 1rem 0;
+  }
+
+  // Success Messages
+  .success-message {
+    @extend .form-success-message;
+    margin: 1rem 0;
+  }
+
+  // Registration Actions
+  .registration-actions {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+
+    .registration-button {
+      @extend .enhanced-button;
+      @extend .large;
+      width: 100%;
+
+      .me-2 {
+        margin-right: 0.5rem;
+      }
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .registration-modal {
+    .modal-dialog {
+      margin: 1rem;
+      max-width: calc(100% - 2rem);
+    }
+  }
+
+  .modal-header-custom {
+    padding: 1.5rem 1.5rem 0.75rem;
+
+    .modal-title-custom {
+      font-size: 1.25rem;
+    }
+  }
+
+  .registration-form {
+    .registration-container {
+      padding: 1.5rem;
+    }
+
+    .input-group {
+      margin-bottom: 1rem;
+    }
+
+    .registration-actions {
+      margin-top: 1.5rem;
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .modal-header-custom {
+    padding: 1.25rem 1.25rem 0.5rem;
+
+    .modal-title-custom {
+      font-size: 1.1rem;
+    }
+  }
+
+  .registration-form {
+    .registration-container {
+      padding: 1.25rem;
+    }
+
+    .input-group {
+      margin-bottom: 0.875rem;
+
+      .registration-input {
+        padding: 0.625rem 0.875rem;
+        font-size: 0.9rem;
+      }
+
+      .input-label {
+        font-size: 0.8rem;
+      }
+    }
+
+    .file-input-group {
+      .file-label {
+        padding: 0.625rem 0.875rem;
+        font-size: 0.9rem;
+      }
+    }
+
+    .file-selected {
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      text-align: center;
+
+      .image-preview-container {
+        .image-preview {
+          width: 50px;
+          height: 50px;
+        }
+      }
+
+      .file-info {
+        flex-direction: column;
+        gap: 0.5rem;
+        width: 100%;
+
+        .file-name {
+          font-size: 0.8rem;
+        }
+      }
+    }
+  }
 }

@@ -278,7 +278,7 @@ ORDER BY date ASC
 
   async getUsers(): Promise<string> {
       const result = await this.pool.query (`
-  SELECT id, username, name, surname, password
+  SELECT id, username, name, surname, password, mail, encode(image, 'escape') as image
   FROM fanta_player;
       `);
       return JSON.stringify(result.rows);
@@ -334,7 +334,7 @@ ORDER BY date ASC
     //   ];
 
 
-      await this.pool.query(query, values);
+      //await this.pool.query(query, values);
       
       console.log(`Successfully saved race result`);
       
