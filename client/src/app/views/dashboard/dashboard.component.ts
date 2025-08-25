@@ -1,4 +1,3 @@
-import { formatDate, NgStyle } from '@angular/common';
 import { CommonModule } from '@angular/common'; // Importa CommonModule
 import { Component, DestroyRef, inject, OnInit, Renderer2, ViewChild, DOCUMENT } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -7,16 +6,10 @@ import { ModalModule, ModalComponent } from '@coreui/angular';
 import {
   AvatarComponent,
   ButtonDirective,
-  ButtonGroupComponent,
   CardBodyComponent,
   CardComponent,
-  CardFooterComponent,
   CardHeaderComponent,
   ColComponent,
-  FormCheckLabelDirective,
-  GutterDirective,
-  ProgressBarDirective,
-  ProgressComponent,
   RowComponent,
   TableDirective,
   TextColorDirective,
@@ -32,12 +25,10 @@ import { RouterLink } from '@angular/router';
 import { IconDirective } from '@coreui/icons-angular';
 import { cilCalendar, cilMap, cilFire } from '@coreui/icons';
 import { cifBh, cifAt, cifMc, cifJp, cifHu, cifCn, cifCa, cifEs, cifGb, cifBe, cifNl, cifAz, cifSg, cifIt, cifUs, cifAu, cifMx, cifBr, cifQa, cifAe, cifSa } from '@coreui/icons';
-import { DatePipe } from '@angular/common';
 import { LeaderboardComponent } from "../../components/leaderboard/leaderboard.component";
 import { TwitchApiService } from '../../service/twitch-api.service';
 import { BehaviorSubject } from 'rxjs';
 import { LoadingService } from '../../service/loading.service';
-import { LoadingSpinnerComponent } from '../../../components/loading-spinner/loading-spinner.component';
 import { ChampionshipTrendComponent } from '../../components/championship-trend/championship-trend.component';
 
 declare const Twitch: any;
@@ -84,11 +75,6 @@ interface NextTrack {
     ButtonDirective,
     IconDirective,
     ReactiveFormsModule,
-    ButtonGroupComponent,
-    FormCheckLabelDirective,
-    NgStyle,
-    CardFooterComponent,
-    GutterDirective,
     CardHeaderComponent,
     TableDirective,
     AvatarComponent,

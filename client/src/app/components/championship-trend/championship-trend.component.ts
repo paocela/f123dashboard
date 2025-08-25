@@ -9,12 +9,10 @@ import {
   CardBodyComponent,
   CardComponent,
   CardFooterComponent,
-  CardHeaderComponent,
   ColComponent,
   FormCheckLabelDirective,
   GutterDirective,
-  RowComponent,
-  ThemeDirective
+  RowComponent
 } from '@coreui/angular';
 import { ChartjsComponent } from '@coreui/angular-chartjs';
 import { DashboardChartsData, IChartProps } from '../../views/dashboard/dashboard-charts-data';
@@ -37,9 +35,7 @@ import { DashboardChartsData, IChartProps } from '../../views/dashboard/dashboar
     FormCheckLabelDirective,
     ButtonDirective,
     CardFooterComponent,
-    GutterDirective,
-    CardHeaderComponent,
-    ThemeDirective
+    GutterDirective
   ],
   providers: [DashboardChartsData]
 })
