@@ -10,3 +10,386 @@
 {
     background-color: #E9E9ED !important;
 }
+
+// Enhanced Admin Form Styling
+
+// Season selector styling to match CoreUI theme
+.season-selector-group {
+  margin-bottom: 1.5rem;
+  position: relative;
+
+  .season-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--cui-body-color);
+  }
+
+  .season-select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--cui-border-color);
+    border-radius: 8px;
+    background: var(--cui-body-bg);
+    color: var(--cui-body-color);
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    
+    &:focus {
+      border-color: var(--cui-primary);
+      box-shadow: 0 0 0 0.2rem rgba(var(--cui-primary-rgb), 0.25);
+      outline: none;
+    }
+
+    &:hover:not(:focus) {
+      border-color: rgba(var(--cui-primary-rgb), 0.5);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    &:disabled {
+      background-color: var(--cui-gray-100);
+      color: var(--cui-gray-600);
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
+    option {
+      padding: 0.5rem;
+      background: var(--cui-body-bg);
+      color: var(--cui-body-color);
+    }
+  }
+
+  // Loading overlay for season selector
+  .loading-overlay {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: rgba(var(--cui-body-bg-rgb), 0.95);
+    padding: 0.75rem;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    z-index: 10;
+
+    .loading-text {
+      font-size: 0.85rem;
+      color: var(--cui-text-muted);
+      margin: 0;
+    }
+  }
+}
+
+// Enhanced styling for all admin select elements
+.admin-select {
+  padding: 0.4rem 0.6rem !important;
+  border: 1px solid var(--cui-border-color) !important;
+  border-radius: 6px !important;
+  background: var(--cui-body-bg) !important;
+  color: var(--cui-body-color) !important;
+  font-size: 0.8rem !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+  min-height: 32px !important;
+  line-height: 1.2 !important;
+
+  &:focus {
+    border-color: var(--cui-primary) !important;
+    box-shadow: 0 0 0 0.1rem rgba(var(--cui-primary-rgb), 0.2) !important;
+    outline: none !important;
+  }
+
+  &:hover:not(:focus) {
+    border-color: rgba(var(--cui-primary-rgb), 0.4) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  &:invalid {
+    border-color: var(--cui-danger) !important;
+    box-shadow: 0 0 0 0.1rem rgba(var(--cui-danger-rgb), 0.15) !important;
+  }
+
+  // Multi-select specific styling
+  &.multi-select {
+    min-height: 70px !important;
+    padding: 0.4rem !important;
+
+    option {
+      padding: 0.3rem 0.5rem;
+      margin: 0.05rem 0;
+      border-radius: 3px;
+      transition: all 0.2s ease;
+      font-size: 0.8rem;
+      line-height: 1.3;
+
+      &:checked {
+        background: linear-gradient(135deg, var(--cui-primary), var(--cui-info)) !important;
+        color: white !important;
+        font-weight: 500;
+      }
+
+      &:hover {
+        background: rgba(var(--cui-primary-rgb), 0.1) !important;
+        color: var(--cui-primary) !important;
+      }
+    }
+  }
+
+  option {
+    padding: 0.4rem 0.6rem;
+    background: var(--cui-body-bg);
+    color: var(--cui-body-color);
+    border: none;
+    font-size: 0.8rem;
+    line-height: 1.3;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: linear-gradient(135deg, rgba(var(--cui-primary-rgb), 0.1), rgba(var(--cui-info-rgb), 0.05)) !important;
+      color: var(--cui-primary) !important;
+    }
+
+    &:checked,
+    &:selected {
+      background: linear-gradient(135deg, var(--cui-primary), var(--cui-info)) !important;
+      color: white !important;
+      font-weight: 500;
+    }
+
+    // Style for the default option
+    &[value="0"] {
+      color: var(--cui-text-muted) !important;
+      font-style: italic;
+      background: var(--cui-tertiary-bg) !important;
+    }
+  }
+}
+
+// Multi-select container styling
+.multi-select-container {
+  .multi-select-label {
+    display: block;
+    margin-bottom: 0.3rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--cui-text-muted);
+  }
+}
+
+// Table enhancements - Reduced height
+table[cTable] {
+  .text-center {
+    vertical-align: middle;
+  }
+
+  td {
+    padding: 0.4rem 0.3rem !important;
+    vertical-align: middle;
+    
+    .admin-select {
+      margin: 0;
+      width: 100%;
+      min-width: 140px;
+      max-width: 160px;
+    }
+
+    .multi-select-container {
+      width: 100%;
+      min-width: 150px;
+      max-width: 170px;
+    }
+
+    // Special styling for position column
+    &:first-child {
+      padding: 0.6rem 0.4rem !important;
+      min-width: 120px;
+      
+      strong {
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+      
+      img, svg {
+        margin-left: 0.25rem;
+      }
+    }
+  }
+
+  th {
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 0.75rem 0.3rem !important;
+    text-align: center;
+    
+    &:first-child {
+      text-align: left;
+      padding-left: 0.6rem !important;
+    }
+  }
+
+  // Striped rows with better contrast
+  tbody tr:nth-child(odd) {
+    background-color: rgba(var(--cui-primary-rgb), 0.02);
+  }
+
+  tbody tr:hover {
+    background-color: rgba(var(--cui-primary-rgb), 0.05);
+  }
+}
+
+// Button enhancements
+button[cButton] {
+  padding: 0.75rem 2rem;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  }
+}
+
+// Submit button with loading state
+.submit-button {
+  min-width: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+
+  c-spinner {
+    animation: pulse 1.5s ease-in-out infinite alternate;
+  }
+}
+
+// Loading animations
+.initial-loading {
+  padding: 3rem 2rem;
+  text-align: center;
+
+  c-spinner {
+    transform: scale(1.5);
+    margin-bottom: 1rem;
+  }
+
+  h4 {
+    color: var(--cui-body-color);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    color: var(--cui-text-muted);
+    margin-bottom: 0;
+  }
+}
+
+// Pulse animation for spinners
+@keyframes pulse {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
+}
+
+// Badge styling improvements
+c-badge {
+  font-weight: 500;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+}
+
+// Accordion improvements
+c-accordion-item {
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+
+  .accordion-body {
+    padding: 2rem;
+  }
+}
+
+// Responsive improvements
+@media (max-width: 768px) {
+  .admin-select {
+    font-size: 0.75rem !important;
+    padding: 0.35rem 0.5rem !important;
+    min-height: 30px !important;
+  }
+
+  .season-selector-group {
+    margin-bottom: 1rem;
+
+    .season-select {
+      padding: 0.6rem 0.8rem;
+      font-size: 0.85rem;
+    }
+  }
+
+  table[cTable] {
+    td {
+      padding: 0.35rem 0.2rem !important;
+      
+      .admin-select {
+        min-width: 110px;
+        max-width: 130px;
+        font-size: 0.75rem;
+      }
+      
+      .multi-select-container {
+        min-width: 120px;
+        max-width: 140px;
+      }
+
+      &:first-child {
+        padding: 0.5rem 0.3rem !important;
+        min-width: 100px;
+        
+        strong {
+          font-size: 0.8rem;
+        }
+      }
+    }
+
+    th {
+      padding: 0.6rem 0.2rem !important;
+      font-size: 0.8rem;
+      
+      &:first-child {
+        padding-left: 0.4rem !important;
+      }
+    }
+  }
+
+  // Compact accordion on mobile
+  c-accordion-item {
+    .accordion-body {
+      padding: 1rem;
+    }
+  }
+}

@@ -41,7 +41,8 @@ export class PostgresService {
     }
 
   /* All tracks and standings (for Championship page) */
-  async getChampionship(): Promise<string> {
+  async getChampionship(seasonId?: number): Promise<string> {
+    console.log(seasonId);
     const result = await this.pool.query(`
 SELECT
     t.name AS track_name,
@@ -99,7 +100,6 @@ SELECT
 FROM gran_prix gp
 JOIN tracks t ON gp.track_id = t.id
 
--- Race Results
 LEFT JOIN LATERAL (
     SELECT
         MAX(CASE WHEN rre.position = 1 THEN d.username END) AS driver_1_place,
@@ -115,7 +115,6 @@ LEFT JOIN LATERAL (
     WHERE rre.race_results_id = gp.race_results_id
 ) race_results ON true
 
--- Full Race Results
 LEFT JOIN LATERAL (
     SELECT
         MAX(CASE WHEN frre.position = 1 THEN d.username END) AS driver_1_place,
@@ -131,7 +130,6 @@ LEFT JOIN LATERAL (
     WHERE frre.race_results_id = gp.full_race_results_id
 ) full_race_results ON true
 
--- Sprint Results
 LEFT JOIN LATERAL (
     SELECT
         MAX(CASE WHEN sre.position = 1 THEN d.username END) AS driver_1_place,
@@ -147,7 +145,6 @@ LEFT JOIN LATERAL (
     WHERE sre.sprint_results_id = gp.sprint_results_id
 ) sprint_results ON true
 
--- Qualifying Results
 LEFT JOIN LATERAL (
     SELECT
         MAX(CASE WHEN qre.position = 1 THEN d.username END) AS driver_1_place,
@@ -161,7 +158,6 @@ LEFT JOIN LATERAL (
     WHERE qre.qualifying_results_id = gp.qualifying_results_id
 ) qualifying_results ON true
 
--- Free Practice Results
 LEFT JOIN LATERAL (
     SELECT
         MAX(CASE WHEN fpre.position = 1 THEN d.username END) AS driver_1_place,
@@ -175,15 +171,22 @@ LEFT JOIN LATERAL (
     WHERE fpre.free_practice_results_id = gp.free_practice_results_id
 ) free_practice_results ON true
 
+WHERE gp.season_id = COALESCE($1, (SELECT id FROM seasons ORDER BY start_date DESC LIMIT 1))
 ORDER BY gp.date ASC;
-      `);
+      `, [seasonId]);
     return JSON.stringify(result.rows);
   }
 
   /* All driver championship's cumulative points (for trend graph)*/
-  async getCumulativePoints(): Promise<string> {
+  async getCumulativePoints(seasonId?: number): Promise<string> {
     const result = await this.pool.query(`
-    WITH all_session_points AS (
+    WITH latest_season AS (
+        SELECT id 
+        FROM seasons 
+        ORDER BY start_date DESC 
+        LIMIT 1
+    ),
+    all_session_points AS (
         SELECT
             dgp.grand_prix_date AS date,
             dgp.track_name,
@@ -192,6 +195,8 @@ ORDER BY gp.date ASC;
             dgp.pilot_id, -- for later reference
             dgp.position_points + dgp.fast_lap_points AS session_point
         FROM public.driver_grand_prix_points dgp
+        CROSS JOIN latest_season ls
+        WHERE dgp.season_id = COALESCE($1, ls.id)
     ),
     driver_colors AS (
         SELECT id AS driver_id, color AS driver_color
@@ -208,13 +213,19 @@ ORDER BY gp.date ASC;
     LEFT JOIN driver_colors dc ON asp.driver_id = dc.driver_id
     GROUP BY asp.date, asp.track_name, asp.driver_id, asp.driver_username, dc.driver_color, asp.session_point
     ORDER BY asp.driver_id, asp.date, asp.track_name;
-      `);
+      `, [seasonId]);
     return JSON.stringify(result.rows);
   }
 
   /* All championship tracks with best time info */
-  async getAllTracks(): Promise<string> {
+  async getAllTracks(seasonId?: number): Promise<string> {
     const result = await this.pool.query (`
+WITH latest_season AS (
+    SELECT id 
+    FROM seasons 
+    ORDER BY start_date DESC 
+    LIMIT 1
+)
 SELECT outer_table_tracks.track_id, outer_table_tracks.name, outer_table_tracks.date, outer_table_tracks.has_sprint, outer_table_tracks.has_x2, outer_table_tracks.country, outer_table_tracks.besttime_driver_time,
 outer_table_drivers.username
 FROM
@@ -225,6 +236,8 @@ FROM
     (
         SELECT *
         FROM gran_prix
+        CROSS JOIN latest_season ls
+        WHERE gran_prix.season_id = COALESCE($1, ls.id)
     ) AS inner_table
     ON tracks.id = inner_table.track_id
 ) AS outer_table_tracks
@@ -234,13 +247,20 @@ LEFT JOIN
     FROM drivers
 ) AS outer_table_drivers
 ON outer_table_tracks.besttime_driver_id = outer_table_drivers.id
+WHERE outer_table_tracks.date IS NOT NULL
 ORDER BY date ASC
-    `);
+    `, [seasonId]);
     return JSON.stringify(result.rows);
   }
 
-  async getRaceResoult(): Promise<string> {
+  async getRaceResoult(seasonId?: number): Promise<string> {
       const result = await this.pool.query(`
+        WITH latest_season AS (
+            SELECT id 
+            FROM seasons 
+            ORDER BY start_date DESC 
+            LIMIT 1
+        )
         SELECT
           gp.id AS track_id,
           MAX(CASE WHEN rre.position = 1 THEN rre.pilot_id END) AS id_1_place,
@@ -252,8 +272,10 @@ ORDER BY date ASC
           MAX(CASE WHEN rre.fast_lap THEN rre.pilot_id END) AS id_fast_lap,
           ARRAY_AGG(rre.pilot_id) FILTER (WHERE rre.position = 0) AS list_dnf
         FROM gran_prix gp
+        CROSS JOIN latest_season ls
         LEFT JOIN race_result_entries rre ON gp.race_results_id = rre.race_results_id
-        WHERE gp.race_results_id IS NOT NULL
+        WHERE gp.race_results_id IS NOT NULL 
+          AND gp.season_id = COALESCE($1, ls.id)
         GROUP BY gp.id
 
         UNION ALL
@@ -269,10 +291,12 @@ ORDER BY date ASC
           MAX(CASE WHEN frre.fast_lap THEN frre.pilot_id END) AS id_fast_lap,
           ARRAY_AGG(frre.pilot_id) FILTER (WHERE frre.position = 0) AS list_dnf
         FROM gran_prix gp
+        CROSS JOIN latest_season ls
         LEFT JOIN full_race_result_entries frre ON gp.full_race_results_id = frre.race_results_id
-        WHERE gp.full_race_results_id IS NOT NULL
+        WHERE gp.full_race_results_id IS NOT NULL 
+          AND gp.season_id = COALESCE($1, ls.id)
         GROUP BY gp.id
-      `);
+      `, [seasonId]);
       return JSON.stringify(result.rows);
   }
 

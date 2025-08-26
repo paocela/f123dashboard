@@ -1,0 +1,44 @@
+// Championship data interface based on the query structure
+export interface ChampionshipData {
+  track_name: string;
+  gran_prix_date: string;
+  gran_prix_has_sprint: number;
+  gran_prix_has_x2: number;
+  track_country: string;
+  driver_race_1_place: string;
+  driver_race_2_place: string;
+  driver_race_3_place: string;
+  driver_race_4_place: string;
+  driver_race_5_place: string;
+  driver_race_6_place: string;
+  driver_race_fast_lap: string;
+  race_dnf: string;
+  driver_full_race_1_place: string;
+  driver_full_race_2_place: string;
+  driver_full_race_3_place: string;
+  driver_full_race_4_place: string;
+  driver_full_race_5_place: string;
+  driver_full_race_6_place: string;
+  driver_full_race_fast_lap: string;
+  full_race_dnf: string;
+  driver_sprint_1_place: string;
+  driver_sprint_2_place: string;
+  driver_sprint_3_place: string;
+  driver_sprint_4_place: string;
+  driver_sprint_5_place: string;
+  driver_sprint_6_place: string;
+  driver_sprint_fast_lap: string;
+  sprint_dnf: string;
+  driver_qualifying_1_place: string;
+  driver_qualifying_2_place: string;
+  driver_qualifying_3_place: string;
+  driver_qualifying_4_place: string;
+  driver_qualifying_5_place: string;
+  driver_qualifying_6_place: string;
+  driver_free_practice_1_place: string;
+  driver_free_practice_2_place: string;
+  driver_free_practice_3_place: string;
+  driver_free_practice_4_place: string;
+  driver_free_practice_5_place: string;
+  driver_free_practice_6_place: string;
+}

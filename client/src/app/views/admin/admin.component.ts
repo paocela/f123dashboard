@@ -15,7 +15,8 @@ import {
   TableDirective,
   BadgeComponent,
   GridModule,
-  ButtonDirective
+  ButtonDirective,
+  SpinnerComponent
 } from '@coreui/angular';
 import { cifAe, cifAt, cifAu, cifAz, cifBe, cifBh, cifBr, cifCa, cifCn, cifEs, cifGb, cifHu, cifIt, 
   cifJp, cifMc, cifMx, cifNl, cifQa, cifSa, cifSg, cifUs, cilX, cilCheckAlt, cilSwapVertical, cilFire, cilPowerStandby } from '@coreui/icons';
@@ -23,7 +24,11 @@ import { cifAe, cifAt, cifAu, cifAz, cifBe, cifBh, cifBr, cifCa, cifCn, cifEs, c
 
 import { DbDataService } from 'src/app/service/db-data.service';
 import { AuthService } from 'src/app/service/auth.service';
-import { GpResult } from '../../model/championship'
+import { GpResult } from '../../model/championship';
+import { ChampionshipData } from '../../model/championship-data';
+import { DriverData } from '../../model/driver';
+import { TrackData } from '../../model/track';
+import { Season } from '../../model/season';
 
 @Component({
   selector: 'app-admin',
@@ -40,9 +45,12 @@ import { GpResult } from '../../model/championship'
     TableDirective,
     BadgeComponent,
     FormsModule,
+    ReactiveFormsModule,
     GridModule,
     ButtonDirective,
-    MatFormFieldModule, MatSelectModule, FormsModule, ReactiveFormsModule
+    SpinnerComponent,
+    MatFormFieldModule, 
+    MatSelectModule
   ],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.scss'
@@ -51,14 +59,21 @@ import { GpResult } from '../../model/championship'
 export class AdminComponent implements OnInit {
   
   // VARIABLE DEFINITIONS
-  tracks: any[] = [];
-  piloti: any[] = [];
-  championshipData: any[] = [];
+  tracks: TrackData[] = [];
+  piloti: DriverData[] = [];
+  championshipData: ChampionshipData[] = [];
+  seasons: Season[] = [];
+  selectedSeason: number | null = null;
   formStatus: { [key: number]: number } = {};
   raceResults: Map<number, any[]> = new Map<number, any[]>(); // [track_id, array_of_results]
   sprintResults: Map<number, any[]> = new Map<number, any[]>();
   qualiResults: Map<number, any[]> = new Map<number, any[]>();
   fpResults: Map<number, any[]> = new Map<number, any[]>();
+
+  // Loading states
+  isInitialLoading: boolean = true;
+  isSeasonLoading: boolean = false;
+  isSubmitting: { [key: number]: boolean } = {};
 
   public allFlags: {[key: string]: any} = {
     "Barhain": cifBh,
@@ -114,29 +129,72 @@ export class AdminComponent implements OnInit {
   ) {}
 
   // FUNCTION DEFINTIONS
-  ngOnInit(): void {
-    // Additional security check
-    const currentUser = this.authService.getCurrentUser();
-    if (!currentUser?.isAdmin) {
-      this.router.navigate(['/dashboard']);
-      return;
+  async ngOnInit(): Promise<void> {
+    this.isInitialLoading = true;
+    
+    try {
+      // Additional security check
+      const currentUser = this.authService.getCurrentUser();
+      if (!currentUser?.isAdmin) {
+        this.router.navigate(['/dashboard']);
+        return;
+      }
+
+      // Load seasons first
+      this.seasons = await this.dbData.getAllSeasons();
+      
+      // Get the latest season (first in the list since it's ordered by start_date DESC)
+      if (this.seasons.length > 0) {
+        console.log(this.seasons);
+        this.selectedSeason = this.seasons[0].id;
+      }
+
+      // Load data for the selected season
+      await this.loadSeasonData();
+    } finally {
+      this.isInitialLoading = false;
     }
+  }
 
-    this.tracks = this.dbData.getAllTracks();
-    this.piloti  = this.dbData.getAllDrivers();
-    this.championshipData = this.dbData.getChampionship();
+  async loadSeasonData(): Promise<void> {
+    this.isSeasonLoading = true;
+    try {
+      if (this.selectedSeason) {
+        // Load data for specific season
+        console.log(this.selectedSeason, typeof this.selectedSeason);
 
-    this.initializeResults();
+        this.tracks = await this.dbData.getAllTracksBySeason(this.selectedSeason);
+        this.championshipData = await this.dbData.getChampionshipBySeason(this.selectedSeason);
+      } else {
+        // Load data for latest season (default)
+        this.tracks = await this.dbData.getAllTracksBySeason();
+        this.championshipData = await this.dbData.getChampionshipBySeason();
+      }
+      
+      // Load drivers (not season-specific)
+      this.piloti = this.dbData.getAllDrivers();
+
+      this.initializeResults();
+    } finally {
+      this.isSeasonLoading = false;
+    }
+  }
+
+  async onSeasonChange(): Promise<void> {
+    await this.loadSeasonData();
   }
 
   initializeResults() {
-    let pilotiMap: Map<string, Number> = new Map<string, Number>(); // map to quickly search driver_id given its driver_username
+    let pilotiMap: Map<string, number> = new Map<string, number>(); // map to quickly search driver_id given its driver_username
     for (let pilota of this.piloti) {
       pilotiMap.set(pilota.driver_username, pilota.driver_id);
     }
 
     for (let gp of this.championshipData) {
-      let track_id = this.tracks.find(t => t.name == gp.track_name).track_id;
+      const track = this.tracks.find(t => t.name == gp.track_name);
+      if (!track) continue; // Skip if track not found
+      
+      let track_id = track.track_id;
       let race: any[] = [];
       if ( gp.gran_prix_has_x2 == 1) {
         race = [pilotiMap.get(gp.driver_full_race_1_place)!,
@@ -209,32 +267,38 @@ export class AdminComponent implements OnInit {
   }
 
 
-  publishResult(trackId: number, hasSprint: string, form: NgForm): void {
-    // check data validity
-    let hasSprintBool = hasSprint == "1";
-    if ( this.formIsValid(trackId, hasSprintBool) ) {
-      let raceDnfResultTmp: number[] = this.raceResults.get(trackId)![7];
-      let sprintDnfResultTmp: number[] = [];
-      if ( hasSprintBool ) {
-        sprintDnfResultTmp = this.sprintResults.get(trackId)![7];
-      }
+  async publishResult(trackId: number, hasSprint: string, form: NgForm): Promise<void> {
+    this.isSubmitting[trackId] = true;
+    
+    try {
+      // check data validity
+      let hasSprintBool = hasSprint == "1";
+      if ( this.formIsValid(trackId, hasSprintBool) ) {
+        let raceDnfResultTmp: number[] = this.raceResults.get(trackId)![7];
+        let sprintDnfResultTmp: number[] = [];
+        if ( hasSprintBool ) {
+          sprintDnfResultTmp = this.sprintResults.get(trackId)![7];
+        }
 
-      let gpResult: GpResult = {
-        trackId: trackId,
-        hasSprint: hasSprintBool,
-        raceResult: Array.from(this.raceResults.get(trackId)!.values()).slice(0, 7).map(x => Number(x)),
-        raceDnfResult: raceDnfResultTmp ?  raceDnfResultTmp.map(x => Number(x)) : [],
-        sprintResult: hasSprintBool ? Array.from(this.sprintResults.get(trackId)!.values()).slice(0, 7).map(x => Number(x)) : [],
-        sprintDnfResult: sprintDnfResultTmp ? sprintDnfResultTmp.map(x => Number(x)) : [],
-        qualiResult: Array.from(this.qualiResults.get(trackId)!.values()).map(x => Number(x)),
-        fpResult: Array.from(this.fpResults.get(trackId)!.values()).map(x => Number(x))
-      }
+        let gpResult: GpResult = {
+          trackId: trackId,
+          hasSprint: hasSprintBool,
+          raceResult: Array.from(this.raceResults.get(trackId)!.values()).slice(0, 7).map(x => Number(x)),
+          raceDnfResult: raceDnfResultTmp ?  raceDnfResultTmp.map(x => Number(x)) : [],
+          sprintResult: hasSprintBool ? Array.from(this.sprintResults.get(trackId)!.values()).slice(0, 7).map(x => Number(x)) : [],
+          sprintDnfResult: sprintDnfResultTmp ? sprintDnfResultTmp.map(x => Number(x)) : [],
+          qualiResult: Array.from(this.qualiResults.get(trackId)!.values()).map(x => Number(x)),
+          fpResult: Array.from(this.fpResults.get(trackId)!.values()).map(x => Number(x))
+        }
 
-      this.dbData.setGpResult(trackId, gpResult);
-      this.formStatus[trackId] = 1;
-    }
-    else {
-      this.formStatus[trackId] = 2;
+        await this.dbData.setGpResult(trackId, gpResult);
+        this.formStatus[trackId] = 1;
+      }
+      else {
+        this.formStatus[trackId] = 2;
+      }
+    } finally {
+      this.isSubmitting[trackId] = false;
     }
   }
 

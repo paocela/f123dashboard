@@ -1,8 +1,12 @@
 import { Injectable } from '@angular/core';
 import { PostgresService, FantaService } from "@genezio-sdk/f123dashboard" 
-import { Fanta, FantaPlayer } from '../model/fanta';
+import { Fanta, FantaPlayer, RaceResult } from '../model/fanta';
 import { User } from '../model/auth';
 import { GpResult } from '../model/championship'
+import { Season } from '../model/season';
+import { ChampionshipData } from '../model/championship-data';
+import { DriverData } from '../model/driver';
+import { TrackData, CumulativePointsData } from '../model/track';
 
 
 
@@ -16,13 +20,13 @@ export class DbDataService {
 /****************************************************************/
 //variabili locali
 /****************************************************************/
-  drivers: string = "";
-  championship: string = "";
-  cumulative_points: string = "";
-  tracks: string = "";
-  fantaVote!: Fanta[];
-  raceResult: any[] = [];
-  users: User[] = [];
+  private drivers: string = "";
+  private championship: string = "";
+  private cumulative_points: string = "";
+  private tracks: string = "";
+  private fantaVote!: Fanta[];
+  private raceResult: RaceResult[] = [];
+  private users: User[] = [];
 
 
 /****************************************************************/
@@ -60,19 +64,19 @@ export class DbDataService {
 /****************************************************************/
 //chiamate che trasferiscono le variabili alle varie pagine 
 /****************************************************************/
-  getAllDrivers() {
+  getAllDrivers(): DriverData[] {
     return JSON.parse(this.drivers);
   }
 
-  getChampionship() {
+  getChampionship(): ChampionshipData[] {
     return JSON.parse(this.championship);
   }
 
-  getCumulativePoints() {
+  getCumulativePoints(): CumulativePointsData[] {
     return JSON.parse(this.cumulative_points);
   }
 
-  getAllTracks() {
+  getAllTracks(): TrackData[] {
     return JSON.parse(this.tracks);
   }
 
@@ -80,13 +84,46 @@ export class DbDataService {
     return this.fantaVote;
   }
 
-  getRaceResoult(): any {
+  getRaceResoult(): RaceResult[] {
     return this.raceResult;
   }
   
   getUsers(): User[] {
     return this.users;
   }
+
+/****************************************************************/
+//season-specific data methods
+/****************************************************************/
+
+  async getChampionshipBySeason(seasonId?: number): Promise<ChampionshipData[]> {
+    const championship = await PostgresService.getChampionship(seasonId);
+    return JSON.parse(championship);
+  }
+
+  async getCumulativePointsBySeason(seasonId?: number): Promise<CumulativePointsData[]> {
+    const cumulativePoints = await PostgresService.getCumulativePoints(seasonId);
+    return JSON.parse(cumulativePoints);
+  }
+
+  async getAllTracksBySeason(seasonId?: number): Promise<TrackData[]> {
+    const tracks = await PostgresService.getAllTracks(seasonId);
+    return JSON.parse(tracks);
+  }
+
+  async getRaceResultBySeason(seasonId?: number): Promise<RaceResult[]> {
+    const raceResult = await PostgresService.getRaceResoult(seasonId);
+    return JSON.parse(raceResult);
+  }
+
+  async getAllSeasons(): Promise<Season[]> {
+    const seasons = await PostgresService.getAllSeasons();
+    return JSON.parse(seasons);
+  }
+
+/****************************************************************/
+//existing methods
+/****************************************************************/
 
   async setFantaVoto(voto: Fanta): Promise<void> {
     await FantaService.setFantaVoto(
