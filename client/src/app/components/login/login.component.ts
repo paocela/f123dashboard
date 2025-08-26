@@ -131,7 +131,7 @@ export class LoginComponent {
         this.errorMessage = '';
         
         // If email is present, perform navigation manually
-        const returnUrl = this.username === 'admin' ? '/admin' : '/fanta';
+        const returnUrl = this.currentUser?.isAdmin ? '/admin' : '/fanta';
         this.router.navigate([returnUrl]);
       } else {
         this.errorMessage = response.message || 'Login failed. Please try again.';
@@ -215,7 +215,7 @@ export class LoginComponent {
     // If user just completed their email, mark them as authenticated and navigate
     if (this.currentUser && this.currentUser.mail && this.currentUser.mail.trim() !== '') {
       this.authService.markUserAsAuthenticated();
-      const returnUrl = this.username === 'admin' ? '/admin' : '/fanta';
+      const returnUrl = this.currentUser.isAdmin ? '/admin' : '/fanta';
       this.router.navigate([returnUrl]);
     }
     

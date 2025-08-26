@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { NgScrollbar } from 'ngx-scrollbar';
+import { Subscription } from 'rxjs';
 
 import {
   ContainerComponent,
@@ -48,14 +49,25 @@ function isOverflown(element: HTMLElement) {
         LoadingSpinnerComponent
     ]
 })
-export class DefaultLayoutComponent {
+export class DefaultLayoutComponent implements OnInit, OnDestroy {
+  private userSubscription?: Subscription;
   
   constructor(
     private authService: AuthService, 
   ) {}
 
-  
-  public navItems = getNavItems(true);
+  public navItems = getNavItems(false);
+
+  ngOnInit(): void {
+    // Subscribe to user changes to update navigation
+    this.userSubscription = this.authService.currentUser$.subscribe(user => {
+      this.navItems = getNavItems(user?.isAdmin ?? false);
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.userSubscription?.unsubscribe();
+  }
   
   onScrollbarUpdate($event: any) {
     // if ($event.verticalUsed) {
@@ -65,6 +77,6 @@ export class DefaultLayoutComponent {
 
   updateNavItems()
   {
-    this.navItems = getNavItems(this.authService.getCurrentUser()?.username == "admin");
+    this.navItems = getNavItems(this.authService.getCurrentUser()?.isAdmin ?? false);
   }
 }

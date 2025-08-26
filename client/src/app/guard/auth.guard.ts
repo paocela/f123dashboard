@@ -24,7 +24,7 @@ export const authGuard: CanActivateFn = (route, state) => {
         return router.createUrlTree(['/login']); // default fallback
       } else {
         if (state.url === '/admin') {
-          if (currentUser?.username === 'admin') {
+          if (currentUser?.isAdmin) {
             return true; // allow access
           } else {
             return router.createUrlTree(['/dashboard']); // redirect if not admin

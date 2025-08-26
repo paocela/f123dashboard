@@ -89,7 +89,7 @@ export class AuthService {
         
         // Navigate to fanta or admin page only if navigation is not skipped
         if (!skipNavigation) {
-          const returnUrl = loginData.username == 'admin' ? '/admin' : '/fanta';
+          const returnUrl = response.user.isAdmin ? '/admin' : '/fanta';
           this.router.navigate([returnUrl]);
         }
       }
@@ -115,9 +115,6 @@ export class AuthService {
         mail: registerData.mail,
         image: registerData.image
       };
-
-      console.log('Register image length:', registerData.image?.length);
-      console.log('Request body size:', JSON.stringify(requestBody).length);
       
       console.log('Making request to:', this.apiService.getEndpointUrl('AuthService/register'));
         

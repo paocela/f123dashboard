@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { DefaultLayoutComponent } from './layout';
 import { authGuard } from './guard/auth.guard';
+import { adminGuard } from './guard/admin.guard';
 
 export const routes: Routes = [
   {
@@ -50,7 +51,7 @@ export const routes: Routes = [
       {
         path: 'admin',
         loadChildren: () => import('./views/admin/routes').then((m) => m.routes),
-        canActivate: [authGuard]
+        canActivate: [adminGuard]
       },
       /* routing credits */
       {

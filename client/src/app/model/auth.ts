@@ -5,6 +5,7 @@ export interface User {
   surname: string;
   mail?: string;
   image?: string;
+  isAdmin?: boolean;
 }
 
 export interface LoginRequest {

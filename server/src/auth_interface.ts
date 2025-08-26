@@ -61,7 +61,7 @@ export class AuthService {
 
     // Generate JWT token
     const user = await this.pool.query(
-      'SELECT username FROM fanta_player WHERE id = $1',
+      'SELECT username FROM users WHERE id = $1',
       [userId]
     );
     
@@ -79,14 +79,14 @@ export class AuthService {
     return jwtToken;
   }
 
-  private async validateSession(jwtToken: string): Promise<{ valid: boolean; userId?: number; username?: string; name?: string; surname?: string; mail?: string; image?: string; }> {
+  private async validateSession(jwtToken: string): Promise<{ valid: boolean; userId?: number; username?: string; name?: string; surname?: string; mail?: string; image?: string; isAdmin?: boolean }> {
     try {
       // Verify JWT token
       const decoded = jwt.verify(jwtToken, this.jwtSecret) as any;
       
       // Check if user still exists and is active
       const result = await this.pool.query(
-        'SELECT id, username, is_active, name, surname, mail, encode(image, \'escape\') as image FROM fanta_player WHERE id = $1',
+        'SELECT id, username, is_active, name, surname, mail, encode(image, \'escape\') as image, is_admin FROM users WHERE id = $1',
         [decoded.userId]
       );
 
@@ -140,7 +140,8 @@ export class AuthService {
         name: user.name,
         surname: user.surname,
         mail: user.mail,
-        image: user.image
+        image: user.image,
+        isAdmin: user.is_admin
       };
 
     } catch (error) {
@@ -200,7 +201,7 @@ export class AuthService {
 
       // Get user from database
       const result = await this.pool.query(
-        'SELECT id, username, name, surname, password, mail, encode(image, \'escape\') as image, is_active FROM fanta_player WHERE username = $1',
+        'SELECT id, username, name, surname, password, mail, encode(image, \'escape\') as image, is_active, is_admin FROM users WHERE username = $1',
         [username]
       );
 
@@ -236,7 +237,7 @@ export class AuthService {
 
       // Update last login
       await this.pool.query(
-        'UPDATE fanta_player SET last_login = NOW() WHERE id = $1',
+        'UPDATE users SET last_login = NOW() WHERE id = $1',
         [user.id]
       );
 
@@ -249,7 +250,8 @@ export class AuthService {
           name: user.name,
           surname: user.surname,
           mail: user.mail,
-          image: user.image
+          image: user.image,
+          isAdmin: user.is_admin
         },
         token: jwtToken
       });
@@ -274,7 +276,7 @@ export class AuthService {
 
       // Check if username already exists
       const existingUser = await this.pool.query(
-        'SELECT username FROM fanta_player WHERE username = $1',
+        'SELECT username FROM users WHERE username = $1',
         [username]
       );
 
@@ -291,7 +293,7 @@ export class AuthService {
 
       // Check if email already exists
       const existingEmail = await this.pool.query(
-        'SELECT mail FROM fanta_player WHERE mail = $1',
+        'SELECT mail FROM users WHERE mail = $1',
         [mail]
       );
 
@@ -311,7 +313,7 @@ export class AuthService {
 
       // Insert new user
       const result = await this.pool.query(
-        'INSERT INTO fanta_player (username, name, surname, password, mail, image, created_at) VALUES ($1, $2, $3, $4, $5, $6, NOW()) RETURNING id, username, name, surname, mail, image',
+        'INSERT INTO users (username, name, surname, password, mail, image, created_at) VALUES ($1, $2, $3, $4, $5, $6, NOW()) RETURNING id, username, name, surname, mail, image',
         [username, name, surname, hashedPassword, mail, image || null]
       );
 
@@ -385,7 +387,8 @@ export class AuthService {
         name: sessionData.name,
         surname: sessionData.surname,
         mail: sessionData.mail,
-        image: sessionData.image
+        image: sessionData.image,
+        isAdmin: sessionData.isAdmin
       });
 
     } catch (error) {
@@ -410,7 +413,7 @@ export class AuthService {
 
       // Get current user
       const result = await this.pool.query(
-        'SELECT password FROM fanta_player WHERE id = $1',
+        'SELECT password FROM users WHERE id = $1',
         [sessionData.userId]
       );
 
@@ -439,7 +442,7 @@ export class AuthService {
 
       // Update password
       await this.pool.query(
-        'UPDATE fanta_player SET password = $1, password_updated_at = NOW() WHERE id = $2',
+        'UPDATE users SET password = $1, password_updated_at = NOW() WHERE id = $2',
         [hashedNewPassword, sessionData.userId]
       );
 
@@ -623,7 +626,7 @@ export class AuthService {
       // If email is being updated, check if it already exists
       if (updates.mail) {
         const existingEmail = await this.pool.query(
-          'SELECT id FROM fanta_player WHERE mail = $1 AND id != $2',
+          'SELECT id FROM users WHERE mail = $1 AND id != $2',
           [updates.mail, sessionData.userId]
         );
 
@@ -685,7 +688,7 @@ export class AuthService {
 
       // Execute update query
       const query = `
-        UPDATE fanta_player 
+        UPDATE users 
         SET ${updateFields.join(', ')} 
         WHERE id = $${parameterIndex} 
         RETURNING id, username, name, surname, mail, encode(image, 'escape') as image

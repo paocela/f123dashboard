@@ -67,7 +67,7 @@ export class EmailService {
             // Get active users' emails
             const activeUsersResult = await this.pool.query(`
                 SELECT id, username, name, surname, mail
-                FROM fanta_player
+                FROM users
                 WHERE is_active = true AND mail IS NOT NULL AND mail != '';
             `);
 

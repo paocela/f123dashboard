@@ -28,10 +28,10 @@ export class FantaService {
         f_table."6_place_id" AS "id_6_place",
         f_table."fast_lap_id" AS "id_fast_lap",
         f_table."dnf_id" AS "id_dnf"
-      FROM fanta_player fp_table
-      JOIN fanta f_table
-      ON fp_table.id = f_table.fanta_player_id
-      ORDER BY fp_table.id, f_table.race_id;
+  FROM users fp_table
+  JOIN fanta f_table
+  ON fp_table.id = f_table.fanta_player_id
+  ORDER BY fp_table.id, f_table.race_id;
     `);
     return JSON.stringify(result.rows);
   }

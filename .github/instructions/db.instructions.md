@@ -10,7 +10,7 @@ This document describes the project database schema.
 ## Database Architecture Overview
 
 ### Core Concept
-This database is designed to support a Formula 1 fantasy game where users can create fantasy teams and compete based on real F1 race results. The schema follows a normalized approach that separates race results from the drivers and teams, allowing for flexible querying and reporting.
+This database is designed to support a Formula 1 fantasy game where users can insert votes and compete based on real F1 race results. The schema follows a normalized approach that separates race results from the drivers and teams, allowing for flexible querying and reporting.
 
 ### Result Tables Structure
 The database uses a modern **entry-based result system** instead of storing positions as separate columns. This design provides several advantages:
@@ -97,18 +97,20 @@ The `fanta` table stores fantasy team selections, while the result entry tables 
 
 ---
 
-## 5. Fanta Player
+
+## 5. Users
 
 - **id**: Primary key (int4, auto-increment)
-- **username**: Username of the fantasy player
-- **name**: Name of the player
-- **surname**: Surname of the player
-- **password**: Player's password
+- **username**: Username of the user
+- **name**: Name of the user
+- **surname**: Surname of the user
+- **password**: User's password
 - **image**: Profile image (bytea)
 - **created_at**: Timestamp of account creation (default: NOW())
 - **last_login**: Timestamp of last login
 - **password_updated_at**: Timestamp of last password update (default: NOW())
 - **is_active**: Boolean indicating if account is active (default: TRUE)
+- **is_admin**: Boolean indicating if user has admin privileges (default: FALSE)
 
 ---
 
@@ -190,7 +192,7 @@ The `fanta` table stores fantasy team selections, while the result entry tables 
 ## 13. Fanta
 
 - **id**: Primary key (int4, auto-increment)
-- **fanta_player_id**: Reference to `fanta_player` (int8, NOT NULL)
+- **fanta_player_id**: Reference to `users` (int8, NOT NULL)
 - **race_id**: Reference to a race event (int8, NOT NULL)
 - **1_place_id** to **6_place_id**: Fantasy team positions (drivers, int8, NOT NULL)
 - **fast_lap_id**: Fastest lap (driver id, int8, NOT NULL)
@@ -227,10 +229,11 @@ The `fanta` table stores fantasy team selections, while the result entry tables 
 
 ---
 
+
 ## 16. User Sessions
 
 - **id**: Primary key (serial4)
-- **user_id**: Reference to `fanta_player` (int4, nullable)
+- **user_id**: Reference to `users (int4, nullable)
 - **session_token**: Unique session token (VARCHAR 255, NOT NULL)
 - **created_at**: Session creation timestamp (default: NOW())
 - **last_activity**: Last activity timestamp (default: NOW())
@@ -282,7 +285,7 @@ Simplified view showing race points by result type and driver.
 - Result entry tables (race, sprint, qualifying, free practice, full race) store individual driver positions and results per session.
 - `gran_prix` acts as a central event, linking to different result entry tables and tracks.
 - The schema supports F1-style events with multiple session types per Grand Prix.
-- Fantasy game logic is supported through `fanta` and `fanta_player` tables.
+- Fantasy game logic is supported through `fanta` and `users` tables.
 - Points logic is centralized in `session_type`, supporting flexible point assignment per session (1st through 6th place plus fast lap points).
 - The design enables tracking performance and statistics for both real drivers and fantasy teams.
 - **Result Structure**: Instead of storing positions as separate columns, the new structure uses entry tables with position fields for better normalization.

@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { Router } from '@angular/router';
 import { 
   AccordionComponent, 
   AccordionItemComponent,
@@ -21,6 +22,7 @@ import { cifAe, cifAt, cifAu, cifAz, cifBe, cifBh, cifBr, cifCa, cifCn, cifEs, c
   import { IconDirective } from '@coreui/icons-angular';
 
 import { DbDataService } from 'src/app/service/db-data.service';
+import { AuthService } from 'src/app/service/auth.service';
 import { GpResult } from '../../model/championship'
 
 @Component({
@@ -46,7 +48,8 @@ import { GpResult } from '../../model/championship'
   styleUrl: './admin.component.scss'
 })
 
-export class AdminComponent {
+export class AdminComponent implements OnInit {
+  
   // VARIABLE DEFINITIONS
   tracks: any[] = [];
   piloti: any[] = [];
@@ -56,7 +59,6 @@ export class AdminComponent {
   sprintResults: Map<number, any[]> = new Map<number, any[]>();
   qualiResults: Map<number, any[]> = new Map<number, any[]>();
   fpResults: Map<number, any[]> = new Map<number, any[]>();
-
 
   public allFlags: {[key: string]: any} = {
     "Barhain": cifBh,
@@ -103,12 +105,23 @@ export class AdminComponent {
   public powerIcon: string[] = cilPowerStandby;
 
   toppings = new FormControl('');
-
+  
   // CONSTRUCTOR
-  constructor(private dbData: DbDataService){};
+  constructor(
+    private dbData: DbDataService,
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   // FUNCTION DEFINTIONS
   ngOnInit(): void {
+    // Additional security check
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser?.isAdmin) {
+      this.router.navigate(['/dashboard']);
+      return;
+    }
+
     this.tracks = this.dbData.getAllTracks();
     this.piloti  = this.dbData.getAllDrivers();
     this.championshipData = this.dbData.getChampionship();
