@@ -1,37 +1,55 @@
 import { GenezioDeploy, GenezioMethod  } from "@genezio/types";
 import { MailService } from "@genezio/email-service";
 import { Pool } from "pg";
+const nodemailer = require("nodemailer");
 
 @GenezioDeploy()
 export class EmailService {
-    from = "noreply@raceforfederica.com";
+    FROM = "noreply@raceforfederica.com";
     pool = new Pool({
         connectionString: process.env.RACEFORFEDERICA_DB_DATABASE_URL,
         ssl: true,
     });
 
-    async sendEmail(email: string, subject: string, htmlContent: string, textContent?: string) {
-        const response = await MailService.sendMail({
-        emailServiceToken: process.env.EMAIL_SERVICE_TOKEN ?? (() => { throw new Error("EMAIL_SERVICE_TOKEN is not defined"); })(),
-        from: this.from,
-        to: email,
-        subject: subject,
-        html: htmlContent,
-        text: textContent,
-        replyTo: "raceforfederica@gmail.com",
-        headers: {
-            "List-Unsubscribe": "<mailto:raceforfederica@gmail.com>",
-            "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
-            "X-Mailer": "Race for Federica",
-            "Message-ID": `<${Date.now()}-${Math.random().toString(36).substring(2, 11)}@raceforfederica.com>`
-        },
+    /**
+     * Send email using Gmail and Nodemailer
+     * @param to recipient email
+     * @param subject email subject
+     * @param htmlContent HTML body
+     * @param textContent plain text body
+     */
+    async sendGmailEmail(to: string, subject: string, htmlContent: string, textContent?: string) {
+        // Gmail credentials from environment variables
+        const gmailUser = process.env.GMAIL_USER;
+        const gmailPass = process.env.GMAIL_PASS;
+        if (!gmailUser || !gmailPass) throw new Error("Gmail credentials not set");
+
+        // Create Nodemailer transporter
+        const transporter = nodemailer.createTransport({
+            host: "smtp.gmail.com",
+            port: 465,
+            secure: true,
+            auth: {
+                user: gmailUser,
+                pass: gmailPass,
+            },
         });
 
-        if (!response.success) {
-        return response.errorMessage;
+        // Send mail
+        const mailOptions = {
+            from: this.FROM,
+            to,
+            subject,
+            html: htmlContent,
+            text: textContent,
+            replyTo: this.FROM,
+        };
+        try {
+            console.log(await transporter.sendMail(mailOptions));
+            return "success";
+        } catch (error) {
+            return `Failed: ${error}`;
         }
-
-        return "success";
     }
 
     @GenezioMethod({ type: "cron", cronString: "0 18 * * *" })
@@ -47,7 +65,8 @@ export class EmailService {
                 ORDER BY gp.date ASC
                 LIMIT 2;
             `);
-
+            
+            // FOR TESTING PURPOSES ONLY - COMMENT THE ABOVE AND UNCOMMENT BELOW
             // const upcomingRacesResult = await this.pool.query(`
             //     SELECT gp.id, gp.date, t.name as track_name, t.country, gp.has_sprint, gp.has_x2
             //     FROM gran_prix gp
@@ -130,7 +149,7 @@ export class EmailService {
                                               border-radius: 25px; font-weight: bold; font-size: 16px; 
                                               box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
                                               border: none; font-family: Arial, sans-serif;">
-                                        🗳️ VOTA LA TUA SQUADRA
+                                        🗳️ VOTA ORA!
                                     </a>
                                 </div>
                                 
@@ -181,7 +200,7 @@ Questa è una email automatica. Non rispondere a questo messaggio.
 Race for Federica 
                     `;
                     
-                    const result = await this.sendEmail(userEmail, subject, htmlMessage, textMessage.trim());
+                    const result = await this.sendGmailEmail(userEmail, subject, htmlMessage, textMessage.trim());
                     console.log(`Email sent to ${user.name} ${user.surname} (${userEmail}): ${result}`);
                     return result;
                 } catch (error) {
