@@ -106,8 +106,10 @@ export class AdminComponent implements OnInit {
     [4, "Quarto"],
     [5, "Quinto"],
     [6, "Sesto"],
-    [7, "Giro Veloce"],
-    [8, "DNF"]
+    [7, "Settimo"],
+    [8, "Ottavo"],
+    [9, "Giro Veloce"],
+    [10, "DNF"]
   ]);
 
   medals = new Map<number, string>([
@@ -195,69 +197,68 @@ export class AdminComponent implements OnInit {
       if (!track) continue; // Skip if track not found
       
       let track_id = track.track_id;
+      
+      // Initialize race results
       let race: any[] = [];
-      if ( gp.gran_prix_has_x2 == 1) {
-        race = [pilotiMap.get(gp.driver_full_race_1_place)!,
-                pilotiMap.get(gp.driver_full_race_2_place)!,
-                pilotiMap.get(gp.driver_full_race_3_place)!,
-                pilotiMap.get(gp.driver_full_race_4_place)!,
-                pilotiMap.get(gp.driver_full_race_5_place)!,
-                pilotiMap.get(gp.driver_full_race_6_place)!,
-                pilotiMap.get(gp.driver_full_race_fast_lap)!,
-                []]
+      const activeRaceSession = gp.gran_prix_has_x2 === '1' ? gp.sessions.full_race : gp.sessions.race;
+      const activeFastLapDriver = gp.gran_prix_has_x2 === '1' ? gp.fastLapDrivers.full_race : gp.fastLapDrivers.race;
+      
+      if (activeRaceSession && activeRaceSession.length > 0) {
+        // Fill positions 1-8
+        for (let i = 1; i <= 8; i++) {
+          const driver = activeRaceSession.find(r => r.position === i);
+          race[i-1] = driver ? pilotiMap.get(driver.driver_username) || 0 : 0;
+        }
 
-        if ( gp.full_race_dnf != null ) {
-          race[7] = race[7].concat(
-            gp.full_race_dnf.split(",").flatMap((x: string) => pilotiMap.get(x.trim()) ?? [])
-          );
+        // Fast lap driver (position 9 in array, index 8)
+        race[8] = activeFastLapDriver ? pilotiMap.get(activeFastLapDriver) || 0 : 0;
+
+        // DNF drivers (position 10 in array, index 9)
+        const dnfDrivers = activeRaceSession.filter(r => r.position === 0);
+        race[9] = dnfDrivers.map(d => pilotiMap.get(d.driver_username)).filter(id => id !== undefined);
+      } else {
+        // Initialize empty array if no results
+        race = [0, 0, 0, 0, 0, 0, 0, 0, []];
+      }
+
+      // Initialize sprint results
+      let sprint: any[] = [];
+      if (gp.gran_prix_has_sprint === '1' && gp.sessions.sprint) {
+        // Fill positions 1-8
+        for (let i = 1; i <= 8; i++) {
+          const driver = gp.sessions.sprint.find(r => r.position === i);
+          sprint[i-1] = driver ? pilotiMap.get(driver.driver_username) || 0 : 0;
+        }
+
+        // Fast lap driver (position 9 in array, index 8)
+        sprint[8] = gp.fastLapDrivers.sprint ? pilotiMap.get(gp.fastLapDrivers.sprint) || 0 : 0;
+
+        // DNF drivers (position 10 in array, index 9)
+        const dnfDrivers = gp.sessions.sprint.filter(r => r.position === 0);
+        sprint[9] = dnfDrivers.map(d => pilotiMap.get(d.driver_username)).filter(id => id !== undefined);
+      }
+
+      // Initialize qualifying results
+      let quali: any[] = [];
+      if (gp.sessions.qualifying) {
+        for (let i = 1; i <= 8; i++) {
+          const driver = gp.sessions.qualifying.find(r => r.position === i);
+          quali[i-1] = driver ? pilotiMap.get(driver.driver_username) || 0 : 0;
         }
       } else {
-        race = [pilotiMap.get(gp.driver_race_1_place)!,
-                pilotiMap.get(gp.driver_race_2_place)!,
-                pilotiMap.get(gp.driver_race_3_place)!,
-                pilotiMap.get(gp.driver_race_4_place)!,
-                pilotiMap.get(gp.driver_race_5_place)!,
-                pilotiMap.get(gp.driver_race_6_place)!,
-                pilotiMap.get(gp.driver_race_fast_lap)!,
-                []]
-
-        if ( gp.race_dnf != null ) {
-          race[7] = race[7].concat(
-            gp.race_dnf.split(",").flatMap((x: string) => pilotiMap.get(x.trim()) ?? [])
-          );
-        }
+        quali = [0, 0, 0, 0, 0, 0, 0, 0];
       }
-      let sprint: any[] = [];
-      if ( gp.gran_prix_has_sprint == 1) {
-        sprint = [pilotiMap.get(gp.driver_sprint_1_place)!,
-                  pilotiMap.get(gp.driver_sprint_2_place)!,
-                  pilotiMap.get(gp.driver_sprint_3_place)!,
-                  pilotiMap.get(gp.driver_sprint_4_place)!,
-                  pilotiMap.get(gp.driver_sprint_5_place)!,
-                  pilotiMap.get(gp.driver_sprint_6_place)!,
-                  pilotiMap.get(gp.driver_sprint_fast_lap)!,
-                  []];
 
-        if ( gp.sprint_dnf != null ) {
-          sprint[7] = sprint[7].concat(
-            gp.sprint_dnf.split(",").flatMap((x: string) => pilotiMap.get(x.trim()) ?? [])
-          );
-        }
-      }
-      let quali: any[] = [];
-      quali = [pilotiMap.get(gp.driver_qualifying_1_place)!,
-               pilotiMap.get(gp.driver_qualifying_2_place)!,
-               pilotiMap.get(gp.driver_qualifying_3_place)!,
-               pilotiMap.get(gp.driver_qualifying_4_place)!,
-               pilotiMap.get(gp.driver_qualifying_5_place)!,
-               pilotiMap.get(gp.driver_qualifying_6_place)!]
+      // Initialize free practice results
       let fp: any[] = [];
-      fp = [pilotiMap.get(gp.driver_free_practice_1_place)!,
-            pilotiMap.get(gp.driver_free_practice_2_place)!,
-            pilotiMap.get(gp.driver_free_practice_3_place)!,
-            pilotiMap.get(gp.driver_free_practice_4_place)!,
-            pilotiMap.get(gp.driver_free_practice_5_place)!,
-            pilotiMap.get(gp.driver_free_practice_6_place)!]
+      if (gp.sessions.free_practice) {
+        for (let i = 1; i <= 8; i++) {
+          const driver = gp.sessions.free_practice.find(r => r.position === i);
+          fp[i-1] = driver ? pilotiMap.get(driver.driver_username) || 0 : 0;
+        }
+      } else {
+        fp = [0, 0, 0, 0, 0, 0, 0, 0];
+      }
 
       this.raceResults.set(track_id, race);
       this.sprintResults.set(track_id, sprint);
@@ -272,20 +273,20 @@ export class AdminComponent implements OnInit {
     
     try {
       // check data validity
-      let hasSprintBool = hasSprint == "1";
+      let hasSprintBool = hasSprint === "1";
       if ( this.formIsValid(trackId, hasSprintBool) ) {
-        let raceDnfResultTmp: number[] = this.raceResults.get(trackId)![7];
+        let raceDnfResultTmp: number[] = this.raceResults.get(trackId)![9];
         let sprintDnfResultTmp: number[] = [];
         if ( hasSprintBool ) {
-          sprintDnfResultTmp = this.sprintResults.get(trackId)![7];
+          sprintDnfResultTmp = this.sprintResults.get(trackId)![9];
         }
 
         let gpResult: GpResult = {
           trackId: trackId,
           hasSprint: hasSprintBool,
-          raceResult: Array.from(this.raceResults.get(trackId)!.values()).slice(0, 7).map(x => Number(x)),
+          raceResult: Array.from(this.raceResults.get(trackId)!.values()).slice(0, 9).map(x => Number(x)),
           raceDnfResult: raceDnfResultTmp ?  raceDnfResultTmp.map(x => Number(x)) : [],
-          sprintResult: hasSprintBool ? Array.from(this.sprintResults.get(trackId)!.values()).slice(0, 7).map(x => Number(x)) : [],
+          sprintResult: hasSprintBool ? Array.from(this.sprintResults.get(trackId)!.values()).slice(0, 9).map(x => Number(x)) : [],
           sprintDnfResult: sprintDnfResultTmp ? sprintDnfResultTmp.map(x => Number(x)) : [],
           qualiResult: Array.from(this.qualiResults.get(trackId)!.values()).map(x => Number(x)),
           fpResult: Array.from(this.fpResults.get(trackId)!.values()).map(x => Number(x))
@@ -315,8 +316,8 @@ export class AdminComponent implements OnInit {
 
   formValidator(resultArray: any[]): boolean {
     let is_valid = true;
-    let positions = resultArray.slice(0, 6);
-    let fast_lap = resultArray[6];
+    let positions = resultArray.slice(0, 8);
+    let fast_lap = resultArray[8];
     let all_positions = positions;
 
     // check duplicates in positions
@@ -325,8 +326,8 @@ export class AdminComponent implements OnInit {
     // check fast lap
     is_valid = is_valid && fast_lap != 0;
 
-    if ( resultArray.length == 8 ) {
-      let dnf: Number[] = resultArray[7].map((x: any) => Number(x));
+    if ( resultArray.length == 10 ) {
+      let dnf: Number[] = resultArray[9].map((x: any) => Number(x));
       all_positions = all_positions.concat(dnf);
 
       // check dnf players are not in positions
@@ -344,7 +345,7 @@ export class AdminComponent implements OnInit {
 
   hasAllPlayers(positions: number[]): boolean {
     const set = new Set(positions); // remove duplicates
-    for (let i = 1; i <= 6; i++) {
+    for (let i = 1; i <= 8; i++) {
       if (!set.has(i)) return false; // missing a number
     }
     return true; // all good
@@ -377,7 +378,7 @@ export class AdminComponent implements OnInit {
         resultArray = [];
         this.raceResults.set(trackId, resultArray);
       }
-      if ( position - 1 < 7) {
+      if ( position - 1 < 9) {
         resultArray[position-1] = +valore;
       } else {
         if ( !resultArray[position-1] )
@@ -396,7 +397,7 @@ export class AdminComponent implements OnInit {
         resultArray = [];
         this.sprintResults.set(trackId, resultArray);
       }
-      if ( position - 1 < 7) {
+      if ( position - 1 < 9) {
         resultArray[position-1] = +valore;
       } else {
         if ( !resultArray[position-1] )

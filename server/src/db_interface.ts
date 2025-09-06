@@ -43,138 +43,213 @@ export class PostgresService {
   /* All tracks and standings (for Championship page) */
   async getChampionship(seasonId?: number): Promise<string> {
     console.log(seasonId);
+    
+    // Single optimized query to get all championship data
     const result = await this.pool.query(`
-SELECT
-    t.name AS track_name,
-    gp.date AS gran_prix_date,
-    gp.has_sprint AS gran_prix_has_sprint,
-    gp.has_x2 AS gran_prix_has_x2,
-    t.country AS track_country,
+      WITH latest_season AS (
+        SELECT id FROM seasons ORDER BY start_date DESC LIMIT 1
+      ),
+      all_session_results AS (
+        -- Free Practice Results
+        SELECT 
+          gp.id AS gran_prix_id,
+          t.name AS track_name,
+          gp.date AS gran_prix_date,
+          gp.has_sprint AS gran_prix_has_sprint,
+          gp.has_x2 AS gran_prix_has_x2,
+          t.country AS track_country,
+          'free_practice' AS session_type,
+          fpre.position,
+          d.username AS driver_username,
+          NULL::boolean AS fast_lap
+        FROM gran_prix gp
+        JOIN tracks t ON gp.track_id = t.id
+        CROSS JOIN latest_season ls
+        LEFT JOIN free_practice_result_entries fpre ON fpre.free_practice_results_id = gp.free_practice_results_id
+        LEFT JOIN drivers d ON fpre.pilot_id = d.id
+        WHERE gp.season_id = COALESCE($1, ls.id)
+          AND gp.free_practice_results_id IS NOT NULL
+          AND fpre.position IS NOT NULL
+        
+        UNION ALL
+        
+        -- Qualifying Results
+        SELECT 
+          gp.id AS gran_prix_id,
+          t.name AS track_name,
+          gp.date AS gran_prix_date,
+          gp.has_sprint AS gran_prix_has_sprint,
+          gp.has_x2 AS gran_prix_has_x2,
+          t.country AS track_country,
+          'qualifying' AS session_type,
+          qre.position,
+          d.username AS driver_username,
+          NULL::boolean AS fast_lap
+        FROM gran_prix gp
+        JOIN tracks t ON gp.track_id = t.id
+        CROSS JOIN latest_season ls
+        LEFT JOIN qualifying_result_entries qre ON qre.qualifying_results_id = gp.qualifying_results_id
+        LEFT JOIN drivers d ON qre.pilot_id = d.id
+        WHERE gp.season_id = COALESCE($1, ls.id)
+          AND gp.qualifying_results_id IS NOT NULL
+          AND qre.position IS NOT NULL
+        
+        UNION ALL
+        
+        -- Race Results
+        SELECT 
+          gp.id AS gran_prix_id,
+          t.name AS track_name,
+          gp.date AS gran_prix_date,
+          gp.has_sprint AS gran_prix_has_sprint,
+          gp.has_x2 AS gran_prix_has_x2,
+          t.country AS track_country,
+          'race' AS session_type,
+          rre.position,
+          d.username AS driver_username,
+          rre.fast_lap
+        FROM gran_prix gp
+        JOIN tracks t ON gp.track_id = t.id
+        CROSS JOIN latest_season ls
+        LEFT JOIN race_result_entries rre ON rre.race_results_id = gp.race_results_id
+        LEFT JOIN drivers d ON rre.pilot_id = d.id
+        WHERE gp.season_id = COALESCE($1, ls.id)
+          AND gp.race_results_id IS NOT NULL
+          AND rre.position IS NOT NULL
+        
+        UNION ALL
+        
+        -- Sprint Results
+        SELECT 
+          gp.id AS gran_prix_id,
+          t.name AS track_name,
+          gp.date AS gran_prix_date,
+          gp.has_sprint AS gran_prix_has_sprint,
+          gp.has_x2 AS gran_prix_has_x2,
+          t.country AS track_country,
+          'sprint' AS session_type,
+          sre.position,
+          d.username AS driver_username,
+          sre.fast_lap
+        FROM gran_prix gp
+        JOIN tracks t ON gp.track_id = t.id
+        CROSS JOIN latest_season ls
+        LEFT JOIN sprint_result_entries sre ON sre.sprint_results_id = gp.sprint_results_id
+        LEFT JOIN drivers d ON sre.pilot_id = d.id
+        WHERE gp.season_id = COALESCE($1, ls.id)
+          AND gp.sprint_results_id IS NOT NULL
+          AND sre.position IS NOT NULL
+        
+        UNION ALL
+        
+        -- Full Race Results
+        SELECT 
+          gp.id AS gran_prix_id,
+          t.name AS track_name,
+          gp.date AS gran_prix_date,
+          gp.has_sprint AS gran_prix_has_sprint,
+          gp.has_x2 AS gran_prix_has_x2,
+          t.country AS track_country,
+          'full_race' AS session_type,
+          frre.position,
+          d.username AS driver_username,
+          frre.fast_lap
+        FROM gran_prix gp
+        JOIN tracks t ON gp.track_id = t.id
+        CROSS JOIN latest_season ls
+        LEFT JOIN full_race_result_entries frre ON frre.race_results_id = gp.full_race_results_id
+        LEFT JOIN drivers d ON frre.pilot_id = d.id
+        WHERE gp.season_id = COALESCE($1, ls.id)
+          AND gp.full_race_results_id IS NOT NULL
+          AND frre.position IS NOT NULL
+      ),
+      grand_prix_base AS (
+        SELECT DISTINCT
+          gran_prix_id,
+          track_name,
+          gran_prix_date,
+          gran_prix_has_sprint,
+          gran_prix_has_x2,
+          track_country
+        FROM all_session_results
+        
+        UNION
+        
+        -- Include Grand Prix without results
+        SELECT 
+          gp.id AS gran_prix_id,
+          t.name AS track_name,
+          gp.date AS gran_prix_date,
+          gp.has_sprint AS gran_prix_has_sprint,
+          gp.has_x2 AS gran_prix_has_x2,
+          t.country AS track_country
+        FROM gran_prix gp
+        JOIN tracks t ON gp.track_id = t.id
+        CROSS JOIN latest_season ls
+        WHERE gp.season_id = COALESCE($1, ls.id)
+      )
+      SELECT 
+        gpb.gran_prix_id,
+        gpb.track_name,
+        gpb.gran_prix_date,
+        gpb.gran_prix_has_sprint,
+        gpb.gran_prix_has_x2,
+        gpb.track_country,
+        asr.session_type,
+        asr.position,
+        asr.driver_username,
+        asr.fast_lap
+      FROM grand_prix_base gpb
+      LEFT JOIN all_session_results asr ON gpb.gran_prix_id = asr.gran_prix_id
+      ORDER BY gpb.gran_prix_date ASC, asr.session_type, asr.position;
+    `, [seasonId]);
 
-    -- Race Results
-    race_results.driver_1_place AS driver_race_1_place,
-    race_results.driver_2_place AS driver_race_2_place,
-    race_results.driver_3_place AS driver_race_3_place,
-    race_results.driver_4_place AS driver_race_4_place,
-    race_results.driver_5_place AS driver_race_5_place,
-    race_results.driver_6_place AS driver_race_6_place,
-    race_results.fast_lap_username AS driver_race_fast_lap,
-    race_results.dnf_usernames AS race_dnf,
+    // Process results into the required format
+    const champMap = new Map();
+    
+    for (const row of result.rows) {
+      const gpId = row.gran_prix_id.toString();
+      
+      if (!champMap.has(gpId)) {
+        champMap.set(gpId, {
+          gran_prix_id: gpId,
+          track_name: row.track_name,
+          gran_prix_date: row.gran_prix_date,
+          gran_prix_has_sprint: row.gran_prix_has_sprint?.toString() || '0',
+          gran_prix_has_x2: row.gran_prix_has_x2?.toString() || '0',
+          track_country: row.track_country,
+          sessions: {},
+          fastLapDrivers: {}
+        });
+      }
+      
+      const champData = champMap.get(gpId);
+      
+      if (row.session_type && row.driver_username) {
+        // Initialize session array if not exists
+        if (!champData.sessions[row.session_type]) {
+          champData.sessions[row.session_type] = [];
+        }
+        
+        // Add driver result
+        champData.sessions[row.session_type].push({
+          position: row.position,
+          driver_username: row.driver_username,
+          fast_lap: row.fast_lap
+        });
+        
+        // Track fast lap drivers
+        if (row.fast_lap === true) {
+          champData.fastLapDrivers[row.session_type] = row.driver_username;
+        }
+      }
+    }
+    
+    // Convert map to array and sort by date
+    const formattedResults = Array.from(champMap.values())
+      .sort((a, b) => new Date(a.gran_prix_date).getTime() - new Date(b.gran_prix_date).getTime());
 
-    -- Full Race Results
-    full_race_results.driver_1_place AS driver_full_race_1_place,
-    full_race_results.driver_2_place AS driver_full_race_2_place,
-    full_race_results.driver_3_place AS driver_full_race_3_place,
-    full_race_results.driver_4_place AS driver_full_race_4_place,
-    full_race_results.driver_5_place AS driver_full_race_5_place,
-    full_race_results.driver_6_place AS driver_full_race_6_place,
-    full_race_results.fast_lap_username AS driver_full_race_fast_lap,
-    full_race_results.dnf_usernames AS full_race_dnf,
-
-    -- Sprint Results
-    sprint_results.driver_1_place AS driver_sprint_1_place,
-    sprint_results.driver_2_place AS driver_sprint_2_place,
-    sprint_results.driver_3_place AS driver_sprint_3_place,
-    sprint_results.driver_4_place AS driver_sprint_4_place,
-    sprint_results.driver_5_place AS driver_sprint_5_place,
-    sprint_results.driver_6_place AS driver_sprint_6_place,
-    sprint_results.fast_lap_username AS driver_sprint_fast_lap,
-    sprint_results.dnf_usernames AS sprint_dnf,
-
-    -- Qualifying Results
-    qualifying_results.driver_1_place AS driver_qualifying_1_place,
-    qualifying_results.driver_2_place AS driver_qualifying_2_place,
-    qualifying_results.driver_3_place AS driver_qualifying_3_place,
-    qualifying_results.driver_4_place AS driver_qualifying_4_place,
-    qualifying_results.driver_5_place AS driver_qualifying_5_place,
-    qualifying_results.driver_6_place AS driver_qualifying_6_place,
-
-    -- Free Practice Results
-    free_practice_results.driver_1_place AS driver_free_practice_1_place,
-    free_practice_results.driver_2_place AS driver_free_practice_2_place,
-    free_practice_results.driver_3_place AS driver_free_practice_3_place,
-    free_practice_results.driver_4_place AS driver_free_practice_4_place,
-    free_practice_results.driver_5_place AS driver_free_practice_5_place,
-    free_practice_results.driver_6_place AS driver_free_practice_6_place
-
-FROM gran_prix gp
-JOIN tracks t ON gp.track_id = t.id
-
-LEFT JOIN LATERAL (
-    SELECT
-        MAX(CASE WHEN rre.position = 1 THEN d.username END) AS driver_1_place,
-        MAX(CASE WHEN rre.position = 2 THEN d.username END) AS driver_2_place,
-        MAX(CASE WHEN rre.position = 3 THEN d.username END) AS driver_3_place,
-        MAX(CASE WHEN rre.position = 4 THEN d.username END) AS driver_4_place,
-        MAX(CASE WHEN rre.position = 5 THEN d.username END) AS driver_5_place,
-        MAX(CASE WHEN rre.position = 6 THEN d.username END) AS driver_6_place,
-        MAX(CASE WHEN rre.fast_lap = true THEN d.username END) AS fast_lap_username,
-        STRING_AGG(d.username, ', ') FILTER (WHERE rre.position = 0) AS dnf_usernames
-    FROM race_result_entries rre
-    JOIN drivers d ON rre.pilot_id = d.id
-    WHERE rre.race_results_id = gp.race_results_id
-) race_results ON true
-
-LEFT JOIN LATERAL (
-    SELECT
-        MAX(CASE WHEN frre.position = 1 THEN d.username END) AS driver_1_place,
-        MAX(CASE WHEN frre.position = 2 THEN d.username END) AS driver_2_place,
-        MAX(CASE WHEN frre.position = 3 THEN d.username END) AS driver_3_place,
-        MAX(CASE WHEN frre.position = 4 THEN d.username END) AS driver_4_place,
-        MAX(CASE WHEN frre.position = 5 THEN d.username END) AS driver_5_place,
-        MAX(CASE WHEN frre.position = 6 THEN d.username END) AS driver_6_place,
-        MAX(CASE WHEN frre.fast_lap = true THEN d.username END) AS fast_lap_username,
-        STRING_AGG(d.username, ', ') FILTER (WHERE frre.position = 0) AS dnf_usernames
-    FROM full_race_result_entries frre
-    JOIN drivers d ON frre.pilot_id = d.id
-    WHERE frre.race_results_id = gp.full_race_results_id
-) full_race_results ON true
-
-LEFT JOIN LATERAL (
-    SELECT
-        MAX(CASE WHEN sre.position = 1 THEN d.username END) AS driver_1_place,
-        MAX(CASE WHEN sre.position = 2 THEN d.username END) AS driver_2_place,
-        MAX(CASE WHEN sre.position = 3 THEN d.username END) AS driver_3_place,
-        MAX(CASE WHEN sre.position = 4 THEN d.username END) AS driver_4_place,
-        MAX(CASE WHEN sre.position = 5 THEN d.username END) AS driver_5_place,
-        MAX(CASE WHEN sre.position = 6 THEN d.username END) AS driver_6_place,
-        MAX(CASE WHEN sre.fast_lap = true THEN d.username END) AS fast_lap_username,
-        STRING_AGG(d.username, ', ') FILTER (WHERE sre.position = 0) AS dnf_usernames
-    FROM sprint_result_entries sre
-    JOIN drivers d ON sre.pilot_id = d.id
-    WHERE sre.sprint_results_id = gp.sprint_results_id
-) sprint_results ON true
-
-LEFT JOIN LATERAL (
-    SELECT
-        MAX(CASE WHEN qre.position = 1 THEN d.username END) AS driver_1_place,
-        MAX(CASE WHEN qre.position = 2 THEN d.username END) AS driver_2_place,
-        MAX(CASE WHEN qre.position = 3 THEN d.username END) AS driver_3_place,
-        MAX(CASE WHEN qre.position = 4 THEN d.username END) AS driver_4_place,
-        MAX(CASE WHEN qre.position = 5 THEN d.username END) AS driver_5_place,
-        MAX(CASE WHEN qre.position = 6 THEN d.username END) AS driver_6_place
-    FROM qualifying_result_entries qre
-    JOIN drivers d ON qre.pilot_id = d.id
-    WHERE qre.qualifying_results_id = gp.qualifying_results_id
-) qualifying_results ON true
-
-LEFT JOIN LATERAL (
-    SELECT
-        MAX(CASE WHEN fpre.position = 1 THEN d.username END) AS driver_1_place,
-        MAX(CASE WHEN fpre.position = 2 THEN d.username END) AS driver_2_place,
-        MAX(CASE WHEN fpre.position = 3 THEN d.username END) AS driver_3_place,
-        MAX(CASE WHEN fpre.position = 4 THEN d.username END) AS driver_4_place,
-        MAX(CASE WHEN fpre.position = 5 THEN d.username END) AS driver_5_place,
-        MAX(CASE WHEN fpre.position = 6 THEN d.username END) AS driver_6_place
-    FROM free_practice_result_entries fpre
-    JOIN drivers d ON fpre.pilot_id = d.id
-    WHERE fpre.free_practice_results_id = gp.free_practice_results_id
-) free_practice_results ON true
-
-WHERE gp.season_id = COALESCE($1, (SELECT id FROM seasons ORDER BY start_date DESC LIMIT 1))
-ORDER BY gp.date ASC;
-      `, [seasonId]);
-    return JSON.stringify(result.rows);
+    return JSON.stringify(formattedResults);
   }
 
   /* All driver championship's cumulative points (for trend graph)*/

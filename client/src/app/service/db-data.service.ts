@@ -21,7 +21,7 @@ export class DbDataService {
 //variabili locali
 /****************************************************************/
   private drivers: string = "";
-  private championship: string = "";
+  private championship: ChampionshipData[] = [];
   private cumulative_points: string = "";
   private tracks: string = "";
   private fantaVote!: Fanta[];
@@ -53,7 +53,7 @@ export class DbDataService {
     ]);
 
     this.drivers = drivers;
-    this.championship = championship;
+    this.championship = JSON.parse(championship);
     this.cumulative_points = cumulativePoints;
     this.tracks = tracks;
     this.fantaVote = JSON.parse(fantaVote);
@@ -69,7 +69,7 @@ export class DbDataService {
   }
 
   getChampionship(): ChampionshipData[] {
-    return JSON.parse(this.championship);
+    return this.championship;
   }
 
   getCumulativePoints(): CumulativePointsData[] {

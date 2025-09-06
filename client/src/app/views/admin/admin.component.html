@@ -118,7 +118,7 @@
                                                   <!-- INDEX -->
                                                   <td class="text-center">
                                                     <strong>
-                                                      @if (posizione.key < 7) {
+                                                      @if (posizione.key <= 8) {
                                                         {{ posizione?.value }} posto
                                                       } @else {
                                                         {{posizione?.value}}
@@ -130,13 +130,13 @@
                                                       style="width: 25px"
                                                       attr.src="assets/medals/{{ medals.get(posizione.key) }}"
                                                     />
-                                                    <svg *ngIf="posizione.key == 7" [cIcon]="fireIcon" style="color: purple"></svg>
-                                                    <svg *ngIf="posizione.key == 8" [cIcon]="powerIcon" style="color: red"></svg>
+                                                    <svg *ngIf="posizione.key == 9" [cIcon]="fireIcon" style="color: purple"></svg>
+                                                    <svg *ngIf="posizione.key == 10" [cIcon]="powerIcon" style="color: red"></svg>
                                                   </td>
 
                                                   <!-- RACE RESULTS -->
                                                   <td class="text-center">
-                                                    <select *ngIf="posizione.key < 8"
+                                                    <select *ngIf="posizione.key < 10"
                                                       [attr.aria-label]="'seleziona il pilota che arrivera ' + posizione?.value"
                                                       [id]="track.track_id + posizione.key"
                                                       [name]="'posizione_' + posizione.key"
@@ -153,7 +153,7 @@
                                                         </option>
                                                       }
                                                     </select>
-                                                    <div *ngIf="posizione.key == 8" class="multi-select-container">
+                                                    <div *ngIf="posizione.key == 10" class="multi-select-container">
                                                       <label class="multi-select-label">-- Seleziona piloti --</label>
                                                       <select [name]="'posizione_' + posizione.key"
                                                               [ngModel]="getRaceResult(track.track_id, posizione.key)"
@@ -173,7 +173,7 @@
 
                                                   <!-- SPRINT RESULTS -->
                                                   <td class="text-center" *ngIf="track.has_sprint == 1">
-                                                    <select *ngIf="posizione.key < 8"
+                                                    <select *ngIf="posizione.key < 10"
                                                             [attr.aria-label]="'seleziona il pilota che arrivera ' + posizione?.value"
                                                             [id]="track.track_id + '_race_' + posizione.key"
                                                             [name]="'race_posizione_' + posizione.key"
@@ -190,7 +190,7 @@
                                                         </option>
                                                       }
                                                     </select>
-                                                    <div *ngIf="posizione.key == 8" class="multi-select-container">
+                                                    <div *ngIf="posizione.key == 10" class="multi-select-container">
                                                       <label class="multi-select-label">-- Seleziona piloti --</label>
                                                       <select [name]="'race_posizione_' + posizione.key"
                                                               [ngModel]="getSprintResult(track.track_id, posizione.key)"
@@ -210,7 +210,7 @@
 
                                                   <!-- QUALI RESULTS -->
                                                   <td class="text-center">
-                                                    <select *ngIf="posizione.key < 7"
+                                                    <select *ngIf="posizione.key < 9"
                                                             [attr.aria-label]="'seleziona il pilota che arrivera ' + posizione?.value"
                                                             [id]="track.track_id + '_quali_' + posizione.key"
                                                             [name]="'quali_posizione_' + posizione.key"
@@ -231,7 +231,7 @@
 
                                                   <!-- FREE PRACTICE RESULTS -->
                                                   <td class="text-center">
-                                                    <select *ngIf="posizione.key < 7"
+                                                    <select *ngIf="posizione.key < 9"
                                                             [attr.aria-label]="'seleziona il pilota che arrivera ' + posizione?.value"
                                                             [id]="track.track_id + '_fp_' + posizione.key"
                                                             [name]="'fp_posizione_' + posizione.key"
