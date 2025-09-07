@@ -130,23 +130,26 @@ export class DashboardComponent implements OnInit {
     this.championship_standings_users = this.dbData.getAllDrivers() ;
     const championshipTrend = this.dbData.getCumulativePoints() ;
     this.championshipTracks = this.dbData.getAllTracks();
+    console.log('Tracks from DB:', this.championshipTracks); // Debug log
     this.constructors = await this.dbData.getConstructors(1);
 
     // filter next championship track
     var i = 0;
     const current_date: Date = new Date();
     current_date.setHours(0, 0, 0, 0);
-    for (let track of this.championshipTracks){
-      const db_date: Date = new Date(track.date);
-      db_date.setHours(0, 0, 0, 0);
-      if ( db_date >= current_date )
-      {
-        this.championshipNextTracks[i] = track;
-        this.championshipNextTracks[i]["date"] = db_date.toLocaleDateString("it-CH");
-        i++;
-        if (i == 2) break;
-      }
-    }
+    this.championshipNextTracks = this.championshipTracks
+      .map(track => {
+        const db_date = new Date(track.date);
+        db_date.setHours(0, 0, 0, 0);
+        return { ...track, date: db_date, db_date };
+      })
+      .filter(track => track.db_date >= current_date)
+      .slice(0, 2)
+      .map(track => ({
+        ...track,
+        date: track.db_date.toLocaleDateString("it-CH")
+      }));
+    console.log('Next Tracks:', this.championshipNextTracks); // Debug log
 
     // Calculate delta points for the last 2 tracks
     for (let user of this.championship_standings_users) {
