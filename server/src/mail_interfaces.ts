@@ -1,5 +1,4 @@
 import { GenezioDeploy, GenezioMethod  } from "@genezio/types";
-import { MailService } from "@genezio/email-service";
 import { Pool } from "pg";
 const nodemailer = require("nodemailer");
 
@@ -45,7 +44,7 @@ export class EmailService {
             replyTo: this.FROM,
         };
         try {
-            console.log(await transporter.sendMail(mailOptions));
+            await transporter.sendMail(mailOptions);
             return "success";
         } catch (error) {
             return `Failed: ${error}`;
@@ -65,7 +64,7 @@ export class EmailService {
                 ORDER BY gp.date ASC
                 LIMIT 2;
             `);
-            
+
             // FOR TESTING PURPOSES ONLY - COMMENT THE ABOVE AND UNCOMMENT BELOW
             // const upcomingRacesResult = await this.pool.query(`
             //     SELECT gp.id, gp.date, t.name as track_name, t.country, gp.has_sprint, gp.has_x2

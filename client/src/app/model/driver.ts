@@ -1,5 +1,5 @@
 // Driver interface based on all_race_points view
-export interface DriverData {
+export interface AllDriverData {
   driver_id: number;
   driver_username: string;
   driver_name: string;
@@ -23,3 +23,11 @@ export interface DriverData {
   total_race_points: number;
   total_points: number;
 }
+
+export interface Driver {
+  driver_id: number;
+  driver_username: string;
+  driver_name: string;
+  driver_surname: string;
+}
+

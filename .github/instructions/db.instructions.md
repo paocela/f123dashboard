@@ -217,6 +217,7 @@ The `fanta` table stores fantasy team selections, while the result entry tables 
 - **strategy_pt**: Strategy points (int4)
 - **color**: Color or team color
 - **license_pt**: License points (int8, default: 3)
+- **season**: Reference to `seasons` (int4, NOT NULL)
 
 ---
 

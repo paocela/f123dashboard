@@ -19,14 +19,14 @@ import {
   SpinnerComponent
 } from '@coreui/angular';
 import { cifAe, cifAt, cifAu, cifAz, cifBe, cifBh, cifBr, cifCa, cifCn, cifEs, cifGb, cifHu, cifIt, 
-  cifJp, cifMc, cifMx, cifNl, cifQa, cifSa, cifSg, cifUs, cilX, cilCheckAlt, cilSwapVertical, cilFire, cilPowerStandby } from '@coreui/icons';
+  cifJp, cifMc, cifMx, cifNl, cifQa, cifSa, cifSg, cifUs, cilFire, cilPowerStandby } from '@coreui/icons';
   import { IconDirective } from '@coreui/icons-angular';
 
 import { DbDataService } from 'src/app/service/db-data.service';
 import { AuthService } from 'src/app/service/auth.service';
 import { GpResult } from '../../model/championship';
 import { ChampionshipData } from '../../model/championship-data';
-import { DriverData } from '../../model/driver';
+import { Driver } from '../../model/driver';
 import { TrackData } from '../../model/track';
 import { Season } from '../../model/season';
 
@@ -60,11 +60,12 @@ export class AdminComponent implements OnInit {
   
   // VARIABLE DEFINITIONS
   tracks: TrackData[] = [];
-  piloti: DriverData[] = [];
+  piloti: Driver[] = [];
   championshipData: ChampionshipData[] = [];
   seasons: Season[] = [];
   selectedSeason: number | null = null;
-  formStatus: { [key: number]: number } = {};
+  formStatus: { [key: number]: number } = {}; // 0: none, 1: success, 2: validation error, 3: backend error
+  formErrors: { [key: number]: string[] } = {};
   raceResults: Map<number, any[]> = new Map<number, any[]>(); // [track_id, array_of_results]
   sprintResults: Map<number, any[]> = new Map<number, any[]>();
   qualiResults: Map<number, any[]> = new Map<number, any[]>();
@@ -147,7 +148,6 @@ export class AdminComponent implements OnInit {
       
       // Get the latest season (first in the list since it's ordered by start_date DESC)
       if (this.seasons.length > 0) {
-        console.log(this.seasons);
         this.selectedSeason = this.seasons[0].id;
       }
 
@@ -163,19 +163,17 @@ export class AdminComponent implements OnInit {
     try {
       if (this.selectedSeason) {
         // Load data for specific season
-        console.log(this.selectedSeason, typeof this.selectedSeason);
 
+        this.piloti = await this.dbData.getDriversData(this.selectedSeason);
         this.tracks = await this.dbData.getAllTracksBySeason(this.selectedSeason);
         this.championshipData = await this.dbData.getChampionshipBySeason(this.selectedSeason);
       } else {
         // Load data for latest season (default)
+        this.piloti = await this.dbData.getDriversData();
         this.tracks = await this.dbData.getAllTracksBySeason();
         this.championshipData = await this.dbData.getChampionshipBySeason();
       }
       
-      // Load drivers (not season-specific)
-      this.piloti = this.dbData.getAllDrivers();
-
       this.initializeResults();
     } finally {
       this.isSeasonLoading = false;
@@ -269,7 +267,15 @@ export class AdminComponent implements OnInit {
 
 
   async publishResult(trackId: number, hasSprint: string, form: NgForm): Promise<void> {
+    if (!this.selectedSeason) {
+      throw new Error('Nessuna stagione selezionata');
+    }
+    console.log('Publishing results for trackId:', trackId, 'seasonId:', this.selectedSeason);
     this.isSubmitting[trackId] = true;
+    
+    // Clear previous errors and status
+    this.formErrors[trackId] = [];
+    this.formStatus[trackId] = 0; // Reset status
     
     try {
       // check data validity
@@ -289,15 +295,44 @@ export class AdminComponent implements OnInit {
           sprintResult: hasSprintBool ? Array.from(this.sprintResults.get(trackId)!.values()).slice(0, 9).map(x => Number(x)) : [],
           sprintDnfResult: sprintDnfResultTmp ? sprintDnfResultTmp.map(x => Number(x)) : [],
           qualiResult: Array.from(this.qualiResults.get(trackId)!.values()).map(x => Number(x)),
-          fpResult: Array.from(this.fpResults.get(trackId)!.values()).map(x => Number(x))
+          fpResult: Array.from(this.fpResults.get(trackId)!.values()).map(x => Number(x)),
+          seasonId: +this.selectedSeason
         }
 
-        await this.dbData.setGpResult(trackId, gpResult);
-        this.formStatus[trackId] = 1;
+        try {
+          const result = await this.dbData.setGpResult(trackId, gpResult);
+          
+          // Check if the result indicates success
+          if (result && typeof result === 'string') {
+            const parsedResult = JSON.parse(result);
+            if (parsedResult.success) {
+              this.formStatus[trackId] = 1; // Success
+              this.formErrors[trackId] = []; // Clear any previous errors
+              console.log('Risultati salvati con successo:', parsedResult.message);
+            } else {
+              this.formStatus[trackId] = 3; // Backend error
+              this.formErrors[trackId] = [`Errore del server: ${parsedResult.message || 'Errore sconosciuto'}`];
+              console.error('Errore dal backend:', parsedResult.message);
+            }
+          } else {
+            // Assume success if no specific response format
+            this.formStatus[trackId] = 1; // Success
+            this.formErrors[trackId] = []; // Clear any previous errors
+            console.log('Risultati salvati con successo');
+          }
+        } catch (backendError) {
+          this.formStatus[trackId] = 3; // Backend error
+          this.formErrors[trackId] = [`Errore di comunicazione con il server: ${backendError instanceof Error ? backendError.message : 'Errore sconosciuto'}`];
+          console.error('Errore nella chiamata al backend:', backendError);
+        }
       }
       else {
-        this.formStatus[trackId] = 2;
+        this.formStatus[trackId] = 2; // Validation errors
       }
+    } catch (error) {
+      this.formStatus[trackId] = 3; // General error
+      this.formErrors[trackId] = [`Errore generale: ${error instanceof Error ? error.message : 'Errore sconosciuto'}`];
+      console.error('Errore generale in publishResult:', error);
     } finally {
       this.isSubmitting[trackId] = false;
     }
@@ -305,50 +340,168 @@ export class AdminComponent implements OnInit {
 
   formIsValid(trackId: number, hasSprint: boolean): boolean {
     let is_valid = true;
-    is_valid = is_valid && this.formValidator(this.raceResults.get(trackId) || []);
-    is_valid = is_valid && this.formValidator(this.qualiResults.get(trackId) || []);
-    is_valid = is_valid && this.formValidator(this.fpResults.get(trackId) || []);
-    if ( hasSprint ) {
-      is_valid = is_valid && this.formValidator(this.sprintResults.get(trackId) || []);
+    let errorMessages: string[] = [];
+
+    // Validate race results (with DNF support)
+    const raceValid = this.validateSessionWithDnf(this.raceResults.get(trackId) || [], 'Gara');
+    is_valid = is_valid && raceValid.isValid;
+    if (!raceValid.isValid) {
+      raceValid.errors.forEach(error => errorMessages.push(`Gara: ${error}`));
     }
+
+    // Validate qualifying results (no DNF)
+    const qualiValid = this.validateSessionNoDnf(this.qualiResults.get(trackId) || [], 'Qualifica');
+    is_valid = is_valid && qualiValid.isValid;
+    if (!qualiValid.isValid) {
+      qualiValid.errors.forEach(error => errorMessages.push(`Qualifica: ${error}`));
+    }
+
+    // Validate free practice results (no DNF)
+    const fpValid = this.validateSessionNoDnf(this.fpResults.get(trackId) || [], 'Prove Libere');
+    is_valid = is_valid && fpValid.isValid;
+    if (!fpValid.isValid) {
+      fpValid.errors.forEach(error => errorMessages.push(`Prove Libere: ${error}`));
+    }
+
+    // Validate sprint results if applicable (with DNF support)
+    if (hasSprint) {
+      const sprintValid = this.validateSessionWithDnf(this.sprintResults.get(trackId) || [], 'Sprint');
+      is_valid = is_valid && sprintValid.isValid;
+      if (!sprintValid.isValid) {
+        sprintValid.errors.forEach(error => errorMessages.push(`Sprint: ${error}`));
+      }
+    }
+
+    // Store error messages for this track
+    this.formErrors[trackId] = errorMessages;
+
+    // Log errors for debugging
+    if (!is_valid) {
+      console.error('Errori di validazione form:', errorMessages);
+    }
+
     return is_valid;
   }
 
-  formValidator(resultArray: any[]): boolean {
-    let is_valid = true;
-    let positions = resultArray.slice(0, 8);
-    let fast_lap = resultArray[8];
-    let all_positions = positions;
+  hasAllPlayersExactlyOnce(positions: number[]): boolean {
+    return this.getDriverValidationErrors(positions).length === 0;
+  }
 
-    // check duplicates in positions
-    is_valid = is_valid && !positions.some((v, i) => v != 0 && positions.indexOf(v) !== i); 
+  getDriverValidationErrors(positions: number[]): string[] {
+    const errors: string[] = [];
+    const driverCount = this.piloti.length;
+    const validPositions = positions.filter(p => Number(p) > 0).map(p => Number(p));
+    const uniqueDrivers = new Set(validPositions);
     
-    // check fast lap
-    is_valid = is_valid && fast_lap != 0;
-
-    if ( resultArray.length == 10 ) {
-      let dnf: Number[] = resultArray[9].map((x: any) => Number(x));
-      all_positions = all_positions.concat(dnf);
-
-      // check dnf players are not in positions
-      is_valid = is_valid && !dnf.some(item => positions.includes(item));
-
-      // check last #num dnf players postions are left empty
-      is_valid = is_valid && !positions.slice(6 - dnf.length).some((v, i) => v != 0);
+    // Get actual driver IDs from piloti array
+    const validDriverIds = new Set(this.piloti.map(p => +p.driver_id));
+    console.log('Valid driver IDs:', Array.from(validDriverIds));
+    console.log('typeof validDriverIds:', typeof Array.from(validDriverIds)[0]);
+    
+    // Check for duplicate drivers
+    if (validPositions.length !== uniqueDrivers.size) {
+      errors.push(`Alcuni piloti sono assegnati più volte`);
     }
-
-    // check all players have been inserted
-    is_valid = is_valid && this.hasAllPlayers(all_positions);
-
-    return is_valid;
+    
+    // Check for missing or extra drivers
+    if (uniqueDrivers.size < driverCount) {
+      const missingCount = driverCount - uniqueDrivers.size;
+      errors.push(`${missingCount} pilota/i mancante/i dai risultati`);
+    } else if (uniqueDrivers.size > driverCount) {
+      errors.push(`Troppi piloti assegnati`);
+    }
+    
+    // Check if all provided driver IDs are valid (exist in piloti array)
+    for (const driverId of uniqueDrivers) {
+      console.log('typeof driverId:', typeof driverId);
+      console.log('driverId:', driverId);
+      if (!validDriverIds.has(driverId)) {
+        // Find the driver username if it exists, otherwise show the ID
+        const driver = this.piloti.find(p => p.driver_id == driverId);
+        const driverName = driver ? driver.driver_username : `ID ${driverId}`;
+        errors.push(`Pilota ${driverName} non esiste`);
+        break; // Only show first invalid driver ID to avoid spam
+      }
+    }
+    
+    return errors;
   }
 
-  hasAllPlayers(positions: number[]): boolean {
-    const set = new Set(positions); // remove duplicates
-    for (let i = 1; i <= 8; i++) {
-      if (!set.has(i)) return false; // missing a number
+  validateSessionWithDnf(resultArray: any[], sessionName: string): { isValid: boolean; errors: string[] } {
+    let errors: string[] = [];
+    
+    if (!resultArray || resultArray.length < 9) {
+      errors.push(`Dati ${sessionName} incompleti`);
+      return { isValid: false, errors };
     }
-    return true; // all good
+
+    const positions = resultArray.slice(0, 8);
+    const fastLap = resultArray[8];
+    const dnf: number[] = resultArray.length > 9 && resultArray[9] ? resultArray[9].map((x: any) => Number(x)) : [];
+    
+    // Check for duplicates in positions (excluding zeros)
+    const nonZeroPositions = positions.filter(p => p !== 0);
+    const positionSet = new Set(nonZeroPositions);
+    if (nonZeroPositions.length !== positionSet.size) {
+      errors.push(`Piloti duplicati trovati nelle posizioni`);
+    }
+
+    // Check fast lap is set
+    if (!fastLap || fastLap === 0) {
+      errors.push(`Il pilota del giro veloce deve essere selezionato`);
+    }
+
+    // Check DNF drivers are not in positions
+    if (dnf.some(d => positions.includes(d))) {
+      errors.push(`I piloti DNF non possono essere anche nelle posizioni di gara`);
+    }
+
+    // Check that positions after DNF count are empty
+    const emptyPositionsNeeded = dnf.length;
+    const lastPositions = positions.slice(8 - emptyPositionsNeeded);
+    if (lastPositions.some(p => p !== 0)) {
+      errors.push(`Le ultime ${emptyPositionsNeeded} posizioni devono essere vuote quando ${dnf.length} piloti sono DNF`);
+    }
+
+    // Check all drivers are present exactly once
+    const allDrivers = nonZeroPositions.concat(dnf);
+    if (!this.hasAllPlayersExactlyOnce(allDrivers)) {
+      const validationErrors = this.getDriverValidationErrors(allDrivers);
+      errors.push(...validationErrors);
+    }
+
+    return { isValid: errors.length === 0, errors };
+  }
+
+  validateSessionNoDnf(resultArray: any[], sessionName: string): { isValid: boolean; errors: string[] } {
+    let errors: string[] = [];
+    
+    if (!resultArray || resultArray.length < 8) {
+      errors.push(`Dati ${sessionName} incompleti`);
+      return { isValid: false, errors };
+    }
+
+    const positions = resultArray.slice(0, 8);
+    
+    // Check for duplicates in positions (excluding zeros)
+    const nonZeroPositions = positions.filter(p => p !== 0);
+    const positionSet = new Set(nonZeroPositions);
+    if (nonZeroPositions.length !== positionSet.size) {
+      errors.push(`Piloti duplicati trovati nelle posizioni`);
+    }
+
+    // Check all positions are filled
+    if (positions.some(p => p === 0 || p === null || p === undefined)) {
+      errors.push(`Tutte le posizioni devono essere compilate`);
+    }
+
+    // Check all drivers are present exactly once
+    if (!this.hasAllPlayersExactlyOnce(positions)) {
+      const validationErrors = this.getDriverValidationErrors(positions);
+      errors.push(...validationErrors);
+    }
+
+    return { isValid: errors.length === 0, errors };
   }
 
   getRaceResult(trackId: number, position: number): any {

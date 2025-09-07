@@ -272,12 +272,35 @@
                                     </button>
                                     </c-col>
                                   <c-col class="text-center">
-                                      <p *ngIf="formStatus[track.track_id] == 2" class="error">
-                                        <c-badge color="danger">Errore: piloti assenti, invalidi, o inseriti più volte :(</c-badge>
-                                      </p>
-                                      <p *ngIf="formStatus[track.track_id] == 1" class="success">
-                                        <c-badge color="success">Risultati salvati correttamente :)</c-badge>
-                                      </p>
+                                      @if (formStatus[track.track_id] == 2) {
+                                        <div class="error mb-2">
+                                          <c-badge color="danger" class="d-block mb-2">Errore nella validazione dei risultati</c-badge>
+                                          @if (formErrors[track.track_id] && formErrors[track.track_id].length > 0) {
+                                            <div class="error-details">
+                                              @for (error of formErrors[track.track_id]; track $index) {
+                                                <small class="text-danger d-block">{{ error }}</small>
+                                              }
+                                            </div>
+                                          }
+                                        </div>
+                                      }
+                                      @if (formStatus[track.track_id] == 3) {
+                                        <div class="error mb-2">
+                                          <c-badge color="danger" class="d-block mb-2">Errore nel salvataggio</c-badge>
+                                          @if (formErrors[track.track_id] && formErrors[track.track_id].length > 0) {
+                                            <div class="error-details">
+                                              @for (error of formErrors[track.track_id]; track $index) {
+                                                <small class="text-danger d-block">{{ error }}</small>
+                                              }
+                                            </div>
+                                          }
+                                        </div>
+                                      }
+                                      @if (formStatus[track.track_id] == 1) {
+                                        <p class="success">
+                                          <c-badge color="success">Risultati salvati correttamente :)</c-badge>
+                                        </p>
+                                      }
                                   </c-col>
                                 </c-row>
                             </c-container>

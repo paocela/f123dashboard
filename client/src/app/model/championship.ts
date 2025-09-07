@@ -7,4 +7,5 @@ export interface GpResult{
     sprintDnfResult: number[];
     qualiResult: number[];
     fpResult: number[];
+    seasonId: number;
   }

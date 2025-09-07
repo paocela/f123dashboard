@@ -5,7 +5,7 @@ import { User } from '../model/auth';
 import { GpResult } from '../model/championship'
 import { Season } from '../model/season';
 import { ChampionshipData } from '../model/championship-data';
-import { DriverData } from '../model/driver';
+import { AllDriverData, Driver } from '../model/driver';
 import { TrackData, CumulativePointsData } from '../model/track';
 
 
@@ -64,7 +64,7 @@ export class DbDataService {
 /****************************************************************/
 //chiamate che trasferiscono le variabili alle varie pagine 
 /****************************************************************/
-  getAllDrivers(): DriverData[] {
+  getAllDrivers(): AllDriverData[] {
     return JSON.parse(this.drivers);
   }
 
@@ -95,6 +95,16 @@ export class DbDataService {
 /****************************************************************/
 //season-specific data methods
 /****************************************************************/
+
+  async getDriversBySeason(seasonId?: number): Promise<AllDriverData[]> {
+    const drivers = await PostgresService.getAllDrivers(seasonId);
+    return JSON.parse(drivers);
+  }
+
+  async getDriversData(seasonId?: number): Promise<Driver[]> {
+    const drivers = await PostgresService.getDriversData(seasonId);
+    return JSON.parse(drivers);
+  }
 
   async getChampionshipBySeason(seasonId?: number): Promise<ChampionshipData[]> {
     const championship = await PostgresService.getChampionship(seasonId);
@@ -147,15 +157,28 @@ export class DbDataService {
       player.password);
   }
 
-  async setGpResult(trackId: Number, gpResult: GpResult): Promise<void> {
-    // await PostgresService.setGpResult(+trackId,
-    //                               gpResult.hasSprint,
-    //                               gpResult.raceResult,
-    //                               gpResult.raceDnfResult,
-    //                               gpResult.sprintResult,
-    //                               gpResult.sprintDnfResult,
-    //                               gpResult.qualiResult,
-    //                               gpResult.fpResult);
+  async setGpResult(trackId: Number, gpResult: GpResult): Promise<string> {
+    try {
+      const result = await PostgresService.setGpResult(
+        +trackId,
+        gpResult.hasSprint,
+        gpResult.raceResult,
+        gpResult.raceDnfResult,
+        gpResult.sprintResult,
+        gpResult.sprintDnfResult,
+        gpResult.qualiResult,
+        gpResult.fpResult,
+        gpResult.seasonId
+      );
+      return result;
+    } catch (error) {
+      console.error('Error setting GP result:', error);
+      // Return error as JSON string to match backend format
+      return JSON.stringify({
+        success: false,
+        message: `Errore di comunicazione: ${error instanceof Error ? error.message : 'Errore sconosciuto'}`
+      });
+    }
   }
 
   getAvatarSrc(user: User | null): string {
