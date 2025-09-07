@@ -173,7 +173,7 @@
                           src="./assets/images/constructors/{{ constructor.constructor_name }}.png"
                         />
                       </td>
-                      <td>
+                      <td *ngIf="showColumn()">
                         <div>{{ constructor.constructor_name }}</div>
                       </td>
                       <td class="text-center" *ngIf="showColumn()">
