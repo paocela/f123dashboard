@@ -25,9 +25,9 @@ export interface AllDriverData {
 }
 
 export interface Driver {
-  driver_id: number;
-  driver_username: string;
-  driver_name: string;
-  driver_surname: string;
+  id: number;
+  username: string;
+  first_name: string;
+  surname: string;
 }
 

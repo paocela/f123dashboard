@@ -21,13 +21,14 @@ export class DbDataService {
 /****************************************************************/
 //variabili locali
 /****************************************************************/
-  private drivers: string = "";
+  private allDrivers: string = "";
   private championship: ChampionshipData[] = [];
   private cumulative_points: string = "";
   private tracks: string = "";
   private fantaVote!: Fanta[];
   private raceResult: RaceResult[] = [];
   private users: User[] = [];
+  private drivers: Driver[] = [];
 
 
 /****************************************************************/
@@ -36,13 +37,14 @@ export class DbDataService {
 
   async AllData() {
     const [
-      drivers,
+      allDrivers,
       championship,
       cumulativePoints,
       tracks,
       fantaVote,
       users,
-      raceResult
+      raceResult,
+      drivers
     ] = await Promise.all([
       PostgresService.getAllDrivers(),
       PostgresService.getChampionship(),
@@ -50,23 +52,25 @@ export class DbDataService {
       PostgresService.getAllTracks(),
       FantaService.getFantaVote(),
       PostgresService.getUsers(),
-      PostgresService.getRaceResoult()
+      PostgresService.getRaceResoult(),
+      PostgresService.getDriversData()
     ]);
 
-    this.drivers = drivers;
+    this.allDrivers = allDrivers;
     this.championship = JSON.parse(championship);
     this.cumulative_points = cumulativePoints;
     this.tracks = tracks;
     this.fantaVote = JSON.parse(fantaVote);
     this.users = JSON.parse(users);
     this.raceResult = JSON.parse(raceResult);
-  } 
+    this.drivers = JSON.parse(drivers);
+  }
 
 /****************************************************************/
 //chiamate che trasferiscono le variabili alle varie pagine 
 /****************************************************************/
   getAllDrivers(): AllDriverData[] {
-    return JSON.parse(this.drivers);
+    return JSON.parse(this.allDrivers);
   }
 
   getChampionship(): ChampionshipData[] {
@@ -91,6 +95,9 @@ export class DbDataService {
   
   getUsers(): User[] {
     return this.users;
+  }
+  getDrivers(): Driver[] {
+    return this.drivers;
   }
 
 /****************************************************************/

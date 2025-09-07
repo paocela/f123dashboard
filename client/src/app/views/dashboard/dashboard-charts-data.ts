@@ -8,6 +8,7 @@ import {
 
 import { getStyle } from '@coreui/utils';
 import {DbDataService} from '../../service/db-data.service';  //aggiunto il servizio per dati db
+import { CumulativePointsData } from '../../model/track';
 
 export interface IChartProps {
   data?: ChartData;
@@ -29,7 +30,7 @@ export class DashboardChartsData {
   }
 
   public mainChart: IChartProps = { type: 'line' };
-  public championshipTrend: any[] = [];
+  public championshipTrend: CumulativePointsData[] = [];
   public championshipTracks: any[] = [];
 
   private chartScale: number = 500;
@@ -38,7 +39,7 @@ export class DashboardChartsData {
     return Math.floor(Math.random() * (max - min + 1) + min);
   }
 
-  initMainChart(period: string = 'all', numberOfRaces: number = 8) {
+  initMainChart(period: string = 'all', maxNumberOfRaces: number = 8) {
 
     this.championshipTrend = this.dbData.getCumulativePoints() ;
     this.championshipTracks = this.dbData.getAllTracks();
@@ -46,39 +47,57 @@ export class DashboardChartsData {
 
     // mainChart
     this.mainChart['elements'] = period === 'Month' ? 12 : 27;
-    this.mainChart['redmamba_99_'] = [];
-    this.mainChart['FASTman'] = [];
-    this.mainChart['HeavyButt'] = [];
-    this.mainChart["Marcogang96"] = [];
-    this.mainChart["GiannisCorbe"] = [];
-    this.mainChart["Lil Mvrck"] = [];
+    
+    // Dynamically initialize mainChart arrays for each driver found in championshipTrend
+    const uniqueDrivers = [...new Set(this.championshipTrend.map(item => item.driver_username))];
+    for (const driverUsername of uniqueDrivers) {
+      this.mainChart[driverUsername] = [];
+    }
+
+    // Initialize arrays for all drivers found in the data
+    for (let pippo of this.championshipTrend) {
+      if (!this.mainChart[pippo.driver_username]) {
+        this.mainChart[pippo.driver_username] = [];
+      }
+    }
 
     let labels: string[] = [];
     if (period === 'Month') {
       //se minore di 8 record prendi le piste da qui 
-      if (labels.length < numberOfRaces){
-        labels = this.championshipTracks.slice(0, numberOfRaces).map(track => track.country);
+      if (labels.length < maxNumberOfRaces){
+        labels = this.championshipTracks.slice(0, maxNumberOfRaces).map(track => track.country);
       }else {
         labels=this.championshipTracks
           .map(track => track.country)
-          .slice(labels.length - numberOfRaces, labels.length);
+          .slice(labels.length - maxNumberOfRaces, labels.length);
       }
 
       const driverData: { [key: string]: number[] } = {};
 
-      for (let pippo of this.championshipTrend) {
-        if (!driverData[pippo.driver_username]) {
-          driverData[pippo.driver_username] = [];
+      for (let trendItem of this.championshipTrend) {
+        if (!driverData[trendItem.driver_username]) {
+          driverData[trendItem.driver_username] = [];
         }
-        driverData[pippo.driver_username].push(pippo.cumulative_points);
+        driverData[trendItem.driver_username].push(trendItem.cumulative_points);
       }
       let maxDriverValue = 0;
       for (let driver in driverData) {
-        // Recupero ultimi 8 risultati
-        const data = driverData[driver].slice(-numberOfRaces);
-        // Sottraggo il primo valore a tutti gli altri per avere un grafico che parte da gara -1
-        const firstValue = driverData[driver][(driverData[driver].length - numberOfRaces) - 1]; 
+        // Recupero ultimi maxNumberOfRaces risultati (o tutti se ce ne sono meno)
+        const data = driverData[driver].slice(-maxNumberOfRaces);
+
+        // Handle edge case: se abbiamo solo una gara o meno gare di maxNumberOfRaces
+        let firstValue = 0;
+        if (driverData[driver].length > maxNumberOfRaces) {
+          // Se abbiamo più gare di maxNumberOfRaces, prendiamo il valore precedente al periodo
+          firstValue = driverData[driver][(driverData[driver].length - maxNumberOfRaces) - 1];
+        } else if (driverData[driver].length > 1) {
+          // Se abbiamo almeno 2 gare ma meno di maxNumberOfRaces, prendiamo il primo valore
+          firstValue = driverData[driver][0];
+        }
+        // Se abbiamo solo 1 gara, firstValue resta 0
+        
         this.mainChart[driver] = data.map(value => value - firstValue);
+        
         // Trova il valore massimo per ogni driver e aggiorna maxDriverValue se necessario
         const driverMax = Math.max(...data) - firstValue;
         if (driverMax > maxDriverValue) {
@@ -93,12 +112,6 @@ export class DashboardChartsData {
       /* tslint:disable:max-line-length */
       labels = this.championshipTracks.map(track => track.country);
 
-      // Initialize arrays for all drivers found in the data
-      for (let pippo of this.championshipTrend) {
-        if (!this.mainChart[pippo.driver_username]) {
-          this.mainChart[pippo.driver_username] = [];
-        }
-      }
 
       for (let pippo of this.championshipTrend ){
         this.mainChart[pippo.driver_username].push(pippo.cumulative_points)
@@ -110,83 +123,25 @@ export class DashboardChartsData {
       this.chartScale = Math.ceil(maxTrendValue / 100) * 100;
     }
 
-    const colors = [
-      {
-        // Colore redmamba_99_
-        backgroundColor: '#8a2be2',
-        borderColor: '#8a2be2',
-        pointHoverBackgroundColor: '#8a2be2',
-        borderWidth: 2,
-      },
-      {
-        // Colore FASTman
-        backgroundColor: '#32cd32',
-        borderColor: '#32cd32',
-        pointHoverBackgroundColor: '#fff',
-        borderWidth: 2,
-      },
-      {
-        // Colore HeavyButt
-        backgroundColor: '#c0c0c0',
-        borderColor: '#c0c0c0',
-        pointHoverBackgroundColor: '#fff',
-        borderWidth: 2,
-      },
-      {
-        // Colore Marcogang96
-        backgroundColor: '#f86c6b',
-        borderColor: '#f86c6b',
-        pointHoverBackgroundColor: '#f86c6b',
-        borderWidth: 2,
-      },
-      {
-        // Colore GiannisCorbe
-        backgroundColor: '#ffa500',
-        borderColor: '#ffa500',
-        pointHoverBackgroundColor: '#fff',
-        borderWidth: 2,
-      },
-      {
-        // Colore Lil Mvrck
-        backgroundColor: '#6495ed',
-        borderColor: '#6495ed',
-        pointHoverBackgroundColor: '#fff',
-        borderWidth: 2,
-      },
+    const defaultColors = [
+      '#8a2be2', '#32cd32', '#c0c0c0', '#f86c6b', '#ffa500', '#6495ed',
+      '#ff6384', '#36a2eb', '#ffce56', '#4bc0c0', '#9966ff', '#ff9f40'
     ];
 
-    const datasets: ChartDataset[] = [
-      {
-        data: this.mainChart['redmamba_99_'],
-        label: 'redmamba_99_',
-        ...colors[0]
-      },
-      {
-        data: this.mainChart['FASTman'],
-        label: 'FASTman',
-        ...colors[1]
-      },
-      {
-        data: this.mainChart['HeavyButt'],
-        label: 'HeavyButt',
-        ...colors[2]
-      },
-      {
-        data: this.mainChart['Marcogang96'],
-        label: 'Marcogang96',
-        ...colors[3]
-      },
-      {
-        data: this.mainChart['GiannisCorbe'],
-        label: 'GiannisCorbe',
-        ...colors[4]
-      },
-      {
-        data: this.mainChart['Lil Mvrck'],
-        label: 'Lil Mvrck',
-        ...colors[5]
-      }
-    ];
+    // Generate datasets dynamically based on championshipTrend driver_username data
+    const datasets: ChartDataset[] = uniqueDrivers.map((driverUsername, index) => {
+      const colorIndex = index % defaultColors.length;
+      const color = defaultColors[colorIndex];
+      
+      return {
+        data: this.mainChart[driverUsername] || [],
+        label: driverUsername,
+        backgroundColor: color,
+        borderColor: color,
+        pointHoverBackgroundColor: color,
+        borderWidth: 2,
+      };
+    });
 
 
     const scales = this.getScales();

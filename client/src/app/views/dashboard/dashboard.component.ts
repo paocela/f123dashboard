@@ -130,7 +130,6 @@ export class DashboardComponent implements OnInit {
     this.championship_standings_users = this.dbData.getAllDrivers() ;
     const championshipTrend = this.dbData.getCumulativePoints() ;
     this.championshipTracks = this.dbData.getAllTracks();
-    console.log('Tracks from DB:', this.championshipTracks); // Debug log
     this.constructors = await this.dbData.getConstructors(1);
 
     // filter next championship track
@@ -149,8 +148,6 @@ export class DashboardComponent implements OnInit {
         ...track,
         date: track.db_date.toLocaleDateString("it-CH")
       }));
-    console.log('Next Tracks:', this.championshipNextTracks); // Debug log
-
     // Calculate delta points for the last 2 tracks
     for (let user of this.championship_standings_users) {
       const userTracks = championshipTrend.filter((track: any) => track.driver_username === user.driver_username);

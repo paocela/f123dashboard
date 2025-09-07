@@ -147,9 +147,9 @@
                                                       class="admin-select"
                                                       required>
                                                       <option value="0">-- Seleziona un pilota --</option>
-                                                      @for (pilota of piloti; track pilota.driver_id) {
-                                                        <option attr.value="{{ pilota.driver_id }}">
-                                                          {{ pilota.driver_username }}
+                                                      @for (pilota of piloti; track pilota.id) {
+                                                        <option attr.value="{{ pilota.id }}">
+                                                          {{ pilota.username }}
                                                         </option>
                                                       }
                                                     </select>
@@ -162,9 +162,9 @@
                                                               cFormControl
                                                               class="admin-select multi-select"
                                                               multiple>
-                                                        @for (pilota of piloti; track pilota.driver_id) {
-                                                          <option [value]="pilota.driver_id">
-                                                            {{ pilota.driver_username }}
+                                                        @for (pilota of piloti; track pilota.id) {
+                                                          <option [value]="pilota.id">
+                                                            {{ pilota.username }}
                                                           </option>
                                                         }
                                                       </select>
@@ -184,9 +184,9 @@
                                                             class="admin-select"
                                                             required>
                                                       <option value="0">-- Seleziona un pilota --</option>
-                                                      @for (pilota of piloti; track pilota.driver_id) {
-                                                        <option [value]="pilota.driver_id">
-                                                          {{ pilota.driver_username }}
+                                                      @for (pilota of piloti; track pilota.id) {
+                                                        <option [value]="pilota.id">
+                                                          {{ pilota.username }}
                                                         </option>
                                                       }
                                                     </select>
@@ -199,9 +199,9 @@
                                                               cFormControl
                                                               class="admin-select multi-select"
                                                               multiple>
-                                                        @for (pilota of piloti; track pilota.driver_id) {
-                                                          <option [value]="pilota.driver_id">
-                                                            {{ pilota.driver_username }}
+                                                        @for (pilota of piloti; track pilota.id) {
+                                                          <option [value]="pilota.id">
+                                                            {{ pilota.username }}
                                                           </option>
                                                         }
                                                       </select>
@@ -221,9 +221,9 @@
                                                             class="admin-select"
                                                             required>
                                                       <option value="0">-- Seleziona un pilota --</option>
-                                                      @for (pilota of piloti; track pilota.driver_id) {
-                                                        <option [value]="pilota.driver_id">
-                                                          {{ pilota.driver_username }}
+                                                      @for (pilota of piloti; track pilota.id) {
+                                                        <option [value]="pilota.id">
+                                                          {{ pilota.username }}
                                                         </option>
                                                       }
                                                     </select>
@@ -242,9 +242,9 @@
                                                             class="admin-select"
                                                             required>
                                                       <option value="0">-- Seleziona un pilota --</option>
-                                                      @for (pilota of piloti; track pilota.driver_id) {
-                                                        <option [value]="pilota.driver_id">
-                                                          {{ pilota.driver_username }}
+                                                      @for (pilota of piloti; track pilota.id) {
+                                                        <option [value]="pilota.id">
+                                                          {{ pilota.username }}
                                                         </option>
                                                       }
                                                     </select>

@@ -1,6 +1,6 @@
 import { NgStyle } from '@angular/common';
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, effect, inject, OnInit, Renderer2, signal, ViewChild, WritableSignal, DOCUMENT } from '@angular/core';
+import { Component, DestroyRef, effect, inject, OnInit, Renderer2, signal, WritableSignal, DOCUMENT } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ChartOptions } from 'chart.js';
 import {

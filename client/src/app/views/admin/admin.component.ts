@@ -187,7 +187,7 @@ export class AdminComponent implements OnInit {
   initializeResults() {
     let pilotiMap: Map<string, number> = new Map<string, number>(); // map to quickly search driver_id given its driver_username
     for (let pilota of this.piloti) {
-      pilotiMap.set(pilota.driver_username, pilota.driver_id);
+      pilotiMap.set(pilota.username, pilota.id);
     }
 
     for (let gp of this.championshipData) {
@@ -394,7 +394,7 @@ export class AdminComponent implements OnInit {
     const uniqueDrivers = new Set(validPositions);
     
     // Get actual driver IDs from piloti array
-    const validDriverIds = new Set(this.piloti.map(p => +p.driver_id));
+    const validDriverIds = new Set(this.piloti.map(p => +p.id));
     console.log('Valid driver IDs:', Array.from(validDriverIds));
     console.log('typeof validDriverIds:', typeof Array.from(validDriverIds)[0]);
     
@@ -417,8 +417,8 @@ export class AdminComponent implements OnInit {
       console.log('driverId:', driverId);
       if (!validDriverIds.has(driverId)) {
         // Find the driver username if it exists, otherwise show the ID
-        const driver = this.piloti.find(p => p.driver_id == driverId);
-        const driverName = driver ? driver.driver_username : `ID ${driverId}`;
+        const driver = this.piloti.find(p => p.id == driverId);
+        const driverName = driver ? driver.username : `ID ${driverId}`;
         errors.push(`Pilota ${driverName} non esiste`);
         break; // Only show first invalid driver ID to avoid spam
       }
