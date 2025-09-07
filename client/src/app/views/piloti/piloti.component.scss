@@ -22,6 +22,8 @@ $list-item-padding: 0 ; // Padding delle voci della lista
 // Stili della card
 .pilot-card {
   margin-bottom: 0.5rem;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
 
   // Header della card con immagine e descrizione
   .card-header {
@@ -32,6 +34,10 @@ $list-item-padding: 0 ; // Padding delle voci della lista
       height: auto;
       display: block;
       margin: 5px auto;
+    }
+
+    .card-avatar {
+      border-radius: 50%;       /* makes it round (circle/ellipse) */
     }
     
     .card-body {
@@ -67,6 +73,42 @@ $list-item-padding: 0 ; // Padding delle voci della lista
             border-right-width: 1px;
           }
         }
+      }
+    }
+  }
+}
+.costructor-card {
+  margin-bottom: 0.5rem;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+
+  // Header della card con immagine e descrizione
+  .card-header {
+    padding: $card-inner-padding;
+    
+    img {
+      width: auto;
+      height: 100px;
+      display: block;
+      margin: 5px auto;
+    }
+
+    .card-avatar {
+      border-radius: 50%;       /* makes it round (circle/ellipse) */
+    }
+    
+    .card-body {
+      height: $card-description-height;
+      padding: $card-inner-padding;
+      
+      h5 {
+        font-size: $card-title-size;
+        margin-bottom: 0.25rem;
+      }
+      
+      p {
+        font-size: $card-text-size;
+        margin-bottom: 0;
       }
     }
   }

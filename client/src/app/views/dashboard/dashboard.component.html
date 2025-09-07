@@ -31,97 +31,204 @@
         <strong></strong>
       </c-card-header>
       <c-card-body>
-        <table
-          [hover]="true"
-          [responsive]="true"
-          [striped]="true"
-          align="middle"
-          cTable
-          class="mb-0 border"
-        >
-          <thead class="text-nowrap text-truncate">
-            <tr>
-              <th class="bg-body-tertiary text-center">Pos.</th>
-              <th class="bg-body-tertiary text-center">
-                <svg cIcon name="cilPeople"></svg>
-              </th>
-              <th class="bg-body-tertiary">Username</th>
-              <th class="bg-body-tertiary text-center" *ngIf="showColumn()">
-                Scuderia
-              </th>
-              <th class="bg-body-tertiary pilot" *ngIf="showColumn()">
-                Pilota
-              </th>
-              <th class="bg-body-tertiary text-center">Punti</th>
-              <th class="bg-body-tertiary text-center">+/-</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (user of championship_standings_users; track
-            user.driver_username; let i = $index) {
-            <tr>
-              <td>
-                <div class="fw-semibold text-center">#{{ i + 1 }}</div>
-              </td>
-              <td class="text-center">
-                <c-avatar
-                  [size]="'md'"
-                  src="./assets/images/avatars/{{ user.driver_username }}.png"
-                />
-              </td>
-              <td>
-                <div>{{ user.driver_username }}</div>
-              </td>
-              <td class="text-center" *ngIf="showColumn()">
-                <img
-                  width="100%"
-                  height="40px"
-                  src="./assets/images/constructors/{{ user.car_name }}.svg"
-                />
-              </td>
-              <td class="pilot" *ngIf="showColumn()">
-                <div class="text-nowrap">
-                  {{ user.pilot_name }} {{ user.pilot_surname }}
-                </div>
-              </td>
-              <td>
-                <div class="fw-semibold text-center">
-                  {{ user.total_points }}
-                </div>
-              </td>
-              <td>
-                <div
-                  class="fw-semibold text-center"
-                  [ngClass]="{
-                    'text-success':
-                      championship_standings_users[i - 1] &&
-                      user.gainedPoints -
-                        championship_standings_users[i - 1].gainedPoints >
-                        0,
-                    'text-danger':
-                      championship_standings_users[i - 1] &&
-                      user.gainedPoints -
-                        championship_standings_users[i - 1].gainedPoints <
-                        0,
-                    'text-warning':
-                      championship_standings_users[i - 1] &&
-                      user.gainedPoints -
-                        championship_standings_users[i - 1].gainedPoints ===
-                        0
-                  }"
+        <c-tabs [activeItemKey]="0" >
+          <c-tabs-list layout="justified" variant="tabs">
+            <button cTab [itemKey]="0">Piloti</button>
+            <button cTab [itemKey]="1">Costruttori</button>
+          </c-tabs-list>
+          <c-tabs-content>
+            <!-- TAB CLASSIFICA PILOTI -->
+            <c-tab-panel class="p-3 custom-c-tab" [itemKey]="0" >
+              <div class="table-wrapper">
+                <table
+                [hover]="true"
+                [responsive]="true"
+                [striped]="true"
+                align="middle"
+                cTable
+                class="mb-0 border rounded custom-table"
+              >
+                <thead class="text-nowrap text-truncate">
+                  <tr>
+                    <th class="bg-body-tertiary text-center">Pos.</th>
+                    <th class="bg-body-tertiary text-center">
+                      <svg cIcon name="cilPeople"></svg>
+                    </th>
+                    <th class="bg-body-tertiary">Username</th>
+                    <th class="bg-body-tertiary text-center" *ngIf="showColumn()">
+                      Scuderia
+                    </th>
+                    <th class="bg-body-tertiary pilot" *ngIf="showColumn()">
+                      Pilota
+                    </th>
+                    <th class="bg-body-tertiary text-center">Punti</th>
+                    <th class="bg-body-tertiary text-center">+/-</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (user of championship_standings_users; track
+                  user.driver_username; let i = $index) {
+                  <tr>
+                    <td>
+                      <div class="fw-semibold text-center">#{{ i + 1 }}</div>
+                    </td>
+                    <td class="text-center">
+                      <c-avatar
+                        [size]="'md'"
+                        src="./assets/images/avatars/{{ user.driver_username }}.png"
+                      />
+                    </td>
+                    <td>
+                      <div>{{ user.driver_username }}</div>
+                    </td>
+                    <td class="text-center" *ngIf="showColumn()">
+                      <img
+                        width="100%"
+                        height="40px"
+                        src="./assets/images/constructors/{{ user.car_name }}.svg"
+                      />
+                    </td>
+                    <td class="pilot" *ngIf="showColumn()">
+                      <div class="text-nowrap">
+                        {{ user.pilot_name }} {{ user.pilot_surname }}
+                      </div>
+                    </td>
+                    <td>
+                      <div class="fw-semibold text-center">
+                        {{ user.total_points }}
+                      </div>
+                    </td>
+                    <td>
+                      <div
+                        class="fw-semibold text-center"
+                        [ngClass]="{
+                          'text-success':
+                            championship_standings_users[i - 1] &&
+                            user.gainedPoints -
+                              championship_standings_users[i - 1].gainedPoints >
+                              0,
+                          'text-danger':
+                            championship_standings_users[i - 1] &&
+                            user.gainedPoints -
+                              championship_standings_users[i - 1].gainedPoints <
+                              0,
+                          'text-warning':
+                            championship_standings_users[i - 1] &&
+                            user.gainedPoints -
+                              championship_standings_users[i - 1].gainedPoints ===
+                              0
+                        }"
+                      >
+                        {{
+                          championship_standings_users[i - 1]
+                            ? user.gainedPoints -
+                              championship_standings_users[i - 1].gainedPoints
+                            : "-"
+                        }}
+                      </div>
+                    </td>
+                  </tr>
+                  }
+                </tbody>
+              </table>
+              </div>
+            </c-tab-panel>
+            <!-- TAB CLASSIFICA COSTRUTTORI -->
+            <c-tab-panel class="p-3 custom-c-tab" [itemKey]="1" >
+                <table
+                  [hover]="true"
+                  [responsive]="true"
+                  [striped]="true"
+                  align="middle"
+                  cTable
+                  class="mb-0 border rounded custom-table"
                 >
-                  {{
-                    championship_standings_users[i - 1]
-                      ? user.gainedPoints -
-                        championship_standings_users[i - 1].gainedPoints
-                      : "-"
-                  }}
-                </div>
-              </td>
-            </tr>
-            }
-          </tbody>
-        </table>
+                  <thead class="text-nowrap text-truncate">
+                    <tr>
+                      <th class="bg-body-tertiary text-center">Pos.</th>
+                      <th class="bg-body-tertiary text-center">
+                        <svg cIcon name="cilPeople"></svg>
+                      </th>
+                      <th class="bg-body-tertiary text-center" *ngIf="showColumn()">
+                        Scuderia
+                      </th>
+                      <th class="bg-body-tertiary pilot" *ngIf="showColumn()">
+                        Piloti
+                      </th>
+                      <th class="bg-body-tertiary text-center">Punti</th>
+                      <th class="bg-body-tertiary text-center">+/-</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (constructor of constructors; track
+                      constructor.constructor_name; let i = $index) {
+                    <tr>
+                      <td>
+                        <div class="fw-semibold text-center">#{{ i + 1 }}</div>
+                      </td>
+                      <td class="text-center">
+                        <img
+                          width="auto"
+                          height="40px"
+                          src="./assets/images/constructors/{{ constructor.constructor_name }}.png"
+                        />
+                      </td>
+                      <td>
+                        <div>{{ constructor.constructor_name }}</div>
+                      </td>
+                      <td class="text-center" *ngIf="showColumn()">
+                        <div class="d-flex align-items-center justify-content-center gap-2">
+                          <c-avatar
+                            [size]="'md'"
+                            src="./assets/images/avatars/{{ constructor.driver_1_username }}.png"
+                          />
+                          <c-avatar
+                            [size]="'md'"
+                            src="./assets/images/avatars/{{ constructor.driver_2_username }}.png"
+                          />
+                        </div>
+                      </td>
+                      <td>
+                        <div class="fw-semibold text-center">
+                          {{ constructor.constructor_tot_points }}
+                        </div>
+                      </td>
+                      <td>
+                        <div
+                          class="fw-semibold text-center"
+                          [ngClass]="{
+                            'text-success':
+                              constructors[i - 1] &&
+                              constructor.constructor_tot_points -
+                                constructors[i - 1].constructor_tot_points >
+                                0,
+                            'text-danger':
+                              constructors[i - 1] &&
+                              constructor.constructor_tot_points -
+                                constructors[i - 1].constructor_tot_points <
+                                0,
+                            'text-warning':
+                              constructors[i - 1] &&
+                              constructor.constructor_tot_points -
+                                constructors[i - 1].constructor_tot_points ===
+                                0
+                          }"
+                        >
+                          {{
+                            constructors[i - 1]
+                              ? constructor.constructor_tot_points -
+                                constructors[i - 1].constructor_tot_points
+                              : "-"
+                          }}
+                        </div>
+                      </td>
+                    </tr>
+                    }
+                  </tbody>
+                </table>
+            </c-tab-panel>
+          </c-tabs-content>
+        </c-tabs>
       </c-card-body>
     </c-card>
   </c-col>

@@ -1,20 +1,24 @@
 <!--<c-header class="mb-4 d-print-none" position="sticky">-->
 <ng-container>
   <c-container [fluid]="true" class="border-bottom px-sm-4 px-2">
-    <button
-      [cSidebarToggle]="sidebarId()"
-      cHeaderToggler
-      class="btn"
-      toggle="visible"
-      style="margin-inline-start: -14px"
-      aria-label="Toggle sidebar navigation"
-    >
-      <svg cIcon name="cilMenu" size="lg"></svg>
-    </button>
 
-    <c-header-nav class="d-flex ms-auto"></c-header-nav>
+    <c-header-nav class="mx-0 d-flex align-items-center justify-content-between w-100" style="height: 10px;">
+      
+      <button
+        [cSidebarToggle]="sidebarId()"
+        cHeaderToggler
+        class="btn"
+        toggle="visible"
+        style="margin-inline-start: -14px"
+        aria-label="Toggle sidebar navigation"
+        >
+        <svg cIcon name="cilMenu" size="lg"></svg>
+      </button>
 
-    <c-header-nav class="mx-0">
+      <div class="flex-grow-1 d-flex justify-content-center">
+        <countdown-component></countdown-component>
+      </div>
+
       <div class="nav-item py-1">
         <div class="vr h-100 mx-2 text-body text-opacity-75"></div>
       </div>
@@ -24,10 +28,6 @@
         [icon]="linkIcon.cibTwitch"
         color="#6441a5"
       ></app-link-box>
-
-      <div class="nav-item py-1">
-        <div class="vr h-100 mx-2 text-body text-opacity-75"></div>
-      </div>
 
       <app-link-box
         linkUrl="https://www.instagram.com/raceforfederica"
@@ -39,25 +39,9 @@
         <div class="vr h-100 mx-2 text-body text-opacity-75"></div>
       </div>
 
-      <div class="clock">
-        <countdown-component></countdown-component>
-      </div>
-
-      <div class="nav-item py-1">
-        <div class="vr h-100 mx-2 text-body text-opacity-75"></div>
-      </div>
-
       <ng-container *ngTemplateOutlet="themeDropdown" />
 
-      <div class="nav-item py-1">
-        <div class="vr h-100 mx-2 text-body text-opacity-75"></div>
-      </div>
-
       <login-component></login-component>
-
-      <div class="nav-item py-1">
-        <div class="vr h-100 mx-2 text-body text-opacity-75"></div>
-      </div>
 
     </c-header-nav>
 

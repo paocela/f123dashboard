@@ -15,10 +15,11 @@ import {
   ListGroupDirective,
   ListGroupItemDirective,
   RowComponent,
-  TextColorDirective
+  TextColorDirective,
+  Tabs2Module
 } from '@coreui/angular';
 import { ChartjsComponent } from '@coreui/angular-chartjs';  // Import per il componente grafici
-
+import { Constructor } from '../../model/constructor';
 
 @Component({
     selector: 'app-cards',
@@ -38,14 +39,16 @@ import { ChartjsComponent } from '@coreui/angular-chartjs';  // Import per il co
     ListGroupItemDirective,
     BorderDirective,
     CardImgDirective,
-    ChartjsComponent // Aggiungi il modulo per i grafici
-]
+    ChartjsComponent,
+    Tabs2Module
+  ]
 })
+
 export class PilotiComponent implements OnInit {
 
   piloti: any[] = [];
+  constructors: Constructor[] = [];
   pilotChart: any[] = [];
-
 
   // Variabili per la personalizzazione del radar chart
   private readonly CHART_TEXT_COLOR = 'rgba(130, 130, 130, 1)';
@@ -101,10 +104,11 @@ export class PilotiComponent implements OnInit {
   constructor(private dbData: DbDataService) {} //aggiunto il servizio per dati db
 
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
 
     //richiesta di dati dal servizio
     this.piloti = this.dbData.getAllDrivers();
+    this.constructors = await this.dbData.getConstructors(1);
 
     this.initializeRadarChartData();
   }
