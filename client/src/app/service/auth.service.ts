@@ -56,7 +56,8 @@ export class AuthService {
           name: validation.name,
           surname: validation.surname,
           mail: validation.mail,
-          image: validation.image
+          image: validation.image,
+          isAdmin: validation.isAdmin
         };
         
         this.setAuthenticatedUser(userData);
@@ -309,11 +310,14 @@ export class AuthService {
   }
 
   private setToken(token: string): void {
-    sessionStorage.setItem('authToken', token);
+    // Set JWT in cookie (expires in 7 days, Secure, SameSite=Strict)
+    document.cookie = `authToken=${token}; path=/; max-age=${7 * 24 * 60 * 60}; Secure; SameSite=Strict`;
   }
 
   private getToken(): string | null {
-    return sessionStorage.getItem('authToken');
+    // Read JWT from cookie
+    const match = document.cookie.match(/(^|;) ?authToken=([^;]*)(;|$)/);
+    return match ? match[2] : null;
   }
 
   private scheduleTokenRefresh(): void {

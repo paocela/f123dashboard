@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common'; // Importa CommonModule
-import { Component, DestroyRef, inject, OnInit, Renderer2, ViewChild, DOCUMENT } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import {DbDataService} from '../../service/db-data.service';  //aggiunto il servizio per dati db
 import { ModalModule, ModalComponent } from '@coreui/angular';
@@ -32,26 +32,6 @@ import { BehaviorSubject } from 'rxjs';
 import { LoadingService } from '../../service/loading.service';
 import { ChampionshipTrendComponent } from '../../components/championship-trend/championship-trend.component';
 import { Constructor } from '../../model/constructor';
-
-declare const Twitch: any;
-
-interface ChampionshipStandings {
-  username: string;
-  car: string;
-  pilot: string;
-  championship: number;
-  position: number
-  lastwin: string;
-  avatar: string;
-  color: string;
-}
-
-interface NextTrack {
-  name: string;
-  date: string;
-  flag: string[];
-  length: number;
-}
 
 @Component({
     selector: 'app-dashboard',
@@ -95,9 +75,6 @@ export class DashboardComponent implements OnInit {
     
   } 
 
-  readonly #destroyRef: DestroyRef = inject(DestroyRef);
-  readonly #document: Document = inject(DOCUMENT);
-  readonly #renderer: Renderer2 = inject(Renderer2);
   public screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 
   public showColumn(): boolean {

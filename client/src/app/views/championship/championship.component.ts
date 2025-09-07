@@ -5,7 +5,8 @@ import { BadgeComponent, RowComponent, ColComponent, TextColorDirective, CardCom
 import { cifBh, cifAt, cifMc, cifJp, cifHu, cifCn, cifCa, cifEs, cifGb, cifBe, cifNl, cifAz, cifSg, cifIt, cifUs, cifAu, cifMx, cifBr, cifQa, cifAe, cifSa } from '@coreui/icons';
 import { cilFire } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
-import {DbDataService} from 'src/app/service/db-data.service';  //aggiunto il servizio per dati db
+import { DbDataService } from '../../service/db-data.service';
+import { ChampionshipData, SessionResult } from '../../model/championship-data';
 
 @Component({
     selector: 'app-championship',
@@ -15,7 +16,7 @@ import {DbDataService} from 'src/app/service/db-data.service';  //aggiunto il se
 })
 export class ChampionshipComponent implements OnInit{
 
-  public championship_data: any[] = [];
+  public championship_data: ChampionshipData[] = [];
   public allFlags: {[key: string]: any} = {
     "Barhain": cifBh,
     "Arabia Saudita": cifSa,
@@ -45,13 +46,89 @@ export class ChampionshipComponent implements OnInit{
   constructor(private dbData: DbDataService) { }
 
   ngOnInit(): void {
-    this.championship_data = this.dbData.getChampionship() ;
+    this.championship_data = this.dbData.getChampionship();
+  }
 
-    // for (let track of this.championship_data){
-    //   const db_date: Date = new Date(track.date);
-    //   console.log(this.championship_data[track.track_name]);
-    //   //this.championship_data[track.track_name]["track_date"] = db_date.toLocaleDateString("it-CH");
-    // }
+  // Helper method to get driver by position in a session
+  getDriverByPosition(session: SessionResult[] | undefined, position: number): string {
+    if (!session) return '';
+    const result = session.find(r => r.position === position);
+    return result?.driver_username || '';
+  }
 
+  // Helper method to get DNF drivers
+  getDNFDrivers(session: SessionResult[] | undefined): string {
+    if (!session) return '';
+    const dnfDrivers = session.filter(r => r.position === 0);
+    return dnfDrivers.map(d => d.driver_username).join(', ');
+  }
+
+  // Helper method to get the active race session (race or full_race based on has_x2)
+  getActiveRaceSession(gp: ChampionshipData): SessionResult[] | undefined {
+    return gp.gran_prix_has_x2 === '1' ? gp.sessions.full_race : gp.sessions.race;
+  }
+
+  // Helper method to get fast lap driver for active race session
+  getActiveFastLapDriver(gp: ChampionshipData): string {
+    const sessionType = gp.gran_prix_has_x2 === '1' ? 'full_race' : 'race';
+    return gp.fastLapDrivers[sessionType] || '';
+  }
+
+  // Helper method to check if session has any results
+  hasSessionResults(session: SessionResult[] | undefined): boolean {
+    return !!(session && session.length > 0);
+  }
+
+  // Helper method to get sorted results (excluding DNFs for position display)
+  getSortedResults(session: SessionResult[] | undefined): SessionResult[] {
+    if (!session) return [];
+    return session
+      .filter(result => result.position > 0) // Exclude DNFs (position 0)
+      .sort((a, b) => a.position - b.position);
+  }
+
+  // Helper method to get all possible positions across all sessions
+  getAllPositions(gp: ChampionshipData): number[] {
+    const positions = new Set<number>();
+    
+    // Get positions from all sessions
+    const sessions = [
+      gp.sessions.race,
+      gp.sessions.full_race,
+      gp.sessions.sprint,
+      gp.sessions.qualifying,
+      gp.sessions.free_practice
+    ];
+
+    sessions.forEach(session => {
+      if (session) {
+        session.forEach(result => {
+          if (result.position > 0) { // Exclude DNFs
+            positions.add(result.position);
+          }
+        });
+      }
+    });
+
+    // Convert to sorted array
+    return Array.from(positions).sort((a, b) => a - b);
+  }
+
+  // Helper method to get position styling
+  getPositionStyle(position: number): { [key: string]: string } {
+    if (position === 1) return { 'color': 'green' };
+    if (position === 2) return { 'color': 'green' };
+    // No styling for other positions (was previously black)
+    return {};
+  }
+
+  // Helper method to get position name for medal images
+  getPositionName(position: number): string {
+    switch (position) {
+      case 1: return 'first';
+      case 2: return 'second';
+      case 3: return 'third';
+      default: return '';
+    }
   }
 }
