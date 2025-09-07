@@ -24,7 +24,7 @@ export class PostgresService {
           driver_id, driver_username, driver_name, driver_surname, driver_description, driver_license_pt, driver_consistency_pt, driver_fast_lap_pt, drivers_dangerous_pt, driver_ingenuity_pt, driver_strategy_pt, driver_color, pilot_name, pilot_surname, car_name, car_overall_score, total_sprint_points, total_free_practice_points, total_qualifying_points, total_full_race_points, total_race_points, total_points
         FROM public.all_race_points arp
         CROSS JOIN latest_season ls
-        WHERE arp.driver_season = COALESCE($1, ls.id);
+        WHERE arp.season_id = COALESCE($1, ls.id);
       `, [seasonId]);
       return JSON.stringify(result.rows);
     }

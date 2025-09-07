@@ -93,6 +93,13 @@ export class DashboardChartsData {
       /* tslint:disable:max-line-length */
       labels = this.championshipTracks.map(track => track.country);
 
+      // Initialize arrays for all drivers found in the data
+      for (let pippo of this.championshipTrend) {
+        if (!this.mainChart[pippo.driver_username]) {
+          this.mainChart[pippo.driver_username] = [];
+        }
+      }
+
       for (let pippo of this.championshipTrend ){
         this.mainChart[pippo.driver_username].push(pippo.cumulative_points)
       }
