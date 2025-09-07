@@ -1,79 +1,129 @@
 <div *ngIf="piloti.length; else goto_loading">
-  <c-row ngPreserveWhitespaces class="g-0">
-    <c-col *ngFor="let pilota of piloti; index as i" xs="6" md="4" lg="2">
-      <c-card [cBorder]="pilota.driver_color" [textColor]="pilota.driver_color" class="pilot-card text-center">
-        <c-card-body class="card-header"> 
-          <c-card [textColor]="pilota.driver_color" style="width: 100%;">
-            <img [cCardImg]="'top'" src='./assets/images/avatars/{{pilota.driver_username}}.png' alt="{{ pilota.driver_username }}'s avatar" />
-            <c-card-body>
-              <h5 cCardTitle>{{ pilota.driver_username }}</h5>
-              <p cCardText>{{ pilota.driver_description }}</p>
-            </c-card-body>
-            <ul [flush]="true" cListGroup class="stats-list">
-              <li cListGroupItem>
-                <div class="row">
-                  <div class="col-7 border-end"><strong>Posizione:</strong></div>
-                  <div class="col-5">{{ i + 1 }}°</div>
-                </div>
-              </li>
-              <li cListGroupItem>
-                <div class="row">
-                  <div class="col-7 border-end"><strong>Tot. points:</strong></div>
-                  <div class="col-5">{{ pilota.total_points }} Pt.</div>
-                </div>
-              </li>
-              <li cListGroupItem>
-                <div class="row">
-                  <div class="col-7 border-end"><strong>Race:</strong></div>
-                  <div class="col-5">{{ pilota.total_race_points }} Pt.</div>
-                </div>
-              </li>
-              <li cListGroupItem>
-                <div class="row">
-                  <div class="col-7 border-end"><strong>Full Race:</strong></div>
-                  <div class="col-5">{{ pilota.total_full_race_points }} Pt.</div>
-                </div>
-              </li>
-              <li cListGroupItem>
-                <div class="row">
-                  <div class="col-7 border-end"><strong>Sprint:</strong></div>
-                  <div class="col-5">{{ pilota.total_sprint_points }} Pt.</div>
-                </div>
-              </li>
-              <li cListGroupItem>
-                <div class="row">
-                  <div class="col-7 border-end"><strong>Qualify:</strong></div>
-                  <div class="col-5">{{ pilota.total_qualifying_points }} Pt.</div>
-                </div>
-              </li>
-              <li cListGroupItem>
-                <div class="row">
-                  <div class="col-7 border-end"><strong>Practice:</strong></div>
-                  <div class="col-5">{{ pilota.total_free_practice_points }} Pt.</div>
-                </div>
-              </li>
-              <li cListGroupItem>
-                <div class="row">
-                  <div class="col-7 border-end"><strong>License:</strong></div>
-                  <div class="col-5">{{ pilota.driver_license_pt }} Pt.</div>
-                </div>
-              </li>
-            </ul>
 
-            <!-- Radar Chart -->
-            <div class="radar-chart-container">
-              <c-chart 
-                type="radar" 
-                [data]="pilota.radarChartData" 
-                [options]="radarChartOptions">
-              </c-chart>
-            </div>
-
-          </c-card>
-        </c-card-body>
-      </c-card>
-    </c-col>
-  </c-row>
+    <c-tabs [activeItemKey]="0" >
+      <c-tabs-list layout="justified" variant="tabs">
+        <button cTab [itemKey]="0">Piloti</button>
+        <button cTab [itemKey]="1">Costruttori</button>
+      </c-tabs-list>
+      <c-tabs-content>
+        <!-- TAB PILOTI -->
+        <c-tab-panel class="p-3" [itemKey]="0" >
+          <c-row ngPreserveWhitespaces class="g-0">
+            <c-col *ngFor="let pilota of piloti; index as i" xs="6" md="4" lg="2">
+              <c-card [cBorder]="pilota.driver_color" class="pilot-card text-center">
+                <c-card-body class="card-header"> 
+                  <c-card style="width: 100%;">
+                    <img class="card-avatar" [cCardImg]="'top'" src='./assets/images/avatars/{{pilota.driver_username}}.png' alt="{{ pilota.driver_username }}'s avatar" />
+                    <c-card-body>
+                      <h5 cCardTitle [ngClass]="'text-' + pilota.driver_color">{{ pilota.driver_username }}</h5>
+                      <p cCardText>{{ pilota.driver_description }}</p>
+                    </c-card-body>
+                    <ul [flush]="true" cListGroup class="stats-list">
+                      <li cListGroupItem>
+                        <div class="row">
+                          <div class="col-7 border-end"><strong>Posizione:</strong></div>
+                          <div class="col-5">{{ i + 1 }}°</div>
+                        </div>
+                      </li>
+                      <li cListGroupItem>
+                        <div class="row">
+                          <div class="col-7 border-end"><strong>Tot. points:</strong></div>
+                          <div class="col-5">{{ pilota.total_points }} Pt.</div>
+                        </div>
+                      </li>
+                      <li cListGroupItem>
+                        <div class="row">
+                          <div class="col-7 border-end"><strong>Race:</strong></div>
+                          <div class="col-5">{{ pilota.total_race_points }} Pt.</div>
+                        </div>
+                      </li>
+                      <li cListGroupItem>
+                        <div class="row">
+                          <div class="col-7 border-end"><strong>Full Race:</strong></div>
+                          <div class="col-5">{{ pilota.total_full_race_points }} Pt.</div>
+                        </div>
+                      </li>
+                      <li cListGroupItem>
+                        <div class="row">
+                          <div class="col-7 border-end"><strong>Sprint:</strong></div>
+                          <div class="col-5">{{ pilota.total_sprint_points }} Pt.</div>
+                        </div>
+                      </li>
+                      <li cListGroupItem>
+                        <div class="row">
+                          <div class="col-7 border-end"><strong>Qualify:</strong></div>
+                          <div class="col-5">{{ pilota.total_qualifying_points }} Pt.</div>
+                        </div>
+                      </li>
+                      <li cListGroupItem>
+                        <div class="row">
+                          <div class="col-7 border-end"><strong>Practice:</strong></div>
+                          <div class="col-5">{{ pilota.total_free_practice_points }} Pt.</div>
+                        </div>
+                      </li>
+                      <li cListGroupItem>
+                        <div class="row">
+                          <div class="col-7 border-end"><strong>License:</strong></div>
+                          <div class="col-5">{{ pilota.driver_license_pt }} Pt.</div>
+                        </div>
+                      </li>
+                    </ul>
+        
+                    <!-- Radar Chart -->
+                    <div class="radar-chart-container">
+                      <c-chart 
+                        type="radar" 
+                        [data]="pilota.radarChartData" 
+                        [options]="radarChartOptions">
+                      </c-chart>
+                    </div>
+        
+                  </c-card>
+                </c-card-body>
+              </c-card>
+            </c-col>
+          </c-row>
+        </c-tab-panel>
+        <!-- TAB COSTRUTTORI -->
+        <c-tab-panel class="p-3" [itemKey]="1">
+          <c-row ngPreserveWhitespaces class="g-0">
+            <c-col *ngFor="let constructor of constructors; index as i" xs="6" md="6" lg="4">
+              <c-card [cBorder]="constructor.constructor_color" class="costructor-card text-center">
+                <c-card-body class="card-header"> 
+                  <c-card >
+                    <img [cCardImg]="'top'" src='./assets/images/constructors/{{constructor.constructor_name}}.png' alt="{{ constructor.constructor_name }}'s logo" />
+                    <c-card-body>
+                      <h5 cCardTitle [ngClass]="'text-' + constructor.constructor_color">{{ constructor.constructor_name }}</h5>
+                      <p cCardText><strong>Tot. points:</strong> {{constructor.constructor_tot_points}} Pt.</p>
+                    </c-card-body>
+                    <c-row>
+                      <c-col>
+                        <c-card style="width: 100%;" class="border-0">
+                          <img class="card-avatar" [cCardImg]="'top'" src='./assets/images/avatars/{{constructor.driver_1_username}}.png' alt="{{ constructor.driver_1_username }}'s avatar" />
+                          <c-card-body>
+                            <h5 cCardTitle>{{ constructor.driver_1_username }}</h5>
+                            <p cCardText><strong>Points:</strong> {{constructor.driver_1_tot_points}} Pt.</p>
+                          </c-card-body>
+                        </c-card>
+                      </c-col>
+                      <c-col>
+                        <c-card style="width: 100%;" class="border-0">
+                          <img class="card-avatar" [cCardImg]="'top'" src='./assets/images/avatars/{{constructor.driver_2_username}}.png' alt="{{ constructor.driver_2_username }}'s avatar" />
+                          <c-card-body>
+                            <h5 cCardTitle>{{ constructor.driver_2_username }}</h5>
+                            <p cCardText><strong>Points:</strong> {{constructor.driver_2_tot_points}} Pt.</p>
+                          </c-card-body>
+                        </c-card>
+                      </c-col>
+                    </c-row>
+                  </c-card>
+                </c-card-body>
+              </c-card>
+            </c-col>
+          </c-row>
+        </c-tab-panel>
+      </c-tabs-content>
+    </c-tabs>
 </div>
 
 
@@ -82,4 +132,5 @@
     <i class="spinner-border text-danger"></i>
     <span class="m-1"><strong>ASPETTA STRONZO</strong></span>
     <i class="spinner-border text-danger"></i>
-  </div></ng-template>
+  </div>
+</ng-template>

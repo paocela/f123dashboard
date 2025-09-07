@@ -59,3 +59,34 @@
 .card-body{
   padding: 1vw;
 }
+
+/* Shrink the card and tabs to content height */
+c-card,
+c-tabs,
+c-tab-panel {
+  height: auto !important;
+  min-height: unset !important;
+  flex: 0 0 auto !important; /* prevent stretching */
+}
+
+/* Optional: make tab content not add extra padding */
+c-card-body {
+  padding-bottom: 0.5rem; /* adjust as needed */
+}
+
+.custom-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden; /* Nasconde i bordi sporgenti */
+  width: 100%; /* force table to use full width */
+  table-layout: auto; /* or fixed, depending on how you want column widths */
+}
+
+.custom-c-tab {
+  padding: 0 !important; /* removes Bootstrap p-3 */
+}
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto; /* if content overflows */
+}

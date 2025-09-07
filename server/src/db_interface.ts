@@ -313,6 +313,23 @@ ORDER BY date ASC
     return JSON.stringify(resoult.rows);
   }
 
+  async getConstructors(seasonId?: number): Promise<string> {
+    const result = await this.pool.query (`
+      SELECT constructor_id,
+      	constructor_name,
+        constructor_color,
+        driver_1_id,
+        driver_1_username,
+        driver_1_tot_points,
+        driver_2_id,
+        driver_2_username,
+        driver_2_tot_points,
+        constructor_tot_points
+      FROM season_constructor_leaderboard
+      `);
+    return JSON.stringify(result.rows);
+  }
+
   async setGpResult(
     track_id: number,
     hasSprint: boolean,

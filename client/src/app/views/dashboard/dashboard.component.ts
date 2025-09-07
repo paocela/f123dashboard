@@ -19,7 +19,8 @@ import {
   CarouselIndicatorsComponent,
   CarouselInnerComponent,
   CarouselItemComponent,
-  ThemeDirective
+  ThemeDirective,
+  Tabs2Module
 } from '@coreui/angular';
 import { RouterLink } from '@angular/router';
 import { IconDirective } from '@coreui/icons-angular';
@@ -30,6 +31,7 @@ import { TwitchApiService } from '../../service/twitch-api.service';
 import { BehaviorSubject } from 'rxjs';
 import { LoadingService } from '../../service/loading.service';
 import { ChampionshipTrendComponent } from '../../components/championship-trend/championship-trend.component';
+import { Constructor } from '../../model/constructor';
 
 declare const Twitch: any;
 
@@ -78,7 +80,8 @@ interface NextTrack {
     CardHeaderComponent,
     TableDirective,
     AvatarComponent,
-    ChampionshipTrendComponent
+    ChampionshipTrendComponent,
+    Tabs2Module
 ]
 })
 export class DashboardComponent implements OnInit {
@@ -105,6 +108,7 @@ export class DashboardComponent implements OnInit {
   public championshipTracks: any[] = [];
   public championshipNextTracks: any[] = [];
   public isLive: boolean = true;
+  public constructors: Constructor[] = [];
 
   public allFlags: {[key: string]: any} = {
     "Bahrain": cifBh,
@@ -143,12 +147,13 @@ export class DashboardComponent implements OnInit {
   public isLive$ = new BehaviorSubject<boolean>(false);
   public streamTitle$ = new BehaviorSubject<string>('');
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     //richiesta dati al db
     this.isLive = this.twitchApiService.isLive();
     this.championship_standings_users = this.dbData.getAllDrivers() ;
     const championshipTrend = this.dbData.getCumulativePoints() ;
     this.championshipTracks = this.dbData.getAllTracks();
+    this.constructors = await this.dbData.getConstructors(1);
 
     // filter next championship track
     var i = 0;

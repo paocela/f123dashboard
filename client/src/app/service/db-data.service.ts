@@ -7,6 +7,7 @@ import { Season } from '../model/season';
 import { ChampionshipData } from '../model/championship-data';
 import { DriverData } from '../model/driver';
 import { TrackData, CumulativePointsData } from '../model/track';
+import { Constructor } from '../model/constructor';
 
 
 
@@ -119,6 +120,11 @@ export class DbDataService {
   async getAllSeasons(): Promise<Season[]> {
     const seasons = await PostgresService.getAllSeasons();
     return JSON.parse(seasons);
+  }
+
+  async getConstructors(seasonId?: number): Promise<Constructor[]> {
+    const constructors = await PostgresService.getConstructors(seasonId);
+    return JSON.parse(constructors);
   }
 
 /****************************************************************/
