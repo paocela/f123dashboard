@@ -113,7 +113,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @for (posizione of posizioni | keyvalue; track posizione.key) {
+                                                @for (posizione of posizioni | keyvalue; track posizione.key + '_' + $index) {
                                                     <tr>
                                                   <!-- INDEX -->
                                                   <td class="text-center">
@@ -147,7 +147,7 @@
                                                       class="admin-select"
                                                       required>
                                                       <option value="0">-- Seleziona un pilota --</option>
-                                                      @for (pilota of piloti; track pilota.id) {
+                                                      @for (pilota of piloti; track pilota.id + '_race_' + $index) {
                                                         <option attr.value="{{ pilota.id }}">
                                                           {{ pilota.username }}
                                                         </option>
@@ -162,7 +162,7 @@
                                                               cFormControl
                                                               class="admin-select multi-select"
                                                               multiple>
-                                                        @for (pilota of piloti; track pilota.id) {
+                                                        @for (pilota of piloti; track pilota.id + '_race_multi_' + $index) {
                                                           <option [value]="pilota.id">
                                                             {{ pilota.username }}
                                                           </option>
@@ -184,7 +184,7 @@
                                                             class="admin-select"
                                                             required>
                                                       <option value="0">-- Seleziona un pilota --</option>
-                                                      @for (pilota of piloti; track pilota.id) {
+                                                      @for (pilota of piloti; track pilota.id + '_sprint_' + $index) {
                                                         <option [value]="pilota.id">
                                                           {{ pilota.username }}
                                                         </option>
@@ -199,7 +199,7 @@
                                                               cFormControl
                                                               class="admin-select multi-select"
                                                               multiple>
-                                                        @for (pilota of piloti; track pilota.id) {
+                                                        @for (pilota of piloti; track pilota.id + '_sprint_multi_' + $index) {
                                                           <option [value]="pilota.id">
                                                             {{ pilota.username }}
                                                           </option>
@@ -221,7 +221,7 @@
                                                             class="admin-select"
                                                             required>
                                                       <option value="0">-- Seleziona un pilota --</option>
-                                                      @for (pilota of piloti; track pilota.id) {
+                                                      @for (pilota of piloti; track pilota.id + '_quali_' + $index) {
                                                         <option [value]="pilota.id">
                                                           {{ pilota.username }}
                                                         </option>
@@ -242,7 +242,7 @@
                                                             class="admin-select"
                                                             required>
                                                       <option value="0">-- Seleziona un pilota --</option>
-                                                      @for (pilota of piloti; track pilota.id) {
+                                                      @for (pilota of piloti; track pilota.id + '_fp_' + $index) {
                                                         <option [value]="pilota.id">
                                                           {{ pilota.username }}
                                                         </option>
