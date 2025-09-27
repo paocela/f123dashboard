@@ -28,7 +28,7 @@ import { ChampionshipData } from '../../model/championship-data';
 import { Driver } from '../../model/driver';
 import { TrackData } from '../../model/track';
 import { Season } from '../../model/season';
-import { medals, allFlags } from '../../model/constants';
+import { medals, allFlags, posizioni } from '../../model/constants';
 
 @Component({
   selector: 'app-admin',
@@ -78,20 +78,7 @@ export class AdminComponent implements OnInit {
 
   public allFlags = allFlags;
   public medals = medals;
-
-  posizioni = new Map<number, string>([
-    [1, "Primo"],
-    [2, "Secondo"],
-    [3, "Terzo"],
-    [4, "Quarto"],
-    [5, "Quinto"],
-    [6, "Sesto"],
-    [7, "Settimo"],
-    [8, "Ottavo"],
-    [9, "Giro Veloce"],
-    [10, "DNF"]
-  ]);
-
+  public posizioni = posizioni;
   public fireIcon: string[] = cilFire;
   public powerIcon: string[] = cilPowerStandby;
 

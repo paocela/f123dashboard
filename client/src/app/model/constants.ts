@@ -6,6 +6,19 @@ export const medals = new Map<number, string>([
   [3, "medal_third.svg"]
 ]);
 
+export const posizioni = new Map<number, string>([
+  [1, "Primo"],
+  [2, "Secondo"],
+  [3, "Terzo"],
+  [4, "Quarto"],
+  [5, "Quinto"],
+  [6, "Sesto"],
+  [7, "Settimo"],
+  [8, "Ottavo"],
+  [9, "Giro Veloce"],
+  [10, "DNF"]
+]);
+
 export const allFlags: {[key: string]: any} = {
   "Barhain": cifBh,
   "Arabia Saudita": cifSa,
