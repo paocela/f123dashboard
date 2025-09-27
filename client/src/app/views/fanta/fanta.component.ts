@@ -17,11 +17,11 @@ import { AuthService } from './../../service/auth.service';
 import { GridModule } from '@coreui/angular';
 import { DbDataService } from './../../service/db-data.service';
 import { FantaService } from './../../service/fanta.service';
-import { cifAe, cifAt, cifAu, cifAz, cifBe, cifBh, cifBr, cifCa, cifCn, cifEs, cifGb, cifHu, cifIt, 
-    cifJp, cifMc, cifMx, cifNl, cifQa, cifSa, cifSg, cifUs, cilX, cilCheckAlt, cilSwapVertical } from '@coreui/icons';
+import { cilX, cilCheckAlt, cilSwapVertical } from '@coreui/icons';
 import { cilFire, cilPowerStandby } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
 import { Fanta, RaceResult } from '../../model/fanta';
+import { medals, allFlags } from '../../model/constants';
 import { LeaderboardComponent } from "../../components/leaderboard/leaderboard.component";
 import {
   ButtonCloseDirective,
@@ -94,35 +94,8 @@ export class FantaComponent {
     [8, "DNF"]
   ]);
 
-  medals = new Map<number, string>([
-    [1, "medal_first.svg"],
-    [2, "medal_second.svg"],
-    [3, "medal_third.svg"]
-  ]);
-
-  public allFlags: {[key: string]: any} = {
-    "Barhain": cifBh,
-    "Arabia Saudita": cifSa,
-    "Australia": cifAu,
-    "Giappone": cifJp,
-    "Cina": cifCn,
-    "USA": cifUs,
-    "Monaco": cifMc,
-    "Canada": cifCa,
-    "Spagna": cifEs,
-    "Austria": cifAt,
-    "UK": cifGb,
-    "Ungheria": cifHu,
-    "Belgio": cifBe,
-    "Olanda": cifNl,
-    "Italia": cifIt,
-    "Azerbaijan": cifAz,
-    "Singapore": cifSg,
-    "Messico": cifMx,
-    "Brasile": cifBr,
-    "Qatar": cifQa,
-    "Emirati Arabi Uniti": cifAe,
-  };
+  public medals = medals;
+  public allFlags = allFlags;
   
 
   constructor(public authService: AuthService, private dbData: DbDataService, public fantaService: FantaService){}

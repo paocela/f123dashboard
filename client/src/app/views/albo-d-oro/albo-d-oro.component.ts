@@ -4,14 +4,13 @@ import { CardModule, TableModule } from '@coreui/angular';
 // Import CoreUI Card
 import { PodiumCardComponent } from '../../components/podium-card/podium-card.component';
 import { GridModule } from '@coreui/angular';
-import { ChampionshipTrendComponent } from '../../components/championship-trend/championship-trend.component';
 import { DbDataService } from '../../service/db-data.service';
 import { AllDriverData } from '../../model/driver';
 
 @Component({
   selector: 'app-albo-d-oro',
   standalone: true,
-  imports: [CommonModule, PodiumCardComponent, GridModule, ChampionshipTrendComponent,CardModule, TableModule],
+  imports: [CommonModule, PodiumCardComponent, GridModule, CardModule, TableModule],
   templateUrl: './albo-d-oro.component.html',
   styleUrls: ['./albo-d-oro.component.scss']
 })
