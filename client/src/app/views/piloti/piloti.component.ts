@@ -141,11 +141,11 @@ export class PilotiComponent implements OnInit {
 
       if (driver1 && driver2) {
         // Calculate session points using parseInt to ensure we're working with numbers
-        constructor.constructor_race_points = parseInt(driver1.race_points || '0') + parseInt(driver2.race_points || '0');
-        constructor.constructor_full_race_points = parseInt(driver1.full_race_points || '0') + parseInt(driver2.full_race_points || '0');
-        constructor.constructor_sprint_points = parseInt(driver1.sprint_points || '0') + parseInt(driver2.sprint_points || '0');
-        constructor.constructor_qualifying_points = parseInt(driver1.qualifying_points || '0') + parseInt(driver2.qualifying_points || '0');
-        constructor.constructor_free_practice_points = parseInt(driver1.free_practice_points || '0') + parseInt(driver2.free_practice_points || '0');
+        constructor.constructor_race_points = parseInt(driver1.total_race_points || '0') + parseInt(driver2.total_race_points || '0');
+        constructor.constructor_full_race_points = parseInt(driver1.total_full_race_points || '0') + parseInt(driver2.total_full_race_points || '0');
+        constructor.constructor_sprint_points = parseInt(driver1.total_sprint_points || '0') + parseInt(driver2.total_sprint_points || '0');
+        constructor.constructor_qualifying_points = parseInt(driver1.total_qualifying_points || '0') + parseInt(driver2.total_qualifying_points || '0');
+        constructor.constructor_free_practice_points = parseInt(driver1.total_free_practice_points || '0') + parseInt(driver2.total_free_practice_points || '0');
         
         // Assicuriamoci che constructor_tot_points sia anche un numero
         constructor.constructor_tot_points = parseInt(driver1.total_points || '0') + parseInt(driver2.total_points || '0');
@@ -153,19 +153,19 @@ export class PilotiComponent implements OnInit {
         console.log(`Points for ${constructor.constructor_name}:`, {
           driver1: {
             name: driver1.driver_username,
-            race: driver1.race_points,
-            full: driver1.full_race_points,
-            sprint: driver1.sprint_points,
-            quali: driver1.qualifying_points,
-            practice: driver1.free_practice_points
+            race: driver1.total_race_points,
+            full: driver1.total_full_race_points,
+            sprint: driver1.total_sprint_points,
+            quali: driver1.total_qualifying_points,
+            practice: driver1.total_free_practice_points
           },
           driver2: {
             name: driver2.driver_username,
-            race: driver2.race_points,
-            full: driver2.full_race_points,
-            sprint: driver2.sprint_points,
-            quali: driver2.qualifying_points,
-            practice: driver2.free_practice_points
+            race: driver2.total_race_points,
+            full: driver2.total_full_race_points,
+            sprint: driver2.total_sprint_points,
+            quali: driver2.total_qualifying_points,
+            practice: driver2.total_free_practice_points
           },
           total: {
             race: constructor.constructor_race_points,
