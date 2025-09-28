@@ -35,10 +35,10 @@ export class PostgresService {
         SELECT id FROM seasons ORDER BY start_date DESC LIMIT 1
       )
       SELECT 
-        d.id as driver_id,
-        d.username as driver_username,
-        d.name as driver_name,
-        d.surname as driver_surname
+        d.id as id,
+        d.username as username,
+        d.name as name,
+        d.surname as surname
       FROM drivers d
       CROSS JOIN latest_season ls
       LEFT JOIN pilots p ON d.pilot_id = p.id
@@ -393,8 +393,8 @@ ORDER BY date ASC
   }
 
   async getAllSeasons(): Promise<string> {
-    const resoult = await this.pool.query(` SELECT id, description, start_date, end_date FROM seasons`);
-    return JSON.stringify(resoult.rows);
+    const result = await this.pool.query(`SELECT id, description, start_date, end_date FROM seasons ORDER BY id DESC`);
+    return JSON.stringify(result.rows);
   }
 
   async getConstructors(seasonId?: number): Promise<string> {
