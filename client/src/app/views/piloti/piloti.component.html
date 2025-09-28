@@ -1,4 +1,4 @@
-<div *ngIf="piloti.length; else goto_loading">
+<div *ngIf="!isLoading; else goto_loading">
 
     <c-tabs [activeItemKey]="0" >
       <c-tabs-list layout="justified" variant="tabs">
@@ -87,36 +87,82 @@
         <!-- TAB COSTRUTTORI -->
         <c-tab-panel class="p-3" [itemKey]="1">
           <c-row ngPreserveWhitespaces class="g-0">
-            <c-col *ngFor="let constructor of constructors; index as i" xs="6" md="6" lg="4">
-              <c-card [cBorder]="constructor.constructor_color" class="costructor-card text-center">
-                <c-card-body class="card-header"> 
-                  <c-card >
-                    <img [cCardImg]="'top'" src='./assets/images/constructors/{{constructor.constructor_name}}.png' alt="{{ constructor.constructor_name }}'s logo" />
-                    <c-card-body>
-                      <h5 cCardTitle [ngClass]="'text-' + constructor.constructor_color">{{ constructor.constructor_name }}</h5>
-                      <p cCardText><strong>Tot. points:</strong> {{constructor.constructor_tot_points}} Pt.</p>
-                    </c-card-body>
-                    <c-row>
-                      <c-col>
-                        <c-card style="width: 100%;" class="border-0">
-                          <img class="card-avatar" [cCardImg]="'top'" src='./assets/images/avatars/{{constructor.driver_1_username}}.png' alt="{{ constructor.driver_1_username }}'s avatar" />
-                          <c-card-body>
-                            <h5 cCardTitle>{{ constructor.driver_1_username }}</h5>
-                            <p cCardText><strong>Points:</strong> {{constructor.driver_1_tot_points}} Pt.</p>
-                          </c-card-body>
-                        </c-card>
-                      </c-col>
-                      <c-col>
-                        <c-card style="width: 100%;" class="border-0">
-                          <img class="card-avatar" [cCardImg]="'top'" src='./assets/images/avatars/{{constructor.driver_2_username}}.png' alt="{{ constructor.driver_2_username }}'s avatar" />
-                          <c-card-body>
-                            <h5 cCardTitle>{{ constructor.driver_2_username }}</h5>
-                            <p cCardText><strong>Points:</strong> {{constructor.driver_2_tot_points}} Pt.</p>
-                          </c-card-body>
-                        </c-card>
-                      </c-col>
-                    </c-row>
-                  </c-card>
+            <c-col *ngFor="let constructor of constructors; index as i" xs="12" md="6" lg="3">
+              <c-card [cBorder]="constructor.constructor_color" class="constructor-card text-center mb-4">
+                <!-- Header con logo e nome -->
+                <c-card-header>
+                  <div class="constructor-header">
+                    <img class="constructor-logo" src='./assets/images/constructors/{{constructor.constructor_name}}.png' alt="{{ constructor.constructor_name }}'s logo" />
+                    <h5 class="mt-2" [ngClass]="'text-' + constructor.constructor_color">{{ constructor.constructor_name }}</h5>
+                  </div>
+                </c-card-header>
+
+                <c-card-body>
+                  <!-- Piloti -->
+                  <div class="drivers-section mb-3">
+                    <div class="row g-2">
+                      <div class="col-6">
+                        <img class="driver-avatar" src='./assets/images/avatars/{{constructor.driver_1_username}}.png' alt="{{ constructor.driver_1_username }}'s avatar" />
+                        <div class="driver-info">
+                          <h6>{{ constructor.driver_1_username }}</h6>
+                          <small><strong>{{ constructor.driver_1_tot_points }}</strong> Pt.</small>
+                        </div>
+                      </div>
+                      <div class="col-6">
+                        <img class="driver-avatar" src='./assets/images/avatars/{{constructor.driver_2_username}}.png' alt="{{ constructor.driver_2_username }}'s avatar" />
+                        <div class="driver-info">
+                          <h6>{{ constructor.driver_2_username }}</h6>
+                          <small><strong>{{ constructor.driver_2_tot_points }}</strong> Pt.</small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Statistiche -->
+                  <ul [flush]="true" cListGroup class="stats-list">
+                    <li cListGroupItem>
+                      <div class="row g-0">
+                        <div class="col-8 border-end"><strong>Posizione:</strong></div>
+                        <div class="col-4">{{ i + 1 }}°</div>
+                      </div>
+                    </li>
+                    <li cListGroupItem>
+                      <div class="row g-0">
+                        <div class="col-8 border-end"><strong>Tot.:</strong></div>
+                        <div class="col-4">{{ constructor.constructor_tot_points }}</div>
+                      </div>
+                    </li>
+                    <li cListGroupItem>
+                      <div class="row g-0">
+                        <div class="col-8 border-end"><strong>Race:</strong></div>
+                        <div class="col-4">{{ constructor.constructor_race_points }}</div>
+                      </div>
+                    </li>
+                    <li cListGroupItem>
+                      <div class="row g-0">
+                        <div class="col-8 border-end"><strong>Full:</strong></div>
+                        <div class="col-4">{{ constructor.constructor_full_race_points }}</div>
+                      </div>
+                    </li>
+                    <li cListGroupItem>
+                      <div class="row g-0">
+                        <div class="col-8 border-end"><strong>Sprint:</strong></div>
+                        <div class="col-4">{{ constructor.constructor_sprint_points }}</div>
+                      </div>
+                    </li>
+                    <li cListGroupItem>
+                      <div class="row g-0">
+                        <div class="col-8 border-end"><strong>Qualify:</strong></div>
+                        <div class="col-4">{{ constructor.constructor_qualifying_points }}</div>
+                      </div>
+                    </li>
+                    <li cListGroupItem>
+                      <div class="row g-0">
+                        <div class="col-8 border-end"><strong>Practice:</strong></div>
+                        <div class="col-4">{{ constructor.constructor_free_practice_points }}</div>
+                      </div>
+                    </li>
+                  </ul>
                 </c-card-body>
               </c-card>
             </c-col>

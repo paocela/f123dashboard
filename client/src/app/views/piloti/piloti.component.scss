@@ -1,3 +1,70 @@
+:host {
+  display: block;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+:host ::ng-deep {
+  .body {
+    overflow: auto;
+  }
+
+  .tab-content {
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  c-tab-panel {
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  .constructor-card {
+    margin-bottom: 1rem;
+    
+    .constructor-header {
+      padding: 1rem;
+      
+      .constructor-logo {
+        max-height: 60px;
+        width: auto;
+        margin: 0 auto;
+      }
+    }
+
+    .drivers-section {
+      border-bottom: 1px solid #dee2e6;
+      padding-bottom: 1rem;
+      margin-bottom: 1rem;
+
+      .driver-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 0.5rem;
+      }
+
+      .driver-info {
+        h6 {
+          margin: 0;
+          font-size: 0.9rem;
+        }
+        small {
+          font-size: 0.8rem;
+        }
+      }
+    }
+
+    .stats-list {
+      font-size: 0.85rem;
+      
+      li {
+        padding: 0.5rem;
+      }
+    }
+  }
+}
 
 // Variabili per la personalizzazione rapida
 $grid-gutter-size: 0.1rem; // Modifica questo valore per cambiare lo spazio tra le card (0 = g-0, 0.25rem = g-1, 0.5rem = g-2, etc.)
@@ -10,8 +77,10 @@ $list-item-padding: 0 ; // Padding delle voci della lista
 // Override dello spacing della griglia
 :host ::ng-deep {
   c-row {
-    margin: -#{$grid-gutter-size};
-    width: calc(100% + #{$grid-gutter-size * 2});
+    margin: 0;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
     
     > c-col {
       padding: #{$grid-gutter-size} !important;

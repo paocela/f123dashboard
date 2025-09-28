@@ -48,7 +48,7 @@ export class AlboDOroComponent implements OnInit {
 
       this.podioFanta = [
           { posizione: 2, nome: "Chichi", img: `/assets/images/avatars_fanta/chichi.jpg`, colore: '#008080' },
-          { posizione: 1, nome: "ProprioGiotto", img: `/assets/images/avatars_fanta/7.png`, colore: '#0e4bef ' },
+          { posizione: 1, nome: "ProprioGiotto", img: `/assets/images/avatars_fanta/7.png`, colore: '#f699cd ' },
           { posizione: 3, nome: "Fambler", img: `/assets/images/avatars_fanta/2.png`, colore: '#ff0000ff' }
         ];
 

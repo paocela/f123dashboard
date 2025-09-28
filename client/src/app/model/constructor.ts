@@ -9,4 +9,9 @@ export interface Constructor {
   driver_2_username: string;
   driver_2_tot_points: number;
   constructor_tot_points: number;
+  constructor_race_points?: number;
+  constructor_full_race_points?: number;
+  constructor_sprint_points?: number;
+  constructor_qualifying_points?: number;
+  constructor_free_practice_points?: number;
 }
