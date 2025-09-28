@@ -18,6 +18,9 @@ export class AlboDOroComponent implements OnInit {
   podio: { posizione: number; nome: string; img: string; colore: string; }[] = [];
   classifica: { posizione: string; nome: string; }[] = [];
 
+  podioFanta: { posizione: number; nome: string; img: string; colore: string; }[] = [];
+  classificaFanta: { posizione: string; nome: string; }[] = [];
+
   constructor(private dbDataService: DbDataService) {}
 
   ngOnInit(): void {
@@ -42,6 +45,21 @@ export class AlboDOroComponent implements OnInit {
       
       // Sort drivers by total_points descending
       const sortedDrivers = drivers.sort((a, b) => +b.total_points - +a.total_points);
+
+      this.podioFanta = [
+          { posizione: 2, nome: "Chichi", img: `/assets/images/avatars_fanta/chichi.jpg`, colore: '#008080' },
+          { posizione: 1, nome: "ProprioGiotto", img: `/assets/images/avatars_fanta/7.png`, colore: '#0e4bef ' },
+          { posizione: 3, nome: "Fambler", img: `/assets/images/avatars_fanta/2.png`, colore: '#ff0000ff' }
+        ];
+
+      this.classificaFanta = [
+          { posizione: "#4", nome: "Shika" },
+          { posizione: "#5", nome: "Matte" },
+          { posizione: "#6", nome: "Ali"},
+          { posizione: "#7", nome: "Sara"}
+        ];
+
+
 
       // Podio setup
       if (sortedDrivers.length >= 3) {
