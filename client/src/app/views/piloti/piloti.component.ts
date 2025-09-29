@@ -1,39 +1,26 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common'; 
 import { RouterLink } from '@angular/router';
 import { NgTemplateOutlet } from '@angular/common';
-import { DocsExampleComponent } from '@docs-components/public-api';
-import {DbDataService} from 'src/app/service/db-data.service';  //aggiunto il servizio per dati db
+import { DbDataService } from '../../service/db-data.service';  // aggiunto il servizio per dati db
 import { ChartData, ChartOptions } from 'chart.js';  // Import per i grafici
 import { 
   BorderDirective,
-  ButtonDirective,
   CardBodyComponent,
   CardComponent,
-  CardFooterComponent,
-  CardGroupComponent,
   CardHeaderComponent,
   CardImgDirective,
-  CardLinkDirective,
-  CardSubtitleDirective,
   CardTextDirective,
   CardTitleDirective,
   ColComponent,
-  GutterDirective,
   ListGroupDirective,
   ListGroupItemDirective,
   RowComponent,
-  TabDirective,
-  TabPanelComponent,
-  TabsComponent,
-  TabsContentComponent,
-  TabsListComponent,
-  TextColorDirective
+  TextColorDirective,
+  Tabs2Module
 } from '@coreui/angular';
 import { ChartjsComponent } from '@coreui/angular-chartjs';  // Import per il componente grafici
-import { IconDirective } from '@coreui/icons-angular';
-import { ChangeDetectorRef } from '@angular/core';
-
+import { Constructor } from '../../model/constructor';
 
 @Component({
     selector: 'app-cards',
@@ -41,66 +28,68 @@ import { ChangeDetectorRef } from '@angular/core';
     styleUrls: ['./piloti.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush, // Utilizzo di OnPush
     imports: [
-        CommonModule,
-        RowComponent,
-        ColComponent,
-        TextColorDirective,
-        CardComponent,
-        CardHeaderComponent,
-        CardBodyComponent,
-        DocsExampleComponent,
-        NgTemplateOutlet,
-        CardTitleDirective,
-        CardTextDirective,
-        ButtonDirective,
-        CardSubtitleDirective,
-        CardLinkDirective,
-        RouterLink,
-        ListGroupDirective,
-        ListGroupItemDirective,
-        CardFooterComponent,
-        BorderDirective,
-        CardGroupComponent,
-        GutterDirective,
-        CardImgDirective,
-        TabsComponent,
-        TabsListComponent,
-        IconDirective,
-        TabDirective,
-        TabsContentComponent,
-        TabPanelComponent,
-        ChartjsComponent // Aggiungi il modulo per i grafici
-    ]
+    CommonModule,
+    RowComponent,
+    ColComponent,
+    TextColorDirective,
+    CardComponent,
+    CardBodyComponent,
+    CardHeaderComponent,
+    CardTitleDirective,
+    CardTextDirective,
+    ListGroupDirective,
+    ListGroupItemDirective,
+    BorderDirective,
+    CardImgDirective,
+    ChartjsComponent,
+    Tabs2Module
+  ]
 })
+
 export class PilotiComponent implements OnInit {
 
   piloti: any[] = [];
+  constructors: Constructor[] = [];
   pilotChart: any[] = [];
+  isLoading = true;
 
+  // Variabili per la personalizzazione del radar chart
+  private readonly CHART_TEXT_COLOR = 'rgba(130, 130, 130, 1)';
+  private readonly CHART_TEXT_SIZE = 12;
 
   // Opzioni comuni per il radar chart
   radarChartOptions: ChartOptions<'radar'> = {
     responsive: true,
-  maintainAspectRatio: true, // Mantiene il grafico quadrato
+    maintainAspectRatio: false, // Mantiene il grafico quadrato
     scales: {
       r: {
         beginAtZero: true,
         max: 5,
         grid: {
-          color: 'rgba(200, 200, 200, 1)', // Cambia il colore delle linee di base
-          lineWidth: 2, // Imposta la larghezza delle linee
+          color: 'rgba(130, 130, 130, 1)', // Cambia il colore delle linee di base
+          lineWidth: 1, // Imposta la larghezza delle linee
         },
         ticks: {
           display: false, // Rimuove i numeri
-          stepSize:1,
+          stepSize: 1,
+        },
+        pointLabels: {
+          color: this.CHART_TEXT_COLOR, // Colore del testo configurabile
+          font: {
+            size: this.CHART_TEXT_SIZE, // Dimensione del testo configurabile
+            weight: 'normal'
+          }
         }
       }
     },
     
     elements: {
       line: {
-        borderWidth: 3
+        borderWidth: 1,
       }
+    },
+    layout: {
+      padding: 5 // Aggiunge un margine di 5 pixel intorno al grafico
     },
     plugins: {
       legend: {
@@ -115,15 +104,82 @@ export class PilotiComponent implements OnInit {
   };
 
 
-  constructor(private dbData: DbDataService) {} //aggiunto il servizio per dati db
+  constructor(
+    private dbData: DbDataService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
+    try {
+      this.isLoading = true;
+      this.cdr.detectChanges();
+      
+      //richiesta di dati dal servizio
+      this.piloti = await this.dbData.getAllDrivers();
+      this.constructors = await this.dbData.getConstructors(1);
 
-    //richiesta di dati dal servizio
-    this.piloti = this.dbData.getAllDrivers();
+      // Calculate points for constructors based on drivers data
+      this.calculateConstructorPoints();
+      this.initializeRadarChartData();
+    } catch (error) {
+      console.error('Error loading data:', error);
+    } finally {
+      this.isLoading = false;
+      this.cdr.detectChanges();
+    }
+  }
 
-    this.initializeRadarChartData();
+  /**
+   * Calculates all points types for each constructor based on their drivers' data
+   */
+  calculateConstructorPoints(): void {
+    this.constructors.forEach(constructor => {
+      // Find the drivers for this constructor
+      const driver1 = this.piloti.find(p => p.driver_username === constructor.driver_1_username);
+      const driver2 = this.piloti.find(p => p.driver_username === constructor.driver_2_username);
+
+      if (driver1 && driver2) {
+        // Calculate session points using parseInt to ensure we're working with numbers
+        constructor.constructor_race_points = parseInt(driver1.total_race_points || '0') + parseInt(driver2.total_race_points || '0');
+        constructor.constructor_full_race_points = parseInt(driver1.total_full_race_points || '0') + parseInt(driver2.total_full_race_points || '0');
+        constructor.constructor_sprint_points = parseInt(driver1.total_sprint_points || '0') + parseInt(driver2.total_sprint_points || '0');
+        constructor.constructor_qualifying_points = parseInt(driver1.total_qualifying_points || '0') + parseInt(driver2.total_qualifying_points || '0');
+        constructor.constructor_free_practice_points = parseInt(driver1.total_free_practice_points || '0') + parseInt(driver2.total_free_practice_points || '0');
+        
+        // Assicuriamoci che constructor_tot_points sia anche un numero
+        constructor.constructor_tot_points = parseInt(driver1.total_points || '0') + parseInt(driver2.total_points || '0');
+
+        console.log(`Points for ${constructor.constructor_name}:`, {
+          driver1: {
+            name: driver1.driver_username,
+            race: driver1.total_race_points,
+            full: driver1.total_full_race_points,
+            sprint: driver1.total_sprint_points,
+            quali: driver1.total_qualifying_points,
+            practice: driver1.total_free_practice_points
+          },
+          driver2: {
+            name: driver2.driver_username,
+            race: driver2.total_race_points,
+            full: driver2.total_full_race_points,
+            sprint: driver2.total_sprint_points,
+            quali: driver2.total_qualifying_points,
+            practice: driver2.total_free_practice_points
+          },
+          total: {
+            race: constructor.constructor_race_points,
+            full: constructor.constructor_full_race_points,
+            sprint: constructor.constructor_sprint_points,
+            quali: constructor.constructor_qualifying_points,
+            practice: constructor.constructor_free_practice_points
+          }
+        });
+      }
+    });
+
+    // Sort constructors by total points
+    this.constructors.sort((a, b) => b.constructor_tot_points - a.constructor_tot_points);
   }
 
 
@@ -134,7 +190,7 @@ export class PilotiComponent implements OnInit {
   initializeRadarChartData(): void {
     this.piloti.forEach(pilota => {
       pilota.radarChartData = {
-        labels: ['Consistenza', 'Giro Veloce', 'Pericolosità', 'Ingenuità', 'Strategia'],
+        labels: ['Costanza', 'Veloce', 'Rischio', 'Errori', 'Tattica'],
         datasets: [
           {
             label: pilota.pilot,

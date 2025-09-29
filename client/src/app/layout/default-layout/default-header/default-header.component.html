@@ -1,68 +1,55 @@
 <!--<c-header class="mb-4 d-print-none" position="sticky">-->
 <ng-container>
   <c-container [fluid]="true" class="border-bottom px-sm-4 px-2">
-    <button
-      [cSidebarToggle]="sidebarId()"
-      cHeaderToggler
-      class="btn"
-      toggle="visible"
-      style="margin-inline-start: -14px;"
-      aria-label="Toggle sidebar navigation"
-    >
-      <svg cIcon name="cilMenu" size="lg"></svg>
-    </button>
-    <c-header-nav class="d-none d-md-flex">
-      <c-nav-item>
-        <a cNavLink routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
-      </c-nav-item>
-      <c-nav-item>
-        <a cNavLink routerLink="/piloti" routerLinkActive="piloti">Piloti</a>
-      </c-nav-item>
-      <c-nav-item>
-        <a cNavLink routerLink="/regole" routerLinkActive="regole">Regole</a>
-      </c-nav-item>
-      <c-nav-item>
-        <a cNavLink routerLink="/calendario" routerLinkActive="calendario">Calendario</a>
-      </c-nav-item>
-      <c-nav-item>
-        <a cNavLink routerLink="/fanta" routerLinkActive="fanta">Fanta</a>
-      </c-nav-item>
-    </c-header-nav>
 
-    <c-header-nav class="d-none d-md-flex ms-auto "></c-header-nav>
-  <div class="d-flex justify-content-end ms-auto">
-    <app-link-box
-      linkName="Dreandos"
-      linkUrl="https://www.twitch.tv/dreandos"
-      [icon]="linkIcon.cibTwitch"
-      color="#6441a5"
-    ></app-link-box>
-    <app-link-box
+    <c-header-nav class="mx-0 d-flex align-items-center justify-content-between w-100" style="height: 10px;">
       
-      linkUrl="https://www.instagram.com/raceforfederica"
-      [icon]="linkIcon.cibInstagram"
-      color="#c13584"
-    ></app-link-box>
-  </div>
-  <div class="clock">
-    <countdown-component ></countdown-component>
-  </div>
-  
-    <c-header-nav class="mx-0">
+      <button
+        [cSidebarToggle]="sidebarId()"
+        cHeaderToggler
+        class="btn"
+        toggle="visible"
+        style="margin-inline-start: -14px"
+        aria-label="Toggle sidebar navigation"
+        >
+        <svg cIcon name="cilMenu" size="lg"></svg>
+      </button>
+
+      <div class="flex-grow-1 d-flex justify-content-center">
+        <countdown-component></countdown-component>
+      </div>
+
       <div class="nav-item py-1">
         <div class="vr h-100 mx-2 text-body text-opacity-75"></div>
       </div>
+
+      <app-link-box
+        linkUrl="https://www.twitch.tv/dreandos"
+        [icon]="linkIcon.cibTwitch"
+        color="#6441a5"
+      ></app-link-box>
+
+      <app-link-box
+        linkUrl="https://www.instagram.com/raceforfederica"
+        [icon]="linkIcon.cibInstagram"
+        color="#c13584"
+      ></app-link-box>
+      
+      <div class="nav-item py-1">
+        <div class="vr h-100 mx-2 text-body text-opacity-75"></div>
+      </div>
+
       <ng-container *ngTemplateOutlet="themeDropdown" />
-      <div class="nav-item py-1">
-        <div class="vr h-100 mx-2 text-body text-opacity-75"></div>
-      </div>
+
+      <login-component></login-component>
+
     </c-header-nav>
 
+   
   </c-container>
-  <c-container [fluid]="true" class="px-4">
-    <c-breadcrumb-router />
-  </c-container>
+  
 </ng-container>
+
 <!--</c-header>-->
 
 <ng-template #themeDropdown>
@@ -72,15 +59,15 @@
     </button>
     <div cDropdownMenu>
       @for (mode of colorModes; track mode.name) {
-        <button
-          (click)="colorMode.set(mode.name)"
-          [active]="colorMode()===mode.name"
-          cDropdownItem
-          class="d-flex align-items-center"
-        >
-          <svg cIcon class="me-2" [name]="mode.icon" size="lg"></svg>
-          {{ mode.text }}
-        </button>
+      <button
+        (click)="colorMode.set(mode.name)"
+        [active]="colorMode() === mode.name"
+        cDropdownItem
+        class="d-flex align-items-center"
+      >
+        <svg cIcon class="me-2" [name]="mode.icon" size="lg"></svg>
+        {{ mode.text }}
+      </button>
       }
     </div>
   </c-dropdown>

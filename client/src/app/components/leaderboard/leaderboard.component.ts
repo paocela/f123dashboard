@@ -1,12 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, input, Input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { GridModule, TableDirective } from '@coreui/angular';
-import { User, USERS } from '../../app/model/user';
-import { LeaderBoard } from '../../app/model/leaderboard'
-import { forEach } from 'lodash-es';
-import { ReturnStatement } from '@angular/compiler';
-import { FantaService } from 'src/app/service/fanta.service';
-import { DbDataService } from 'src/app/service/db-data.service';
+import { User } from '../../../app/model/auth';
+import { LeaderBoard } from '../../../app/model/leaderboard'
+import { FantaService } from '../../../app/service/fanta.service';
+import { DbDataService } from '../../../app/service/db-data.service';
 import { cilPeople} from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
 import { AvatarComponent, TextColorDirective } from '@coreui/angular';
@@ -44,11 +42,20 @@ export class LeaderboardComponent {
         id: user.id,
         username: user.username,
         points: this.fantaService.getFantaPoints(user.id),
-        numberVotes: this.fantaService.getFantaNumberVotes(user.id)
+        numberVotes: this.fantaService.getFantaNumberVotes(user.id),
+        avatarImage: user.image
       };
       this.leaderBoards.push(newUser);
     });
     this.leaderBoards = this.leaderBoards.filter(lb => lb.numberVotes > 0);
     this.leaderBoards.sort((a, b) => b.points - a.points);
+  }
+
+    GetAvatar(userId: number, image?: string): string {
+    if (image) {
+      return `data:image/jpeg;base64,${image}`;
+    }
+    // Fallback to file path
+    return `./assets/images/avatars_fanta/${userId}.png`;
   }
 }

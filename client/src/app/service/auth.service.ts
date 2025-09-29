@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable, timer } from 'rxjs';
+import { BehaviorSubject, firstValueFrom } from 'rxjs';
 import { AuthService as BackendAuthService } from "@genezio-sdk/f123dashboard";
-import { User, LoginRequest, RegisterRequest, AuthResponse, ChangePasswordRequest, SessionsResponse } from '../model/auth';
+import { User, LoginRequest, RegisterRequest, AuthResponse, ChangePasswordRequest, SessionsResponse, UpdateUserInfoRequest, UpdateUserInfoResponse } from '../model/auth';
+import { ApiService } from './api.service';
+import { ConfigService } from './config.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +17,7 @@ export class AuthService {
   public currentUser$ = this.currentUserSubject.asObservable();
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
-  constructor(private router: Router) {
+  constructor(private router: Router, private apiService: ApiService, private configService: ConfigService) {
     this.initializeAuth();
   }
 
@@ -27,6 +29,17 @@ export class AuthService {
 
   private initializeAuth(): void {
     const token = this.getToken();
+    const storedUser = sessionStorage.getItem('user');
+    
+    if (storedUser) {
+      try {
+        const user = JSON.parse(storedUser);
+        this.setAuthenticatedUser(user);
+      } catch (error) {
+        console.error('Error parsing stored user data:', error);
+      }
+    }
+    
     if (token) {
       this.validateTokenAndSetUser(token);
     }
@@ -40,8 +53,11 @@ export class AuthService {
         const userData = {
           id: validation.userId,
           username: validation.username,
-          name: '', // These would come from a separate user details call
-          surname: ''
+          name: validation.name,
+          surname: validation.surname,
+          mail: validation.mail,
+          image: validation.image,
+          isAdmin: validation.isAdmin
         };
         
         this.setAuthenticatedUser(userData);
@@ -55,7 +71,7 @@ export class AuthService {
     }
   }
 
-  async login(loginData: LoginRequest): Promise<AuthResponse> {
+  async login(loginData: LoginRequest, skipNavigation: boolean = false): Promise<AuthResponse> {
     try {
       const clientInfo = this.getClientInfo();
       const response = JSON.parse(await BackendAuthService.login(
@@ -66,13 +82,17 @@ export class AuthService {
       
       if (response.success && response.user && response.token) {
         this.setToken(response.token);
-        this.setAuthenticatedUser(response.user);
         this.scheduleTokenRefresh();
+        if (response.user.mail && response.user.mail.trim() !== '') {
+          this.setAuthenticatedUser(response.user);
+        }
+
         
-        // Navigate to dashboard or return URL
-        const returnUrl = sessionStorage.getItem('returnUrl') || '/dashboard';
-        sessionStorage.removeItem('returnUrl');
-        this.router.navigate([returnUrl]);
+        // Navigate to fanta or admin page only if navigation is not skipped
+        if (!skipNavigation) {
+          const returnUrl = response.user.isAdmin ? '/admin' : '/fanta';
+          this.router.navigate([returnUrl]);
+        }
       }
       
       return response;
@@ -87,14 +107,23 @@ export class AuthService {
 
   async register(registerData: RegisterRequest): Promise<AuthResponse> {
     try {
-      const clientInfo = this.getClientInfo();
-      const response = JSON.parse(await BackendAuthService.register(
-        registerData.username,
-        registerData.name,
-        registerData.surname,
-        registerData.password,
-        clientInfo.userAgent
-      ));
+      // Prepare the request body for the HTTP endpoint
+      const requestBody = {
+        username: registerData.username,
+        name: registerData.name,
+        surname: registerData.surname,
+        password: registerData.password,
+        mail: registerData.mail,
+        image: registerData.image
+      };
+      
+      console.log('Making request to:', this.apiService.getEndpointUrl('AuthService/register'));
+        
+      const response: AuthResponse = await firstValueFrom(
+        this.apiService.post<AuthResponse>('AuthService/register', requestBody, {
+          headers: this.apiService.createHeaders(true)
+        })
+      );
       
       if (response.success && response.user && response.token) {
         this.setToken(response.token);
@@ -106,11 +135,20 @@ export class AuthService {
       }
       
       return response;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Registration error:', error);
+      
+      // Handle HTTP error responses
+      if (error.error && error.error.message) {
+        return {
+          success: false,
+          message: error.error.message
+        };
+      }
+      
       return {
         success: false,
-        message: 'An error occurred during registration. Please try again.'
+        message: 'An error occurred during registration. Please try again. If the error persists, contact support.'
       };
     }
   }
@@ -136,6 +174,55 @@ export class AuthService {
       return {
         success: false,
         message: 'An error occurred while changing password. Please try again.'
+      };
+    }
+  }
+
+  async updateUserInfo(updateData: UpdateUserInfoRequest): Promise<UpdateUserInfoResponse> {
+    try {
+      const token = this.getToken();
+      if (!token) {
+        return {
+          success: false,
+          message: 'No authentication token found'
+        };
+      }
+
+      // Prepare the request body for the HTTP endpoint
+      const requestBody = {
+        jwtToken: token,
+        updates: updateData
+      };
+
+      console.log('Update user info request body size:', JSON.stringify(requestBody).length);
+      
+      console.log('Making update request to:', this.apiService.getEndpointUrl('AuthService/updateUserInfo'));
+        
+      const response: UpdateUserInfoResponse = await firstValueFrom(
+        this.apiService.post<UpdateUserInfoResponse>('AuthService/updateUserInfo', requestBody, {
+          headers: this.apiService.createAuthHeaders(token)
+        })
+      );
+      
+      if (response.success && response.user) {
+        // Update the current user data in the service
+        this.setAuthenticatedUser(response.user);
+      }
+      
+      return response;
+    } catch (error: any) {
+      console.error('Update user info error:', error);
+      
+      // Handle HTTP error responses
+      if (error.error && error.error.message) {
+        return {
+          success: false,
+          message: error.error.message
+        };
+      }
+      return {
+        success: false,
+        message: 'An error occurred while updating user information. Please try again.'
       };
     }
   }
@@ -188,11 +275,23 @@ export class AuthService {
 
   private setAuthenticatedUser(user: User): void {
     this.currentUserSubject.next(user);
-    this.isAuthenticatedSubject.next(true);
+    
+    // Only set as authenticated if user has email
+    const hasEmail = !!(user.mail && user.mail.trim() !== '');
+    this.isAuthenticatedSubject.next(hasEmail);
     
     // Store user data in session storage for persistence
     sessionStorage.setItem('user', JSON.stringify(user));
-    sessionStorage.setItem('isLoggedIn', 'true');
+    sessionStorage.setItem('isLoggedIn', hasEmail ? 'true' : 'false');
+  }
+
+  // Method to mark user as fully authenticated after email completion
+  public markUserAsAuthenticated(): void {
+    const currentUser = this.currentUserSubject.value;
+    if (currentUser && currentUser.mail && currentUser.mail.trim() !== '') {
+      this.isAuthenticatedSubject.next(true);
+      sessionStorage.setItem('isLoggedIn', 'true');
+    }
   }
 
   private clearAuth(): void {
@@ -211,11 +310,14 @@ export class AuthService {
   }
 
   private setToken(token: string): void {
-    sessionStorage.setItem('authToken', token);
+    // Set JWT in cookie (expires in 7 days, Secure, SameSite=Strict)
+    document.cookie = `authToken=${token}; path=/; max-age=${7 * 24 * 60 * 60}; Secure; SameSite=Strict`;
   }
 
   private getToken(): string | null {
-    return sessionStorage.getItem('authToken');
+    // Read JWT from cookie
+    const match = document.cookie.match(/(^|;) ?authToken=([^;]*)(;|$)/);
+    return match ? match[2] : null;
   }
 
   private scheduleTokenRefresh(): void {
@@ -224,14 +326,14 @@ export class AuthService {
       clearTimeout(this.tokenRefreshTimer);
     }
 
-    // Schedule refresh for 6 days (token expires in 7 days)
+    // Schedule refresh using configured time before expiry
     this.tokenRefreshTimer = setTimeout(() => {
       this.refreshToken().then(success => {
         if (!success) {
           this.logout();
         }
       });
-    }, 6 * 24 * 60 * 60 * 1000); // 6 days in milliseconds
+    }, this.configService.tokenRefreshTimeBeforeExpiry);
   }
 
   // Getters for backwards compatibility

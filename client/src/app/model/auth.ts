@@ -3,6 +3,9 @@ export interface User {
   username: string;
   name: string;
   surname: string;
+  mail?: string;
+  image?: string;
+  isAdmin?: boolean;
 }
 
 export interface LoginRequest {
@@ -15,6 +18,8 @@ export interface RegisterRequest {
   name: string;
   surname: string;
   password: string;
+  mail: string;
+  image: string;
 }
 
 export interface AuthResponse {
@@ -42,4 +47,17 @@ export interface SessionsResponse {
   success: boolean;
   message?: string;
   sessions?: UserSession[];
+}
+
+export interface UpdateUserInfoRequest {
+  name?: string;
+  surname?: string;
+  mail?: string;
+  image?: string;
+}
+
+export interface UpdateUserInfoResponse {
+  success: boolean;
+  message: string;
+  user?: User;
 }

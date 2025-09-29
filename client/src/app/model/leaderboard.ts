@@ -3,4 +3,5 @@ export interface LeaderBoard{
     username: string;
     points: number;
     numberVotes: number;
+    avatarImage?: string;
   }

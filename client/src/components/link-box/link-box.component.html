@@ -1,10 +1,9 @@
 <button cButton 
     (click)="goTo()" 
-    class="my-3 mx-sm-2 mx-1" 
-    [ngStyle]="{'max-width.px': 540, 'background-color': color}" 
-    textColor="white" 
+    class="transparent-button" 
+    [ngStyle]="{'--hover-color': color}"
     [size]="isLargeScreen ? 'lg' : 'sm'"
 >
-    <svg [cIcon]="icon" [class.me-2]="linkName && isLargeScreen"></svg>
+    <svg [cIcon]="icon" [class.me-2]="linkName && isLargeScreen" class="social-icon"></svg>
     <span class="link-name">{{ linkName }}</span>
 </button>

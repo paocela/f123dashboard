@@ -1,8 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { NgScrollbar } from 'ngx-scrollbar';
+import { Subscription } from 'rxjs';
 
-import { IconDirective } from '@coreui/icons-angular';
 import {
   ContainerComponent,
   ShadowOnScrollDirective,
@@ -16,8 +16,9 @@ import {
 } from '@coreui/angular';
 
 import { DefaultFooterComponent, DefaultHeaderComponent } from './';
-import { navItems } from './_nav';
+import { getNavItems } from './_nav';
 import { LoadingSpinnerComponent } from '../../../components/loading-spinner/loading-spinner.component';
+import { AuthService } from './../../service/auth.service';
 
 function isOverflown(element: HTMLElement) {
   return (
@@ -35,7 +36,6 @@ function isOverflown(element: HTMLElement) {
         SidebarHeaderComponent,
         SidebarBrandComponent,
         RouterLink,
-        IconDirective,
         NgScrollbar,
         SidebarNavComponent,
         SidebarFooterComponent,
@@ -49,12 +49,34 @@ function isOverflown(element: HTMLElement) {
         LoadingSpinnerComponent
     ]
 })
-export class DefaultLayoutComponent {
-  public navItems = navItems;
+export class DefaultLayoutComponent implements OnInit, OnDestroy {
+  private userSubscription?: Subscription;
+  
+  constructor(
+    private authService: AuthService, 
+  ) {}
 
+  public navItems = getNavItems(false);
+
+  ngOnInit(): void {
+    // Subscribe to user changes to update navigation
+    this.userSubscription = this.authService.currentUser$.subscribe(user => {
+      this.navItems = getNavItems(user?.isAdmin ?? false);
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.userSubscription?.unsubscribe();
+  }
+  
   onScrollbarUpdate($event: any) {
     // if ($event.verticalUsed) {
     // console.log('verticalUsed', $event.verticalUsed);
     // }
+  }
+
+  updateNavItems()
+  {
+    this.navItems = getNavItems(this.authService.getCurrentUser()?.isAdmin ?? false);
   }
 }

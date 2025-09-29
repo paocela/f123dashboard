@@ -8,7 +8,7 @@
               <div>
                 <c-avatar
                   [size]="'xl'"
-                  src="./assets/images/avatars_fanta/{{ this.user.id }}.png"
+                  [src]="avatarSrc"
                 />
               </div>
             </td>
@@ -32,11 +32,6 @@
       <c-col>
         <div class="align">
           <button (click)="toggleModalRanking()" cButton>Classifica Fanta</button>
-        </div>
-      </c-col>
-      <c-col xs="auto">
-        <div class="align">
-          <button cButton (click)="this.authService.logout()">Logout</button>
         </div>
       </c-col>
     </c-row>
@@ -81,11 +76,13 @@
                   </c-col>
                   <c-col xs="auto">
                     <div class="small">
-                        <p *ngIf="forms[track.track_id] && (!forms[track.track_id].submitted 
-                            && !forms[track.track_id].touched && formStatus[track.track_id] != 1) || formStatus[track.track_id] == 2" class="error">
+                        <p style="margin-bottom: 0;" *ngIf="hasNoData(track.track_id)" class="warning">
+                          <c-badge color="warning">Votazione Mancante</c-badge>
+                        </p>
+                        <p style="margin-bottom: 0;" *ngIf="hasUnsavedData(track.track_id)" class="error">
                           <c-badge color="danger">NON SALVATO!</c-badge>
                         </p>
-                        <p *ngIf="formStatus[track.track_id] == 1" class="success">
+                        <p style="margin-bottom: 0;" *ngIf="formStatus[track.track_id] == 1" class="success">
                           <c-badge color="success">Salvato</c-badge>
                         </p>
                     </div>
@@ -110,7 +107,7 @@
                   >
                     <c-col xs="4" sm="auto">
                       <strong>
-                        @if (posizione.key < 7) {
+                        @if (posizione.key <= 8) {
                           {{ posizione?.value }} posto
                         } @else {
                           {{posizione?.value}}
@@ -122,8 +119,8 @@
                         style="width: 25px"
                         attr.src="assets/medals/{{ medals.get(posizione.key) }}"
                       />
-                      <svg *ngIf="posizione.key == 7" [cIcon]="fireIcon" style="color: purple"></svg>
-                      <svg *ngIf="posizione.key == 8" [cIcon]="powerIcon" style="color: red"></svg>
+                      <svg *ngIf="posizione.key == 9" [cIcon]="fireIcon" style="color: purple"></svg>
+                      <svg *ngIf="posizione.key == 10" [cIcon]="powerIcon" style="color: red"></svg>
                     </c-col>
                     <c-col xs="8" sm="auto" class="ms-auto">
                       <select
@@ -262,9 +259,9 @@
                         <tr>
                           <td>
                             <div class="text-center fw-semibold">
-                              @if (i + 1 < 7 ){
+                              @if (i + 1 <= 8 ){
                                 <div [class]="">{{ i + 1 }}</div>
-                              } @else if ( i + 1 == 7) {
+                              } @else if ( i + 1 == 9) {
                                 <div [class]="">GV</div>
                               } @else {
                                 <div [class]="">DNF</div>
@@ -286,11 +283,11 @@
                             ></div>
                           </td>
                           <td>
-                            @if (i + 1 < 7 ) {
+                            @if (i + 1 <= 8 ) {
                               <div class="fw-semibold text-center">
                                 {{ getPosizioneArrivo(voto, track.track_id) }}
                               </div>
-                            } @else if ( i + 1 == 7 ) {
+                            } @else if ( i + 1 == 9 ) {
                               <div class="fw-semibold text-center">
                                 @if (getFastLap(track.track_id) == voto)
                                 {
@@ -301,7 +298,7 @@
                               </div>
                             } @else {
                               <div class="fw-semibold text-center">
-                                @if (validateDnf(getDnf(track.track_id), voto))
+                                @if (fantaService.isDnfCorrect(getDnf(track.track_id), voto))
                                 {
                                   SI
                                 } @else {
@@ -312,9 +309,9 @@
                           </td>
                           <td>
                             <div class="fw-semibold text-center">
-                              @if (i + 1 < 7) {
+                              @if (i + 1 <= 8 ) {
                                 {{getPunti(voto, track.track_id)}}
-                              } @else if ( i + 1 == 7 ) {
+                              } @else if ( i + 1 == 9 ) {
                                 {{getPuntiFastLap(track.track_id)}}
                               } @else {
                                 {{getPuntiDnf(track.track_id)}}
@@ -323,7 +320,7 @@
                           </td>
                           <td>
                             <div class="text-center">
-                              @if (i + 1 < 7) {
+                              @if (i + 1 <= 8 ) {
                                 <svg
                                   [cIcon]="isCorrect(voto, track.track_id).icon"
                                   size="lg"
@@ -331,7 +328,7 @@
                                     color: isCorrect(voto, track.track_id).color
                                   }"
                                 ></svg>
-                              } @else if ( i + 1 == 7 ) {
+                              } @else if ( i + 1 == 9 ) {
                                 <svg
                                 [cIcon]="isCorrectFastLap(track.track_id).icon"
                                 size="lg"

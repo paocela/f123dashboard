@@ -1,0 +1,422 @@
+// Common Floating Form Styles
+// Shared styles for login dropdown and registration modal
+
+// Base input styling for floating forms
+.floating-input-base {
+  border-radius: 8px;
+  border: 2px solid var(--cui-border-color);
+  padding: 1rem 0.75rem 0.25rem 0.75rem;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  background: var(--cui-body-bg);
+  height: calc(3.5rem + 2px);
+  line-height: 1.25;
+
+  &:focus {
+    border-color: var(--cui-primary);
+    box-shadow: 0 0 0 0.2rem rgba(var(--cui-primary-rgb), 0.25);
+    background: var(--cui-body-bg);
+    outline: none;
+  }
+
+  &:invalid {
+    border-color: var(--cui-danger);
+  }
+
+  &:hover:not(:focus) {
+    border-color: rgba(var(--cui-primary-rgb), 0.5);
+  }
+}
+
+// Base label styling for floating forms
+.floating-label-base {
+  color: var(--cui-primary);
+  font-weight: 500;
+  font-size: 0.85rem;
+}
+
+// Input group container for floating forms
+// Unified class that supports both CoreUI and custom floating labels
+.floating-input-group {
+  margin-bottom: 1.25rem;
+  position: relative;
+
+  // Floating label container
+  &.form-floating {
+    position: relative;
+  }
+
+  // Apply base styles to CoreUI inputs
+  input[cFormControl] {
+    @extend .floating-input-base;
+  }
+
+  // Apply base styles to CoreUI labels
+  label {
+    @extend .floating-label-base;
+  }
+
+  // Support for custom floating inputs (legacy)
+  .registration-input,
+  .login-input {
+    border-radius: 8px;
+    border: 2px solid var(--cui-border-color);
+    padding: 1rem 0.75rem 0.25rem 0.75rem;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background: var(--cui-body-bg);
+    height: auto;
+    min-height: 58px;
+
+    &:focus {
+      border-color: var(--cui-primary);
+      box-shadow: 0 0 0 0.2rem rgba(var(--cui-primary-rgb), 0.25);
+      background: var(--cui-body-bg);
+      outline: none;
+    }
+
+    &::placeholder {
+      color: transparent;
+      opacity: 0;
+    }
+
+    &:focus::placeholder {
+      color: var(--cui-text-muted);
+      opacity: 0.7;
+    }
+
+    &:invalid {
+      border-color: var(--cui-danger);
+    }
+
+    &:hover:not(:focus) {
+      border-color: rgba(var(--cui-primary-rgb), 0.5);
+    }
+
+    // When input has value or is focused
+    &:focus,
+    &:not(:placeholder-shown) {
+      padding-top: 1.25rem;
+      padding-bottom: 0.25rem;
+    }
+  }
+
+  // Custom floating label styling
+  .input-label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 1rem 0.75rem;
+    pointer-events: none;
+    color: var(--cui-text-muted);
+    font-weight: 400;
+    font-size: 0.95rem;
+    margin-bottom: 0;
+    transform-origin: 0 0;
+    transition: all 0.3s ease;
+    z-index: 2;
+
+    // When input is focused or has value
+    .registration-input:focus ~ &,
+    .registration-input:not(:placeholder-shown) ~ &,
+    .login-input:focus ~ &,
+    .login-input:not(:placeholder-shown) ~ & {
+      color: var(--cui-primary);
+      font-weight: 500;
+      font-size: 0.75rem;
+      transform: translateY(-0.5rem) scale(0.85);
+      padding: 0.25rem 0.75rem 0;
+    }
+
+    // Alternative approach for floating labels
+    .form-floating & {
+      position: absolute;
+      top: 0;
+      left: 0;
+      padding: 1rem 0.75rem;
+      color: var(--cui-text-muted);
+      font-size: 0.95rem;
+      font-weight: 400;
+      pointer-events: none;
+      transform-origin: 0 0;
+      transition: all 0.3s ease;
+    }
+  }
+}
+
+// CoreUI floating form overrides - common to all components
+[cFormFloating] {
+  .form-control,
+  input[cFormControl] {
+    border-radius: 8px !important;
+    border: 2px solid var(--cui-border-color) !important;
+    transition: all 0.3s ease !important;
+
+    &:focus {
+      border-color: var(--cui-primary) !important;
+      box-shadow: 0 0 0 0.2rem rgba(var(--cui-primary-rgb), 0.25) !important;
+    }
+
+    &:hover:not(:focus) {
+      border-color: rgba(var(--cui-primary-rgb), 0.5) !important;
+    }
+  }
+
+  label {
+    color: var(--cui-primary) !important;
+    font-weight: 500 !important;
+    font-size: 0.85rem !important;
+  }
+}
+
+// Error message styling for forms
+.form-error-message {
+  color: var(--cui-danger);
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: rgba(var(--cui-danger-rgb), 0.1);
+  border-radius: 6px;
+  border-left: 3px solid var(--cui-danger);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  .error-icon {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+  }
+}
+
+// Success message styling for forms
+.form-success-message {
+  color: var(--cui-success);
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: rgba(var(--cui-success-rgb), 0.1);
+  border-radius: 6px;
+  border-left: 3px solid var(--cui-success);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  .success-icon {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+  }
+}
+
+// Common UI Component Patterns
+// These patterns are reused across multiple components
+
+// Gradient header pattern (used in login dropdown and registration modal)
+.gradient-header {
+  padding: 1.25rem 1.5rem 0.75rem;
+  background: linear-gradient(135deg, var(--cui-primary), var(--cui-info));
+  color: white;
+  border-bottom: none;
+
+  .title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-align: center;
+    color: white;
+  }
+
+  .btn-close {
+    filter: brightness(0) invert(1);
+    opacity: 0.8;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+// Enhanced button with hover effects
+.enhanced-button {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(var(--cui-primary-rgb), 0.3);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  // Variant for larger buttons
+  &.large {
+    padding: 0.875rem 2rem;
+    border-radius: 10px;
+    font-size: 1rem;
+
+    &:hover:not(:disabled) {
+      box-shadow: 0 6px 20px rgba(var(--cui-primary-rgb), 0.3);
+    }
+  }
+
+  // Variant for smaller buttons
+  &.small {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+  }
+}
+
+// Modal/Dropdown container pattern
+.modal-dropdown-container {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  background: var(--cui-body-bg);
+
+  // Enhanced variant for larger modals
+  &.enhanced {
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  }
+}
+
+// File input styling pattern
+.file-input-group {
+  margin-bottom: 1.25rem;
+
+  .file-label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border: 2px dashed var(--cui-border-color);
+    border-radius: 8px;
+    background: var(--cui-tertiary-bg);
+    color: var(--cui-text-muted);
+    font-weight: 500;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    justify-content: center;
+
+    &:hover {
+      border-color: var(--cui-primary);
+      background: rgba(var(--cui-primary-rgb), 0.05);
+      color: var(--cui-primary);
+    }
+
+    .file-icon {
+      flex-shrink: 0;
+      transition: transform 0.3s ease;
+    }
+
+    &:hover .file-icon {
+      transform: scale(1.1);
+    }
+  }
+
+  .file-input {
+    display: none;
+  }
+
+  .file-selected {
+    margin-top: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    background: rgba(var(--cui-success-rgb), 0.1);
+    border: 1px solid rgba(var(--cui-success-rgb), 0.3);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+
+    .file-name {
+      color: var(--cui-success);
+      font-size: 0.9rem;
+      font-weight: 500;
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .remove-file {
+      background: none;
+      border: none;
+      color: var(--cui-danger);
+      font-size: 1.25rem;
+      font-weight: bold;
+      cursor: pointer;
+      padding: 0;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: rgba(var(--cui-danger-rgb), 0.1);
+        transform: scale(1.2);
+      }
+    }
+  }
+}
+
+// Card container pattern (used in podium cards, albo containers, etc.)
+.card-container {
+  background: var(--cui-body-bg);
+  border-radius: 16px;
+  border: 1px solid var(--cui-border-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  // Variants
+  &.padded {
+    padding: 2rem;
+  }
+
+  &.small {
+    border-radius: 12px;
+    padding: 1rem;
+  }
+
+  &.large {
+    border-radius: 20px;
+    padding: 2.5rem;
+  }
+}
+
+// Toggle button pattern (login toggle, etc.)
+.toggle-button {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+  background: transparent;
+  border: 1px solid var(--cui-border-color);
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 2px rgba(var(--cui-primary-rgb), 0.25);
+    outline: none;
+  }
+}
+
+

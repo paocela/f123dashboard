@@ -36,23 +36,6 @@ Run `genezio deploy` to deploy remotely on genezio infrastracture.
   - `ALTER SEQUENCE public.fanta_player_new_id_seq RESTART WITH 1` per farlo ripartire da 1
 - per lanciare in locale, ricordati di settare la variabile d'ambiente `RACEFORFEDERICA_DB_DATABASE_URL` alla stringa di connessione al db postgre
 
-## Todo 🎯
-
-- offri un caffè agli sviluppatori
-- link a pagina instagram e twitch (con plug-in integrati)
-
-## Todo Next Season 🔜
-
-- gestione stagioni da menu a tendina (e in DB)
-- voto pole position x fanta
-- sicurezza dati utenti fanta
-- Moltiplicatore punteggi
-- Admin deve poter caricare i risultati delle gare da sito
-- Query asicrone su ogni pagina
-- pagina albo d'oro
-- aggiungere descrizione gara nella pagina dei risultati
-- foto nuove piloti
-
 ## Credits 🙇
 
 Credits for this small but fun project goes to:

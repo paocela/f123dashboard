@@ -1,105 +1,245 @@
-<c-row *ngIf="isLive" >
-  <c-card class="mb-4">
-    <c-card-header>
-      <h4 class="card-title mb-0" >
-        {{streamTitle$ | async}}
-      </h4>
-    </c-card-header>
-    <c-card-body>
-      <div class="twitch-embed-container" style="aspect-ratio:16/9;max-width:none;min-width:100%!important;">
-        <iframe src="https://player.twitch.tv/?channel=dreandos&parent=localhost&autoplay=false&muted=false&time=0s" 
-          width="100%" 
-          height="100%" 
-          frameborder="0" 
-          allowfullscreen>
-        </iframe>
-      </div>
-    </c-card-body> 
-  </c-card>
-</c-row>
-
+@if (isLive) {
+  <c-row>
+    <c-card class="mb-4">
+      <c-card-header>
+        <h4 class="card-title mb-0">
+          {{ streamTitle$ | async }}
+        </h4>
+      </c-card-header>
+      <c-card-body>
+        <div
+          class="twitch-embed-container"
+          style="aspect-ratio: 16/9; max-width: none; min-width: 100% !important"
+        >
+          <iframe
+            src="https://player.twitch.tv/?channel=dreandos&parent=localhost&autoplay=false&muted=false&time=0s"
+            width="100%"
+            height="100%"
+            frameborder="0"
+            allowfullscreen
+          >
+          </iframe>
+        </div>
+      </c-card-body>
+    </c-card>
+  </c-row>
+}
 
 <c-row>
   <c-col xs="12" md="6">
     <c-card class="mb-4">
       <c-card-header>
-        <h4 class="card-title mb-0" id="traffic">Championship Standings</h4>
+        <h4 class="card-title mb-0" id="traffic">Classifica Campionato</h4>
         <strong></strong>
       </c-card-header>
       <c-card-body>
-        <table
-          [hover]="true"
-          [responsive]="true"
-          [striped]="true"
-          align="middle"
-          cTable
-          class="mb-0 border"
-        >
-          <thead class="text-nowrap text-truncate">
-            <tr>
-              <th class="bg-body-tertiary text-center">
-                <svg cIcon name="cilPeople"></svg>
-              </th>
-              <th class="bg-body-tertiary"></th>
-              <th class="bg-body-tertiary">Username</th>
-              <th class="bg-body-tertiary text-center" *ngIf="showColumn()">Car</th>
-              <th class="bg-body-tertiary pilot" *ngIf="showColumn()">Pilot</th>
-              <th class="bg-body-tertiary text-center">Points</th>
-              <th class="bg-body-tertiary text-center">Gain/Lost</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (user of championship_standings_users; track
-            user.driver_username; let i = $index) {
-            <tr>
-              <td>
-                <div class="fw-semibold text-center">#{{ i + 1 }}</div>
-              </td>
-              <td class="text-center">
-                <c-avatar
-                  [size]="'md'"
-                  src="./assets/images/avatars/{{ user.driver_username }}.png"
-                />
-              </td>
-              <td>
-                <div>{{ user.driver_username }}</div>
-              </td>
-              <td class="text-center" *ngIf="showColumn()">
-                <img
-                  width="100%"
-                  height="40px"
-                  src="./assets/images/constructors/{{ user.car_name }}.svg"
-                />
-              </td>
-              <td class="pilot" *ngIf="showColumn()">
-                <div class="text-nowrap">
-                  {{ user.pilot_name }} {{ user.pilot_surname }}
-                </div>
-              </td>
-              <td>
-                <div class="fw-semibold text-center">
-                  {{ user.total_points }}
-                </div>
-              </td>
-              <td>
-                <div class="fw-semibold text-center" [ngClass]="{
-                  'text-success': (championship_standings_users[i - 1] && (user.gainedPoints - championship_standings_users[i - 1].gainedPoints) > 0),
-                  'text-danger': (championship_standings_users[i - 1] && (user.gainedPoints - championship_standings_users[i - 1].gainedPoints) < 0),
-                  'text-warning': (championship_standings_users[i - 1] && (user.gainedPoints - championship_standings_users[i - 1].gainedPoints) === 0)
-                }">
-                  {{ championship_standings_users[i - 1] ? (user.gainedPoints - championship_standings_users[i - 1].gainedPoints) : '-' }}
-                </div>
-              </td>
-            </tr>
-            }
-          </tbody>
-        </table>
+        <c-tabs [activeItemKey]="0" >
+          <c-tabs-list layout="justified" variant="tabs">
+            <button cTab [itemKey]="0">Piloti</button>
+            <button cTab [itemKey]="1">Costruttori</button>
+          </c-tabs-list>
+          <c-tabs-content>
+            <!-- TAB CLASSIFICA PILOTI -->
+            <c-tab-panel class="p-3 custom-c-tab" [itemKey]="0" >
+              <div class="table-wrapper">
+                <table
+                [hover]="true"
+                [responsive]="true"
+                [striped]="true"
+                align="middle"
+                cTable
+                class="mb-0 border rounded custom-table"
+              >
+                <thead class="text-nowrap text-truncate">
+                  <tr>
+                    <th class="bg-body-tertiary text-center">Pos.</th>
+                    <th class="bg-body-tertiary text-center">
+                      <svg cIcon name="cilPeople"></svg>
+                    </th>
+                    <th class="bg-body-tertiary">Username</th>
+                    <th class="bg-body-tertiary text-center" *ngIf="showColumn()">
+                      Scuderia
+                    </th>
+                    <th class="bg-body-tertiary pilot" *ngIf="showColumn()">
+                      Pilota
+                    </th>
+                    <th class="bg-body-tertiary text-center">Punti</th>
+                    <th class="bg-body-tertiary text-center">+/-</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (user of championship_standings_users; track
+                  user.driver_username; let i = $index) {
+                  <tr>
+                    <td>
+                      <div class="fw-semibold text-center">#{{ i + 1 }}</div>
+                    </td>
+                    <td class="text-center">
+                      <c-avatar
+                        [size]="'md'"
+                        src="./assets/images/avatars/{{ user.driver_username }}.png"
+                      />
+                    </td>
+                    <td>
+                      <div>{{ user.driver_username }}</div>
+                    </td>
+                    <td class="text-center" *ngIf="showColumn()">
+                      <img
+                        width="100%"
+                        height="40px"
+                        src="./assets/images/constructors/{{ user.car_name }}.svg"
+                      />
+                    </td>
+                    <td class="pilot" *ngIf="showColumn()">
+                      <div class="text-nowrap">
+                        {{ user.driver_name }} {{ user.driver_surname }}
+                      </div>
+                    </td>
+                    <td>
+                      <div class="fw-semibold text-center">
+                        {{ user.total_points }}
+                      </div>
+                    </td>
+                    <td>
+                      <div
+                        class="fw-semibold text-center"
+                        [ngClass]="{
+                          'text-success':
+                            championship_standings_users[i - 1] &&
+                            user.gainedPoints -
+                              championship_standings_users[i - 1].gainedPoints >
+                              0,
+                          'text-danger':
+                            championship_standings_users[i - 1] &&
+                            user.gainedPoints -
+                              championship_standings_users[i - 1].gainedPoints <
+                              0,
+                          'text-warning':
+                            championship_standings_users[i - 1] &&
+                            user.gainedPoints -
+                              championship_standings_users[i - 1].gainedPoints ===
+                              0
+                        }"
+                      >
+                        {{
+                          championship_standings_users[i - 1]
+                            ? user.gainedPoints -
+                              championship_standings_users[i - 1].gainedPoints
+                            : "-"
+                        }}
+                      </div>
+                    </td>
+                  </tr>
+                  }
+                </tbody>
+              </table>
+              </div>
+            </c-tab-panel>
+            <!-- TAB CLASSIFICA COSTRUTTORI -->
+            <c-tab-panel class="p-3 custom-c-tab" [itemKey]="1" >
+                <table
+                  [hover]="true"
+                  [responsive]="true"
+                  [striped]="true"
+                  align="middle"
+                  cTable
+                  class="mb-0 border rounded custom-table"
+                >
+                  <thead class="text-nowrap text-truncate">
+                    <tr>
+                      <th class="bg-body-tertiary text-center">Pos.</th>
+                      <th class="bg-body-tertiary text-center">
+                        <svg cIcon name="cilPeople"></svg>
+                      </th>
+                      <th class="bg-body-tertiary text-center" *ngIf="showColumn()">
+                        Scuderia
+                      </th>
+                      <th class="bg-body-tertiary pilot" *ngIf="showColumn()">
+                        Piloti
+                      </th>
+                      <th class="bg-body-tertiary text-center">Punti</th>
+                      <th class="bg-body-tertiary text-center">+/-</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (constructor of constructors; track
+                      constructor.constructor_name; let i = $index) {
+                    <tr>
+                      <td>
+                        <div class="fw-semibold text-center">#{{ i + 1 }}</div>
+                      </td>
+                      <td class="text-center">
+                        <img
+                          width="auto"
+                          height="40px"
+                          src="./assets/images/constructors/{{ constructor.constructor_name }}.png"
+                        />
+                      </td>
+                      <td *ngIf="showColumn()">
+                        <div>{{ constructor.constructor_name }}</div>
+                      </td>
+                      <td class="text-center" *ngIf="showColumn()">
+                        <div class="d-flex align-items-center justify-content-center gap-2">
+                          <c-avatar
+                            [size]="'md'"
+                            src="./assets/images/avatars/{{ constructor.driver_1_username }}.png"
+                          />
+                          <c-avatar
+                            [size]="'md'"
+                            src="./assets/images/avatars/{{ constructor.driver_2_username }}.png"
+                          />
+                        </div>
+                      </td>
+                      <td>
+                        <div class="fw-semibold text-center">
+                          {{ constructor.constructor_tot_points }}
+                        </div>
+                      </td>
+                      <td>
+                        <div
+                          class="fw-semibold text-center"
+                          [ngClass]="{
+                            'text-success':
+                              constructors[i - 1] &&
+                              constructor.constructor_tot_points -
+                                constructors[i - 1].constructor_tot_points >
+                                0,
+                            'text-danger':
+                              constructors[i - 1] &&
+                              constructor.constructor_tot_points -
+                                constructors[i - 1].constructor_tot_points <
+                                0,
+                            'text-warning':
+                              constructors[i - 1] &&
+                              constructor.constructor_tot_points -
+                                constructors[i - 1].constructor_tot_points ===
+                                0
+                          }"
+                        >
+                          {{
+                            constructors[i - 1]
+                              ? constructor.constructor_tot_points -
+                                constructors[i - 1].constructor_tot_points
+                              : "-"
+                          }}
+                        </div>
+                      </td>
+                    </tr>
+                    }
+                  </tbody>
+                </table>
+            </c-tab-panel>
+          </c-tabs-content>
+        </c-tabs>
       </c-card-body>
     </c-card>
   </c-col>
   <c-col class="carousle-height" xs="12" md="6">
-    <c-carousel [dark]="false" [touch]="true" *ngIf="championshipNextTracks.length > 0">
-      
+    @if (championshipNextTracks.length > 0) {
+    <c-carousel
+      [dark]="false"
+      [touch]="true"
+    >
       <c-carousel-indicators></c-carousel-indicators>
       <c-carousel-inner>
         <c-carousel-item *ngFor="let next_track of championshipNextTracks">
@@ -109,26 +249,22 @@
                 <c-col xs="auto">
                   <h4 class="card-title mb-0" id="traffic">
                     Next Track: {{ next_track.name }}
-                    <svg
-                      size="lg"
-                      [cIcon]="allFlags[next_track.country]"
-                    ></svg>
+                    <svg size="lg" [cIcon]="allFlags[next_track.country]"></svg>
                   </h4>
                 </c-col>
                 @if (next_track.has_sprint == 1) {
-                    <c-col xs="auto">
-                      <c-badge color="info">Sprint</c-badge>
-                    </c-col>
-                  }
-                @if (next_track.has_x2 == 1) {
-                    <c-col xs="auto">
-                      <c-badge color="danger">Points X2</c-badge>
-                    </c-col>
-                  }
+                <c-col xs="auto">
+                  <c-badge color="info">Sprint</c-badge>
+                </c-col>
+                } @if (next_track.has_x2 == 1) {
+                <c-col xs="auto">
+                  <c-badge color="danger">Points X2</c-badge>
+                </c-col>
+                }
               </c-row>
             </c-card-header>
             <c-card-body>
-              <div >
+              <div>
                 <img
                   height="auto"
                   width="100%"
@@ -156,136 +292,79 @@
           </c-card>
         </c-carousel-item>
       </c-carousel-inner>
-      <c-carousel-control [routerLink] caption="Previous" direction="prev"></c-carousel-control>
-      <c-carousel-control [routerLink] caption="Next" direction="next"></c-carousel-control>
+      <c-carousel-control
+        [routerLink]
+        caption="Previous"
+        direction="prev"
+      ></c-carousel-control>
+      <c-carousel-control
+        [routerLink]
+        caption="Next"
+        direction="next"
+      ></c-carousel-control>
     </c-carousel>
-    <c-card *ngIf="championshipNextTracks.length === 0">
+    }
+    @else if (championshipNextTracks.length === 0) {
+    <c-card>
       <c-card-header>
-        <h4 class="card-title mb-0" id="traffic">Fanta Standings</h4>
+        <h4 class="card-title mb-0" id="traffic">Classifica Fanta</h4>
       </c-card-header>
       <c-card-body>
-        <app-leaderboard [maxDisplayable]="6" [showVotes]="showColumn()" ></app-leaderboard>
+        <app-leaderboard
+          [maxDisplayable]="6"
+          [showVotes]="showColumn()"
+        ></app-leaderboard>
       </c-card-body>
     </c-card>
+    }
   </c-col>
 </c-row>
 <div id="twitch-embed"></div>
 
-<c-card class="my-4">
-  <c-card-body>
-    <c-row>
-      <c-col sm="5">
-        <h4 class="card-title mb-0" id="traffic">Championship Fight</h4>
-        <div class="small text-body-secondary">Pilots trend after every GP</div>
-      </c-col>
-      <c-col sm="7">
-        <form [formGroup]="trafficRadioGroup">
-          <c-button-group class="float-end me-3" role="group">
-            <input
-              class="btn-check"
-              formControlName="trafficRadio"
-              type="radio"
-              value="Month4"
-              id="radio4Month"
-            />
-            <label
-              (click)="setTrafficPeriod('Month', 4)"
-              cButton
-              cFormCheckLabel
-              color="secondary"
-              variant="outline"
-              for="radio4Month"
-            >
-              Last 4 GP
-            </label>
-            <input
-            class="btn-check"
-            formControlName="trafficRadio"
-            type="radio"
-            value="Month8"
-            id="radio8Month"
-          />
-          <label
-            (click)="setTrafficPeriod('Month', 8)"
-            cButton
-            cFormCheckLabel
-            color="secondary"
-            variant="outline"
-            for="radio8Month"
-          >
-            Last 8 GP
-          </label>
-            <input
-              class="btn-check"
-              formControlName="trafficRadio"
-              type="radio"
-              value="Year"
-              id="radioYear"
-            />
-            <label
-              (click)="setTrafficPeriod('Year', 0)"
-              cButton
-              cFormCheckLabel
-              color="secondary"
-              variant="outline"
-              for="radioYear"
-            >
-              All
-            </label>
-          </c-button-group>
-        </form>
-      </c-col>
-    </c-row>
-    <c-chart
-      [data]="mainChart.data"
-      [height]="300"
-      [ngStyle]="{ 'marginTop.px': 40 }"
-      [options]="mainChart.options"
-      [type]="mainChart.type"
-      (chartRef)="handleChartRef($event)"
-    >
-      Main chart
-    </c-chart>
-  </c-card-body>
-  <c-card-footer>
-    <c-row
-      class="text-center mb-2"
-      [xl]="5"
-      [lg]="4"
-      [sm]="2"
-      [xs]="1"
-      [gutter]="4"
-    >
-    </c-row>
-  </c-card-footer>
-</c-card>
+<app-championship-trend></app-championship-trend>
 
-<c-modal  alignment="center" id="championshipResoult"  size="lg" class="modalAnimation"
-      [visible]="resoultModalVisible==1"   backdrop="static">
+<c-modal
+  alignment="center"
+  id="championshipResoult"
+  size="lg"
+  class="modalAnimation"
+  [visible]="resoultModalVisible == 1"
+  backdrop="static"
+>
   <c-modal-header>
     <h5 cModalTitle>Risultati Stagione</h5>
   </c-modal-header>
   <c-modal-body class="box">
     <c-row>
-      <img  src="./assets/images/championshipResoult/classifica2025.jpg" style="width: 100%; height: auto;">
+      <img
+        src="./assets/images/championshipResoult/classifica2025.jpg"
+        style="width: 100%; height: auto"
+      />
     </c-row>
   </c-modal-body>
   <c-modal-footer>
     <button (click)="toggleResoultModalvisible(0)" cButton color="secondary">
       Chiudi
     </button>
-    <button (click)="toggleResoultModalvisible(2)" cButton color="primary">Risultati Fanta</button>
+    <button (click)="toggleResoultModalvisible(2)" cButton color="primary">
+      Risultati Fanta
+    </button>
   </c-modal-footer>
 </c-modal>
 
-<c-modal id="FantaResoult" alignment="center" class="modalAnimation"
-    [visible]="resoultModalVisible==2" backdrop="static">
+<c-modal
+  id="FantaResoult"
+  alignment="center"
+  class="modalAnimation"
+  [visible]="resoultModalVisible == 2"
+  backdrop="static"
+>
   <c-modal-header>
     <h5 cModalTitle>Risultati Fanta</h5>
   </c-modal-header>
-    <div class="box" class="m-2">
-      <app-leaderboard [maxDisplayable]="8"></app-leaderboard>
-    </div>
+  <div class="box" class="m-2">
+    <app-leaderboard [maxDisplayable]="8"></app-leaderboard>
+  </div>
   <c-modal-footer>
     <button (click)="toggleResoultModalvisible(0)" cButton color="secondary">
       Chiudi

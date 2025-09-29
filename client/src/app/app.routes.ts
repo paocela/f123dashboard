@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { DefaultLayoutComponent } from './layout';
 import { authGuard } from './guard/auth.guard';
+import { adminGuard } from './guard/admin.guard';
 
 export const routes: Routes = [
   {
@@ -35,15 +36,32 @@ export const routes: Routes = [
         path: 'championship',
         loadChildren: () => import('./views/championship/routes').then((m) => m.routes)
       },
-       /* routing fanta */
+      /* routing fanta-dashboard */
+      {
+        path: 'fanta-dashboard',
+        loadChildren: () => import('./views/fanta-dashboard/routes').then((m) => m.routes),
+      },
+      /* routing fanta */
       {
         path: 'fanta',
         loadChildren: () => import('./views/fanta/routes').then((m) => m.routes),
         canActivate: [authGuard]
       },
-      { 
-        path: 'login', 
-        loadChildren: () => import('./views/login/routes').then((m) => m.routes) 
+      /* routing admin */
+      {
+        path: 'admin',
+        loadChildren: () => import('./views/admin/routes').then((m) => m.routes),
+        canActivate: [adminGuard]
+      },
+      /* routing credits */
+      {
+        path: 'credits',
+        loadChildren: () => import('./views/credits/routes').then((m) => m.routes)
+      },
+      /* routing albo d'oro */
+      {
+        path: 'albo-d-oro',
+        loadChildren: () => import('./views/albo-d-oro/routes').then((m) => m.routes)
       }
     ]
   },
