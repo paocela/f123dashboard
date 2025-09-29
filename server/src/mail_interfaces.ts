@@ -128,12 +128,16 @@ export class EmailService {
                         </head>
                         <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
                             <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px 10px 0 0; text-align: center;">
-                                <h1 style="margin: 0; font-size: 24px;">🏎️ Race for Federica 🏎️</h1>
-                                <p style="margin: 10px 0 0 0; font-size: 16px;">Fantasy F1 Championship</p>
+                                <h1 style="margin: 0; font-size: 20px;">
+                                    <img style="height: 20px; vertical-align: middle;" src="https://f123dashboard.app.genez.io/assets/images/logo_raceforfederica.png" alt="Race for Federica Logo">
+                                    Race for Federica
+                                    <img style="height: 20px; vertical-align: middle;" src="https://f123dashboard.app.genez.io/assets/images/logo_raceforfederica.png" alt="Race for Federica Logo">
+                                </h1>
+                                <p style="margin: 10px 0 0 0; font-size: 14px;">Fantasy F1 Championship</p>
                             </div>
                             
                             <div style="background-color: #ffffff; padding: 30px; border: 1px solid #ddd; border-top: none;">
-                                <h2 style="color: #333; margin-top: 0;">Ciao ${user.username}! 👋</h2>
+                                <h2 style="color: #333; margin-top: 0; font-size: 16px">Ciao ${user.username}! 👋</h2>
                                 
                                 <p style="font-size: 16px; margin-bottom: 20px;">
                                     Le seguenti gare stanno per iniziare:
@@ -148,25 +152,25 @@ export class EmailService {
                                               border-radius: 25px; font-weight: bold; font-size: 16px; 
                                               box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
                                               border: none; font-family: Arial, sans-serif;">
-                                        🗳️ VOTA ORA!
+                                        VOTA ORA! 🗳️ 
                                     </a>
                                 </div>
                                 
-                                <p style="margin-bottom: 15px;">
+                                <p style="margin-bottom: 15px; font-size: 16px">
                                     Buona fortuna e che vinca il pilota più veloce! 🏆
                                 </p>
                                 
                                 <div style="text-align: center; margin-top: 30px;">
                                     <div style="background-color: #f8f9fa; padding: 8px; border-radius: 4px; border-top: 2px solid #007bff;">
-                                        <p style="margin: 0; color: #666; font-size: 13px;">
+                                        <p style="margin: 0; color: #666; font-size: 14px;">
                                             <strong style="color: #333;">Team Race for Federica</strong>
                                         </p>
                                     </div>
                                 </div>
                             </div>
                             
-                            <div style="background-color: #f8f9fa; padding: 15px; border-radius: 0 0 10px 10px; text-align: center; font-size: 12px; color: #666;">
-                                <p style="margin: 0;">
+                            <div style="background-color: #f8f9fa; padding: 15px; border-radius: 0 0 10px 10px; text-align: center; font-size: 11px; color: #666;">
+                                <p style="margin: 0;  font-size: 10px">
                                     Questa è una email automatica. Non rispondere a questo messaggio.
                                 </p>
                             </div>
@@ -176,27 +180,27 @@ export class EmailService {
 
                     // Create plain text version
                     const textMessage = `
-Race for Federica - Fantasy F1 Championship
+                        Race for Federica - Fantasy F1 Championship
 
-Ciao ${user.username}!
+                        Ciao ${user.username}!
 
-Le seguenti gare stanno per iniziare:
+                        Le seguenti gare stanno per iniziare:
 
-${upcomingRaces.map(race => {
-    const raceDate = new Date(race.date);
-    const sprintInfo = race.has_sprint === 1 ? " (con Sprint)" : "";
-    const multiplierInfo = race.has_x2 === 1 ? " - PUNTI DOPPI!" : "";
-    return `${race.track_name}, ${race.country}${sprintInfo}${multiplierInfo}\nInizio oggi alle: ${raceDate.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}`;
-}).join('\n\n')}
+                        ${upcomingRaces.map(race => {
+                            const raceDate = new Date(race.date);
+                            const sprintInfo = race.has_sprint === 1 ? " (con Sprint)" : "";
+                            const multiplierInfo = race.has_x2 === 1 ? " - PUNTI DOPPI!" : "";
+                            return `${race.track_name}, ${race.country}${sprintInfo}${multiplierInfo}\nInizio oggi alle: ${raceDate.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}`;
+                        }).join('\n\n')}
 
-Vota la tua squadra su: https://f123dashboard.app.genez.io/#/fanta
+                        Vota la tua squadra su: https://f123dashboard.app.genez.io/#/fanta
 
-Buona fortuna e che vinca il pilota più veloce!
+                        Buona fortuna e che vinca il pilota più veloce!
 
----
-Team Race for Federica
-Questa è una email automatica. Non rispondere a questo messaggio.
-Race for Federica 
+                        ---
+                        Team Race for Federica
+                        Questa è una email automatica. Non rispondere a questo messaggio.
+                        Race for Federica 
                     `;
                     
                     const result = await this.sendGmailEmail(userEmail, subject, htmlMessage, textMessage.trim());
