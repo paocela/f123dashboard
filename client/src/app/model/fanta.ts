@@ -8,8 +8,11 @@ export interface Fanta {
     id_4_place: number,
     id_5_place: number,
     id_6_place: number,
+    id_7_place: number,
+    id_8_place: number,
     id_fast_lap: number,
-    id_dnf: number
+    id_dnf: number,
+    season_id?: number
 }
 
 export interface RaceResult {
@@ -20,6 +23,8 @@ export interface RaceResult {
     id_4_place: number,
     id_5_place: number,
     id_6_place: number,
+    id_7_place: number,
+    id_8_place: number,
     id_fast_lap: number,
     list_dnf: string
 }

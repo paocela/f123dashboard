@@ -194,8 +194,10 @@ The `fanta` table stores fantasy team selections, while the result entry tables 
 - **id**: Primary key (int4, auto-increment)
 - **fanta_player_id**: Reference to `users` (int8, NOT NULL)
 - **race_id**: Reference to a race event (int8, NOT NULL)
-- **1_place_id** to **6_place_id**: Fantasy team positions (drivers, int8, NOT NULL)
+- **1_place_id** to **8_place_id**: Fantasy team positions (drivers, int8, NOT NULL)
 - **fast_lap_id**: Fastest lap (driver id, int8, NOT NULL)
+- **dnf_id**: Driver who did not finish (driver id, int8, NOT NULL)
+- **season_id**: Reference to `seasons` (int4, NOT NULL)
 
 ---
 

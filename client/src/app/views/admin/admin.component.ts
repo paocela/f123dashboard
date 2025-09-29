@@ -18,9 +18,8 @@ import {
   ButtonDirective,
   SpinnerComponent
 } from '@coreui/angular';
-import { cifAe, cifAt, cifAu, cifAz, cifBe, cifBh, cifBr, cifCa, cifCn, cifEs, cifGb, cifHu, cifIt, 
-  cifJp, cifMc, cifMx, cifNl, cifQa, cifSa, cifSg, cifUs, cilFire, cilPowerStandby } from '@coreui/icons';
-  import { IconDirective } from '@coreui/icons-angular';
+import { cilFire, cilPowerStandby } from '@coreui/icons';
+import { IconDirective } from '@coreui/icons-angular';
 
 import { DbDataService } from 'src/app/service/db-data.service';
 import { AuthService } from 'src/app/service/auth.service';
@@ -29,6 +28,7 @@ import { ChampionshipData } from '../../model/championship-data';
 import { Driver } from '../../model/driver';
 import { TrackData } from '../../model/track';
 import { Season } from '../../model/season';
+import { medals, allFlags, posizioni } from '../../model/constants';
 
 @Component({
   selector: 'app-admin',
@@ -76,49 +76,9 @@ export class AdminComponent implements OnInit {
   isSeasonLoading: boolean = false;
   isSubmitting: { [key: number]: boolean } = {};
 
-  public allFlags: {[key: string]: any} = {
-    "Barhain": cifBh,
-    "Arabia Saudita": cifSa,
-    "Australia": cifAu,
-    "Giappone": cifJp,
-    "Cina": cifCn,
-    "USA": cifUs,
-    "Monaco": cifMc,
-    "Canada": cifCa,
-    "Spagna": cifEs,
-    "Austria": cifAt,
-    "UK": cifGb,
-    "Ungheria": cifHu,
-    "Belgio": cifBe,
-    "Olanda": cifNl,
-    "Italia": cifIt,
-    "Azerbaijan": cifAz,
-    "Singapore": cifSg,
-    "Messico": cifMx,
-    "Brasile": cifBr,
-    "Qatar": cifQa,
-    "Emirati Arabi Uniti": cifAe,
-  };
-
-  posizioni = new Map<number, string>([
-    [1, "Primo"],
-    [2, "Secondo"],
-    [3, "Terzo"],
-    [4, "Quarto"],
-    [5, "Quinto"],
-    [6, "Sesto"],
-    [7, "Settimo"],
-    [8, "Ottavo"],
-    [9, "Giro Veloce"],
-    [10, "DNF"]
-  ]);
-
-  medals = new Map<number, string>([
-    [1, "medal_first.svg"],
-    [2, "medal_second.svg"],
-    [3, "medal_third.svg"]
-  ]);
-
+  public allFlags = allFlags;
+  public medals = medals;
+  public posizioni = posizioni;
   public fireIcon: string[] = cilFire;
   public powerIcon: string[] = cilPowerStandby;
 

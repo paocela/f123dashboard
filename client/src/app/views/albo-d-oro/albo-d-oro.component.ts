@@ -4,20 +4,22 @@ import { CardModule, TableModule } from '@coreui/angular';
 // Import CoreUI Card
 import { PodiumCardComponent } from '../../components/podium-card/podium-card.component';
 import { GridModule } from '@coreui/angular';
-import { ChampionshipTrendComponent } from '../../components/championship-trend/championship-trend.component';
 import { DbDataService } from '../../service/db-data.service';
 import { AllDriverData } from '../../model/driver';
 
 @Component({
   selector: 'app-albo-d-oro',
   standalone: true,
-  imports: [CommonModule, PodiumCardComponent, GridModule, ChampionshipTrendComponent,CardModule, TableModule],
+  imports: [CommonModule, PodiumCardComponent, GridModule, CardModule, TableModule],
   templateUrl: './albo-d-oro.component.html',
   styleUrls: ['./albo-d-oro.component.scss']
 })
 export class AlboDOroComponent implements OnInit {
   podio: { posizione: number; nome: string; img: string; colore: string; }[] = [];
   classifica: { posizione: string; nome: string; }[] = [];
+
+  podioFanta: { posizione: number; nome: string; img: string; colore: string; }[] = [];
+  classificaFanta: { posizione: string; nome: string; }[] = [];
 
   constructor(private dbDataService: DbDataService) {}
 
@@ -43,6 +45,21 @@ export class AlboDOroComponent implements OnInit {
       
       // Sort drivers by total_points descending
       const sortedDrivers = drivers.sort((a, b) => +b.total_points - +a.total_points);
+
+      this.podioFanta = [
+          { posizione: 2, nome: "Chichi", img: `/assets/images/avatars_fanta/chichi.jpg`, colore: '#008080' },
+          { posizione: 1, nome: "ProprioGiotto", img: `/assets/images/avatars_fanta/7.png`, colore: '#f699cd ' },
+          { posizione: 3, nome: "Fambler", img: `/assets/images/avatars_fanta/2.png`, colore: '#ff0000ff' }
+        ];
+
+      this.classificaFanta = [
+          { posizione: "#4", nome: "Shika" },
+          { posizione: "#5", nome: "Matte" },
+          { posizione: "#6", nome: "Ali"},
+          { posizione: "#7", nome: "Sara"}
+        ];
+
+
 
       // Podio setup
       if (sortedDrivers.length >= 3) {

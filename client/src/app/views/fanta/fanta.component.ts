@@ -17,11 +17,11 @@ import { AuthService } from './../../service/auth.service';
 import { GridModule } from '@coreui/angular';
 import { DbDataService } from './../../service/db-data.service';
 import { FantaService } from './../../service/fanta.service';
-import { cifAe, cifAt, cifAu, cifAz, cifBe, cifBh, cifBr, cifCa, cifCn, cifEs, cifGb, cifHu, cifIt, 
-    cifJp, cifMc, cifMx, cifNl, cifQa, cifSa, cifSg, cifUs, cilX, cilCheckAlt, cilSwapVertical } from '@coreui/icons';
+import { cilX, cilCheckAlt, cilSwapVertical } from '@coreui/icons';
 import { cilFire, cilPowerStandby } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
 import { Fanta, RaceResult } from '../../model/fanta';
+import { medals, allFlags, posizioni } from '../../model/constants';
 import { LeaderboardComponent } from "../../components/leaderboard/leaderboard.component";
 import {
   ButtonCloseDirective,
@@ -78,51 +78,14 @@ export class FantaComponent {
   previusTracks: any[] = [];
   //voto: number[] = [];
   votazioni: Map<number, number[]> = new Map<number, number[]>();
+  originalVotazioni: Map<number, number[]> = new Map<number, number[]>(); // Store original loaded data
   public modalRankingVisible = false;
 
   public fireIcon: string[] = cilFire;
   public powerIcon: string[] = cilPowerStandby;
-  
-  posizioni = new Map<number, string>([
-    [1, "Primo"],
-    [2, "Secondo"],
-    [3, "Terzo"],
-    [4, "Quarto"],
-    [5, "Quinto"],
-    [6, "Sesto"],
-    [7, "Giro Veloce"],
-    [8, "DNF"]
-  ]);
-
-  medals = new Map<number, string>([
-    [1, "medal_first.svg"],
-    [2, "medal_second.svg"],
-    [3, "medal_third.svg"]
-  ]);
-
-  public allFlags: {[key: string]: any} = {
-    "Barhain": cifBh,
-    "Arabia Saudita": cifSa,
-    "Australia": cifAu,
-    "Giappone": cifJp,
-    "Cina": cifCn,
-    "USA": cifUs,
-    "Monaco": cifMc,
-    "Canada": cifCa,
-    "Spagna": cifEs,
-    "Austria": cifAt,
-    "UK": cifGb,
-    "Ungheria": cifHu,
-    "Belgio": cifBe,
-    "Olanda": cifNl,
-    "Italia": cifIt,
-    "Azerbaijan": cifAz,
-    "Singapore": cifSg,
-    "Messico": cifMx,
-    "Brasile": cifBr,
-    "Qatar": cifQa,
-    "Emirati Arabi Uniti": cifAe,
-  };
+  public posizioni = posizioni;
+  public medals = medals;
+  public allFlags = allFlags;
   
 
   constructor(public authService: AuthService, private dbData: DbDataService, public fantaService: FantaService){}
@@ -151,41 +114,29 @@ export class FantaComponent {
       return itemDate <= today;
     })
 
-    this.previusTracks.forEach( track => {
+    const applyPreviousVote = (track: any) => {
       const previousVote: Fanta | undefined = this.user?.id ? this.fantaService.getFantaVote(this.user.id, track.track_id) : undefined;
-      if ( previousVote )
-      {
-        const previousVoteArray = [
-          this.toNumber(previousVote.id_1_place),
-          this.toNumber(previousVote.id_2_place),
-          this.toNumber(previousVote.id_3_place),
-          this.toNumber(previousVote.id_4_place),
-          this.toNumber(previousVote.id_5_place),
-          this.toNumber(previousVote.id_6_place),
-          this.toNumber(previousVote.id_fast_lap), 
-          this.toNumber(previousVote.id_dnf)
-        ];
-        this.votazioni.set(track.track_id, previousVoteArray);
+      if (previousVote) {
+      const previousVoteArray = [
+        this.toNumber(previousVote.id_1_place),
+        this.toNumber(previousVote.id_2_place),
+        this.toNumber(previousVote.id_3_place),
+        this.toNumber(previousVote.id_4_place),
+        this.toNumber(previousVote.id_5_place),
+        this.toNumber(previousVote.id_6_place),
+        this.toNumber(previousVote.id_7_place),
+        this.toNumber(previousVote.id_8_place),
+        this.toNumber(previousVote.id_fast_lap),
+        this.toNumber(previousVote.id_dnf)
+      ];
+      this.votazioni.set(track.track_id, previousVoteArray);
+      // Store a copy of the original data for comparison
+      this.originalVotazioni.set(track.track_id, [...previousVoteArray]);
       }
-    });
+    };
 
-    this.nextTracks.forEach( track => {
-      const previousVote: Fanta | undefined = this.user?.id ? this.fantaService.getFantaVote(this.user.id, track.track_id) : undefined;
-      if ( previousVote )
-      {
-        const previousVoteArray = [
-          this.toNumber(previousVote.id_1_place),
-          this.toNumber(previousVote.id_2_place),
-          this.toNumber(previousVote.id_3_place),
-          this.toNumber(previousVote.id_4_place),
-          this.toNumber(previousVote.id_5_place),
-          this.toNumber(previousVote.id_6_place),
-          this.toNumber(previousVote.id_fast_lap),
-          this.toNumber(previousVote.id_dnf)
-        ];
-        this.votazioni.set(track.track_id, previousVoteArray);
-      }
-    })
+    this.previusTracks.forEach(applyPreviousVote);
+    this.nextTracks.forEach(applyPreviousVote);
 
   }
 
@@ -199,18 +150,26 @@ export class FantaComponent {
       let fantaVoto: Fanta = {
         fanta_player_id: this.user.id,
         username: this.user.username,
-        id_1_place: this.getVoto(trackId,1),
-        id_2_place: this.getVoto(trackId,2),
-        id_3_place: this.getVoto(trackId,3),
-        id_4_place: this.getVoto(trackId,4),
-        id_5_place: this.getVoto(trackId,5),
-        id_6_place: this.getVoto(trackId,6),
-        id_fast_lap: this.getVoto(trackId, 7),
-        id_dnf: this.getVoto(trackId, 8),
+        id_1_place: this.getVoto(trackId, 1),
+        id_2_place: this.getVoto(trackId, 2),
+        id_3_place: this.getVoto(trackId, 3),
+        id_4_place: this.getVoto(trackId, 4),
+        id_5_place: this.getVoto(trackId, 5),
+        id_6_place: this.getVoto(trackId, 6),
+        id_7_place: this.getVoto(trackId, 7),
+        id_8_place: this.getVoto(trackId, 8),
+        id_fast_lap: this.getVoto(trackId, 9),
+        id_dnf: this.getVoto(trackId, 10),
         track_id: trackId,
       };
+      console.log(JSON.stringify(fantaVoto));
       this.dbData.setFantaVoto(fantaVoto);
       this.formStatus[trackId] = 1;
+      // Update the original votazioni to reflect the saved state
+      const currentVotes = this.votazioni.get(trackId);
+      if (currentVotes) {
+        this.originalVotazioni.set(trackId, [...currentVotes]);
+      }
     } else {
       this.formStatus[trackId] = 2;
     }
@@ -218,7 +177,7 @@ export class FantaComponent {
 
   formIsValid(trackId: number): boolean {
     const votoArray = this.votazioni.get(trackId) || [];
-    const hasDuplicates = votoArray.some((v, i) => i + 1 != 7 && i + 1 != 8 && votoArray.indexOf(v) !== i);
+    const hasDuplicates = votoArray.some((v, i) => i <= 7 && votoArray.indexOf(v) !== i);
     const hasEmptyVotes = votoArray.some((v, i)=> v == 0);
     if(hasDuplicates || hasEmptyVotes || votoArray.length < 7){
       return false;
@@ -250,6 +209,11 @@ export class FantaComponent {
         this.votazioni.set(trackId, votoArray);
       }
       votoArray[index-1] = +valore;
+      
+      // Reset form status when data is changed, so user knows they need to save
+      if (this.formStatus[trackId] === 1) {
+        delete this.formStatus[trackId];
+      }
     }
   }
 
@@ -266,6 +230,8 @@ export class FantaComponent {
       if (result.id_4_place == pilota) return 4;
       if (result.id_5_place == pilota) return 5;
       if (result.id_6_place == pilota) return 6;
+      if (result.id_7_place == pilota) return 7;
+      if (result.id_8_place == pilota) return 8;
     }
     return 0;
   }
@@ -294,19 +260,19 @@ export class FantaComponent {
   
   getPuntiFastLap(trackId: number): number{
     let posizioneArrivo: number = this.getFastLap(trackId);
-    let votazione: number = this.getVoto(trackId, 7); // 7 is giro veloce
+    let votazione: number = this.getVoto(trackId, 9); // 9 is giro veloce
     return votazione == posizioneArrivo && votazione != 0 ? this.fantaService.getCorrectResponsePointFastLap() : 0;  
   }
 
   getPuntiDnf(trackId: number): number {
     let listDnf: string = this.getDnf(trackId);
-    let votazione: number = this.getVoto(trackId, 8); // 8 is dnf
+    let votazione: number = this.getVoto(trackId, 10); // 10 is dnf
     return this.fantaService.isDnfCorrect(listDnf, votazione) && votazione != 0 ? this.fantaService.getCorrectResponsePointDnf() : 0;
   }
 
   getPuntiGp( trackId: number): number{
     let punti: number = 0;
-    for (let i: number = 1; i <= 6; i++) {
+    for (let i: number = 1; i <= 8; i++) {
       punti += this.getPunti(i, trackId);
     }
     punti += this.getPuntiFastLap(trackId);
@@ -378,6 +344,58 @@ export class FantaComponent {
 
   toggleModalRanking() {
     this.modalRankingVisible = !this.modalRankingVisible;
+  }
+
+  hasUnsavedData(trackId: number): boolean {
+    // Get current votes and original votes
+    const currentVotes = this.votazioni.get(trackId) || [];
+    const originalVotes = this.originalVotazioni.get(trackId) || [];
+    
+    // If form status is success (1), no unsaved data
+    if (this.formStatus[trackId] === 1) {
+      return false;
+    }
+    
+    // Check if there are any votes entered
+    const hasVotes = currentVotes.some(vote => vote && vote > 0);
+    
+    // If no votes at all, no unsaved data
+    if (!hasVotes) {
+      return false;
+    }
+    
+    // If there are no original votes but current votes exist, it's unsaved
+    if (originalVotes.length === 0) {
+      return true;
+    }
+    
+    // Compare current votes with original votes
+    if (currentVotes.length !== originalVotes.length) {
+      return true;
+    }
+    
+    // Check if any vote has changed
+    for (let i = 0; i < currentVotes.length; i++) {
+      if (currentVotes[i] !== originalVotes[i]) {
+        return true;
+      }
+    }
+    
+    return false;
+  }
+
+  hasNoData(trackId: number): boolean {
+    // Get current votes
+    const currentVotes = this.votazioni.get(trackId) || [];
+    
+    // If form is already saved, don't show "Votazione Mancante"
+    if (this.formStatus[trackId] === 1) {
+      return false;
+    }
+    
+    // Show "Votazione Mancante" if no votes are entered at all
+    const hasAnyVotes = currentVotes.some(vote => vote && vote > 0);
+    return !hasAnyVotes;
   }
   
   get avatarSrc(): string {

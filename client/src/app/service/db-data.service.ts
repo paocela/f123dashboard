@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { PostgresService, FantaService } from "@genezio-sdk/f123dashboard" 
 import { Fanta, FantaPlayer, RaceResult } from '../model/fanta';
 import { User } from '../model/auth';
@@ -25,7 +26,8 @@ export class DbDataService {
   private championship: ChampionshipData[] = [];
   private cumulative_points: string = "";
   private tracks: string = "";
-  private fantaVote!: Fanta[];
+  private fantaVoteSubject = new BehaviorSubject<Fanta[]>([]);
+  public fantaVote$ = this.fantaVoteSubject.asObservable();
   private raceResult: RaceResult[] = [];
   private users: User[] = [];
   private drivers: Driver[] = [];
@@ -60,7 +62,7 @@ export class DbDataService {
     this.championship = JSON.parse(championship);
     this.cumulative_points = cumulativePoints;
     this.tracks = tracks;
-    this.fantaVote = JSON.parse(fantaVote);
+    this.fantaVoteSubject.next(JSON.parse(fantaVote));
     this.users = JSON.parse(users);
     this.raceResult = JSON.parse(raceResult);
     this.drivers = JSON.parse(drivers);
@@ -86,7 +88,14 @@ export class DbDataService {
   }
 
   getFantaVote(): Fanta[] {
-    return this.fantaVote;
+    return this.fantaVoteSubject.value;
+  }
+
+  /**
+   * Get the fantaVote as an Observable for reactive components
+   */
+  getFantaVoteObservable(): Observable<Fanta[]> {
+    return this.fantaVote$;
   }
 
   getRaceResoult(): RaceResult[] {
@@ -158,17 +167,23 @@ export class DbDataService {
       voto.id_4_place,
       voto.id_5_place,
       voto.id_6_place,
+      voto.id_7_place,
+      voto.id_8_place,
       voto.id_fast_lap,
-      voto.id_dnf
+      voto.id_dnf,
     );
+    
+    // Refresh the fanta votes and notify subscribers
+    const updatedFantaVote = await FantaService.getFantaVote();
+    this.fantaVoteSubject.next(JSON.parse(updatedFantaVote));
   }
 
-  async setFantaPlayer(player: FantaPlayer): Promise<void> {
-    await FantaService.setFantaPlayer(player.username, 
-      player.name, 
-      player.surname, 
-      player.password);
-  }
+  // async setFantaPlayer(player: FantaPlayer): Promise<void> {
+  //   await FantaService.setFantaPlayer(player.username, 
+  //     player.name, 
+  //     player.surname, 
+  //     player.password);
+  // }
 
   async setGpResult(trackId: Number, gpResult: GpResult): Promise<string> {
     try {
@@ -186,11 +201,7 @@ export class DbDataService {
       return result;
     } catch (error) {
       console.error('Error setting GP result:', error);
-      // Return error as JSON string to match backend format
-      return JSON.stringify({
-        success: false,
-        message: `Errore di comunicazione: ${error instanceof Error ? error.message : 'Errore sconosciuto'}`
-      });
+      throw new Error(`Failed to set GP result: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
