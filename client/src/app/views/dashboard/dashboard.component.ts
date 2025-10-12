@@ -78,7 +78,7 @@ export class DashboardComponent implements OnInit {
   public screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 
   public showColumn(): boolean {
-    return this.screenWidth > 1600 || this.screenWidth < 768;
+    return this.screenWidth > 1600;
   }
 
   public championship_standings_users: any[] = [];
