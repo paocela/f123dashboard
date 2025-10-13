@@ -32,7 +32,8 @@ export class FantaService {
         f_table."7_place_id" AS "id_7_place",
         f_table."8_place_id" AS "id_8_place",
         f_table."fast_lap_id" AS "id_fast_lap",
-        f_table."dnf_id" AS "id_dnf"
+        f_table."dnf_id" AS "id_dnf",
+        f_table."team_id" AS "constructor_id"
       FROM users fp_table
       JOIN fanta f_table ON fp_table.id = f_table.fanta_player_id
       CROSS JOIN latest_season ls
@@ -55,11 +56,13 @@ export class FantaService {
     id_8_place: number,
     id_fast_lap: number,
     id_dnf: number,
+    team_id: number,
     seasonId?: number
   ): Promise<string> {
     try {
       // Validate input
-      this.validateFantaVoto(fanta_player_id, track_id, id_1_place, id_2_place, id_3_place, id_4_place, id_5_place, id_6_place, id_7_place, id_8_place, id_fast_lap, id_dnf);
+      this.validateFantaVoto(fanta_player_id, track_id, id_1_place, id_2_place, id_3_place, id_4_place, id_5_place,
+         id_6_place, id_7_place, id_8_place, id_fast_lap, id_dnf, team_id);
 
       // Get the season_id (use provided or get latest)
       let season_id = seasonId;
@@ -72,9 +75,9 @@ export class FantaService {
         INSERT INTO "fanta" (
           "fanta_player_id", "race_id", "1_place_id", "2_place_id", "3_place_id", 
           "4_place_id", "5_place_id", "6_place_id", "7_place_id", "8_place_id", 
-          "fast_lap_id", "dnf_id", "season_id"
+          "fast_lap_id", "dnf_id", "season_id", "team_id"
         ) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
         ON CONFLICT ("fanta_player_id", "race_id", "season_id")
         DO UPDATE SET
           "1_place_id" = EXCLUDED."1_place_id",
@@ -87,7 +90,8 @@ export class FantaService {
           "8_place_id" = EXCLUDED."8_place_id",
           "fast_lap_id" = EXCLUDED."fast_lap_id",
           "dnf_id" = EXCLUDED."dnf_id",
-          "season_id" = EXCLUDED."season_id"
+          "season_id" = EXCLUDED."season_id",
+          "team_id" = EXCLUDED."team_id"
       `;
 
       const values = [
@@ -103,7 +107,8 @@ export class FantaService {
         id_8_place,
         id_fast_lap,
         id_dnf,
-        season_id
+        season_id,
+        team_id
       ];
 
       await this.pool.query(query, values);
@@ -161,20 +166,14 @@ export class FantaService {
     id_7_place: number | null,
     id_8_place: number | null,
     id_fast_lap: number | null,
-    id_dnf: number | null
+    id_dnf: number | null,
+    team_id: number | null
   ): void {
     // Validate required fields
-    if (!fanta_player_id || !track_id) {
-      throw new Error('Fanta player ID and track ID are required');
-    }
-
-    if (!id_fast_lap) {
-      throw new Error('Fast lap driver ID is required');
-    }
-
-    if (!id_dnf) {
-      throw new Error('DNF driver ID is required');
-    }
+    if (!fanta_player_id || !track_id) throw new Error('Fanta player ID and track ID are required');
+    if (!id_fast_lap) throw new Error('Fast lap driver ID is required');
+    if (!id_dnf) throw new Error('DNF driver ID is required');
+    if (!team_id) throw new Error("Team ID is required");
 
     // Validate that all 8 places are different (if provided)
     const places = [id_1_place, id_2_place, id_3_place, id_4_place, id_5_place, id_6_place, id_7_place, id_8_place]

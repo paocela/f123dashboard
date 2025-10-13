@@ -110,14 +110,14 @@ export class PilotiComponent implements OnInit {
   ) {}
 
 
-  async ngOnInit(): Promise<void> {
+  ngOnInit() {
     try {
       this.isLoading = true;
       this.cdr.detectChanges();
       
       //richiesta di dati dal servizio
-      this.piloti = await this.dbData.getAllDrivers();
-      this.constructors = await this.dbData.getConstructors(1);
+      this.piloti = this.dbData.getAllDrivers();
+      this.constructors = this.dbData.getConstructors();
 
       // Calculate points for constructors based on drivers data
       this.calculateConstructorPoints();

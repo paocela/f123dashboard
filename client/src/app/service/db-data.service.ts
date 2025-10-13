@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { PostgresService, FantaService } from "@genezio-sdk/f123dashboard" 
-import { Fanta, FantaPlayer, RaceResult } from '../model/fanta';
+import { Fanta, RaceResult } from '../model/fanta';
 import { User } from '../model/auth';
 import { GpResult } from '../model/championship'
 import { Season } from '../model/season';
 import { ChampionshipData } from '../model/championship-data';
 import { AllDriverData, Driver } from '../model/driver';
 import { TrackData, CumulativePointsData } from '../model/track';
-import { Constructor } from '../model/constructor';
+import { Constructor, ConstructorGrandPrixPoints } from '../model/constructor';
 
 
 
@@ -27,10 +27,12 @@ export class DbDataService {
   private cumulative_points: string = "";
   private tracks: string = "";
   private fantaVoteSubject = new BehaviorSubject<Fanta[]>([]);
-  public fantaVote$ = this.fantaVoteSubject.asObservable();
+  public  fantaVote$ = this.fantaVoteSubject.asObservable();
   private raceResult: RaceResult[] = [];
   private users: User[] = [];
   private drivers: Driver[] = [];
+  private constructorGrandPrixPoints: ConstructorGrandPrixPoints[] = [];
+  private constructors: Constructor[] = [];
 
 
 /****************************************************************/
@@ -46,7 +48,10 @@ export class DbDataService {
       fantaVote,
       users,
       raceResult,
-      drivers
+      constructors,
+      drivers,
+      constructorGrandPrixPoints
+
     ] = await Promise.all([
       PostgresService.getAllDrivers(),
       PostgresService.getChampionship(),
@@ -55,7 +60,9 @@ export class DbDataService {
       FantaService.getFantaVote(),
       PostgresService.getUsers(),
       PostgresService.getRaceResoult(),
-      PostgresService.getDriversData()
+      PostgresService.getConstructors(),
+      PostgresService.getDriversData(),
+      PostgresService.getConstructorGrandPrixPoints()
     ]);
 
     this.allDrivers = allDrivers;
@@ -65,7 +72,9 @@ export class DbDataService {
     this.fantaVoteSubject.next(JSON.parse(fantaVote));
     this.users = JSON.parse(users);
     this.raceResult = JSON.parse(raceResult);
+    this.constructors = JSON.parse(constructors);
     this.drivers = JSON.parse(drivers);
+    this.constructorGrandPrixPoints = JSON.parse(constructorGrandPrixPoints);
   }
 
 /****************************************************************/
@@ -91,9 +100,6 @@ export class DbDataService {
     return this.fantaVoteSubject.value;
   }
 
-  /**
-   * Get the fantaVote as an Observable for reactive components
-   */
   getFantaVoteObservable(): Observable<Fanta[]> {
     return this.fantaVote$;
   }
@@ -109,6 +115,32 @@ export class DbDataService {
     return this.drivers;
   }
 
+  getConstructors(): Constructor[] {
+    return this.constructors;
+  }
+
+  getConstructorGrandPrixPointsData(): ConstructorGrandPrixPoints[] {
+    return this.constructorGrandPrixPoints;
+  }
+
+  getWinningConstructorGrandPrixPointsData(): ConstructorGrandPrixPoints[] {
+    const allConstructorGpPoints = this.constructorGrandPrixPoints
+    
+    // Group by grand_prix_id and find the constructor with the highest points for each race
+    const winningConstructorsByRace = new Map<number, ConstructorGrandPrixPoints>();
+    
+    allConstructorGpPoints.forEach(entry => {
+      const existingWinner = winningConstructorsByRace.get(entry.grand_prix_id);
+      
+      if (!existingWinner || entry.constructor_points > existingWinner.constructor_points) {
+        winningConstructorsByRace.set(entry.grand_prix_id, entry);
+      }
+    });
+    
+    // Convert map to array and sort by date
+    return Array.from(winningConstructorsByRace.values())
+      .sort((a, b) => new Date(a.grand_prix_date).getTime() - new Date(b.grand_prix_date).getTime());
+  }
 /****************************************************************/
 //season-specific data methods
 /****************************************************************/
@@ -148,14 +180,15 @@ export class DbDataService {
     return JSON.parse(seasons);
   }
 
-  async getConstructors(seasonId?: number): Promise<Constructor[]> {
+  async getConstructorsBySeason(seasonId?: number): Promise<Constructor[]> {
     const constructors = await PostgresService.getConstructors(seasonId);
     return JSON.parse(constructors);
   }
 
-/****************************************************************/
-//existing methods
-/****************************************************************/
+  async getConstructorGrandPrixPoints(seasonId?: number): Promise<ConstructorGrandPrixPoints[]> {
+    const constructorGpPoints = await (PostgresService as any).getConstructorGrandPrixPoints(seasonId);
+    return JSON.parse(constructorGpPoints);
+  }
 
   async setFantaVoto(voto: Fanta): Promise<void> {
     await FantaService.setFantaVoto(
@@ -171,6 +204,7 @@ export class DbDataService {
       voto.id_8_place,
       voto.id_fast_lap,
       voto.id_dnf,
+      voto.constructor_id
     );
     
     // Refresh the fanta votes and notify subscribers
@@ -178,12 +212,6 @@ export class DbDataService {
     this.fantaVoteSubject.next(JSON.parse(updatedFantaVote));
   }
 
-  // async setFantaPlayer(player: FantaPlayer): Promise<void> {
-  //   await FantaService.setFantaPlayer(player.username, 
-  //     player.name, 
-  //     player.surname, 
-  //     player.password);
-  // }
 
   async setGpResult(trackId: Number, gpResult: GpResult): Promise<string> {
     try {

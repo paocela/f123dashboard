@@ -45,325 +45,406 @@
     </c-row>
     <c-row>
       <c-accordion>
-        <c-accordion-item
-          #item0="cAccordionItem"
-          [visible]="false"
-          *ngFor="let track of nextTracks"
-        >
-          <strong>{{ track.track_name }}</strong>
-          <ng-template cTemplateId="accordionHeaderTemplate">
-            <button
-              (click)="item0.toggleItem()"
-              [collapsed]="!item0.visible"
-              cAccordionButton
-            >
-              <c-container>
-                <c-row>
-                  <c-col xs="auto" class="me-auto">
-                    <h5 class="card-title mb-0" id="traffic">
-                      <svg
-                        class="mx-1"
-                        size="lg"
-                        [cIcon]="allFlags[track.country]"
-                      ></svg>
-                      <strong>{{ track.name }}</strong>
-                      <svg
-                        class="mx-1"
-                        size="lg"
-                        [cIcon]="allFlags[track.country]"
-                      ></svg>
-                    </h5>
-                  </c-col>
-                  <c-col xs="auto">
-                    <div class="small">
-                        <p style="margin-bottom: 0;" *ngIf="hasNoData(track.track_id)" class="warning">
-                          <c-badge color="warning">Votazione Mancante</c-badge>
-                        </p>
-                        <p style="margin-bottom: 0;" *ngIf="hasUnsavedData(track.track_id)" class="error">
-                          <c-badge color="danger">NON SALVATO!</c-badge>
-                        </p>
-                        <p style="margin-bottom: 0;" *ngIf="formStatus[track.track_id] == 1" class="success">
-                          <c-badge color="success">Salvato</c-badge>
-                        </p>
-                    </div>
-                  </c-col>
-                  <c-col xs="auto">
-                    <div class="small">
-                      {{ track.date | date : "dd/MM/yyyy" }}
-                    </div>
-                  </c-col>
-                </c-row>
-              </c-container>
-            </button>
-          </ng-template>
-          <ng-template cTemplateId="accordionBodyTemplate">
-            <div class="accordion-body">
-              <form #form="ngForm" cForm (ngSubmit)="publishVoto(track.track_id, form)">
-               <c-container>
-                  <c-row
-                    *ngFor="let posizione of posizioni | keyvalue"
-                    class="my-2"
-                    [gutter]="{g: 0, sm: {g: 3}}"
-                  >
-                    <c-col xs="4" sm="auto">
-                      <strong>
-                        @if (posizione.key <= 8) {
-                          {{ posizione?.value }} posto
-                        } @else {
-                          {{posizione?.value}}
-                        }
-                      </strong>
-                      <img
-                        *ngIf="posizione.key <= 3"
-                        class="cIcon"
-                        style="width: 25px"
-                        attr.src="assets/medals/{{ medals.get(posizione.key) }}"
-                      />
-                      <svg *ngIf="posizione.key == 9" [cIcon]="fireIcon" style="color: purple"></svg>
-                      <svg *ngIf="posizione.key == 10" [cIcon]="powerIcon" style="color: red"></svg>
-                    </c-col>
-                    <c-col xs="8" sm="auto" class="ms-auto">
-                      <select
-                        attr.aria-label="seleziona il pilota che arrivera {{
-                          posizione?.value
-                        }}"
-                        attr.id="{{ track.track_id + posizione.key }}"
-                        [ngModel]="getVoto(track.track_id, posizione.key)"
-                        (ngModelChange)="
-                          setVoto(track.track_id, posizione.key, $event, form)
-                        "
-                        name="voto{{ track.track_id + posizione.key }}"
-                        cSelect
-                        cFormControl
-                        required="true"
-                      >
-                        <option value="0">-- Seleziona un pilota --</option>
-                        <option
-                          *ngFor="let pilota of piloti"
-                          attr.value="{{ pilota.driver_id }}"
-                        >
-                          {{ pilota.driver_username }}
-                        </option>
-                      </select>
-                    </c-col>
-                  </c-row>
+        @for (track of nextTracks; track track.track_id) {
+          <c-accordion-item
+            #item0="cAccordionItem"
+            [visible]="false"
+          >
+            <strong>{{ track.track_name }}</strong>
+            <ng-template cTemplateId="accordionHeaderTemplate">
+              <button
+                (click)="item0.toggleItem()"
+                [collapsed]="!item0.visible"
+                cAccordionButton
+              >
+                <c-container>
                   <c-row>
-                    <c-col></c-col>
-                    <c-col class="text-center">
-                      <button cButton type="submit" >Conferma</button>
-    	              </c-col>
-                    <c-col class="text-center">
-                        <p *ngIf="formStatus[track.track_id] == 2" class="error">
-                          <c-badge color="danger">Errore: piloti assenti, invalidi, o inseriti più volte :(</c-badge>
-                        </p>
-                        <p *ngIf="formStatus[track.track_id] == 1" class="success">
-                          <c-badge color="success">Preferenze salvate correttamente :)</c-badge>
-                        </p>
+                    <c-col xs="auto" class="me-auto">
+                      <h5 class="card-title mb-0" id="traffic">
+                        <svg
+                          class="mx-1"
+                          size="lg"
+                          [cIcon]="allFlags[track.country]"
+                        ></svg>
+                        <strong>{{ track.name }}</strong>
+                        <svg
+                          class="mx-1"
+                          size="lg"
+                          [cIcon]="allFlags[track.country]"
+                        ></svg>
+                      </h5>
                     </c-col>
-
+                    <c-col xs="auto">
+                      <div class="small">
+                          @if (hasNoData(track.track_id)) {
+                            <p style="margin-bottom: 0;" class="warning">
+                              <c-badge color="warning">Votazione Mancante</c-badge>
+                            </p>
+                          }
+                          @if (hasUnsavedData(track.track_id)) {
+                            <p style="margin-bottom: 0;" class="error">
+                              <c-badge color="danger">NON SALVATO!</c-badge>
+                            </p>
+                          }
+                          @if (formStatus[track.track_id] == 1) {
+                            <p style="margin-bottom: 0;" class="success">
+                              <c-badge color="success">Salvato</c-badge>
+                            </p>
+                          }
+                      </div>
+                    </c-col>
+                    <c-col xs="auto">
+                      <div class="small">
+                        {{ track.date | date : "dd/MM/yyyy" }}
+                      </div>
+                    </c-col>
                   </c-row>
                 </c-container>
-              </form>
-            </div>
-          </ng-template>
-        </c-accordion-item>
-      </c-accordion>
-    </c-row>
-  </c-container>
-  <c-container *ngIf="previusTracks.length > 0">
-    <c-row>
-      <div class="titolo">
-        <h2 class="mt-4 text-center titolo">Storico Votazioni</h2>
-        <p class="lead text-center">
-          In questa sezione puoi visualizzare i punti guadagnati
-        </p>
-      </div>
-    </c-row>
-
-    <c-row class="storico">
-      <c-accordion>
-        <c-accordion-item
-          #item0="cAccordionItem"
-          [visible]="false"
-          *ngFor="let track of previusTracks"
-        >
-          <strong>{{ track.track_name }}</strong>
-          <ng-template cTemplateId="accordionHeaderTemplate">
-            <button
-              (click)="item0.toggleItem()"
-              [collapsed]="!item0.visible"
-              cAccordionButton
-            >
-              <c-container>
-                <c-row>
-                  <c-col xs="auto" class="me-auto">
-                    <h5 class="card-title mb-0" id="traffic">
-                      <svg
-                        class="mx-1"
-                        size="lg"
-                        [cIcon]="allFlags[track.country]"
-                      ></svg>
-                      <strong>{{ track.name }}</strong>
-                      <svg
-                        class="mx-1"
-                        size="lg"
-                        [cIcon]="allFlags[track.country]"
-                      ></svg>
-                    </h5>
-                  </c-col>
-                  <c-col xs="auto">
-                    <div class="small">
-                      {{ track.date | date : "dd/MM/yyyy" }}
-                    </div>
-                  </c-col>
-                </c-row>
-              </c-container>
-            </button>
-          </ng-template>
-          <ng-template cTemplateId="accordionBodyTemplate">
-            <div class="accordion-body">
-              <c-container>
-                <c-row>
-                  <table
-                    [hover]="true"
-                    [responsive]="true"
-                    [striped]="true"
-                    align="middle"
-                    cTable
-                    class="mb-0 border"
-                  >
-                    <thead class="text-nowrap text-truncate">
-                      <tr>
-                        <th class="bg-body-tertiary text-center">Voto</th>
-                        <th class="bg-body-tertiary text-center">
-                          <svg cIcon name="cilPeople"></svg>
-                        </th>
-                        <th class="bg-body-tertiary">Username</th>
-                        <th class="bg-body-tertiary text-center">
-                          Posizione di arrivo
-                        </th>
-                        <th class="bg-body-tertiary text-center">
-                          Punti fatti
-                        </th>
-                        <th class="bg-body-tertiary text-center">Risultato</th>
-                      </tr>
-                    </thead>
-
-                    <tbody>
-                      <ng-container
-                        *ngFor="
-                          let voto of votazioni.get(track.track_id);
-                          let i = index
-                        "
+              </button>
+            </ng-template>
+            <ng-template cTemplateId="accordionBodyTemplate">
+              <div class="accordion-body">
+                <form #form="ngForm" cForm (ngSubmit)="publishVoto(track.track_id, form)">
+                 <c-container>
+                    @for (posizione of posizioni | keyvalue; track posizione.key) {
+                      <c-row
+                        class="my-2"
+                        [gutter]="{g: 0, sm: {g: 3}}"
                       >
-                        <tr>
-                          <td>
-                            <div class="text-center fw-semibold">
-                              @if (i + 1 <= 8 ){
-                                <div [class]="">{{ i + 1 }}</div>
-                              } @else if ( i + 1 == 9) {
-                                <div [class]="">GV</div>
-                              } @else {
-                                <div [class]="">DNF</div>
-                              }
-                            </div>
-                          </td>
-                          <td class="text-center">
-                            <c-avatar
-                              [size]="'md'"
-                              src="./assets/images/avatars/{{
-                                getPilota(voto)? getPilota(voto).driver_username: 'invalid'
-                              }}.png"
-                            />
-                          </td>
-                          <td>
-                            <div>{{ getPilota(voto)? getPilota(voto).driver_username : '-' }}</div>
-                            <div
-                              class="small text-body-secondary text-nowrap"
-                            ></div>
-                          </td>
-                          <td>
-                            @if (i + 1 <= 8 ) {
-                              <div class="fw-semibold text-center">
-                                {{ getPosizioneArrivo(voto, track.track_id) }}
-                              </div>
-                            } @else if ( i + 1 == 9 ) {
-                              <div class="fw-semibold text-center">
-                                @if (getFastLap(track.track_id) == voto)
-                                {
-                                  SI
-                                } @else {
-                                  NO
-                                }
-                              </div>
+                        <c-col xs="4" sm="auto">
+                          <strong>
+                            @if (posizione.key <= 8) {
+                              {{ posizione?.value }} posto
                             } @else {
-                              <div class="fw-semibold text-center">
-                                @if (fantaService.isDnfCorrect(getDnf(track.track_id), voto))
-                                {
-                                  SI
-                                } @else {
-                                  NO
-                                }
-                              </div>
+                              {{posizione?.value}}
                             }
-                          </td>
-                          <td>
-                            <div class="fw-semibold text-center">
-                              @if (i + 1 <= 8 ) {
-                                {{getPunti(voto, track.track_id)}}
-                              } @else if ( i + 1 == 9 ) {
-                                {{getPuntiFastLap(track.track_id)}}
-                              } @else {
-                                {{getPuntiDnf(track.track_id)}}
+                          </strong>
+                          @if (posizione.key <= 3) {
+                            <img
+                              class="cIcon"
+                              style="width: 25px"
+                              attr.src="assets/medals/{{ medals.get(posizione.key) }}"
+                            />
+                          }
+                          @if (posizione.key == 9) {
+                            <svg [cIcon]="fireIcon" style="color: purple"></svg>
+                          }
+                          @if (posizione.key == 10) {
+                            <svg [cIcon]="powerIcon" style="color: red"></svg>
+                          }
+                          @if (posizione.key == 11) {
+                            <svg [cIcon]="teamIcon" style="color: blue"></svg>
+                          }
+                        </c-col>
+                        <c-col xs="8" sm="auto" class="ms-auto">
+                          @if (posizione.key <= 10) {
+                            <select
+                              attr.aria-label="seleziona il pilota che arrivera {{posizione?.value}}"
+                              attr.id="{{ track.track_id + posizione.key }}"
+                              [ngModel]="getVoto(track.track_id, posizione.key)"
+                              (ngModelChange)="setVoto(track.track_id, posizione.key, $event, form)"
+                              name="voto{{ track.track_id + posizione.key }}"
+                              cSelect
+                              cFormControl
+                              required="true"
+                            >
+                              <option value="0">-- Seleziona un pilota --</option>
+                              @for (pilota of piloti; track pilota.driver_id) {
+                                <option attr.value="{{ pilota.driver_id }}">
+                                  {{ pilota.driver_username }}
+                                </option>
                               }
-                            </div>
-                          </td>
-                          <td>
-                            <div class="text-center">
-                              @if (i + 1 <= 8 ) {
-                                <svg
-                                  [cIcon]="isCorrect(voto, track.track_id).icon"
-                                  size="lg"
-                                  [ngStyle]="{
-                                    color: isCorrect(voto, track.track_id).color
-                                  }"
-                                ></svg>
-                              } @else if ( i + 1 == 9 ) {
-                                <svg
-                                [cIcon]="isCorrectFastLap(track.track_id).icon"
-                                size="lg"
-                                [ngStyle]="{
-                                  color: isCorrectFastLap(track.track_id).color
-                                }"
-                              ></svg>
-                              } @else {
-                                <svg
-                                [cIcon]="isCorrectDnf(track.track_id).icon"
-                                size="lg"
-                                [ngStyle]="{
-                                  color: isCorrectDnf(track.track_id).color
-                                }"
-                              ></svg>
+                            </select>
+                          } @else {
+                            <select
+                              aria-label="seleziona il team vincente"
+                              attr.id="{{ track.track_id + posizione.key }}"
+                              [ngModel]="getVoto(track.track_id, posizione.key)"
+                              (ngModelChange)="setVoto(track.track_id, posizione.key, $event, form)"
+                              name="voto{{ track.track_id + posizione.key }}"
+                              cSelect
+                              cFormControl
+                              required="true"
+                            >
+                              <option value="0">-- Seleziona un team --</option>
+                              @for (constructor of constructors | keyvalue; track constructor.key) {
+                                <option attr.value="{{ constructor.key }}">
+                                  {{ constructor.value }}
+                                </option>
                               }
-                            </div>
-                          </td>
-                        </tr>
-                      </ng-container>
-                    </tbody>
-                  </table>
-                </c-row>
-                <c-row class="m-3">
-                  <h4 class="text-center text-success">
-                    Totale Punti: {{ getPuntiGp(track.track_id) }}
-                  </h4>
-                </c-row>
-              </c-container>
-            </div>
-          </ng-template>
-        </c-accordion-item>
+                            </select>
+                          }
+                        </c-col>
+                      </c-row>
+                    }
+                    <c-row>
+                      <c-col></c-col>
+                      <c-col class="text-center">
+                        <button cButton type="submit" >Conferma</button>
+      	              </c-col>
+                      <c-col class="text-center">
+                          @if (formStatus[track.track_id] == 2) {
+                            <p class="error">
+                              <c-badge color="danger">Errore: piloti assenti, invalidi, o inseriti più volte :(</c-badge>
+                            </p>
+                          }
+                          @if (formStatus[track.track_id] == 3) {
+                            <p class="error">
+                              <c-badge color="danger">Errore nel salvataggio: contattare l'assistenza :(</c-badge>
+                            </p>
+                          }
+                          @if (formStatus[track.track_id] == 1) {
+                            <p class="success">
+                              <c-badge color="success">Preferenze salvate correttamente :)</c-badge>
+                            </p>
+                          }
+                      </c-col>
+
+                    </c-row>
+                  </c-container>
+                </form>
+              </div>
+            </ng-template>
+          </c-accordion-item>
+        }
       </c-accordion>
     </c-row>
   </c-container>
+  @if (previusTracks.length > 0) {
+    <c-container>
+      <c-row>
+        <div class="titolo">
+          <h2 class="mt-4 text-center titolo">Storico Votazioni</h2>
+          <p class="lead text-center">
+            In questa sezione puoi visualizzare i punti guadagnati
+          </p>
+        </div>
+      </c-row>
+
+      <c-row class="storico">
+        <c-accordion>
+          @for (track of previusTracks; track track.track_id) {
+            <c-accordion-item
+              #item0="cAccordionItem"
+              [visible]="false"
+            >
+              <strong>{{ track.track_name }}</strong>
+              <ng-template cTemplateId="accordionHeaderTemplate">
+                <button
+                  (click)="votazioni.has(track.track_id) ? item0.toggleItem() : null"
+                  [collapsed]="!item0.visible"
+                  cAccordionButton
+                >
+                  <c-container>
+                    <c-row>
+                      <c-col xs="auto" class="me-auto">
+                        <h5 class="card-title mb-0" id="traffic">
+                          <svg
+                            class="mx-1"
+                            size="lg"
+                            [cIcon]="allFlags[track.country]"
+                          ></svg>
+                          <strong>{{ track.name }}</strong>
+                          <svg
+                            class="mx-1"
+                            size="lg"
+                            [cIcon]="allFlags[track.country]"
+                          ></svg>
+                        </h5>
+                      </c-col>
+                      @if(!votazioni.has(track.track_id)){
+                        <c-col xs="auto">
+                          <div class="small">
+                            <c-badge color="danger">Votazione non effettuata</c-badge>
+                          </div>
+                        </c-col>
+                      }
+                      <c-col xs="auto">
+                        <div class="small">
+                          {{ track.date | date : "dd/MM/yyyy" }}
+                        </div>
+                      </c-col>
+                    </c-row>
+                  </c-container>
+                </button>
+              </ng-template>
+              @if (votazioni.has(track.track_id)) {
+                <ng-template cTemplateId="accordionBodyTemplate">
+                  <div class="accordion-body">
+                    <c-container>
+                      <c-row>
+                        <table
+                          [hover]="true"
+                          [responsive]="true"
+                          [striped]="true"
+                          align="middle"
+                          cTable
+                          class="mb-0 border"
+                        >
+                          <thead class="text-nowrap text-truncate">
+                            <tr>
+                              <th class="bg-body-tertiary text-center">Voto</th>
+                              <th class="bg-body-tertiary text-center">
+                                <svg cIcon name="cilPeople"></svg>
+                              </th>
+                              <th class="bg-body-tertiary">Username</th>
+                              <th class="bg-body-tertiary text-center">
+                                Posizione di arrivo
+                              </th>
+                              <th class="bg-body-tertiary text-center">
+                                Punti fatti
+                              </th>
+                              <th class="bg-body-tertiary text-center">Risultato</th>
+                            </tr>
+                          </thead>
+
+                          <tbody>
+                            @for (voto of votazioni.get(track.track_id); track i; let i = $index) {
+                              <tr>
+                                <td>
+                                  <div class="text-center fw-semibold">
+                                    @if (i + 1 <= 8 ){
+                                      <div [class]="">{{ i + 1 }}</div>
+                                    } @else if ( i + 1 == 9) {
+                                      <div [class]="">GV</div>
+                                    } @else if ( i + 1 == 10) {
+                                      <div [class]="">DNF</div>
+                                    } @else {
+                                      <div [class]="">TEAM</div>
+                                    }
+                                  </div>
+                                </td>
+                                <td class="text-center">
+                                  @if (i + 1 <= 10) {
+                                    <c-avatar
+                                      [size]="'md'"
+                                      src="./assets/images/avatars/{{
+                                        getPilota(voto)? getPilota(voto).driver_username: 'invalid'
+                                      }}.png"
+                                    />
+                                  } @else {
+                                  <c-avatar
+                                      [size]="'md'"
+                                      src="./assets/images/constructors/{{
+                                      getConstructor(voto)
+                                      }}.png"
+                                    />
+                                  }
+                                </td>
+                                <td>
+                                  @if (i + 1 <= 10) {
+                                    <div>{{ getPilota(voto)? getPilota(voto).driver_username : '-' }}</div>
+                                  } @else {
+                                    <div>{{ getConstructor(voto) || '-' }}</div>
+                                  }
+                                  <div
+                                    class="small text-body-secondary text-nowrap"
+                                  ></div>
+                                </td>
+                                <td>
+                                  @if (i + 1 <= 8 ) {
+                                    <div class="fw-semibold text-center">
+                                      {{ getPosizioneArrivo(voto, track.track_id) }}
+                                    </div>
+                                  } @else if ( i + 1 == 9 ) {
+                                    <div class="fw-semibold text-center">
+                                      @if (getFastLap(track.track_id) == voto)
+                                      {
+                                        SI
+                                      } @else {
+                                        NO
+                                      }
+                                    </div>
+                                  } @else if ( i + 1 == 10 ) {
+                                    <div class="fw-semibold text-center">
+                                      @if (fantaService.isDnfCorrect(getDnf(track.track_id), voto))
+                                      {
+                                        SI
+                                      } @else {
+                                        NO
+                                      }
+                                    </div>
+                                  } @else {
+                                    <div class="fw-semibold text-center">
+                                      @if (fantaService.getWinningConstructorForTrack(track.track_id) == voto)
+                                      {
+                                        SI
+                                      } @else {
+                                        NO
+                                      }
+                                    </div>
+                                  }
+                                </td>
+                                <td>
+                                  <div class="fw-semibold text-center">
+                                    @if (i + 1 <= 8 ) {
+                                      {{getPunti(voto, track.track_id)}}
+                                    } @else if ( i + 1 == 9 ) {
+                                      {{getPuntiFastLap(track.track_id)}}
+                                    } @else if ( i + 1 == 10 ) {
+                                      {{getPuntiDnf(track.track_id)}}
+                                    } @else {
+                                      {{getPuntiConstructor(track.track_id)}}
+                                    }
+                                  </div>
+                                </td>
+                                <td>
+                                  <div class="text-center">
+                                    @if (i + 1 <= 8 ) {
+                                      <svg
+                                        [cIcon]="isCorrect(voto, track.track_id).icon"
+                                        size="lg"
+                                        [ngStyle]="{
+                                          color: isCorrect(voto, track.track_id).color
+                                        }"
+                                      ></svg>
+                                    } @else if ( i + 1 == 9 ) {
+                                      <svg
+                                      [cIcon]="isCorrectFastLap(track.track_id).icon"
+                                      size="lg"
+                                      [ngStyle]="{
+                                        color: isCorrectFastLap(track.track_id).color
+                                      }"
+                                    ></svg>
+                                    } @else if ( i + 1 == 10 ) {
+                                      <svg
+                                      [cIcon]="isCorrectDnf(track.track_id).icon"
+                                      size="lg"
+                                      [ngStyle]="{
+                                        color: isCorrectDnf(track.track_id).color
+                                      }"
+                                    ></svg>
+                                    } @else {
+                                      <svg
+                                      [cIcon]="isCorrectConstructor(track.track_id).icon"
+                                      size="lg"
+                                      [ngStyle]="{
+                                        color: isCorrectConstructor(track.track_id).color
+                                      }"
+                                    ></svg>
+                                    }
+                                  </div>
+                                </td>
+                              </tr>
+                            }
+                          </tbody>
+                        </table>
+                      </c-row>
+                      <c-row class="m-3">
+                        <h4 class="text-center text-success">
+                          Totale Punti: {{ getPuntiGp(track.track_id) }}
+                        </h4>
+                      </c-row>
+                    </c-container>
+                  </div>
+                </ng-template>
+              }
+            </c-accordion-item>
+          }
+        </c-accordion>
+      </c-row>
+    </c-container>
+  }
 </div>
 <c-modal id="liveDemoModal" [visible]="modalRankingVisible">
   <c-modal-header>

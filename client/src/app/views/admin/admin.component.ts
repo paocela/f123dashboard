@@ -78,7 +78,7 @@ export class AdminComponent implements OnInit {
 
   public allFlags = allFlags;
   public medals = medals;
-  public posizioni = posizioni;
+  public posizioni = new Map([...posizioni].filter(([key]) => key !== 11));
   public fireIcon: string[] = cilFire;
   public powerIcon: string[] = cilPowerStandby;
 

@@ -124,13 +124,13 @@ export class DashboardComponent implements OnInit {
   public isLive$ = new BehaviorSubject<boolean>(false);
   public streamTitle$ = new BehaviorSubject<string>('');
 
-  async ngOnInit(): Promise<void> {
+  ngOnInit(){
     //richiesta dati al db
     this.isLive = this.twitchApiService.isLive();
-    this.championship_standings_users = this.dbData.getAllDrivers() ;
-    const championshipTrend = this.dbData.getCumulativePoints() ;
+    this.championship_standings_users = this.dbData.getAllDrivers();
+    const championshipTrend = this.dbData.getCumulativePoints();
     this.championshipTracks = this.dbData.getAllTracks();
-    this.constructors = await this.dbData.getConstructors(1);
+    this.constructors =  this.dbData.getConstructors();
 
     // filter next championship track
     var i = 0;

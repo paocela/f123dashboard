@@ -346,13 +346,16 @@ ORDER BY date ASC
             LIMIT 1
         )
         SELECT
-          gp.id AS track_id,
+          gp.id AS id,
+          gp.track_id AS track_id,
           MAX(CASE WHEN rre.position = 1 THEN rre.pilot_id END) AS id_1_place,
           MAX(CASE WHEN rre.position = 2 THEN rre.pilot_id END) AS id_2_place,
           MAX(CASE WHEN rre.position = 3 THEN rre.pilot_id END) AS id_3_place,
           MAX(CASE WHEN rre.position = 4 THEN rre.pilot_id END) AS id_4_place,
           MAX(CASE WHEN rre.position = 5 THEN rre.pilot_id END) AS id_5_place,
           MAX(CASE WHEN rre.position = 6 THEN rre.pilot_id END) AS id_6_place,
+          MAX(CASE WHEN rre.position = 7 THEN rre.pilot_id END) AS id_7_place,
+          MAX(CASE WHEN rre.position = 8 THEN rre.pilot_id END) AS id_8_place,
           MAX(CASE WHEN rre.fast_lap THEN rre.pilot_id END) AS id_fast_lap,
           ARRAY_AGG(rre.pilot_id) FILTER (WHERE rre.position = 0) AS list_dnf
         FROM gran_prix gp
@@ -366,12 +369,15 @@ ORDER BY date ASC
 
         SELECT
           gp.id AS track_id,
+          gp.track_id AS track_id,
           MAX(CASE WHEN frre.position = 1 THEN frre.pilot_id END) AS id_1_place,
           MAX(CASE WHEN frre.position = 2 THEN frre.pilot_id END) AS id_2_place,
           MAX(CASE WHEN frre.position = 3 THEN frre.pilot_id END) AS id_3_place,
           MAX(CASE WHEN frre.position = 4 THEN frre.pilot_id END) AS id_4_place,
           MAX(CASE WHEN frre.position = 5 THEN frre.pilot_id END) AS id_5_place,
           MAX(CASE WHEN frre.position = 6 THEN frre.pilot_id END) AS id_6_place,
+          MAX(CASE WHEN frre.position = 7 then frre.pilot_id END) AS id_7_place,
+          MAX(CASE WHEN frre.position = 8 THEN frre.pilot_id END) AS id_8_place,
           MAX(CASE WHEN frre.fast_lap THEN frre.pilot_id END) AS id_fast_lap,
           ARRAY_AGG(frre.pilot_id) FILTER (WHERE frre.position = 0) AS list_dnf
         FROM gran_prix gp
@@ -411,6 +417,34 @@ ORDER BY date ASC
         constructor_tot_points
       FROM season_constructor_leaderboard
       `);
+    return JSON.stringify(result.rows);
+  }
+
+  /* Constructor Grand Prix Points */
+  async getConstructorGrandPrixPoints(seasonId?: number): Promise<string> {
+    const result = await this.pool.query(`
+      WITH latest_season AS (
+        SELECT id FROM seasons ORDER BY start_date DESC LIMIT 1
+      )
+      SELECT
+        constructor_id,
+        constructor_name,
+        grand_prix_id,
+        grand_prix_date,
+        track_name,
+        track_id,
+        season_id,
+        season_description,
+        driver_id_1,
+        driver_id_2,
+        driver_1_points,
+        driver_2_points,
+        constructor_points
+      FROM constructor_grand_prix_points cgp
+      CROSS JOIN latest_season ls
+      WHERE cgp.season_id = COALESCE($1, ls.id)
+      ORDER BY cgp.grand_prix_date DESC, cgp.constructor_points DESC;
+    `, [seasonId]);
     return JSON.stringify(result.rows);
   }
 
