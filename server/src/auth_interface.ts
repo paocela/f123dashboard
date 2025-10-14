@@ -1,10 +1,81 @@
-import { GenezioDeploy, GenezioMethod  } from "@genezio/types";
-import { GenezioHttpResponse, GenezioHttpRequest } from "@genezio/types";
+import { GenezioDeploy, GenezioMethod, GenezioHttpRequest, GenezioHttpResponse } from "@genezio/types";
 import pg from "pg";
 import { createHash, randomBytes } from "crypto";
 import jwt from "jsonwebtoken";
 const { Pool } = pg;
 
+type User = {
+  id: number;
+  username: string;
+  name: string;
+  surname: string;
+  mail?: string;
+  image?: string;
+  isAdmin?: boolean;
+}
+
+type LoginRequest = {
+  username: string;
+  password: string;
+  userAgent?: string;
+}
+
+type AuthResponse = {
+  success: boolean;
+  message: string;
+  user?: User;
+  token?: string;
+}
+
+type ChangePasswordRequest = {
+  currentPassword: string;
+  newPassword: string;
+  jwtToken: string;
+}
+
+type ChangePasswordResponse = {
+  success: boolean;
+  message: string;
+}
+
+type UserSession = {
+  sessionToken: string;
+  createdAt: string;
+  lastActivity: string;
+  expiresAt: string;
+  isActive: boolean;
+  isCurrent: boolean;
+}
+
+type SessionsResponse = {
+  success: boolean;
+  message?: string;
+  sessions?: UserSession[];
+}
+
+
+
+type TokenValidationResponse = {
+  valid: boolean;
+  userId?: number;
+  username?: string;
+  name?: string;
+  surname?: string;
+  mail?: string;
+  image?: string;
+  isAdmin?: boolean;
+}
+
+type RefreshTokenResponse = {
+  success: boolean;
+  token?: string;
+  message: string;
+}
+
+type LogoutResponse = {
+  success: boolean;
+  message: string;
+}
 @GenezioDeploy()
 export class AuthService {
   private pool: pg.Pool;
@@ -23,217 +94,71 @@ export class AuthService {
     this.jwtSecret = process.env.JWT_SECRET;
   }
 
-  private hashPassword(password: string): string {
-    return createHash('sha256').update(password).digest('hex');
+  async getUsers(): Promise<User[]> {
+    const result = await this.pool.query (`
+  SELECT id, username, name, surname, password, mail, encode(image, 'escape') as image
+  FROM users;
+    `);
+      return result.rows as User[];
   }
 
-  private comparePassword(password: string, hashedPassword: string): boolean {
-    return this.hashPassword(password) === hashedPassword;
-  }
-
-  private sanitizeUserAgent(userAgent?: string): string | undefined {
-    if (!userAgent) return undefined;
-    
-    // Limit user agent length to prevent database issues
-    const maxLength = 500;
-    return userAgent.length > maxLength ? userAgent.substring(0, maxLength) : userAgent;
-  }
-
-  private generateSessionToken(): string {
-    return randomBytes(32).toString('hex');
-  }
-
-  private generateJWTToken(userId: number, username: string): string {
-    return jwt.sign(
-      { 
-        userId: userId, 
-        username: username 
-      },
-      this.jwtSecret,
-      { expiresIn: AuthService.TOKEN_EXPIRY_JWT }
-    );
-  }
-
-  private async createSession(userId: number, userAgent?: string): Promise<string> {
-    const sessionToken = this.generateSessionToken();
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + AuthService.TOKEN_EXPIRY_DAYS); // 7 days from now
-
-    // Generate JWT token
-    const user = await this.pool.query(
-      'SELECT username FROM users WHERE id = $1',
-      [userId]
-    );
-    
-    const jwtToken = this.generateJWTToken(userId, user.rows[0].username);
-
-    // Sanitize user agent for database storage
-    const sanitizedUserAgent = this.sanitizeUserAgent(userAgent);
-
-    await this.pool.query(
-      `INSERT INTO user_sessions (user_id, session_token, expires_at, ip_address, user_agent) 
-       VALUES ($1, $2, $3, $4, $5)`,
-      [userId, sessionToken, expiresAt, null, sanitizedUserAgent || null]
-    );
-
-    return jwtToken;
-  }
-
-  private async validateSession(jwtToken: string): Promise<{ valid: boolean; userId?: number; username?: string; name?: string; surname?: string; mail?: string; image?: string; isAdmin?: boolean }> {
-    try {
-      // Verify JWT token
-      const decoded = jwt.verify(jwtToken, this.jwtSecret) as any;
-      
-      // Check if user still exists and is active
-      const result = await this.pool.query(
-        'SELECT id, username, is_active, name, surname, mail, encode(image, \'escape\') as image, is_admin FROM users WHERE id = $1',
-        [decoded.userId]
-      );
-
-      if (result.rows.length === 0) {
-        return { valid: false };
-      }
-
-      const user = result.rows[0];
-
-      // Check if user account is active
-      if (!user.is_active) {
-        return { valid: false };
-      }
-
-      // Check if there's an active session for this user
-      const sessionResult = await this.pool.query(
-        `SELECT session_token, expires_at, is_active 
-         FROM user_sessions 
-         WHERE user_id = $1 AND is_active = TRUE 
-         ORDER BY last_activity DESC 
-         LIMIT 1`,
-        [decoded.userId]
-      );
-
-      if (sessionResult.rows.length === 0) {
-        return { valid: false };
-      }
-
-      const session = sessionResult.rows[0];
-
-      // Check if session is expired
-      if (new Date() > new Date(session.expires_at)) {
-        // Clean up expired session
-        await this.pool.query(
-          'UPDATE user_sessions SET is_active = FALSE WHERE user_id = $1',
-          [decoded.userId]
-        );
-        return { valid: false };
-      }
-
-      // Update last activity for the most recent session
-      await this.pool.query(
-        'UPDATE user_sessions SET last_activity = NOW() WHERE session_token = $1',
-        [session.session_token]
-      );
-
-      return {
-        valid: true,
-        userId: user.id,
-        username: user.username,
-        name: user.name,
-        surname: user.surname,
-        mail: user.mail,
-        image: user.image,
-        isAdmin: user.is_admin
-      };
-
-    } catch (error) {
-      console.error('Token validation error:', error);
-      return { valid: false };
-    }
-  }
-
-  private async invalidateSession(jwtToken: string): Promise<void> {
-    try {
-      // Decode JWT to get user ID
-      const decoded = jwt.verify(jwtToken, this.jwtSecret) as any;
-      
-      // Invalidate all sessions for this user
-      await this.pool.query(
-        'UPDATE user_sessions SET is_active = FALSE WHERE user_id = $1',
-        [decoded.userId]
-      );
-    } catch (error) {
-      console.error('Error invalidating session:', error);
-    }
-  }
-
-  private async cleanExpiredSessions(): Promise<void> {
-    // Mark expired sessions as inactive
-    await this.pool.query(
-      'UPDATE user_sessions SET is_active = FALSE WHERE expires_at < NOW() AND is_active = TRUE'
-    );
-    
-    // Delete very old sessions (older than 30 days) to prevent database bloat
-    await this.pool.query(
-      'DELETE FROM user_sessions WHERE created_at < NOW() - INTERVAL \'30 days\''
-    );
-  }
-
-  async cleanupExpiredSessions(): Promise<string> {
+  async cleanupExpiredSessions(): Promise<LogoutResponse> {
     try {
       await this.cleanExpiredSessions();
       
-      return JSON.stringify({
+      return {
         success: true,
         message: 'Expired sessions cleaned up successfully'
-      });
+      };
 
     } catch (error) {
       console.error('Cleanup expired sessions error:', error);
-      return JSON.stringify({
+      return {
         success: false,
         message: 'An error occurred while cleaning up expired sessions'
-      });
+      };
     }
   }
 
-  async login(username: string, password: string, userAgent?: string): Promise<string> {
+  async login(loginData: LoginRequest): Promise<AuthResponse> {
     try {
-      this.validateLoginInput(username, password);
+      this.validateLoginInput(loginData.username, loginData.password);
 
       // Get user from database
       const result = await this.pool.query(
         'SELECT id, username, name, surname, password, mail, encode(image, \'escape\') as image, is_active, is_admin FROM users WHERE username = $1',
-        [username]
+        [loginData.username]
       );
 
       if (result.rows.length === 0) {
-        return JSON.stringify({
+        return {
           success: false,
           message: 'Invalid username or password'
-        });
+        };
       }
 
       const user = result.rows[0];
 
       // Check if user account is active
       if (!user.is_active) {
-        return JSON.stringify({
+        return {
           success: false,
           message: 'Account is disabled'
-        });
+        };
       }
       
       // Verify password
-      const isPasswordValid = this.comparePassword(password, user.password);
+      const isPasswordValid = this.comparePassword(loginData.password, user.password);
       
       if (!isPasswordValid) {
-        return JSON.stringify({
+        return {
           success: false,
           message: 'Invalid username or password'
-        });
+        };
       }
 
       // Create session and get JWT token
-      const jwtToken = await this.createSession(user.id, userAgent);
+      const jwtToken = await this.createSession(user.id, loginData.userAgent);
 
       // Update last login
       await this.pool.query(
@@ -241,7 +166,7 @@ export class AuthService {
         [user.id]
       );
 
-      return JSON.stringify({
+      return {
         success: true,
         message: 'Login successful',
         user: {
@@ -254,14 +179,14 @@ export class AuthService {
           isAdmin: user.is_admin
         },
         token: jwtToken
-      });
+      };
 
     } catch (error) {
       console.error('Login error:', error);
-      return JSON.stringify({
+      return {
         success: false,
         message: 'An error occurred during login'
-      });
+      };
     }
   }
 
@@ -372,15 +297,15 @@ export class AuthService {
     }
   }
 
-  async validateToken(jwtToken: string): Promise<string> {
+  async validateToken(jwtToken: string): Promise<TokenValidationResponse> {
     try {
       const sessionData = await this.validateSession(jwtToken);
       
       if (!sessionData.valid) {
-        return JSON.stringify({ valid: false });
+        return { valid: false };
       }
 
-      return JSON.stringify({
+      return {
         valid: true,
         userId: sessionData.userId,
         username: sessionData.username,
@@ -389,26 +314,26 @@ export class AuthService {
         mail: sessionData.mail,
         image: sessionData.image,
         isAdmin: sessionData.isAdmin
-      });
+      };
 
     } catch (error) {
       console.error('Token validation error:', error);
-      return JSON.stringify({ valid: false });
+      return { valid: false };
     }
   }
 
-  async changePassword(jwtToken: string, currentPassword: string, newPassword: string): Promise<string> {
+  async changePassword(changeData: ChangePasswordRequest): Promise<ChangePasswordResponse> {
     try {
-      this.validateChangePasswordInput(currentPassword, newPassword);
+      this.validateChangePasswordInput(changeData.currentPassword, changeData.newPassword);
 
       // Validate JWT token
-      const sessionData = await this.validateSession(jwtToken);
+      const sessionData = await this.validateSession(changeData.jwtToken);
       
       if (!sessionData.valid) {
-        return JSON.stringify({
+        return {
           success: false,
           message: 'Invalid session'
-        });
+        };
       }
 
       // Get current user
@@ -418,27 +343,27 @@ export class AuthService {
       );
 
       if (result.rows.length === 0) {
-        return JSON.stringify({
+        return {
           success: false,
           message: 'User not found'
-        });
+        };
       }
 
       // Verify current password
       const isCurrentPasswordValid = this.comparePassword(
-        currentPassword, 
+        changeData.currentPassword, 
         result.rows[0].password
       );
 
       if (!isCurrentPasswordValid) {
-        return JSON.stringify({
+        return {
           success: false,
           message: 'Current password is incorrect'
-        });
+        };
       }
 
       // Hash new password
-      const hashedNewPassword = this.hashPassword(newPassword);
+      const hashedNewPassword = this.hashPassword(changeData.newPassword);
 
       // Update password
       await this.pool.query(
@@ -452,29 +377,29 @@ export class AuthService {
         [sessionData.userId]
       );
 
-      return JSON.stringify({
+      return {
         success: true,
         message: 'Password changed successfully'
-      });
+      };
 
     } catch (error) {
       console.error('Change password error:', error);
-      return JSON.stringify({
+      return {
         success: false,
         message: 'An error occurred while changing password'
-      });
+      };
     }
   }
 
-  async refreshToken(oldJwtToken: string, userAgent?: string): Promise<string> {
+  async refreshToken(oldJwtToken: string, userAgent?: string): Promise<RefreshTokenResponse> {
     try {
       const sessionData = await this.validateSession(oldJwtToken);
       
       if (!sessionData.valid) {
-        return JSON.stringify({
+        return {
           success: false,
           message: 'Invalid session'
-        });
+        };
       }
 
       // Generate new JWT token
@@ -486,48 +411,48 @@ export class AuthService {
         [sessionData.userId]
       );
 
-      return JSON.stringify({
+      return {
         success: true,
         token: newJwtToken,
         message: 'Token refreshed successfully'
-      });
+      };
 
     } catch (error) {
       console.error('Refresh token error:', error);
-      return JSON.stringify({
+      return {
         success: false,
         message: 'An error occurred while refreshing token'
-      });
+      };
     }
   }
 
-  async logout(jwtToken: string): Promise<string> {
+  async logout(jwtToken: string): Promise<LogoutResponse> {
     try {
       await this.invalidateSession(jwtToken);
       
-      return JSON.stringify({
+      return {
         success: true,
         message: 'Logged out successfully'
-      });
+      };
 
     } catch (error) {
       console.error('Logout error:', error);
-      return JSON.stringify({
+      return {
         success: false,
         message: 'An error occurred during logout'
-      });
+      };
     }
   }
 
-  async logoutAllSessions(jwtToken: string): Promise<string> {
+  async logoutAllSessions(jwtToken: string): Promise<LogoutResponse> {
     try {
       const sessionData = await this.validateSession(jwtToken);
       
       if (!sessionData.valid) {
-        return JSON.stringify({
+        return {
           success: false,
           message: 'Invalid session'
-        });
+        };
       }
 
       // Invalidate all sessions for this user
@@ -536,29 +461,29 @@ export class AuthService {
         [sessionData.userId]
       );
 
-      return JSON.stringify({
+      return {
         success: true,
         message: 'All sessions logged out successfully'
-      });
+      };
 
     } catch (error) {
       console.error('Logout all sessions error:', error);
-      return JSON.stringify({
+      return {
         success: false,
         message: 'An error occurred while logging out all sessions'
-      });
+      };
     }
   }
 
-  async getUserSessions(jwtToken: string): Promise<string> {
+  async getUserSessions(jwtToken: string): Promise<SessionsResponse> {
     try {
       const sessionData = await this.validateSession(jwtToken);
       
       if (!sessionData.valid) {
-        return JSON.stringify({
+        return {
           success: false,
           message: 'Invalid session'
-        });
+        };
       }
 
       const result = await this.pool.query(
@@ -569,7 +494,7 @@ export class AuthService {
         [sessionData.userId]
       );
 
-      return JSON.stringify({
+      return {
         success: true,
         sessions: result.rows.map(session => ({
           sessionToken: session.session_token,
@@ -579,14 +504,14 @@ export class AuthService {
           isActive: session.is_active,
           isCurrent: true // Since we're using JWT, we can't easily identify the current session
         }))
-      });
+      };
 
     } catch (error) {
       console.error('Get user sessions error:', error);
-      return JSON.stringify({
+      return {
         success: false,
         message: 'An error occurred while fetching sessions'
-      });
+      };
     }
   }
 
@@ -756,6 +681,160 @@ export class AuthService {
         headers: { 'Content-Type': 'application/json' }
       };
     }
+  }
+
+    private hashPassword(password: string): string {
+    return createHash('sha256').update(password).digest('hex');
+  }
+
+  private comparePassword(password: string, hashedPassword: string): boolean {
+    return this.hashPassword(password) === hashedPassword;
+  }
+
+  private sanitizeUserAgent(userAgent?: string): string | undefined {
+    if (!userAgent) return undefined;
+    
+    // Limit user agent length to prevent database issues
+    const maxLength = 500;
+    return userAgent.length > maxLength ? userAgent.substring(0, maxLength) : userAgent;
+  }
+
+  private generateSessionToken(): string {
+    return randomBytes(32).toString('hex');
+  }
+
+  private generateJWTToken(userId: number, username: string): string {
+    return jwt.sign(
+      { 
+        userId: userId, 
+        username: username 
+      },
+      this.jwtSecret,
+      { expiresIn: AuthService.TOKEN_EXPIRY_JWT }
+    );
+  }
+
+  private async createSession(userId: number, userAgent?: string): Promise<string> {
+    const sessionToken = this.generateSessionToken();
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + AuthService.TOKEN_EXPIRY_DAYS); // 7 days from now
+
+    // Generate JWT token
+    const user = await this.pool.query(
+      'SELECT username FROM users WHERE id = $1',
+      [userId]
+    );
+    
+    const jwtToken = this.generateJWTToken(userId, user.rows[0].username);
+
+    // Sanitize user agent for database storage
+    const sanitizedUserAgent = this.sanitizeUserAgent(userAgent);
+
+    await this.pool.query(
+      `INSERT INTO user_sessions (user_id, session_token, expires_at, ip_address, user_agent) 
+       VALUES ($1, $2, $3, $4, $5)`,
+      [userId, sessionToken, expiresAt, null, sanitizedUserAgent || null]
+    );
+
+    return jwtToken;
+  }
+
+  private async validateSession(jwtToken: string): Promise<{ valid: boolean; userId?: number; username?: string; name?: string; surname?: string; mail?: string; image?: string; isAdmin?: boolean }> {
+    try {
+      // Verify JWT token
+      const decoded = jwt.verify(jwtToken, this.jwtSecret) as any;
+      
+      // Check if user still exists and is active
+      const result = await this.pool.query(
+        'SELECT id, username, is_active, name, surname, mail, encode(image, \'escape\') as image, is_admin FROM users WHERE id = $1',
+        [decoded.userId]
+      );
+
+      if (result.rows.length === 0) {
+        return { valid: false };
+      }
+
+      const user = result.rows[0];
+
+      // Check if user account is active
+      if (!user.is_active) {
+        return { valid: false };
+      }
+
+      // Check if there's an active session for this user
+      const sessionResult = await this.pool.query(
+        `SELECT session_token, expires_at, is_active 
+         FROM user_sessions 
+         WHERE user_id = $1 AND is_active = TRUE 
+         ORDER BY last_activity DESC 
+         LIMIT 1`,
+        [decoded.userId]
+      );
+
+      if (sessionResult.rows.length === 0) {
+        return { valid: false };
+      }
+
+      const session = sessionResult.rows[0];
+
+      // Check if session is expired
+      if (new Date() > new Date(session.expires_at)) {
+        // Clean up expired session
+        await this.pool.query(
+          'UPDATE user_sessions SET is_active = FALSE WHERE user_id = $1',
+          [decoded.userId]
+        );
+        return { valid: false };
+      }
+
+      // Update last activity for the most recent session
+      await this.pool.query(
+        'UPDATE user_sessions SET last_activity = NOW() WHERE session_token = $1',
+        [session.session_token]
+      );
+
+      return {
+        valid: true,
+        userId: user.id,
+        username: user.username,
+        name: user.name,
+        surname: user.surname,
+        mail: user.mail,
+        image: user.image,
+        isAdmin: user.is_admin
+      };
+
+    } catch (error) {
+      console.error('Token validation error:', error);
+      return { valid: false };
+    }
+  }
+
+  private async invalidateSession(jwtToken: string): Promise<void> {
+    try {
+      // Decode JWT to get user ID
+      const decoded = jwt.verify(jwtToken, this.jwtSecret) as any;
+      
+      // Invalidate all sessions for this user
+      await this.pool.query(
+        'UPDATE user_sessions SET is_active = FALSE WHERE user_id = $1',
+        [decoded.userId]
+      );
+    } catch (error) {
+      console.error('Error invalidating session:', error);
+    }
+  }
+
+  private async cleanExpiredSessions(): Promise<void> {
+    // Mark expired sessions as inactive
+    await this.pool.query(
+      'UPDATE user_sessions SET is_active = FALSE WHERE expires_at < NOW() AND is_active = TRUE'
+    );
+    
+    // Delete very old sessions (older than 30 days) to prevent database bloat
+    await this.pool.query(
+      'DELETE FROM user_sessions WHERE created_at < NOW() - INTERVAL \'30 days\''
+    );
   }
 
   private validateLoginInput(username: string, password: string): void {

@@ -1,22 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { DreandosTwitchInterface } from "@genezio-sdk/f123dashboard" 
-
-
-interface TwitchStreamResponse {
-  data: Array<{
-      id: string;
-      user_id: string;
-      user_login: string;
-      type: string;
-      title: string;
-      viewer_count: number;
-      started_at: string;
-      language: string;
-      thumbnail_url: string;
-  }>;
-}
+import { DreandosTwitchInterface, TwitchStreamResponse } from "@genezio-sdk/f123dashboard" 
 
 
 @Injectable({
@@ -30,7 +14,7 @@ export class TwitchApiService {
   private twitchStreamResponse: TwitchStreamResponse |null = null;
 
   async checkStreamStatus(){
-    this.twitchStreamResponse = JSON.parse(await DreandosTwitchInterface.getStreamInfo(this.channelId));
+    this.twitchStreamResponse = await DreandosTwitchInterface.getStreamInfo(this.channelId);
   }
   
   isLive(): boolean {

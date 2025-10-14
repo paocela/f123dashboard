@@ -1,8 +1,8 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { DbDataService } from './db-data.service';
-import { Fanta, RaceResult } from '../model/fanta';
 import { size } from 'lodash-es';
 import { Subscription } from 'rxjs';
+import { FantaVote, RaceResult } from '@genezio-sdk/f123dashboard';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +11,7 @@ export class FantaService implements OnDestroy {
   fantaPoints: Map<number,number> = new Map<number,number>(); // track fanta point per player
   fantaNumberVotes: Map<number, number> = new Map<number, number>(); // track how many times a fanta player voted out of all possible votes
   fantaRacePoints: Map<string, number> = new Map<string, number>(); // track points per race per player (key: "playerId_raceId")
-  fantaVotes:  Fanta[] = [];
+  fantaVotes:  FantaVote[] = [];
   raceResults: RaceResult[] = [];
   private subscription: Subscription = new Subscription();
 
@@ -30,7 +30,7 @@ export class FantaService implements OnDestroy {
     
     // Subscribe to fantaVote changes directly
     this.subscription.add(
-      this.dbData.fantaVote$.subscribe((fantaVotes: Fanta[]) => {
+      this.dbData.fantaVote$.subscribe((fantaVotes: FantaVote[]) => {
         this.fantaVotes = fantaVotes;
         this.calculatePoints();
       })
@@ -104,7 +104,7 @@ export class FantaService implements OnDestroy {
     return size(this.raceResults);
    }
 
-   getFantaVote( userId:number, raceId:number): Fanta | undefined {
+   getFantaVote( userId:number, raceId:number): FantaVote | undefined {
     return this.fantaVotes.filter(vote => vote.fanta_player_id == userId)
                 .find(vote => vote.track_id == raceId);
    }
@@ -130,7 +130,7 @@ export class FantaService implements OnDestroy {
      this.subscription.unsubscribe();
    }
 
-  calculateFantaPoints(raceResult: RaceResult, fantaVote: Fanta): number {
+  calculateFantaPoints(raceResult: RaceResult, fantaVote: FantaVote): number {
     let points: number = 0;
     // Create arrays of positions for both result and vote
     const resultPositions = [

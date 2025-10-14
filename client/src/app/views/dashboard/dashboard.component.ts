@@ -31,7 +31,7 @@ import { TwitchApiService } from '../../service/twitch-api.service';
 import { BehaviorSubject } from 'rxjs';
 import { LoadingService } from '../../service/loading.service';
 import { ChampionshipTrendComponent } from '../../components/championship-trend/championship-trend.component';
-import { Constructor } from '../../model/constructor';
+import { Constructor } from '@genezio-sdk/f123dashboard';
 
 @Component({
     selector: 'app-dashboard',

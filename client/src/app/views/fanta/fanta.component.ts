@@ -20,7 +20,7 @@ import { FantaService } from './../../service/fanta.service';
 import { cilX, cilCheckAlt, cilSwapVertical } from '@coreui/icons';
 import { cilFire, cilPowerStandby, cilPeople } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
-import { Fanta, RaceResult, VoteStatus, VOTE_INDEX, FORM_STATUS, DRIVER_POSITIONS_COUNT, TOTAL_VOTE_FIELDS, FantaVoteHelper } from '../../model/fanta';
+import { VoteStatus, VOTE_INDEX, FORM_STATUS, DRIVER_POSITIONS_COUNT, TOTAL_VOTE_FIELDS, FantaVoteHelper } from '../../model/fanta';
 import { medals, allFlags, posizioni } from '../../model/constants';
 import { LeaderboardComponent } from "../../components/leaderboard/leaderboard.component";
 import {
@@ -31,8 +31,8 @@ import {
   ModalTitleDirective,
   ThemeDirective
 } from '@coreui/angular';
-import { User } from '../../model/auth';
-import { TrackData } from '../../model/track';
+import { FantaVote } from '@genezio-sdk/f123dashboard/lib/fantaService.sdk';
+import { RaceResult, User } from '@genezio-sdk/f123dashboard';
 
 @Component({
     selector: 'app-fanta',
@@ -151,7 +151,7 @@ export class FantaComponent {
     }
 
     const votes = this.votazioni.get(trackId) || [];
-    const fantaVoto: Fanta = {
+    const fantaVoto: FantaVote = {
       fanta_player_id: this.user.id,
       username: this.user.username,
       track_id: trackId,

@@ -1,36 +1,4 @@
-
-export interface Fanta {
-    fanta_player_id: number,
-    username: string,
-    track_id: number,
-    id_1_place: number,
-    id_2_place: number,
-    id_3_place: number,
-    id_4_place: number,
-    id_5_place: number,
-    id_6_place: number,
-    id_7_place: number,
-    id_8_place: number,
-    id_fast_lap: number,
-    id_dnf: number,
-    season_id?: number,
-    constructor_id: number
-}
-
-export interface RaceResult {
-    id: number,
-    track_id: number,
-    id_1_place: number,
-    id_2_place: number,
-    id_3_place: number,
-    id_4_place: number,
-    id_5_place: number,
-    id_6_place: number,
-    id_7_place: number,
-    id_8_place: number,
-    id_fast_lap: number,
-    list_dnf: string
-}
+import { FantaVote } from "@genezio-sdk/f123dashboard";
 
 export interface FantaPlayer {
     username: string,
@@ -91,7 +59,7 @@ export class FantaVoteHelper {
     /**
      * Converts a Fanta object to a vote array.
      */
-    static toArray(fanta: Fanta): readonly number[] {
+    static toArray(fanta: FantaVote): readonly number[] {
         return [
             fanta.id_1_place,
             fanta.id_2_place,
@@ -110,7 +78,7 @@ export class FantaVoteHelper {
     /**
      * Converts a vote array to a partial Fanta object (without user/track info).
      */
-    static fromArray(votes: number[]): Pick<Fanta, 
+    static fromArray(votes: number[]): Pick<FantaVote, 
         'id_1_place' | 'id_2_place' | 'id_3_place' | 'id_4_place' | 
         'id_5_place' | 'id_6_place' | 'id_7_place' | 'id_8_place' | 
         'id_fast_lap' | 'id_dnf' | 'constructor_id'> {

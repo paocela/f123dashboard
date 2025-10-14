@@ -1,16 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { PostgresService, FantaService } from "@genezio-sdk/f123dashboard" 
-import { Fanta, RaceResult } from '../model/fanta';
-import { User } from '../model/auth';
+import { PostgresService, FantaService, FantaVote, DriverData, Driver, ChampionshipData, Season, CumulativePointsData, TrackData, AuthService, User, RaceResult, ConstructorGrandPrixPoints, Constructor } from "@genezio-sdk/f123dashboard" 
 import { GpResult } from '../model/championship'
-import { Season } from '../model/season';
-import { ChampionshipData } from '../model/championship-data';
-import { AllDriverData, Driver } from '../model/driver';
-import { TrackData, CumulativePointsData } from '../model/track';
-import { Constructor, ConstructorGrandPrixPoints } from '../model/constructor';
-
-
 
 @Injectable({
   providedIn: 'root'
@@ -22,11 +13,11 @@ export class DbDataService {
 /****************************************************************/
 //variabili locali
 /****************************************************************/
-  private allDrivers: string = "";
+  private allDrivers: DriverData[] = [];
   private championship: ChampionshipData[] = [];
-  private cumulative_points: string = "";
-  private tracks: string = "";
-  private fantaVoteSubject = new BehaviorSubject<Fanta[]>([]);
+  private cumulative_points: CumulativePointsData[] = [];
+  private tracks: TrackData[] = [];
+  private fantaVoteSubject = new BehaviorSubject<FantaVote[]>([]);
   public  fantaVote$ = this.fantaVoteSubject.asObservable();
   private raceResult: RaceResult[] = [];
   private users: User[] = [];
@@ -58,7 +49,7 @@ export class DbDataService {
       PostgresService.getCumulativePoints(),
       PostgresService.getAllTracks(),
       FantaService.getFantaVote(),
-      PostgresService.getUsers(),
+      AuthService.getUsers(),
       PostgresService.getRaceResoult(),
       PostgresService.getConstructors(),
       PostgresService.getDriversData(),
@@ -66,22 +57,22 @@ export class DbDataService {
     ]);
 
     this.allDrivers = allDrivers;
-    this.championship = JSON.parse(championship);
+    this.championship = championship;
     this.cumulative_points = cumulativePoints;
     this.tracks = tracks;
-    this.fantaVoteSubject.next(JSON.parse(fantaVote));
-    this.users = JSON.parse(users);
-    this.raceResult = JSON.parse(raceResult);
-    this.constructors = JSON.parse(constructors);
-    this.drivers = JSON.parse(drivers);
-    this.constructorGrandPrixPoints = JSON.parse(constructorGrandPrixPoints);
+    this.fantaVoteSubject.next(fantaVote);
+    this.users = users;
+    this.raceResult = raceResult;
+    this.constructors = constructors;
+    this.drivers = drivers;
+    this.constructorGrandPrixPoints = constructorGrandPrixPoints;
   }
 
 /****************************************************************/
 //chiamate che trasferiscono le variabili alle varie pagine 
 /****************************************************************/
-  getAllDrivers(): AllDriverData[] {
-    return JSON.parse(this.allDrivers);
+  getAllDrivers(): DriverData[] {
+    return this.allDrivers;
   }
 
   getChampionship(): ChampionshipData[] {
@@ -89,18 +80,18 @@ export class DbDataService {
   }
 
   getCumulativePoints(): CumulativePointsData[] {
-    return JSON.parse(this.cumulative_points);
+    return this.cumulative_points;
   }
 
   getAllTracks(): TrackData[] {
-    return JSON.parse(this.tracks);
+    return this.tracks;
   }
 
-  getFantaVote(): Fanta[] {
+  getFantaVote(): FantaVote[] {
     return this.fantaVoteSubject.value;
   }
 
-  getFantaVoteObservable(): Observable<Fanta[]> {
+  getFantaVoteObservable(): Observable<FantaVote[]> {
     return this.fantaVote$;
   }
 
@@ -145,71 +136,57 @@ export class DbDataService {
 //season-specific data methods
 /****************************************************************/
 
-  async getDriversBySeason(seasonId?: number): Promise<AllDriverData[]> {
+  async getDriversBySeason(seasonId?: number): Promise<DriverData[]> {
     const drivers = await PostgresService.getAllDrivers(seasonId);
-    return JSON.parse(drivers);
+    return drivers;
   }
 
   async getDriversData(seasonId?: number): Promise<Driver[]> {
     const drivers = await PostgresService.getDriversData(seasonId);
-    return JSON.parse(drivers);
+    return drivers;
   }
 
   async getChampionshipBySeason(seasonId?: number): Promise<ChampionshipData[]> {
     const championship = await PostgresService.getChampionship(seasonId);
-    return JSON.parse(championship);
+    return championship;
   }
 
   async getCumulativePointsBySeason(seasonId?: number): Promise<CumulativePointsData[]> {
     const cumulativePoints = await PostgresService.getCumulativePoints(seasonId);
-    return JSON.parse(cumulativePoints);
+    return cumulativePoints;
   }
 
   async getAllTracksBySeason(seasonId?: number): Promise<TrackData[]> {
     const tracks = await PostgresService.getAllTracks(seasonId);
-    return JSON.parse(tracks);
+    return tracks;
   }
 
   async getRaceResultBySeason(seasonId?: number): Promise<RaceResult[]> {
     const raceResult = await PostgresService.getRaceResoult(seasonId);
-    return JSON.parse(raceResult);
+    return raceResult;
   }
 
   async getAllSeasons(): Promise<Season[]> {
     const seasons = await PostgresService.getAllSeasons();
-    return JSON.parse(seasons);
+    return seasons;
   }
 
   async getConstructorsBySeason(seasonId?: number): Promise<Constructor[]> {
     const constructors = await PostgresService.getConstructors(seasonId);
-    return JSON.parse(constructors);
+    return constructors;
   }
 
   async getConstructorGrandPrixPoints(seasonId?: number): Promise<ConstructorGrandPrixPoints[]> {
     const constructorGpPoints = await (PostgresService as any).getConstructorGrandPrixPoints(seasonId);
-    return JSON.parse(constructorGpPoints);
+    return constructorGpPoints;
   }
 
-  async setFantaVoto(voto: Fanta): Promise<void> {
-    await FantaService.setFantaVoto(
-      voto.fanta_player_id,
-      voto.track_id,
-      voto.id_1_place,
-      voto.id_2_place,
-      voto.id_3_place,
-      voto.id_4_place,
-      voto.id_5_place,
-      voto.id_6_place,
-      voto.id_7_place,
-      voto.id_8_place,
-      voto.id_fast_lap,
-      voto.id_dnf,
-      voto.constructor_id
-    );
+  async setFantaVoto(voto: FantaVote): Promise<void> {
+    await FantaService.setFantaVoto(voto);
     
     // Refresh the fanta votes and notify subscribers
     const updatedFantaVote = await FantaService.getFantaVote();
-    this.fantaVoteSubject.next(JSON.parse(updatedFantaVote));
+    this.fantaVoteSubject.next(updatedFantaVote);
   }
 
 

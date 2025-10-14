@@ -5,7 +5,7 @@ import { CardModule, TableModule } from '@coreui/angular';
 import { PodiumCardComponent } from '../../components/podium-card/podium-card.component';
 import { GridModule } from '@coreui/angular';
 import { DbDataService } from '../../service/db-data.service';
-import { AllDriverData } from '../../model/driver';
+import { DriverData } from '@genezio-sdk/f123dashboard';
 
 @Component({
   selector: 'app-albo-d-oro',
@@ -41,7 +41,7 @@ export class AlboDOroComponent implements OnInit {
 
   async loadAlboDoro(): Promise<void> {
     try {
-      const drivers: AllDriverData[] = await this.dbDataService.getDriversBySeason(1);
+      const drivers: DriverData[] = await this.dbDataService.getDriversBySeason(1);
       
       // Sort drivers by total_points descending
       const sortedDrivers = drivers.sort((a, b) => +b.total_points - +a.total_points);

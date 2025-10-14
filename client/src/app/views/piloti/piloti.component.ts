@@ -1,9 +1,7 @@
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common'; 
-import { RouterLink } from '@angular/router';
-import { NgTemplateOutlet } from '@angular/common';
 import { DbDataService } from '../../service/db-data.service';  // aggiunto il servizio per dati db
-import { ChartData, ChartOptions } from 'chart.js';  // Import per i grafici
+import {  ChartOptions } from 'chart.js';  // Import per i grafici
 import { 
   BorderDirective,
   CardBodyComponent,
@@ -20,7 +18,7 @@ import {
   Tabs2Module
 } from '@coreui/angular';
 import { ChartjsComponent } from '@coreui/angular-chartjs';  // Import per il componente grafici
-import { Constructor } from '../../model/constructor';
+import { Constructor } from '@genezio-sdk/f123dashboard';
 
 @Component({
     selector: 'app-cards',
