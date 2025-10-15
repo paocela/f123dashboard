@@ -78,7 +78,7 @@ export class DashboardComponent implements OnInit {
   public screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 
   public showColumn(): boolean {
-    return this.screenWidth > 1600 || this.screenWidth < 768;
+    return this.screenWidth > 1600;
   }
 
   public championship_standings_users: any[] = [];
@@ -86,6 +86,7 @@ export class DashboardComponent implements OnInit {
   public championshipNextTracks: any[] = [];
   public isLive: boolean = true;
   public constructors: Constructor[] = [];
+  public showGainedPointsColumn: boolean = false;
 
   public allFlags: {[key: string]: any} = {
     "Bahrain": cifBh,
@@ -155,8 +156,9 @@ export class DashboardComponent implements OnInit {
         const lastPoints = userTracks[userTracks.length - 1].cumulative_points;
         const thirdToLastPoints = userTracks[userTracks.length - 3].cumulative_points;
         user.gainedPoints = lastPoints - thirdToLastPoints;
+        this.showGainedPointsColumn = true;
       } else {
-        user.gainedPoints = '-';
+        user.gainedPoints = 0;
       }
     }
 
@@ -164,5 +166,6 @@ export class DashboardComponent implements OnInit {
     for (let i = 1; i < this.championship_standings_users.length; i++) {
       this.championship_standings_users[i].deltaPoints = this.championship_standings_users[i - 1].total_points - this.championship_standings_users[i].total_points;
     }
+    console.log("Championship Standings Users: ", this.championship_standings_users);
   }
 }

@@ -64,7 +64,7 @@
                       Pilota
                     </th>
                     <th class="bg-body-tertiary text-center">Punti</th>
-                    <th class="bg-body-tertiary text-center">+/-</th>
+                    <th class="bg-body-tertiary text-center" *ngIf="showGainedPointsColumn">+/-</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -100,7 +100,7 @@
                         {{ user.total_points }}
                       </div>
                     </td>
-                    <td>
+                    <td *ngIf="showGainedPointsColumn">
                       <div
                         class="fw-semibold text-center"
                         [ngClass]="{
@@ -121,12 +121,11 @@
                               0
                         }"
                       >
-                        {{
-                          championship_standings_users[i - 1]
-                            ? user.gainedPoints -
-                              championship_standings_users[i - 1].gainedPoints
-                            : "-"
-                        }}
+                        @if (championship_standings_users[i - 1]) {
+                          {{ user.gainedPoints - championship_standings_users[i - 1].gainedPoints }}
+                        } @else {
+                          -
+                        }
                       </div>
                     </td>
                   </tr>
@@ -158,7 +157,7 @@
                         Piloti
                       </th>
                       <th class="bg-body-tertiary text-center">Punti</th>
-                      <th class="bg-body-tertiary text-center">+/-</th>
+                      <th class="bg-body-tertiary text-center" *ngIf="showGainedPointsColumn">+/-</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -195,7 +194,7 @@
                           {{ constructor.constructor_tot_points }}
                         </div>
                       </td>
-                      <td>
+                      <td *ngIf="showGainedPointsColumn">
                         <div
                           class="fw-semibold text-center"
                           [ngClass]="{
