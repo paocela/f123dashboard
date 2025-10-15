@@ -6,3 +6,29 @@
     height: 100%; /* Se necessario, assicura che l'altezza del contenitore permetta la centratura verticale */
   }
   
+.external-link-button svg {
+  color: inherit;
+  transition: color 0.2s ease;
+}
+
+.external-link-button:hover svg {
+  color: #28a745;
+}
+
+.twitch-link,
+.instagram-link {
+  color: inherit;
+  transition: color 0.2s ease;
+}
+
+/* Twitch hover color */
+.twitch-link:hover {
+  color: #6441a5 !important;
+}
+
+/* Instagram hover color */
+.instagram-link:hover {
+  color: #c13584 !important;
+}
+
+

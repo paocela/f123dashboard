@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, Input, OnDestroy } from '@angular/core';
 import { IconDirective } from '@coreui/icons-angular';
 import { ButtonModule } from '@coreui/angular';
-import { cilLink } from '@coreui/icons';
+import { cilLink, cibInstagram, cibTwitch } from '@coreui/icons';
 
 @Component({
     selector: 'app-link-box',
@@ -48,5 +48,7 @@ export class LinkBoxComponent implements OnDestroy {
 }
 
 export const icons = {
-    cilLink
+    cilLink,
+    cibInstagram,
+    cibTwitch
   };

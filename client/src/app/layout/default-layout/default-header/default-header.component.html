@@ -23,11 +23,34 @@
         <div class="vr h-100 mx-2 text-body text-opacity-75"></div>
       </div> -->
 
-      <app-link-box
-        linkUrl="https://lnk.bio/RaceForFederica?fbclid=PAb21jcANYoc1leHRuA2FlbQIxMQABp3llJHHXAs97FjuvH-BFhI_Ck2hLmSgp86NHWuGDYNPhWGQSKfZ0RYk6qK5F_aem_JaxF9Ktjxu3mXzSBjVvyVA"
-        [icon]="linkIcon.cilLink"
-        color="#6441a5"
-      ></app-link-box>
+      <c-dropdown alignment="end" variant="nav-item">
+        <button [caret]="false" cDropdownToggle aria-label="External links" class="external-link-button">
+          <svg cIcon name="cilLink" size="lg"></svg>
+        </button>
+        <div cDropdownMenu>
+          <a
+            cDropdownItem
+            href="https://www.twitch.tv/dreandos"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="d-flex align-items-center twitch-link"
+          >
+            <svg cIcon class="me-2" name="cibTwitch" size="lg" style="color: #6441a5"></svg>
+            Dreandos
+          </a>
+
+          <a
+            cDropdownItem
+            href="https://www.instagram.com/raceforfederica"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="d-flex align-items-center instagram-link"
+          >
+            <svg cIcon class="me-2" name="cibInstagram" size="lg" style="color: #c13584"></svg>
+            RaceForFederica
+          </a>
+        </div>
+      </c-dropdown>
 
       <ng-container *ngTemplateOutlet="themeDropdown" />
 
