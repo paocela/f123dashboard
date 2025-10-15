@@ -116,7 +116,7 @@ export class ChampionshipComponent implements OnInit{
   // Helper method to get position styling
   getPositionStyle(position: number): { [key: string]: string } {
     if (position === 1) return { 'color': 'green' };
-    if (position === 2) return { 'color': 'green' };
+    if (position === 8) return { 'color': 'red' };
     // No styling for other positions (was previously black)
     return {};
   }
