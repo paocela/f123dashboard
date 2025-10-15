@@ -33,6 +33,21 @@ import { LoadingService } from '../../service/loading.service';
 import { ChampionshipTrendComponent } from '../../components/championship-trend/championship-trend.component';
 import { Constructor } from '@genezio-sdk/f123dashboard';
 
+export interface DriverOfWeek {
+  driver_username: string;
+  driver_id: number;
+  points: number;
+}
+
+export interface ConstructorOfWeek {
+  constructor_name: string;
+  constructor_id: number;
+  constructor_driver_1_id: number;
+  constructor_driver_2_id: number;
+  points: number;
+}
+
+
 @Component({
     selector: 'app-dashboard',
     templateUrl: './dashboard.component.html',
@@ -87,6 +102,12 @@ export class DashboardComponent implements OnInit {
   public isLive: boolean = true;
   public constructors: Constructor[] = [];
   public showGainedPointsColumn: boolean = false;
+  public driverOfWeek: DriverOfWeek = { driver_username: '', driver_id: 0, points: 0 };
+  public constructorOfWeek: ConstructorOfWeek = { constructor_name: '', 
+                                                  constructor_id: 0,
+                                                  constructor_driver_1_id: 0, 
+                                                  constructor_driver_2_id: 0, 
+                                                  points: 0 };
 
   public allFlags: {[key: string]: any} = {
     "Bahrain": cifBh,
@@ -166,6 +187,40 @@ export class DashboardComponent implements OnInit {
     for (let i = 1; i < this.championship_standings_users.length; i++) {
       this.championship_standings_users[i].deltaPoints = this.championship_standings_users[i - 1].total_points - this.championship_standings_users[i].total_points;
     }
-    console.log("Championship Standings Users: ", this.championship_standings_users);
+
+    // Get best driver and constructor of the week
+    const sortedCumulativePoints = championshipTrend.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    const lastRacePoints = sortedCumulativePoints.slice(0, this.championship_standings_users.length);
+    const secondToLastRacePoints = sortedCumulativePoints.slice(this.championship_standings_users.length, 2*this.championship_standings_users.length);
+
+    let constructorsOfWeek_tmp: ConstructorOfWeek[] = [];
+    for (let constructor of this.constructors) {
+      constructorsOfWeek_tmp.push({ constructor_name: constructor.constructor_name,
+                                    constructor_id: constructor.constructor_id,
+                                    constructor_driver_1_id: constructor.driver_1_id,
+                                    constructor_driver_2_id: constructor.driver_2_id,
+                                    points: 0 });
+    }
+
+    let bestPoints = 0;
+    let currentPoints = 0;
+
+    for (i = 0; i < lastRacePoints.length; i++) {
+      currentPoints = lastRacePoints[i].cumulative_points - secondToLastRacePoints[i].cumulative_points;
+      if ( currentPoints > bestPoints ) {
+        bestPoints = currentPoints;
+        this.driverOfWeek.driver_username = lastRacePoints[i].driver_username;
+        this.driverOfWeek.driver_id = lastRacePoints[i].driver_id;
+        this.driverOfWeek.points = currentPoints;
+      } 
+
+      constructorsOfWeek_tmp.forEach(constructor => {
+        if (constructor.constructor_driver_1_id === lastRacePoints[i].driver_id || constructor.constructor_driver_2_id === lastRacePoints[i].driver_id) {
+          constructor.points += currentPoints;
+        }
+      });
+    }
+
+    this.constructorOfWeek = constructorsOfWeek_tmp.sort((a, b) => b.points - a.points)[0];
   }
 }

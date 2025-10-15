@@ -90,3 +90,65 @@ c-card-body {
   width: 100%;
   overflow-x: auto; /* if content overflows */
 }
+
+
+/* STYLE FOR DRIVER OF THE WEEK AND CONSTRUCTOR OF THE WEEK */
+.card-avatar {
+  width: 100%;
+  max-width: 100px;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  margin: 0 auto;
+  display: block;
+  padding: 10px;
+  background: none !important; /* removes white background */
+  box-shadow: none;
+}
+
+/* Driver avatar - circular */
+.driver-avatar {
+  border-radius: 50%;
+}
+
+/* Constructor avatar - keep square */
+.constructor-avatar {
+  border-radius: 0;
+}
+
+/* Text box in purple */
+.info-box {
+  background: transparent;
+  display: inline-block;
+  min-width: 120px;
+}
+
+/* Mobile-friendly scaling */
+@media (max-width: 768px) {
+  .card-avatar {
+    max-width: 120px;
+  }
+  .info-box {
+    font-size: 0.9rem;
+  }
+}
+
+.separator {
+  background-color: #ccc; /* grey color */
+  flex-shrink: 0;
+}
+
+/* Vertical by default (desktop) */
+@media (min-width: 768px) {
+  .separator {
+    width: 2px;
+    height: 60px;
+  }
+}
+
+/* Horizontal on small screens */
+@media (max-width: 767px) {
+  .separator {
+    width: 60px;
+    height: 2px;
+  }
+}
