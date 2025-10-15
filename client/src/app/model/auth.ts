@@ -1,19 +1,6 @@
-export interface User {
-  id: number;
-  username: string;
-  name: string;
-  surname: string;
-  mail?: string;
-  image?: string;
-  isAdmin?: boolean;
-}
+import { User } from "@genezio-sdk/f123dashboard";
 
-export interface LoginRequest {
-  username: string;
-  password: string;
-}
-
-export interface RegisterRequest {
+export type RegisterRequest = {
   username: string;
   name: string;
   surname: string;
@@ -22,41 +9,14 @@ export interface RegisterRequest {
   image: string;
 }
 
-export interface AuthResponse {
-  success: boolean;
-  message: string;
-  user?: User;
-  token?: string;
-}
-
-export interface ChangePasswordRequest {
-  currentPassword: string;
-  newPassword: string;
-}
-
-export interface UserSession {
-  sessionToken: string;
-  createdAt: string;
-  lastActivity: string;
-  expiresAt: string;
-  isActive: boolean;
-  isCurrent: boolean;
-}
-
-export interface SessionsResponse {
-  success: boolean;
-  message?: string;
-  sessions?: UserSession[];
-}
-
-export interface UpdateUserInfoRequest {
+export type UpdateUserInfoRequest = {
   name?: string;
   surname?: string;
   mail?: string;
   image?: string;
 }
 
-export interface UpdateUserInfoResponse {
+export type UpdateUserInfoResponse = {
   success: boolean;
   message: string;
   user?: User;

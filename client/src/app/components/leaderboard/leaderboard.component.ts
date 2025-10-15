@@ -1,13 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { GridModule, TableDirective } from '@coreui/angular';
-import { User } from '../../../app/model/auth';
 import { LeaderBoard } from '../../../app/model/leaderboard'
 import { FantaService } from '../../../app/service/fanta.service';
 import { DbDataService } from '../../../app/service/db-data.service';
 import { cilPeople} from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
 import { AvatarComponent, TextColorDirective } from '@coreui/angular';
+import { User } from '@genezio-sdk/f123dashboard';
 
 
 @Component({

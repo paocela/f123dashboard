@@ -16,6 +16,7 @@ applyTo: '**'
 - Use `standalone: true` in all new components.
 - Use `ChangeDetectionStrategy.OnPush` for performance in components that do not require default change detection.
 - Use Angular CLI commands for scaffolding (e.g., `ng generate component`, `ng generate service`).
+- use `PostgresService` from `"@genezio-sdk/f123dashboard"` for database interactions and model/type definitions.
 
 ## Components
 - Place view components in `src/app/views/<feature>/`.
@@ -60,7 +61,6 @@ applyTo: '**'
   - `src/app/views/` for main app views
   - `src/app/service/` for services
   - `src/components/` for reusable components
-  - `src/app/model/` for data models
   - `src/app/icons/` for icon sets
   - `src/assets/` for images and static assets
   - `src/scss/` for global styles
@@ -84,7 +84,6 @@ applyTo: '**'
 - Place new features under `app` in a dedicated folder (e.g., `feature-name/`).
 - For shared or reusable components, use `components`.
 - Services should be placed in `service`.
-- Models/interfaces go in `model`.
 
 ### Routing
 - Define routes in a `routes.ts` file within the feature folder.
@@ -106,7 +105,6 @@ applyTo: '**'
 ### Naming Conventions
 - Use English for all code, comments, and documentation.
 - Use descriptive, self-explanatory names for variables, methods, and classes.
-- Prefix interfaces with `I` (e.g., `IUser`), except for Angular models.
 - Use PascalCase for class names and file names (e.g., `FantaComponent`, `LeaderboardComponent`).
 - Use camelCase for variables and methods.
 - Use kebab-case for file and folder names (e.g., `leaderboard.component.ts`).
@@ -121,9 +119,6 @@ applyTo: '**'
 - Use CoreUI and project SCSS variables and mixins.
 - Keep styles modular and component-scoped.
 
-### Documentation
-- Add JSDoc comments for all public classes, methods, and properties.
-- Document component inputs, outputs, and service methods.
 
 ### Internationalization
 - Use Angular `$localize` for all user-facing strings.
@@ -143,6 +138,7 @@ applyTo: '**'
 
 ## Genezio 
 - in `server/` there is the genezio backend, which is used to connect to the database and other service like twitch.
+- in `server/src/` there is the genezio interface to the database, and the type use as model for frontend to backend communication.
 - in `client/` there is the genezio client, witch is the angular application.
 - 
 ---

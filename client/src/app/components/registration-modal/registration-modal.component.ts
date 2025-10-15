@@ -12,7 +12,7 @@ import {
   AlertComponent
 } from '@coreui/angular';
 import { AuthService } from '../../service/auth.service';
-import { User } from '../../model/auth';
+import { User } from '@genezio-sdk/f123dashboard';
 
 @Component({
   selector: 'app-registration-modal',

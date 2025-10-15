@@ -1,10 +1,18 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, firstValueFrom } from 'rxjs';
-import { AuthService as BackendAuthService } from "@genezio-sdk/f123dashboard";
-import { User, LoginRequest, RegisterRequest, AuthResponse, ChangePasswordRequest, SessionsResponse, UpdateUserInfoRequest, UpdateUserInfoResponse } from '../model/auth';
+import { 
+  AuthResponse,
+  AuthService as BackendAuthService,
+  ChangePasswordRequest,
+  LoginRequest,
+  SessionsResponse,
+  TokenValidationResponse,
+  User
+} from "@genezio-sdk/f123dashboard";
 import { ApiService } from './api.service';
 import { ConfigService } from './config.service';
+import { UpdateUserInfoRequest, RegisterRequest, UpdateUserInfoResponse } from '../model/auth';
 
 @Injectable({
   providedIn: 'root'
@@ -47,10 +55,10 @@ export class AuthService {
 
   private async validateTokenAndSetUser(token: string): Promise<void> {
     try {
-      const validation = JSON.parse(await BackendAuthService.validateToken(token));
-      if (validation.valid && validation.userId && validation.username) {
+      const validation = await BackendAuthService.validateToken(token) as any as TokenValidationResponse;
+      if (validation.valid && validation.userId && validation.username && validation.name && validation.surname) {
         // Get full user data (you might want to create a separate method for this)
-        const userData = {
+        const userData: User = {
           id: validation.userId,
           username: validation.username,
           name: validation.name,
@@ -74,11 +82,8 @@ export class AuthService {
   async login(loginData: LoginRequest, skipNavigation: boolean = false): Promise<AuthResponse> {
     try {
       const clientInfo = this.getClientInfo();
-      const response = JSON.parse(await BackendAuthService.login(
-        loginData.username, 
-        loginData.password, 
-        clientInfo.userAgent
-      ));
+      loginData.userAgent = clientInfo.userAgent;
+      const response = await BackendAuthService.login(loginData);
       
       if (response.success && response.user && response.token) {
         this.setToken(response.token);
@@ -153,7 +158,7 @@ export class AuthService {
     }
   }
 
-  async changePassword(changeData: ChangePasswordRequest): Promise<{ success: boolean; message: string }> {
+  async changePassword(currentPassword: string, newPassword: string): Promise<{ success: boolean; message: string }> {
     try {
       const token = this.getToken();
       if (!token) {
@@ -162,12 +167,13 @@ export class AuthService {
           message: 'No authentication token found'
         };
       }
+      const changeData: ChangePasswordRequest = {
+        currentPassword,
+        newPassword,
+        jwtToken: token
+      };
 
-      const response = JSON.parse(await BackendAuthService.changePassword(
-        token,
-        changeData.currentPassword,
-        changeData.newPassword
-      ));
+      const response = await BackendAuthService.changePassword(changeData);
       return response;
     } catch (error) {
       console.error('Change password error:', error);
@@ -235,10 +241,10 @@ export class AuthService {
       }
 
       const clientInfo = this.getClientInfo();
-      const response = JSON.parse(await BackendAuthService.refreshToken(
+      const response = await BackendAuthService.refreshToken(
         currentToken, 
         clientInfo.userAgent
-      ));
+      );
       
       if (response.success && response.token) {
         this.setToken(response.token);
@@ -257,11 +263,11 @@ export class AuthService {
     try {
       const token = this.getToken();
       if (token) {
-        // Call backend to invalidate session (if method is available)
+        // Call backend to invalidate session
         try {
-          await (BackendAuthService as any).logout(token);
+          await BackendAuthService.logout(token);
         } catch (methodError) {
-          console.warn('Backend logout method not available:', methodError);
+          console.warn('Backend logout error:', methodError);
         }
       }
     } catch (error) {
@@ -367,7 +373,7 @@ export class AuthService {
         return { success: false, message: 'No authentication token found' };
       }
 
-      const response = JSON.parse(await (BackendAuthService as any).getUserSessions(token));
+      const response = await BackendAuthService.getUserSessions(token);
       return response;
     } catch (error) {
       console.error('Get user sessions error:', error);
@@ -382,7 +388,7 @@ export class AuthService {
         return { success: false, message: 'No authentication token found' };
       }
 
-      const response = JSON.parse(await (BackendAuthService as any).logoutAllSessions(token));
+      const response = await BackendAuthService.logoutAllSessions(token);
       
       if (response.success) {
         // Clear local auth state since all sessions are logged out

@@ -7,8 +7,8 @@ import {
   ScaleOptions} from 'chart.js';
 
 import { getStyle } from '@coreui/utils';
-import {DbDataService} from '../../service/db-data.service';  //aggiunto il servizio per dati db
-import { CumulativePointsData } from '../../model/track';
+import {DbDataService} from '../../service/db-data.service'; 
+import { CumulativePointsData } from '@genezio-sdk/f123dashboard';
 
 export interface IChartProps {
   data?: ChartData;

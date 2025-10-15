@@ -2,6 +2,141 @@ import { GenezioDeploy } from "@genezio/types";
 import pg from "pg";
 const { Pool } = pg;
 
+type DriverData = {
+  driver_id: number;
+  driver_username: string;
+  driver_name: string;
+  driver_surname: string;
+  driver_description: string;
+  driver_license_pt: number;
+  driver_consistency_pt: number;
+  driver_fast_lap_pt: number;
+  drivers_dangerous_pt: number;
+  driver_ingenuity_pt: number;
+  driver_strategy_pt: number;
+  driver_color: string;
+  car_name: string;
+  car_overall_score: number;
+  total_sprint_points: number;
+  total_free_practice_points: number;
+  total_qualifying_points: number;
+  total_full_race_points: number;
+  total_race_points: number;
+  total_points: number;
+};
+
+type Driver = {
+  id: number;
+  username: string;
+  first_name: string;
+  surname: string;
+}
+
+type SessionResult = {
+  position: number;
+  driver_username: string;
+  fast_lap: boolean | null;
+}
+
+type ChampionshipData = {
+  gran_prix_id: number;
+  track_name: string;
+  gran_prix_date: Date;
+  gran_prix_has_sprint: number;
+  gran_prix_has_x2: number;
+  track_country: string;
+  sessions: {
+    free_practice?: SessionResult[];
+    qualifying?: SessionResult[];
+    race?: SessionResult[];
+    sprint?: SessionResult[];
+    full_race?: SessionResult[];
+  };
+  fastLapDrivers: {
+    race?: string;
+    sprint?: string;
+    full_race?: string;
+  };
+}
+
+type Season = {
+  id: number;
+  description: string;
+  startDate?: Date;
+  endDate?: Date;
+}
+
+type CumulativePointsData = {
+  date: string;
+  track_name: string;
+  driver_id: number;
+  driver_username: string;
+  driver_color: string;
+  cumulative_points: number;
+}
+
+type TrackData = {
+  track_id: number;
+  name: string;
+  date: string;
+  has_sprint: number;
+  has_x2: number;
+  country: string;
+  besttime_driver_time: string;
+  username: string;
+}
+
+type RaceResult = {
+    id: number,
+    track_id: number,
+    id_1_place: number,
+    id_2_place: number,
+    id_3_place: number,
+    id_4_place: number,
+    id_5_place: number,
+    id_6_place: number,
+    id_7_place: number,
+    id_8_place: number,
+    id_fast_lap: number,
+    list_dnf: string
+}
+
+type Constructor = {
+  constructor_id: number;
+  constructor_name: string;
+  constructor_color: string;
+  driver_1_id: number;
+  driver_1_username: string;
+  driver_1_tot_points: number;
+  driver_2_id: number;
+  driver_2_username: string;
+  driver_2_tot_points: number;
+  constructor_tot_points: number;
+  constructor_race_points?: number;
+  constructor_full_race_points?: number;
+  constructor_sprint_points?: number;
+  constructor_qualifying_points?: number;
+  constructor_free_practice_points?: number;
+}
+
+
+type ConstructorGrandPrixPoints = {
+  constructor_id: number;
+  constructor_name: string;
+  grand_prix_id: number;
+  grand_prix_date: string;
+  track_name: string;
+  track_id: number;
+  season_id: number;
+  season_description: string;
+  driver_id_1: number;
+  driver_id_2: number;
+  driver_1_points: number;
+  driver_2_points: number;
+  constructor_points: number;
+}
+
+
 @GenezioDeploy()
 export class PostgresService {
   pool = new Pool({
@@ -15,7 +150,7 @@ export class PostgresService {
 /****************************************************************/
 
 // 1) restituisce tutti i dati legati al pilota 
-    async getAllDrivers(seasonId?: number): Promise<string> {
+    async getAllDrivers(seasonId?: number): Promise<DriverData[]> {
       const result = await this.pool.query(`
         WITH latest_season AS (
           SELECT id FROM seasons ORDER BY start_date DESC LIMIT 1
@@ -26,10 +161,10 @@ export class PostgresService {
         CROSS JOIN latest_season ls
         WHERE arp.season_id = COALESCE($1, ls.id);
       `, [seasonId]);
-      return JSON.stringify(result.rows);
+      return result.rows as DriverData[];
     }
 
-  async getDriversData(seasonId?: number): Promise<string> {
+  async getDriversData(seasonId?: number): Promise<Driver[]> {
     const result = await this.pool.query(`
       WITH latest_season AS (
         SELECT id FROM seasons ORDER BY start_date DESC LIMIT 1
@@ -46,11 +181,11 @@ export class PostgresService {
       WHERE d.season = COALESCE($1, ls.id)
       ORDER BY d.username;
     `, [seasonId]);
-    return JSON.stringify(result.rows);
+    return result.rows as Driver[];
   }
 
   /* All tracks and standings (for Championship page) */
-  async getChampionship(seasonId?: number): Promise<string> {
+  async getChampionship(seasonId?: number): Promise<ChampionshipData[]> {
     console.log(seasonId);
     
     // Single optimized query to get all championship data
@@ -258,11 +393,11 @@ export class PostgresService {
     const formattedResults = Array.from(champMap.values())
       .sort((a, b) => new Date(a.gran_prix_date).getTime() - new Date(b.gran_prix_date).getTime());
 
-    return JSON.stringify(formattedResults);
+    return formattedResults as ChampionshipData[];
   }
 
   /* All driver championship's cumulative points (for trend graph)*/
-  async getCumulativePoints(seasonId?: number): Promise<string> {
+  async getCumulativePoints(seasonId?: number): Promise<CumulativePointsData[]> {
     const result = await this.pool.query(`
     WITH latest_season AS (
         SELECT id 
@@ -298,11 +433,11 @@ export class PostgresService {
     GROUP BY asp.date, asp.track_name, asp.driver_id, asp.driver_username, dc.driver_color, asp.session_point
     ORDER BY asp.driver_id, asp.date, asp.track_name;
       `, [seasonId]);
-    return JSON.stringify(result.rows);
+    return result.rows as CumulativePointsData[];
   }
 
   /* All championship tracks with best time info */
-  async getAllTracks(seasonId?: number): Promise<string> {
+  async getAllTracks(seasonId?: number): Promise<TrackData[]> {
     const result = await this.pool.query (`
 WITH latest_season AS (
     SELECT id 
@@ -334,10 +469,10 @@ ON outer_table_tracks.besttime_driver_id = outer_table_drivers.id
 WHERE outer_table_tracks.date IS NOT NULL
 ORDER BY date ASC
     `, [seasonId]);
-    return JSON.stringify(result.rows);
+    return result.rows as TrackData[];
   }
 
-  async getRaceResoult(seasonId?: number): Promise<string> {
+  async getRaceResoult(seasonId?: number): Promise<RaceResult[]> {
       const result = await this.pool.query(`
         WITH latest_season AS (
             SELECT id 
@@ -346,13 +481,16 @@ ORDER BY date ASC
             LIMIT 1
         )
         SELECT
-          gp.id AS track_id,
+          gp.id AS id,
+          gp.track_id AS track_id,
           MAX(CASE WHEN rre.position = 1 THEN rre.pilot_id END) AS id_1_place,
           MAX(CASE WHEN rre.position = 2 THEN rre.pilot_id END) AS id_2_place,
           MAX(CASE WHEN rre.position = 3 THEN rre.pilot_id END) AS id_3_place,
           MAX(CASE WHEN rre.position = 4 THEN rre.pilot_id END) AS id_4_place,
           MAX(CASE WHEN rre.position = 5 THEN rre.pilot_id END) AS id_5_place,
           MAX(CASE WHEN rre.position = 6 THEN rre.pilot_id END) AS id_6_place,
+          MAX(CASE WHEN rre.position = 7 THEN rre.pilot_id END) AS id_7_place,
+          MAX(CASE WHEN rre.position = 8 THEN rre.pilot_id END) AS id_8_place,
           MAX(CASE WHEN rre.fast_lap THEN rre.pilot_id END) AS id_fast_lap,
           ARRAY_AGG(rre.pilot_id) FILTER (WHERE rre.position = 0) AS list_dnf
         FROM gran_prix gp
@@ -366,12 +504,15 @@ ORDER BY date ASC
 
         SELECT
           gp.id AS track_id,
+          gp.track_id AS track_id,
           MAX(CASE WHEN frre.position = 1 THEN frre.pilot_id END) AS id_1_place,
           MAX(CASE WHEN frre.position = 2 THEN frre.pilot_id END) AS id_2_place,
           MAX(CASE WHEN frre.position = 3 THEN frre.pilot_id END) AS id_3_place,
           MAX(CASE WHEN frre.position = 4 THEN frre.pilot_id END) AS id_4_place,
           MAX(CASE WHEN frre.position = 5 THEN frre.pilot_id END) AS id_5_place,
           MAX(CASE WHEN frre.position = 6 THEN frre.pilot_id END) AS id_6_place,
+          MAX(CASE WHEN frre.position = 7 then frre.pilot_id END) AS id_7_place,
+          MAX(CASE WHEN frre.position = 8 THEN frre.pilot_id END) AS id_8_place,
           MAX(CASE WHEN frre.fast_lap THEN frre.pilot_id END) AS id_fast_lap,
           ARRAY_AGG(frre.pilot_id) FILTER (WHERE frre.position = 0) AS list_dnf
         FROM gran_prix gp
@@ -381,23 +522,16 @@ ORDER BY date ASC
           AND gp.season_id = COALESCE($1, ls.id)
         GROUP BY gp.id
       `, [seasonId]);
-      return JSON.stringify(result.rows);
+      return result.rows as RaceResult[];
   }
 
-  async getUsers(): Promise<string> {
-    const result = await this.pool.query (`
-  SELECT id, username, name, surname, password, mail, encode(image, 'escape') as image
-  FROM users;
-    `);
-      return JSON.stringify(result.rows);
-  }
 
-  async getAllSeasons(): Promise<string> {
+  async getAllSeasons(): Promise<Season[]> {
     const result = await this.pool.query(`SELECT id, description, start_date, end_date FROM seasons ORDER BY id DESC`);
-    return JSON.stringify(result.rows);
+    return result.rows as Season[];
   }
 
-  async getConstructors(seasonId?: number): Promise<string> {
+  async getConstructors(seasonId?: number): Promise<Constructor[]> {
     const result = await this.pool.query (`
       SELECT constructor_id,
       	constructor_name,
@@ -411,7 +545,35 @@ ORDER BY date ASC
         constructor_tot_points
       FROM season_constructor_leaderboard
       `);
-    return JSON.stringify(result.rows);
+    return result.rows as Constructor[];
+  }
+
+  /* Constructor Grand Prix Points */
+  async getConstructorGrandPrixPoints(seasonId?: number): Promise<ConstructorGrandPrixPoints[]> {
+    const result = await this.pool.query(`
+      WITH latest_season AS (
+        SELECT id FROM seasons ORDER BY start_date DESC LIMIT 1
+      )
+      SELECT
+        constructor_id,
+        constructor_name,
+        grand_prix_id,
+        grand_prix_date,
+        track_name,
+        track_id,
+        season_id,
+        season_description,
+        driver_id_1,
+        driver_id_2,
+        driver_1_points,
+        driver_2_points,
+        constructor_points
+      FROM constructor_grand_prix_points cgp
+      CROSS JOIN latest_season ls
+      WHERE cgp.season_id = COALESCE($1, ls.id)
+      ORDER BY cgp.grand_prix_date DESC, cgp.constructor_points DESC;
+    `, [seasonId]);
+    return result.rows as ConstructorGrandPrixPoints[];
   }
 
   async setGpResult(

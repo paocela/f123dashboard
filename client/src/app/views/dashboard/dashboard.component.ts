@@ -31,7 +31,7 @@ import { TwitchApiService } from '../../service/twitch-api.service';
 import { BehaviorSubject } from 'rxjs';
 import { LoadingService } from '../../service/loading.service';
 import { ChampionshipTrendComponent } from '../../components/championship-trend/championship-trend.component';
-import { Constructor } from '../../model/constructor';
+import { Constructor } from '@genezio-sdk/f123dashboard';
 
 @Component({
     selector: 'app-dashboard',
@@ -86,6 +86,7 @@ export class DashboardComponent implements OnInit {
   public championshipNextTracks: any[] = [];
   public isLive: boolean = true;
   public constructors: Constructor[] = [];
+  public showGainedPointsColumn: boolean = false;
 
   public allFlags: {[key: string]: any} = {
     "Bahrain": cifBh,
@@ -124,13 +125,13 @@ export class DashboardComponent implements OnInit {
   public isLive$ = new BehaviorSubject<boolean>(false);
   public streamTitle$ = new BehaviorSubject<string>('');
 
-  async ngOnInit(): Promise<void> {
+  ngOnInit(){
     //richiesta dati al db
     this.isLive = this.twitchApiService.isLive();
-    this.championship_standings_users = this.dbData.getAllDrivers() ;
-    const championshipTrend = this.dbData.getCumulativePoints() ;
+    this.championship_standings_users = this.dbData.getAllDrivers();
+    const championshipTrend = this.dbData.getCumulativePoints();
     this.championshipTracks = this.dbData.getAllTracks();
-    this.constructors = await this.dbData.getConstructors(1);
+    this.constructors =  this.dbData.getConstructors();
 
     // filter next championship track
     var i = 0;
@@ -155,8 +156,9 @@ export class DashboardComponent implements OnInit {
         const lastPoints = userTracks[userTracks.length - 1].cumulative_points;
         const thirdToLastPoints = userTracks[userTracks.length - 3].cumulative_points;
         user.gainedPoints = lastPoints - thirdToLastPoints;
+        this.showGainedPointsColumn = true;
       } else {
-        user.gainedPoints = '-';
+        user.gainedPoints = 0;
       }
     }
 
@@ -164,5 +166,6 @@ export class DashboardComponent implements OnInit {
     for (let i = 1; i < this.championship_standings_users.length; i++) {
       this.championship_standings_users[i].deltaPoints = this.championship_standings_users[i - 1].total_points - this.championship_standings_users[i].total_points;
     }
+    console.log("Championship Standings Users: ", this.championship_standings_users);
   }
 }
