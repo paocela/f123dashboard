@@ -74,6 +74,16 @@ type LogoutResponse = {
   success: boolean;
   message: string;
 }
+
+type RegisterRequest = {
+  username: string;
+  name: string;
+  surname: string;
+  password: string;
+  mail: string;
+  image: string;
+}
+
 @GenezioDeploy()
 export class AuthService {
   private pool: pg.Pool;
@@ -188,14 +198,14 @@ export class AuthService {
     }
   }
 
-  @GenezioMethod({ type: "http" })
-  async register(request: GenezioHttpRequest): Promise<GenezioHttpResponse> {
+
+  async register(request: RegisterRequest): Promise<AuthResponse> {
     try {   
-      const { username, name, surname, password, mail, image } = request.body;
-      const userAgent = request.headers['user-agent'];
+      const { username, name, surname, password, mail, image } = request;
+      //onst userAgent = request.headers['user-agent'];
 
       // Validate input
-      this.validateRegisterInput(username, name, surname, password, mail, image);
+      this.validateRegisterInput(request);
 
       // Check if username already exists
       const existingUser = await this.pool.query(
@@ -205,12 +215,8 @@ export class AuthService {
 
       if (existingUser.rows.length > 0) {
         return {
-          statusCode: "409",
-          body: JSON.stringify({
             success: false,
             message: 'Nome utente già esistente'
-          }),
-          headers: { 'Content-Type': 'application/json' }
         };
       }
 
@@ -222,12 +228,8 @@ export class AuthService {
 
       if (existingEmail.rows.length > 0) {
         return {
-          statusCode: "409",
-          body: JSON.stringify({
             success: false,
             message: 'Email già esistente'
-          }),
-          headers: { 'Content-Type': 'application/json' }
         };
       }
 
@@ -243,11 +245,9 @@ export class AuthService {
       const newUser = result.rows[0];
 
       // Create session and get JWT token
-      const jwtToken = await this.createSession(newUser.id, userAgent);
+      const jwtToken = await this.createSession(newUser.id, undefined);
 
       return {
-        statusCode: "201",
-        body: JSON.stringify({
           success: true,
           message: 'Registrazione completata con successo',
           user: {
@@ -256,11 +256,9 @@ export class AuthService {
             name: newUser.name,
             surname: newUser.surname,
             mail: newUser.mail,
-            image: newUser.image
+            image: image
           },
           token: jwtToken
-        }),
-        headers: { 'Content-Type': 'application/json' }
       };
 
     } catch (error) {
@@ -273,24 +271,16 @@ export class AuthService {
             error.message.includes('caratteri') ||
             error.message.includes('email valido') ||
             error.message.includes('contenere')) {
-          return {
-            statusCode: "400",
-            body: JSON.stringify({
+          return {    
               success: false,
               message: error.message
-            }),
-            headers: { 'Content-Type': 'application/json' }
           };
         }
       }
 
       return {
-        statusCode: "500",
-        body: JSON.stringify({
           success: false,
           message: 'Si è verificato un errore durante la registrazione'
-        }),
-        headers: { 'Content-Type': 'application/json' }
       };
     }
   }
@@ -845,7 +835,9 @@ export class AuthService {
     }
   }
 
-  private validateRegisterInput(username: string, name: string, surname: string, password: string, mail: string, image: string): void {
+  private validateRegisterInput(registerData: RegisterRequest): void {
+    const { username, name, surname, password, mail, image } = registerData;
+    
     if (!username || !name || !surname || !password || !mail || !image) {
       throw new Error('Tutti i campi sono obbligatori inclusa l\'immagine del profilo');
     }
