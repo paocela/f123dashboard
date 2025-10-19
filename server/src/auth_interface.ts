@@ -1,4 +1,4 @@
-import { GenezioDeploy, GenezioMethod, GenezioHttpRequest, GenezioHttpResponse } from "@genezio/types";
+import { GenezioDeploy } from "@genezio/types";
 import pg from "pg";
 import { createHash, randomBytes } from "crypto";
 import jwt from "jsonwebtoken";
@@ -82,6 +82,14 @@ type RegisterRequest = {
   password: string;
   mail: string;
   image: string;
+}
+
+export type UpdateUserInfoRequest = {
+  name?: string;
+  surname?: string;
+  mail?: string;
+  image?: string;
+  jwt: string;
 }
 
 @GenezioDeploy()
@@ -503,54 +511,49 @@ export class AuthService {
     }
   }
 
-  @GenezioMethod({ type: "http" })
-  async updateUserInfo(request: GenezioHttpRequest): Promise<GenezioHttpResponse> {
+  async updateUserInfo(request: UpdateUserInfoRequest): Promise<AuthResponse> {
     try {
-      const { jwtToken, updates } = request.body;
+      const { jwt, name, surname, mail, image } = request;
 
-      if (!jwtToken || !updates) {
+      if (!jwt) {
         return {
-          statusCode: "400",
-          body: JSON.stringify({
-            success: false,
-            message: 'Token JWT e aggiornamenti sono obbligatori'
-          }),
-          headers: { 'Content-Type': 'application/json' }
+          success: false,
+          message: 'Token JWT è obbligatorio'
         };
       }
 
       // Validate JWT token
-      const sessionData = await this.validateSession(jwtToken);
+      const sessionData = await this.validateSession(jwt);
       
       if (!sessionData.valid) {
         return {
-          statusCode: "401",
-          body: JSON.stringify({
-            success: false,
-            message: 'Sessione non valida'
-          }),
-          headers: { 'Content-Type': 'application/json' }
+          success: false,
+          message: 'Sessione non valida'
         };
       }
+
+      // Build updates object from provided fields
+      const updates = {
+        name,
+        surname,
+        mail,
+        image
+      };
 
       // Validate updates
       this.validateUpdateUserInfoInput(updates);
 
       // If email is being updated, check if it already exists
-      if (updates.mail) {
+      if (mail) {
         const existingEmail = await this.pool.query(
           'SELECT id FROM users WHERE mail = $1 AND id != $2',
-          [updates.mail, sessionData.userId]
+          [mail, sessionData.userId]
         );
 
         if (existingEmail.rows.length > 0) {
           return {
-            statusCode: "409",
-            body: JSON.stringify({
-              success: false,
-              message: 'Email già esistente'
-            }),
-            headers: { 'Content-Type': 'application/json' }
+            success: false,
+            message: 'Email già esistente'
           };
         }
       }
@@ -560,39 +563,35 @@ export class AuthService {
       const values: any[] = [];
       let parameterIndex = 1;
 
-      if (updates.name !== undefined) {
+      if (name !== undefined) {
         updateFields.push(`name = $${parameterIndex}`);
-        values.push(updates.name);
+        values.push(name);
         parameterIndex++;
       }
 
-      if (updates.surname !== undefined) {
+      if (surname !== undefined) {
         updateFields.push(`surname = $${parameterIndex}`);
-        values.push(updates.surname);
+        values.push(surname);
         parameterIndex++;
       }
 
-      if (updates.mail !== undefined) {
+      if (mail !== undefined) {
         updateFields.push(`mail = $${parameterIndex}`);
-        values.push(updates.mail);
+        values.push(mail);
         parameterIndex++;
       }
 
-      if (updates.image !== undefined) {
+      if (image !== undefined) {
         updateFields.push(`image = $${parameterIndex}`);
-        values.push(updates.image);
+        values.push(image);
         parameterIndex++;
       }
 
       // If no fields to update
       if (updateFields.length === 0) {
         return {
-          statusCode: "400",
-          body: JSON.stringify({
-            success: false,
-            message: 'Nessun campo valido da aggiornare'
-          }),
-          headers: { 'Content-Type': 'application/json' }
+          success: false,
+          message: 'Nessun campo valido da aggiornare'
         };
       }
 
@@ -604,45 +603,38 @@ export class AuthService {
         UPDATE users 
         SET ${updateFields.join(', ')} 
         WHERE id = $${parameterIndex} 
-        RETURNING id, username, name, surname, mail, encode(image, 'escape') as image
+        RETURNING id, username, name, surname, mail, encode(image, 'escape') as image, is_admin
       `;
 
       const result = await this.pool.query(query, values);
 
       if (result.rows.length === 0) {
         return {
-          statusCode: "404",
-          body: JSON.stringify({
-            success: false,
-            message: 'Utente non trovato'
-          }),
-          headers: { 'Content-Type': 'application/json' }
+          success: false,
+          message: 'Utente non trovato'
         };
       }
 
       const updatedUser = result.rows[0];
 
       return {
-        statusCode: "200",
-        body: JSON.stringify({
-          success: true,
-          message: 'Informazioni utente aggiornate con successo',
-          user: {
-            id: updatedUser.id,
-            username: updatedUser.username,
-            name: updatedUser.name,
-            surname: updatedUser.surname,
-            mail: updatedUser.mail,
-            image: updatedUser.image
-          }
-        }),
-        headers: { 'Content-Type': 'application/json' }
+        success: true,
+        message: 'Informazioni utente aggiornate con successo',
+        user: {
+          id: updatedUser.id,
+          username: updatedUser.username,
+          name: updatedUser.name,
+          surname: updatedUser.surname,
+          mail: updatedUser.mail,
+          image: updatedUser.image,
+          isAdmin: updatedUser.is_admin
+        }
       };
 
     } catch (error) {
       console.error('Update user info error:', error);
       
-      // Handle validation errors with specific status codes
+      // Handle validation errors
       if (error instanceof Error) {
         if (error.message.includes('obbligatori') || 
             error.message.includes('deve') || 
@@ -650,23 +642,15 @@ export class AuthService {
             error.message.includes('email valido') ||
             error.message.includes('contenere')) {
           return {
-            statusCode: "400",
-            body: JSON.stringify({
-              success: false,
-              message: error.message
-            }),
-            headers: { 'Content-Type': 'application/json' }
+            success: false,
+            message: error.message
           };
         }
       }
 
       return {
-        statusCode: "500",
-        body: JSON.stringify({
-          success: false,
-          message: 'Si è verificato un errore durante l\'aggiornamento delle informazioni utente'
-        }),
-        headers: { 'Content-Type': 'application/json' }
+        success: false,
+        message: 'Si è verificato un errore durante l\'aggiornamento delle informazioni utente'
       };
     }
   }

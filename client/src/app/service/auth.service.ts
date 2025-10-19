@@ -9,12 +9,11 @@ import {
   RegisterRequest,
   SessionsResponse,
   TokenValidationResponse,
+  UpdateUserInfoRequest,
   User
 } from "@genezio-sdk/f123dashboard";
 import { ApiService } from './api.service';
 import { ConfigService } from './config.service';
-import { UpdateUserInfoRequest, UpdateUserInfoResponse } from '../model/auth';
-
 @Injectable({
   providedIn: 'root'
 })
@@ -171,7 +170,7 @@ export class AuthService {
     }
   }
 
-  async updateUserInfo(updateData: UpdateUserInfoRequest): Promise<UpdateUserInfoResponse> {
+  async updateUserInfo(updateData: UpdateUserInfoRequest): Promise<AuthResponse> {
     try {
       const token = this.getToken();
       if (!token) {
@@ -180,23 +179,10 @@ export class AuthService {
           message: 'Token di autenticazione non trovato'
         };
       }
+      updateData.jwt = token;
+    
+      const response: AuthResponse = await BackendAuthService.updateUserInfo(updateData);
 
-      // Prepare the request body for the HTTP endpoint
-      const requestBody = {
-        jwtToken: token,
-        updates: updateData
-      };
-
-      console.log('Update user info request body size:', JSON.stringify(requestBody).length);
-      
-      console.log('Making update request to:', this.apiService.getEndpointUrl('AuthService/updateUserInfo'));
-        
-      const response: UpdateUserInfoResponse = await firstValueFrom(
-        this.apiService.post<UpdateUserInfoResponse>('AuthService/updateUserInfo', requestBody, {
-          headers: this.apiService.createAuthHeaders(token)
-        })
-      );
-      
       if (response.success && response.user) {
         // Update the current user data in the service
         this.setAuthenticatedUser(response.user);
