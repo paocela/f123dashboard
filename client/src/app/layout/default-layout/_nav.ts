@@ -35,8 +35,8 @@ export const getNavItems = (isAdmin: boolean): INavData[] => {
       url: '/albo-d-oro',
       iconComponent: { name: 'cil-star' },
       badge: {
-        color: 'warning',
-        text: 'BETA'
+        color: 'success',
+        text: 'NEW'
       }
     },
     {
@@ -44,8 +44,8 @@ export const getNavItems = (isAdmin: boolean): INavData[] => {
       url: '/credits',
       iconComponent: { name: 'cil-coffee' },
       badge: {
-        color: 'warning',
-        text: 'BETA'
+        color: 'success',
+        text: 'NEW'
       }
     }
   ];
@@ -57,8 +57,8 @@ export const getNavItems = (isAdmin: boolean): INavData[] => {
       url: '/admin',
       iconComponent: { name: 'cil-settings' },
       badge: {
-        color: 'warning',
-        text: 'BETA'
+        color: 'success',
+        text: 'NEW'
       }
     });
   }
