@@ -56,7 +56,7 @@ export class PilotiComponent implements OnInit {
   private readonly CHART_TEXT_SIZE = 12;
 
   // Opzioni comuni per il radar chart
-  radarChartOptions: ChartOptions<'radar'> = {
+  radarChartOptions: any = {
     responsive: true,
     maintainAspectRatio: false, // Mantiene il grafico quadrato
     scales: {
@@ -147,32 +147,6 @@ export class PilotiComponent implements OnInit {
         
         // Assicuriamoci che constructor_tot_points sia anche un numero
         constructor.constructor_tot_points = parseInt(driver1.total_points || '0') + parseInt(driver2.total_points || '0');
-
-        console.log(`Points for ${constructor.constructor_name}:`, {
-          driver1: {
-            name: driver1.driver_username,
-            race: driver1.total_race_points,
-            full: driver1.total_full_race_points,
-            sprint: driver1.total_sprint_points,
-            quali: driver1.total_qualifying_points,
-            practice: driver1.total_free_practice_points
-          },
-          driver2: {
-            name: driver2.driver_username,
-            race: driver2.total_race_points,
-            full: driver2.total_full_race_points,
-            sprint: driver2.total_sprint_points,
-            quali: driver2.total_qualifying_points,
-            practice: driver2.total_free_practice_points
-          },
-          total: {
-            race: constructor.constructor_race_points,
-            full: constructor.constructor_full_race_points,
-            sprint: constructor.constructor_sprint_points,
-            quali: constructor.constructor_qualifying_points,
-            practice: constructor.constructor_free_practice_points
-          }
-        });
       }
     });
 

@@ -85,23 +85,23 @@
     <span class="m-1">
       <div id="lights_container">
         <div class="bulbs_container">
-            <div class="bulb_up"></div>
+            <div class="bulb_up logo"></div>
             <div class="bulb"></div>
         </div>
         <div class="bulbs_container">
-            <div class="bulb_up"></div>
+            <div class="bulb_up logo"></div>
             <div class="bulb"></div>
         </div>
         <div class="bulbs_container">
-            <div class="bulb_up"></div>
+            <div class="bulb_up logo"></div>
             <div class="bulb"></div>
         </div>
         <div class="bulbs_container">
-            <div class="bulb_up"></div>
+            <div class="bulb_up logo"></div>
             <div class="bulb"></div>
         </div>
         <div class="bulbs_container">
-            <div class="bulb_up"></div>
+            <div class="bulb_up logo"></div>
             <div class="bulb"></div>
         </div>
       </div>
@@ -128,7 +128,7 @@
 
   function lightUp() {
       if (currentIndex < bulbs.length) {
-          bulbs_up[currentIndex].classList.add('logo');
+          // bulbs_up[currentIndex].classList.add('logo');
           bulbs[currentIndex].classList.add('red_light');
           currentIndex++;
           setTimeout(lightUp, 300); // Call the function again after 1 second

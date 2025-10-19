@@ -17,12 +17,12 @@ import { IconDirective } from '@coreui/icons-angular';
 
 import { CountdownComponent } from '../../../components/countdown/countdown.component'
 import { LoginComponent } from '../../../components/login/login.component'
-import { LinkBoxComponent, icons } from "../../../../components/link-box/link-box.component";
+import { icons } from "../../../../components/link-box/link-box.component";
 
 @Component({
     selector: 'app-default-header',
     templateUrl: './default-header.component.html',
-    imports: [LoginComponent, CountdownComponent, ContainerComponent, HeaderTogglerDirective, SidebarToggleDirective, IconDirective, HeaderNavComponent, NgTemplateOutlet, DropdownComponent, DropdownToggleDirective, DropdownMenuDirective, DropdownItemDirective, LinkBoxComponent]
+    imports: [LoginComponent, CountdownComponent, ContainerComponent, HeaderTogglerDirective, SidebarToggleDirective, IconDirective, HeaderNavComponent, NgTemplateOutlet, DropdownComponent, DropdownToggleDirective, DropdownMenuDirective, DropdownItemDirective]
   })
 export class DefaultHeaderComponent extends HeaderComponent {
 

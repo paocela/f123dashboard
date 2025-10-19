@@ -53,8 +53,6 @@ type SessionsResponse = {
   sessions?: UserSession[];
 }
 
-
-
 type TokenValidationResponse = {
   valid: boolean;
   userId?: number;
@@ -108,14 +106,14 @@ export class AuthService {
       
       return {
         success: true,
-        message: 'Expired sessions cleaned up successfully'
+        message: 'Sessioni scadute pulite con successo'
       };
 
     } catch (error) {
       console.error('Cleanup expired sessions error:', error);
       return {
         success: false,
-        message: 'An error occurred while cleaning up expired sessions'
+        message: 'Si è verificato un errore durante la pulizia delle sessioni scadute'
       };
     }
   }
@@ -133,7 +131,7 @@ export class AuthService {
       if (result.rows.length === 0) {
         return {
           success: false,
-          message: 'Invalid username or password'
+          message: 'Nome utente o password non validi'
         };
       }
 
@@ -143,7 +141,7 @@ export class AuthService {
       if (!user.is_active) {
         return {
           success: false,
-          message: 'Account is disabled'
+          message: 'Account disabilitato'
         };
       }
       
@@ -153,7 +151,7 @@ export class AuthService {
       if (!isPasswordValid) {
         return {
           success: false,
-          message: 'Invalid username or password'
+          message: 'Nome utente o password non validi'
         };
       }
 
@@ -168,7 +166,7 @@ export class AuthService {
 
       return {
         success: true,
-        message: 'Login successful',
+        message: 'Login effettuato con successo',
         user: {
           id: user.id,
           username: user.username,
@@ -185,7 +183,7 @@ export class AuthService {
       console.error('Login error:', error);
       return {
         success: false,
-        message: 'An error occurred during login'
+        message: 'Si è verificato un errore durante il login'
       };
     }
   }
@@ -210,7 +208,7 @@ export class AuthService {
           statusCode: "409",
           body: JSON.stringify({
             success: false,
-            message: 'Username already exists'
+            message: 'Nome utente già esistente'
           }),
           headers: { 'Content-Type': 'application/json' }
         };
@@ -227,7 +225,7 @@ export class AuthService {
           statusCode: "409",
           body: JSON.stringify({
             success: false,
-            message: 'Email already exists'
+            message: 'Email già esistente'
           }),
           headers: { 'Content-Type': 'application/json' }
         };
@@ -251,7 +249,7 @@ export class AuthService {
         statusCode: "201",
         body: JSON.stringify({
           success: true,
-          message: 'Registration successful',
+          message: 'Registrazione completata con successo',
           user: {
             id: newUser.id,
             username: newUser.username,
@@ -270,11 +268,11 @@ export class AuthService {
       
       // Handle validation errors with specific status codes
       if (error instanceof Error) {
-        if (error.message.includes('required') || 
-            error.message.includes('must be') || 
-            error.message.includes('characters') ||
-            error.message.includes('valid email') ||
-            error.message.includes('contain')) {
+        if (error.message.includes('obbligatori') || 
+            error.message.includes('deve') || 
+            error.message.includes('caratteri') ||
+            error.message.includes('email valido') ||
+            error.message.includes('contenere')) {
           return {
             statusCode: "400",
             body: JSON.stringify({
@@ -290,7 +288,7 @@ export class AuthService {
         statusCode: "500",
         body: JSON.stringify({
           success: false,
-          message: 'An error occurred during registration'
+          message: 'Si è verificato un errore durante la registrazione'
         }),
         headers: { 'Content-Type': 'application/json' }
       };
@@ -332,7 +330,7 @@ export class AuthService {
       if (!sessionData.valid) {
         return {
           success: false,
-          message: 'Invalid session'
+          message: 'Sessione non valida'
         };
       }
 
@@ -345,7 +343,7 @@ export class AuthService {
       if (result.rows.length === 0) {
         return {
           success: false,
-          message: 'User not found'
+          message: 'Utente non trovato'
         };
       }
 
@@ -358,7 +356,7 @@ export class AuthService {
       if (!isCurrentPasswordValid) {
         return {
           success: false,
-          message: 'Current password is incorrect'
+          message: 'Password corrente errata'
         };
       }
 
@@ -379,14 +377,14 @@ export class AuthService {
 
       return {
         success: true,
-        message: 'Password changed successfully'
+        message: 'Password modificata con successo'
       };
 
     } catch (error) {
       console.error('Change password error:', error);
       return {
         success: false,
-        message: 'An error occurred while changing password'
+        message: 'Si è verificato un errore durante la modifica della password'
       };
     }
   }
@@ -398,7 +396,7 @@ export class AuthService {
       if (!sessionData.valid) {
         return {
           success: false,
-          message: 'Invalid session'
+          message: 'Sessione non valida'
         };
       }
 
@@ -414,14 +412,14 @@ export class AuthService {
       return {
         success: true,
         token: newJwtToken,
-        message: 'Token refreshed successfully'
+        message: 'Token aggiornato con successo'
       };
 
     } catch (error) {
       console.error('Refresh token error:', error);
       return {
         success: false,
-        message: 'An error occurred while refreshing token'
+        message: 'Si è verificato un errore durante l\'aggiornamento del token'
       };
     }
   }
@@ -432,14 +430,14 @@ export class AuthService {
       
       return {
         success: true,
-        message: 'Logged out successfully'
+        message: 'Disconnessione effettuata con successo'
       };
 
     } catch (error) {
       console.error('Logout error:', error);
       return {
         success: false,
-        message: 'An error occurred during logout'
+        message: 'Si è verificato un errore durante la disconnessione'
       };
     }
   }
@@ -451,7 +449,7 @@ export class AuthService {
       if (!sessionData.valid) {
         return {
           success: false,
-          message: 'Invalid session'
+          message: 'Sessione non valida'
         };
       }
 
@@ -463,14 +461,14 @@ export class AuthService {
 
       return {
         success: true,
-        message: 'All sessions logged out successfully'
+        message: 'Tutte le sessioni sono state disconnesse con successo'
       };
 
     } catch (error) {
       console.error('Logout all sessions error:', error);
       return {
         success: false,
-        message: 'An error occurred while logging out all sessions'
+        message: 'Si è verificato un errore durante la disconnessione di tutte le sessioni'
       };
     }
   }
@@ -482,7 +480,7 @@ export class AuthService {
       if (!sessionData.valid) {
         return {
           success: false,
-          message: 'Invalid session'
+          message: 'Sessione non valida'
         };
       }
 
@@ -510,7 +508,7 @@ export class AuthService {
       console.error('Get user sessions error:', error);
       return {
         success: false,
-        message: 'An error occurred while fetching sessions'
+        message: 'Si è verificato un errore durante il recupero delle sessioni'
       };
     }
   }
@@ -525,7 +523,7 @@ export class AuthService {
           statusCode: "400",
           body: JSON.stringify({
             success: false,
-            message: 'JWT token and updates are required'
+            message: 'Token JWT e aggiornamenti sono obbligatori'
           }),
           headers: { 'Content-Type': 'application/json' }
         };
@@ -539,7 +537,7 @@ export class AuthService {
           statusCode: "401",
           body: JSON.stringify({
             success: false,
-            message: 'Invalid session'
+            message: 'Sessione non valida'
           }),
           headers: { 'Content-Type': 'application/json' }
         };
@@ -560,7 +558,7 @@ export class AuthService {
             statusCode: "409",
             body: JSON.stringify({
               success: false,
-              message: 'Email already exists'
+              message: 'Email già esistente'
             }),
             headers: { 'Content-Type': 'application/json' }
           };
@@ -602,7 +600,7 @@ export class AuthService {
           statusCode: "400",
           body: JSON.stringify({
             success: false,
-            message: 'No valid fields to update'
+            message: 'Nessun campo valido da aggiornare'
           }),
           headers: { 'Content-Type': 'application/json' }
         };
@@ -626,7 +624,7 @@ export class AuthService {
           statusCode: "404",
           body: JSON.stringify({
             success: false,
-            message: 'User not found'
+            message: 'Utente non trovato'
           }),
           headers: { 'Content-Type': 'application/json' }
         };
@@ -638,7 +636,7 @@ export class AuthService {
         statusCode: "200",
         body: JSON.stringify({
           success: true,
-          message: 'User information updated successfully',
+          message: 'Informazioni utente aggiornate con successo',
           user: {
             id: updatedUser.id,
             username: updatedUser.username,
@@ -656,11 +654,11 @@ export class AuthService {
       
       // Handle validation errors with specific status codes
       if (error instanceof Error) {
-        if (error.message.includes('required') || 
-            error.message.includes('must be') || 
-            error.message.includes('characters') ||
-            error.message.includes('valid email') ||
-            error.message.includes('contain')) {
+        if (error.message.includes('obbligatori') || 
+            error.message.includes('deve') || 
+            error.message.includes('caratteri') ||
+            error.message.includes('email valido') ||
+            error.message.includes('contenere')) {
           return {
             statusCode: "400",
             body: JSON.stringify({
@@ -676,7 +674,7 @@ export class AuthService {
         statusCode: "500",
         body: JSON.stringify({
           success: false,
-          message: 'An error occurred while updating user information'
+          message: 'Si è verificato un errore durante l\'aggiornamento delle informazioni utente'
         }),
         headers: { 'Content-Type': 'application/json' }
       };
@@ -839,36 +837,36 @@ export class AuthService {
 
   private validateLoginInput(username: string, password: string): void {
     if (!username || !password) {
-      throw new Error('Username and password are required');
+      throw new Error('Nome utente e password sono obbligatori');
     }
     
     if (typeof username !== 'string' || typeof password !== 'string') {
-      throw new Error('Username and password must be strings');
+      throw new Error('Nome utente e password devono essere stringhe');
     }
   }
 
   private validateRegisterInput(username: string, name: string, surname: string, password: string, mail: string, image: string): void {
     if (!username || !name || !surname || !password || !mail || !image) {
-      throw new Error('All fields are required including profile image');
+      throw new Error('Tutti i campi sono obbligatori inclusa l\'immagine del profilo');
     }
 
     if (username.length < 3 || username.length > 30) {
-      throw new Error('Username must be between 3 and 30 characters');
+      throw new Error('Il nome utente deve contenere tra 3 e 30 caratteri');
     }
 
     if (password.length < 8) {
-      throw new Error('Password must be at least 8 characters long');
+      throw new Error('La password deve contenere almeno 8 caratteri');
     }
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(mail)) {
-      throw new Error('Please enter a valid email address');
+      throw new Error('Inserire un indirizzo email valido');
     }
 
     // Image validation
     if (image.length > 5000000) { // 5MB limit
-      throw new Error('Image size is too large (max 5MB)');
+      throw new Error('Dimensione immagine troppo grande (massimo 5MB)');
     }
 
     // Check if image is a valid base64 string
@@ -884,47 +882,45 @@ export class AuthService {
     }
     
     if (!base64Regex.test(cleanImage)) {
-      throw new Error('Invalid image format. Please provide a valid base64 encoded image');
+      throw new Error('Formato immagine non valido. Fornire un\'immagine codificata in base64 valida');
     }
 
     // Password strength validation
     const hasUpperCase = /[A-Z]/.test(password);
     const hasLowerCase = /[a-z]/.test(password);
     const hasNumbers = /\d/.test(password);
-    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
 
-    if (!hasUpperCase || !hasLowerCase || !hasNumbers || !hasSpecialChar) {
-      throw new Error('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character');
+    if (!hasUpperCase || !hasLowerCase || !hasNumbers) {
+      throw new Error('La password deve contenere almeno una lettera maiuscola, una lettera minuscola e un numero');
     }
 
     // Username format validation
     const usernameRegex = /^[a-zA-Z0-9_]+$/;
     if (!usernameRegex.test(username)) {
-      throw new Error('Username can only contain letters, numbers, and underscores');
+      throw new Error('Il nome utente può contenere solo lettere, numeri e underscore');
     }
   }
 
   private validateChangePasswordInput(currentPassword: string, newPassword: string): void {
     if (!currentPassword || !newPassword) {
-      throw new Error('Current password and new password are required');
+      throw new Error('Password corrente e nuova password sono obbligatorie');
     }
 
     if (newPassword.length < 8) {
-      throw new Error('New password must be at least 8 characters long');
+      throw new Error('La nuova password deve contenere almeno 8 caratteri');
     }
 
     if (currentPassword === newPassword) {
-      throw new Error('New password must be different from current password');
+      throw new Error('La nuova password deve essere diversa dalla password corrente');
     }
 
     // Password strength validation for new password
     const hasUpperCase = /[A-Z]/.test(newPassword);
     const hasLowerCase = /[a-z]/.test(newPassword);
     const hasNumbers = /\d/.test(newPassword);
-    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(newPassword);
 
-    if (!hasUpperCase || !hasLowerCase || !hasNumbers || !hasSpecialChar) {
-      throw new Error('New password must contain at least one uppercase letter, one lowercase letter, one number, and one special character');
+    if (!hasUpperCase || !hasLowerCase || !hasNumbers) {
+      throw new Error('La nuova password deve contenere almeno una lettera maiuscola, una lettera minuscola e un numero');
     }
   }
 

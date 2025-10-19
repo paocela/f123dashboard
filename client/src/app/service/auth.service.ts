@@ -126,7 +126,7 @@ export class AuthService {
         
       const response: AuthResponse = await firstValueFrom(
         this.apiService.post<AuthResponse>('AuthService/register', requestBody, {
-          headers: this.apiService.createHeaders(true)
+          headers: this.apiService.createHeaders()
         })
       );
       
@@ -432,5 +432,14 @@ export class AuthService {
     }
 
     return deviceInfo;
+  }
+
+  // Helper method to validate password strength
+  isPasswordStrong(password: string): boolean {
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumbers = /\d/.test(password);
+
+    return hasUpperCase && hasLowerCase && hasNumbers;
   }
 }

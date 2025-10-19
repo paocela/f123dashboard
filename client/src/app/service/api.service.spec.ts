@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ApiService } from './api.service';
 
 describe('ApiService', () => {
@@ -7,7 +8,10 @@ describe('ApiService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting()
+      ]
     });
     service = TestBed.inject(ApiService);
   });
@@ -27,13 +31,8 @@ describe('ApiService', () => {
   });
 
   it('should create headers with content type', () => {
-    const headers = service.createHeaders(false);
+    const headers = service.createHeaders();
     expect(headers['Content-Type']).toBe('application/json');
-  });
-
-  it('should create headers with user agent when requested', () => {
-    const headers = service.createHeaders(true);
-    expect(headers['User-Agent']).toBeDefined();
   });
 
   it('should create auth headers with bearer token', () => {
