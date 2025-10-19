@@ -153,3 +153,11 @@ c-card-body {
     height: 2px;
   }
 }
+
+@media (max-width: 495px) {
+  .on-fire-title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+}
