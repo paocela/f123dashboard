@@ -6,13 +6,14 @@ import {
   AuthService as BackendAuthService,
   ChangePasswordRequest,
   LoginRequest,
+  RegisterRequest,
   SessionsResponse,
   TokenValidationResponse,
   User
 } from "@genezio-sdk/f123dashboard";
 import { ApiService } from './api.service';
 import { ConfigService } from './config.service';
-import { UpdateUserInfoRequest, RegisterRequest, UpdateUserInfoResponse } from '../model/auth';
+import { UpdateUserInfoRequest, UpdateUserInfoResponse } from '../model/auth';
 
 @Injectable({
   providedIn: 'root'
@@ -105,7 +106,7 @@ export class AuthService {
       console.error('Login error:', error);
       return {
         success: false,
-        message: 'An error occurred during login. Please try again.'
+        message: 'Si è verificato un errore durante il login. Riprova.'
       };
     }
   }
@@ -113,22 +114,8 @@ export class AuthService {
   async register(registerData: RegisterRequest): Promise<AuthResponse> {
     try {
       // Prepare the request body for the HTTP endpoint
-      const requestBody = {
-        username: registerData.username,
-        name: registerData.name,
-        surname: registerData.surname,
-        password: registerData.password,
-        mail: registerData.mail,
-        image: registerData.image
-      };
-      
-      console.log('Making request to:', this.apiService.getEndpointUrl('AuthService/register'));
-        
-      const response: AuthResponse = await firstValueFrom(
-        this.apiService.post<AuthResponse>('AuthService/register', requestBody, {
-          headers: this.apiService.createHeaders()
-        })
-      );
+
+      const response: AuthResponse = await BackendAuthService.register(registerData);
       
       if (response.success && response.user && response.token) {
         this.setToken(response.token);
@@ -153,7 +140,7 @@ export class AuthService {
       
       return {
         success: false,
-        message: 'An error occurred during registration. Please try again. If the error persists, contact support.'
+        message: 'Si è verificato un errore durante la registrazione. Riprova. Se l\'errore persiste, contatta il supporto.'
       };
     }
   }
@@ -164,7 +151,7 @@ export class AuthService {
       if (!token) {
         return {
           success: false,
-          message: 'No authentication token found'
+          message: 'Token di autenticazione non trovato'
         };
       }
       const changeData: ChangePasswordRequest = {
@@ -179,7 +166,7 @@ export class AuthService {
       console.error('Change password error:', error);
       return {
         success: false,
-        message: 'An error occurred while changing password. Please try again.'
+        message: 'Si è verificato un errore durante il cambio password. Riprova.'
       };
     }
   }
@@ -190,7 +177,7 @@ export class AuthService {
       if (!token) {
         return {
           success: false,
-          message: 'No authentication token found'
+          message: 'Token di autenticazione non trovato'
         };
       }
 
@@ -228,7 +215,7 @@ export class AuthService {
       }
       return {
         success: false,
-        message: 'An error occurred while updating user information. Please try again.'
+        message: 'Si è verificato un errore durante l\'aggiornamento delle informazioni utente. Riprova.'
       };
     }
   }
@@ -370,14 +357,14 @@ export class AuthService {
     try {
       const token = this.getToken();
       if (!token) {
-        return { success: false, message: 'No authentication token found' };
+        return { success: false, message: 'Token di autenticazione non trovato' };
       }
 
       const response = await BackendAuthService.getUserSessions(token);
       return response;
     } catch (error) {
       console.error('Get user sessions error:', error);
-      return { success: false, message: 'An error occurred while fetching sessions' };
+      return { success: false, message: 'Si è verificato un errore durante il recupero delle sessioni' };
     }
   }
 
@@ -385,7 +372,7 @@ export class AuthService {
     try {
       const token = this.getToken();
       if (!token) {
-        return { success: false, message: 'No authentication token found' };
+        return { success: false, message: 'Token di autenticazione non trovato' };
       }
 
       const response = await BackendAuthService.logoutAllSessions(token);
@@ -399,7 +386,7 @@ export class AuthService {
       return response;
     } catch (error) {
       console.error('Logout all sessions error:', error);
-      return { success: false, message: 'An error occurred while logging out all sessions' };
+      return { success: false, message: 'Si è verificato un errore durante il logout da tutte le sessioni' };
     }
   }
 

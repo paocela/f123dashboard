@@ -160,6 +160,11 @@ export class RegistrationModalComponent implements OnDestroy {
     this.isEmailCompletion = false;
   }
 
+  public close(): void {
+    this.modal.visible = false;
+    this.clearForm();
+  }
+
 
   async onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;

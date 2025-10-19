@@ -186,6 +186,17 @@
         <div class="registration-actions">
           <button
             cButton
+            class="registration-button me-2"
+            color="secondary"
+            variant="outline"
+            type="button"
+            (click)="close()"
+            [disabled]="isLoading"
+          >
+            Chiudi
+          </button>
+          <button
+            cButton
             class="registration-button"
             color="primary"
             type="submit"
