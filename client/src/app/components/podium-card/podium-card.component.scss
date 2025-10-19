@@ -39,6 +39,7 @@ $font-family: 'Roboto', sans-serif;
   max-width: 200px;
   border: 1px solid var(--cui-border-color);
   background: var(--podio-card-bg);
+  min-width: 0px;
 
   &::before {
     content: "";
@@ -53,19 +54,22 @@ $font-family: 'Roboto', sans-serif;
     mask-repeat: no-repeat;
     mask-size: cover;
     pointer-events: none;
-    z-index: -1;
+    z-index: -2;
   }
 
 
   &.first {
+    min-height: 230px;
     height: 310px;
   }
 
   &.second {
+    min-height: 200px;
     height: 270px;
   }
 
   &.third {
+    min-height: 170px;
     height: 240px;
   }
 }
@@ -75,8 +79,9 @@ $font-family: 'Roboto', sans-serif;
   font-weight: bold;
   opacity: 0.5;
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: -10px;
+  left: 15px;
+  z-index: -1;
 }
 
 .pilota-img {
@@ -95,13 +100,18 @@ $font-family: 'Roboto', sans-serif;
 .info {
   margin-top: auto;
   padding-top: 0.5rem;
+  width: 100%;
 }
 
 .nome {
   display: block;
   font-weight: bold;
-  font-size: 1.2rem;
+  font-size: 1rem;
   color: aliceblue;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-all;
 }
 
 .nome-table {
@@ -187,9 +197,6 @@ $font-family: 'Roboto', sans-serif;
     width: 70%;
   }
 
-  .nome {
-    font-size: 1rem;
-  }
 
   .classifica {
     h2 {
@@ -222,10 +229,10 @@ $font-family: 'Roboto', sans-serif;
   }
 
   .numero {
-    font-size: 2rem;
+    font-size: 3rem;
   }
 
   .nome {
-    font-size: 0.9rem;
+    font-size: 0.88rem;
   }
 }
