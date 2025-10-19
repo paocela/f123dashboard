@@ -6,29 +6,47 @@
   id="sidebar1"
   visible
 >
-<c-sidebar-header class="border-bottom">
-  <c-sidebar-brand [routerLink]="[]">
-    <!-- Logo completo -->
-    <span class="sidebar-brand-full" style="font-size: 18px; font-weight: bold;">
-      <img src="assets/images/logo_raceforfederica.png" alt="RaceForFederica Logo" height="30vh">
-      RaceForFederica
-    </span>
-    <!-- Logo ridotto -->
-    <span class="sidebar-brand-narrow" style="font-size: 18px; font-weight: bold;">
-      <img src="assets/images/logo_raceforfederica.png" alt="RaceForFederica Logo" height="30vh">
-    </span>
-  </c-sidebar-brand>
-</c-sidebar-header>
-
+  <c-sidebar-header class="border-bottom">
+    <c-sidebar-brand [routerLink]="[]">
+      <!-- Logo completo -->
+      <span
+        class="sidebar-brand-full"
+        style="font-size: 18px; font-weight: bold"
+      >
+        <img
+          src="assets/images/logo_raceforfederica.png"
+          alt="RaceForFederica Logo"
+          height="30vh"
+        />
+        RaceForFederica
+      </span>
+      <!-- Logo ridotto -->
+      <span
+        class="sidebar-brand-narrow"
+        style="font-size: 18px; font-weight: bold"
+      >
+        <img
+          src="assets/images/logo_raceforfederica.png"
+          alt="RaceForFederica Logo"
+          height="30vh"
+        />
+      </span>
+    </c-sidebar-brand>
+  </c-sidebar-header>
 
   <ng-scrollbar pointerEventsMethod="scrollbar" visibility="hover">
     <c-sidebar-nav [navItems]="navItems" dropdownMode="close" compact />
   </ng-scrollbar>
-  
+
   @if (!sidebar1.narrow) {
-    <c-sidebar-footer cSidebarToggle="sidebar1" class="border-top d-none d-lg-flex" toggle="unfoldable" style="cursor: pointer;">
-      <button cSidebarToggler aria-label="Toggle sidebar fold"></button>
-    </c-sidebar-footer>
+  <c-sidebar-footer
+    cSidebarToggle="sidebar1"
+    class="border-top d-none d-lg-flex"
+    toggle="unfoldable"
+    style="cursor: pointer"
+  >
+    <button cSidebarToggler aria-label="Toggle sidebar fold"></button>
+  </c-sidebar-footer>
   }
 </c-sidebar>
 
@@ -43,7 +61,6 @@
   />
   <!--app-body-->
   <div class="body flex-grow-1">
-
     <c-container breakpoint="lg" class="h-auto px-2 px-sm-4">
       <app-loading-spinner />
       <router-outlet />
