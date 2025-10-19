@@ -27,18 +27,6 @@ export class AlboDOroComponent implements OnInit {
     this.loadAlboDoro();
   }
 
-  private getColor(driverColor: string): string {
-    const colorMap: { [key: string]: string } = {
-      'primary': '#8a2be2',
-      'info': '#6495ed',
-      'warning': '#ffa500',
-      'secondary': '#6c757d',
-      'success': '#28a745',
-      'danger': '#dc3545'
-    };
-    return colorMap[driverColor] || '#000000'; // Fallback to black
-  }
-
   async loadAlboDoro(): Promise<void> {
     try {
       const drivers: DriverData[] = await this.dbDataService.getDriversBySeason(1);
@@ -72,9 +60,9 @@ export class AlboDOroComponent implements OnInit {
         const third = podioDrivers[2];
 
         this.podio = [
-          { posizione: 2, nome: second.driver_username, img: `/assets/images/avatars/${second.driver_username}.png`, colore: this.getColor(second.driver_color), punti: second.total_points.toString() },
-          { posizione: 1, nome: first.driver_username, img: `/assets/images/avatars/${first.driver_username}.png`, colore: this.getColor(first.driver_color), punti: first.total_points.toString() },
-          { posizione: 3, nome: third.driver_username, img: `/assets/images/avatars/${third.driver_username}.png`, colore: this.getColor(third.driver_color), punti: third.total_points.toString() }
+          { posizione: 2, nome: second.driver_username, img: `/assets/images/avatars/${second.driver_username}.png`, colore: second.driver_color, punti: second.total_points.toString() },
+          { posizione: 1, nome: first.driver_username, img: `/assets/images/avatars/${first.driver_username}.png`, colore: first.driver_color, punti: first.total_points.toString() },
+          { posizione: 3, nome: third.driver_username, img: `/assets/images/avatars/${third.driver_username}.png`, colore: third.driver_color, punti: third.total_points.toString() }
         ];
       } else if (sortedDrivers.length > 0) {
         // Handle cases with fewer than 3 drivers for the podium
@@ -82,7 +70,7 @@ export class AlboDOroComponent implements OnInit {
             posizione: index + 1,
             nome: driver.driver_username,
             img: `/assets/images/avatars/${driver.driver_username}.png`,
-            colore: this.getColor(driver.driver_color),
+            colore: driver.driver_color,
             punti: driver.total_points.toString()
         }));
       }
