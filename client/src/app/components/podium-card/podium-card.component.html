@@ -12,7 +12,7 @@
       [class.first]="pilota.posizione === 1"
       [class.second]="pilota.posizione === 2"
       [class.third]="pilota.posizione === 3"
-      [style.background]=" 'linear-gradient(to bottom,' + pilota.colore + ', #111)' "
+      [style.--podio-card-bg]="'linear-gradient(to bottom,' + pilota.colore + ', #111)'"
       
     >
       <div class="numero">{{ pilota.posizione }}</div>
@@ -27,6 +27,7 @@
       />
       <div class="info">
         <span class="nome">{{ pilota.nome }}</span>
+        <span class="punti">{{ pilota.punti }} Pt</span>
       </div>
     </div>
   </section>
@@ -45,6 +46,7 @@
           <tr *ngFor="let p of classifica">
             <td class="pos">{{ p.posizione }}</td>
             <td class="nome-table">{{ p.nome }}</td>
+            <td class="punti-table">{{ p.punti }} Pt</td>
           </tr>
         </tbody>
     </table>

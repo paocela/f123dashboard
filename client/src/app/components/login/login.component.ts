@@ -4,7 +4,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FormModule } from '@coreui/angular';
 import { AuthService } from './../../service/auth.service';
-import { User } from '../../model/auth';
 import {
   AvatarComponent,
   DropdownComponent,
@@ -21,6 +20,7 @@ import { IconDirective } from '@coreui/icons-angular';
 import { cilUser } from '@coreui/icons';
 import { RegistrationModalComponent } from '../registration-modal/registration-modal.component';
 import { PasswordChangeModalComponent } from '../password-change-modal/password-change-modal.component';
+import { User } from '@genezio-sdk/f123dashboard';
 
 @Component({
   selector: 'login-component',

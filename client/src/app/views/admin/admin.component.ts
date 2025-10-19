@@ -24,11 +24,8 @@ import { IconDirective } from '@coreui/icons-angular';
 import { DbDataService } from 'src/app/service/db-data.service';
 import { AuthService } from 'src/app/service/auth.service';
 import { GpResult } from '../../model/championship';
-import { ChampionshipData } from '../../model/championship-data';
-import { Driver } from '../../model/driver';
-import { TrackData } from '../../model/track';
-import { Season } from '../../model/season';
 import { medals, allFlags, posizioni } from '../../model/constants';
+import { ChampionshipData, Driver, Season, TrackData } from '@genezio-sdk/f123dashboard';
 
 @Component({
   selector: 'app-admin',
@@ -78,7 +75,7 @@ export class AdminComponent implements OnInit {
 
   public allFlags = allFlags;
   public medals = medals;
-  public posizioni = posizioni;
+  public posizioni = new Map([...posizioni].filter(([key]) => key !== 11));
   public fireIcon: string[] = cilFire;
   public powerIcon: string[] = cilPowerStandby;
 
@@ -158,9 +155,9 @@ export class AdminComponent implements OnInit {
       
       // Initialize race results
       let race: any[] = [];
-      const activeRaceSession = gp.gran_prix_has_x2 === '1' ? gp.sessions.full_race : gp.sessions.race;
-      const activeFastLapDriver = gp.gran_prix_has_x2 === '1' ? gp.fastLapDrivers.full_race : gp.fastLapDrivers.race;
-      
+      const activeRaceSession = gp.gran_prix_has_x2 === 1 ? gp.sessions.full_race : gp.sessions.race;
+      const activeFastLapDriver = gp.gran_prix_has_x2 === 1 ? gp.fastLapDrivers.full_race : gp.fastLapDrivers.race;
+
       if (activeRaceSession && activeRaceSession.length > 0) {
         // Fill positions 1-8
         for (let i = 1; i <= 8; i++) {
@@ -181,7 +178,7 @@ export class AdminComponent implements OnInit {
 
       // Initialize sprint results
       let sprint: any[] = [];
-      if (gp.gran_prix_has_sprint === '1' && gp.sessions.sprint) {
+      if (gp.gran_prix_has_sprint === 1 && gp.sessions.sprint) {
         // Fill positions 1-8
         for (let i = 1; i <= 8; i++) {
           const driver = gp.sessions.sprint.find(r => r.position === i);

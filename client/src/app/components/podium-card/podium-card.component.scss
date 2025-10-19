@@ -30,6 +30,7 @@ $font-family: 'Roboto', sans-serif;
 
 .podio-card {
   position: relative;
+  isolation: isolate;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   text-align: center;
@@ -37,6 +38,23 @@ $font-family: 'Roboto', sans-serif;
   flex: 1;
   max-width: 200px;
   border: 1px solid var(--cui-border-color);
+  background: var(--podio-card-bg);
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url('/assets/images/texture/texture.png') repeat;
+    background-size: 250%;
+    -webkit-mask-image: linear-gradient(135deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.1) 60%, rgba(0, 0, 0, 0.5) 100%);
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: cover;
+    mask-image: linear-gradient(135deg, rgba(0,0,0,0) 0%, rgba(0, 0, 0, 0.1) 60%, rgba(0, 0, 0, 0.5) 100%);
+    mask-repeat: no-repeat;
+    mask-size: cover;
+    pointer-events: none;
+    z-index: -1;
+  }
 
 
   &.first {
@@ -55,7 +73,7 @@ $font-family: 'Roboto', sans-serif;
 .numero {
   font-size: 4rem;
   font-weight: bold;
-  opacity: 0.3;
+  opacity: 0.5;
   position: absolute;
   top: 10px;
   left: 10px;

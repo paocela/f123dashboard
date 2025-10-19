@@ -16,7 +16,8 @@ export const posizioni = new Map<number, string>([
   [7, "Settimo"],
   [8, "Ottavo"],
   [9, "Giro Veloce"],
-  [10, "DNF"]
+  [10, "DNF"],
+  [11, "Team Vincente"]
 ]);
 
 export const allFlags: {[key: string]: any} = {

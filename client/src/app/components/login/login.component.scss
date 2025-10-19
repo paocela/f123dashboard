@@ -100,11 +100,27 @@
       font-weight: 500;
       text-decoration: none;
       transition: all 0.3s ease;
-      padding: 0.5rem 1rem;
+      padding: 0.2rem 1rem;
       border-radius: 6px;
 
       &:hover {
         background: rgba(var(--cui-primary-rgb), 0.1);
+        text-decoration: underline;
+      }
+    }
+
+    .forgot-pw-button {
+      color: var(--cui-tertiary-color);
+      font-weight: 500;
+      font-size: 0.7rem;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      padding: 0.2rem 1rem;
+      border-radius: 6px;
+      margin-left: 10px;
+
+      &:hover {
+        background: rgba(var(--cui-tertiary-color-rgb), 0.1);
         text-decoration: underline;
       }
     }

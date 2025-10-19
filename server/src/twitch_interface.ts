@@ -1,12 +1,12 @@
 import { GenezioDeploy } from "@genezio/types";
 import axios from 'axios';
 
-interface TwitchTokenResponse {
+type TwitchTokenResponse = {
     access_token: string;
     expires_in: number;
 }
 
-interface TwitchStreamResponse {
+type TwitchStreamResponse = {
     data: Array<{
         id: string;
         user_id: string;
@@ -60,7 +60,7 @@ export class DreandosTwitchInterface {
         }
     }
 
-    async getStreamInfo(channelName: string): Promise<string> {
+    async getStreamInfo(channelName: string): Promise<TwitchStreamResponse> {
      
       return this.getAccessToken()
         .then(token => {
@@ -75,7 +75,7 @@ export class DreandosTwitchInterface {
           );
         })
         .then(response => {
-          return JSON.stringify(response.data);
+          return response.data;
         })
         .catch(error => {
           throw new Error(`Failed to fetch access token: ${error instanceof Error ? error.message : 'Unknown error'}`);

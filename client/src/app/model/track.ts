@@ -19,3 +19,15 @@ export interface CumulativePointsData {
   driver_color: string;
   cumulative_points: number;
 }
+
+export interface DriverOfWeek {
+  driver_username: string;
+  driver_id: number;
+  points: number;
+}
+
+export interface ConstructorOfWeek {
+  constructor_name: string;
+  constructor_id: number;
+  points: number;
+}

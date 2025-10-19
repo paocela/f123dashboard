@@ -1,9 +1,7 @@
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common'; 
-import { RouterLink } from '@angular/router';
-import { NgTemplateOutlet } from '@angular/common';
 import { DbDataService } from '../../service/db-data.service';  // aggiunto il servizio per dati db
-import { ChartData, ChartOptions } from 'chart.js';  // Import per i grafici
+import {  ChartOptions } from 'chart.js';  // Import per i grafici
 import { 
   BorderDirective,
   CardBodyComponent,
@@ -20,7 +18,7 @@ import {
   Tabs2Module
 } from '@coreui/angular';
 import { ChartjsComponent } from '@coreui/angular-chartjs';  // Import per il componente grafici
-import { Constructor } from '../../model/constructor';
+import { Constructor } from '@genezio-sdk/f123dashboard';
 
 @Component({
     selector: 'app-cards',
@@ -110,14 +108,14 @@ export class PilotiComponent implements OnInit {
   ) {}
 
 
-  async ngOnInit(): Promise<void> {
+  ngOnInit() {
     try {
       this.isLoading = true;
       this.cdr.detectChanges();
       
       //richiesta di dati dal servizio
-      this.piloti = await this.dbData.getAllDrivers();
-      this.constructors = await this.dbData.getConstructors(1);
+      this.piloti = this.dbData.getAllDrivers();
+      this.constructors = this.dbData.getConstructors();
 
       // Calculate points for constructors based on drivers data
       this.calculateConstructorPoints();
@@ -149,32 +147,6 @@ export class PilotiComponent implements OnInit {
         
         // Assicuriamoci che constructor_tot_points sia anche un numero
         constructor.constructor_tot_points = parseInt(driver1.total_points || '0') + parseInt(driver2.total_points || '0');
-
-        console.log(`Points for ${constructor.constructor_name}:`, {
-          driver1: {
-            name: driver1.driver_username,
-            race: driver1.total_race_points,
-            full: driver1.total_full_race_points,
-            sprint: driver1.total_sprint_points,
-            quali: driver1.total_qualifying_points,
-            practice: driver1.total_free_practice_points
-          },
-          driver2: {
-            name: driver2.driver_username,
-            race: driver2.total_race_points,
-            full: driver2.total_full_race_points,
-            sprint: driver2.total_sprint_points,
-            quali: driver2.total_qualifying_points,
-            practice: driver2.total_free_practice_points
-          },
-          total: {
-            race: constructor.constructor_race_points,
-            full: constructor.constructor_full_race_points,
-            sprint: constructor.constructor_sprint_points,
-            quali: constructor.constructor_qualifying_points,
-            practice: constructor.constructor_free_practice_points
-          }
-        });
       }
     });
 

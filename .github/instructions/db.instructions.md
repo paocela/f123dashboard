@@ -198,6 +198,7 @@ The `fanta` table stores fantasy team selections, while the result entry tables 
 - **fast_lap_id**: Fastest lap (driver id, int8, NOT NULL)
 - **dnf_id**: Driver who did not finish (driver id, int8, NOT NULL)
 - **season_id**: Reference to `seasons` (int4, NOT NULL)
+- **team_id**: Reference to `teams` (int8, NOT NULL)
 
 ---
 
@@ -223,7 +224,17 @@ The `fanta` table stores fantasy team selections, while the result entry tables 
 
 ---
 
-## 15. Session Type
+## 15. Constructors
+
+- **id**: Primary key (int8)
+- **name**: Constructor/team name (text, NOT NULL)
+- **driver_id_1**: Reference to first driver in the constructor references `drivers(id)` (int8, nullable)
+- **driver_id_2**: Reference to second driver in the constructor references `drivers(id)` (int8, nullable)
+- **color**: Constructor team color (text, nullable)
+
+---
+
+## 16. Session Type
 
 - **id**: Primary key (int8)
 - **1_points** to **6_points**: Points assigned for each placement (int4, NOT NULL)
@@ -233,7 +244,7 @@ The `fanta` table stores fantasy team selections, while the result entry tables 
 ---
 
 
-## 16. User Sessions
+## 17. User Sessions
 
 - **id**: Primary key (serial4)
 - **user_id**: Reference to `users (int4, nullable)
@@ -291,6 +302,7 @@ Simplified view showing race points by result type and driver.
 - Fantasy game logic is supported through `fanta` and `users` tables.
 - Points logic is centralized in `session_type`, supporting flexible point assignment per session (1st through 6th place plus fast lap points).
 - The design enables tracking performance and statistics for both real drivers and fantasy teams.
+- **Constructor Teams**: The `constructors` table manages F1 team structures, linking two drivers per constructor with team branding (name and color).
 - **Result Structure**: Instead of storing positions as separate columns, the new structure uses entry tables with position fields for better normalization.
 - **Session Management**: Sessions are managed through the `user_sessions` table with automatic cleanup capabilities.
 - **Data Integrity**: Foreign key constraints ensure data consistency across related tables.

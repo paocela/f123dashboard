@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, Input, OnDestroy } from '@angular/core';
 import { IconDirective } from '@coreui/icons-angular';
 import { ButtonModule } from '@coreui/angular';
-import { cibInstagram, cibTwitch } from '@coreui/icons';
+import { cilLink, cibInstagram, cibTwitch } from '@coreui/icons';
 
 @Component({
     selector: 'app-link-box',
@@ -20,7 +20,7 @@ export class LinkBoxComponent implements OnDestroy {
   @Input() title: string = '';
   @Input() linkName: string = '';
   @Input() linkUrl: string = '';
-  @Input() icon : string[] = cibInstagram;
+  @Input() icon : string[] = cilLink;
   @Input() color: string = '#000000'; // Default color
 
   isLargeScreen: boolean = false;
@@ -48,6 +48,7 @@ export class LinkBoxComponent implements OnDestroy {
 }
 
 export const icons = {
+    cilLink,
     cibInstagram,
     cibTwitch
   };

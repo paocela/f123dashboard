@@ -1,12 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common'; 
-import { DocsExampleComponent } from '@docs-components/public-api';
 import { BadgeComponent, RowComponent, ColComponent, TextColorDirective, CardComponent, CardHeaderComponent, CardBodyComponent, TableDirective, TableColorDirective, TableActiveDirective, BorderDirective, AlignDirective, ContainerComponent } from '@coreui/angular';
 import { cifBh, cifAt, cifMc, cifJp, cifHu, cifCn, cifCa, cifEs, cifGb, cifBe, cifNl, cifAz, cifSg, cifIt, cifUs, cifAu, cifMx, cifBr, cifQa, cifAe, cifSa } from '@coreui/icons';
 import { cilFire } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
 import { DbDataService } from '../../service/db-data.service';
-import { ChampionshipData, SessionResult } from '../../model/championship-data';
+import { ChampionshipData, SessionResult } from '@genezio-sdk/f123dashboard';
 
 @Component({
     selector: 'app-championship',
@@ -65,12 +64,12 @@ export class ChampionshipComponent implements OnInit{
 
   // Helper method to get the active race session (race or full_race based on has_x2)
   getActiveRaceSession(gp: ChampionshipData): SessionResult[] | undefined {
-    return gp.gran_prix_has_x2 === '1' ? gp.sessions.full_race : gp.sessions.race;
+    return gp.gran_prix_has_x2 === 1 ? gp.sessions.full_race : gp.sessions.race;
   }
 
   // Helper method to get fast lap driver for active race session
   getActiveFastLapDriver(gp: ChampionshipData): string {
-    const sessionType = gp.gran_prix_has_x2 === '1' ? 'full_race' : 'race';
+    const sessionType = gp.gran_prix_has_x2 === 1 ? 'full_race' : 'race';
     return gp.fastLapDrivers[sessionType] || '';
   }
 
@@ -117,7 +116,7 @@ export class ChampionshipComponent implements OnInit{
   // Helper method to get position styling
   getPositionStyle(position: number): { [key: string]: string } {
     if (position === 1) return { 'color': 'green' };
-    if (position === 2) return { 'color': 'green' };
+    if (position === 8) return { 'color': 'red' };
     // No styling for other positions (was previously black)
     return {};
   }

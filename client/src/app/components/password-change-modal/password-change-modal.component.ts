@@ -12,7 +12,6 @@ import {
   AlertComponent
 } from '@coreui/angular';
 import { AuthService } from '../../service/auth.service';
-import { ChangePasswordRequest } from '../../model/auth';
 
 @Component({
   selector: 'app-password-change-modal',
@@ -121,12 +120,8 @@ export class PasswordChangeModalComponent implements OnDestroy {
     this.successMessage = '';
 
     try {
-      const changeData: ChangePasswordRequest = {
-        currentPassword: this.currentPassword,
-        newPassword: this.newPassword
-      };
 
-      const response = await this.authService.changePassword(changeData);
+      const response = await this.authService.changePassword(this.confirmPassword, this.newPassword);
 
       if (response.success) {
         this.successMessage = 'Password cambiata con successo!';

@@ -29,8 +29,7 @@
   <c-col xs="12" md="6">
     <c-card class="mb-4">
       <c-card-header>
-        <h4 class="card-title mb-0" id="traffic">Classifica Campionato</h4>
-        <strong></strong>
+        <h4 class="card-title mb-0" id="traffic">Classifica Campionato 🏅</h4>
       </c-card-header>
       <c-card-body>
         <c-tabs [activeItemKey]="0" >
@@ -64,7 +63,7 @@
                       Pilota
                     </th>
                     <th class="bg-body-tertiary text-center">Punti</th>
-                    <th class="bg-body-tertiary text-center">+/-</th>
+                    <th class="bg-body-tertiary text-center" *ngIf="showGainedPointsColumn">+/-</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -100,7 +99,7 @@
                         {{ user.total_points }}
                       </div>
                     </td>
-                    <td>
+                    <td *ngIf="showGainedPointsColumn">
                       <div
                         class="fw-semibold text-center"
                         [ngClass]="{
@@ -121,12 +120,11 @@
                               0
                         }"
                       >
-                        {{
-                          championship_standings_users[i - 1]
-                            ? user.gainedPoints -
-                              championship_standings_users[i - 1].gainedPoints
-                            : "-"
-                        }}
+                        @if (championship_standings_users[i - 1]) {
+                          {{ user.gainedPoints - championship_standings_users[i - 1].gainedPoints }}
+                        } @else {
+                          -
+                        }
                       </div>
                     </td>
                   </tr>
@@ -158,7 +156,7 @@
                         Piloti
                       </th>
                       <th class="bg-body-tertiary text-center">Punti</th>
-                      <th class="bg-body-tertiary text-center">+/-</th>
+                      <th class="bg-body-tertiary text-center" *ngIf="showGainedPointsColumn">+/-</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -195,7 +193,7 @@
                           {{ constructor.constructor_tot_points }}
                         </div>
                       </td>
-                      <td>
+                      <td *ngIf="showGainedPointsColumn">
                         <div
                           class="fw-semibold text-center"
                           [ngClass]="{
@@ -234,8 +232,9 @@
       </c-card-body>
     </c-card>
   </c-col>
-  <c-col class="carousle-height" xs="12" md="6">
-    @if (championshipNextTracks.length > 0) {
+  <c-col xs="12" md="6">
+    <c-row class="carousle-height">
+       @if (championshipNextTracks.length > 0) {
     <c-carousel
       [dark]="false"
       [touch]="true"
@@ -248,7 +247,7 @@
               <c-row>
                 <c-col xs="auto">
                   <h4 class="card-title mb-0" id="traffic">
-                    Next Track: {{ next_track.name }}
+                    Prossimo GP: {{ next_track.name }}
                     <svg size="lg" [cIcon]="allFlags[next_track.country]"></svg>
                   </h4>
                 </c-col>
@@ -264,10 +263,9 @@
               </c-row>
             </c-card-header>
             <c-card-body>
-              <div>
+              <div style="max-height: 311px; aspect-ratio: 587/311;">
                 <img
-                  height="auto"
-                  width="100%"
+                  style="width: 100%; height: 100%; object-fit: contain;"
                   src="./assets/images/tracks/{{ next_track.track_id }}.png"
                 />
               </div>
@@ -317,6 +315,50 @@
       </c-card-body>
     </c-card>
     }
+    </c-row>
+    <c-row class="g-4 align-items-stretch">
+      <c-col>
+        <c-card class="text-center shadow-sm h-100 driver-card">
+          <c-card-header>
+            <h4 class="card-title mb-0">Pilota on Fire 🔥</h4>
+          </c-card-header>
+          <c-card-body class="d-flex flex-column flex-md-row align-items-center justify-content-center text-center text-md-start">
+            <img
+              class="card-avatar driver-avatar mb-2 mb-md-0 me-md-3"
+              src="./assets/images/avatars/{{ driverOfWeek.driver_username }}.png"
+              alt="{{ driverOfWeek.driver_username }}'s avatar"
+            />
+            <div class="separator my-2 my-md-0 mx-md-3"></div>    
+            <div class="info-box p-2 rounded">
+              <strong>{{ driverOfWeek.driver_username }}</strong><br>
+              {{ driverOfWeek.points }} Pt.
+            </div>
+          </c-card-body>
+        </c-card>
+      </c-col>
+      <c-col>
+        <c-card class="text-center shadow-sm h-100 team-card">
+          <c-card-header>
+            <h4 class="card-title mb-0">Squadra on Fire 🔥</h4>
+          </c-card-header>
+            <c-card-body
+              class="d-flex flex-column flex-md-row align-items-center justify-content-center text-center text-md-start"
+            >
+              <img
+                class="card-avatar constructor-avatar mb-2 mb-md-0 me-md-3"
+                src="./assets/images/constructors/{{ constructorOfWeek.constructor_name }}.png"
+                alt="{{ constructorOfWeek.constructor_name }}'s logo"
+              />
+              <div class="separator my-2 my-md-0 mx-md-3"></div>
+              <div class="info-box p-2 rounded">
+                <strong>{{ constructorOfWeek.constructor_name }}</strong><br />
+                {{ constructorOfWeek.points }} Pt.
+              </div>
+            </c-card-body>
+        </c-card>
+      </c-col>
+    </c-row>
+   
   </c-col>
 </c-row>
 <div id="twitch-embed"></div>

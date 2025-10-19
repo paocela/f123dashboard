@@ -1,10 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { PostgresService } from "@genezio-sdk/f123dashboard" 
-import { Season } from '../model/season';
-import { z } from "zod";
-
-const schema = z.coerce.date().optional();
+import { PostgresService, Season } from "@genezio-sdk/f123dashboard" 
 
 @Injectable({ providedIn: 'root' })
 export class SeasonService {
@@ -25,22 +21,13 @@ export class SeasonService {
   }
 
   public setAllSeasons() {
-    PostgresService.getAllSeasons().then((seasons: string) => {
-      
-      JSON.parse(seasons).forEach((season: any) => {
-  
-        this.allSesons.push({
-          id: season.id,
-          description: season.description,
-          startDate: new Date(season.start_date),
-          endDate: new Date(season.end_date)
-        })
-      });
-      if (this.allSesons.length === 0) {
+    PostgresService.getAllSeasons().then((seasons: Season[]) => {
+      if (seasons.length === 0) {
         console.error("No seasons found in the database.");
         return;
       }
-      const latestSeason = this.allSesons.reduce((latest, current) => 
+      this.allSesons = seasons;
+      const latestSeason = this.allSesons.reduce((latest, current) =>
         latest?.startDate && current?.startDate && latest.startDate > current.startDate ? latest : current
         , this.allSesons[0]
       );
