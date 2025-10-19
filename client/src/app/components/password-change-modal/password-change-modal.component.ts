@@ -92,8 +92,8 @@ export class PasswordChangeModalComponent implements OnDestroy {
       return false;
     }
 
-    if (!this.isPasswordStrong(this.newPassword)) {
-      this.errorMessage = 'La password deve contenere almeno una lettera maiuscola, una lettera minuscola, un numero e un carattere speciale';
+    if (!this.authService.isPasswordStrong(this.newPassword)) {
+      this.errorMessage = 'La password deve contenere almeno una lettera maiuscola, una lettera minuscola e un numero';
       return false;
     }
 
@@ -121,7 +121,7 @@ export class PasswordChangeModalComponent implements OnDestroy {
 
     try {
 
-      const response = await this.authService.changePassword(this.confirmPassword, this.newPassword);
+      const response = await this.authService.changePassword(this.currentPassword, this.newPassword);
 
       if (response.success) {
         this.successMessage = 'Password cambiata con successo!';
@@ -144,14 +144,5 @@ export class PasswordChangeModalComponent implements OnDestroy {
 
   onModalHidden(): void {
     this.resetForm();
-  }
-
-  private isPasswordStrong(password: string): boolean {
-    const hasUpperCase = /[A-Z]/.test(password);
-    const hasLowerCase = /[a-z]/.test(password);
-    const hasNumbers = /\d/.test(password);
-    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-
-    return hasUpperCase && hasLowerCase && hasNumbers && hasSpecialChar;
   }
 }

@@ -212,12 +212,31 @@ export class DbDataService {
 
   getAvatarSrc(user: User | null): string {
     if (user?.image) {
+      // Handle case where image might be a Buffer or other non-string type
+      const image = user.image as any; // Type assertion since image can be Buffer from DB
+      let imageStr: string;
+      
+      if (typeof image === 'string') {
+        imageStr = image;
+      } else if (image instanceof ArrayBuffer || image instanceof Uint8Array) {
+        // Convert Buffer/ArrayBuffer to base64 string
+        const bytes = new Uint8Array(image);
+        imageStr = btoa(String.fromCharCode(...bytes));
+      } else if (image && typeof image === 'object' && 'data' in image) {
+        // Handle Buffer-like object with data property
+        const bytes = new Uint8Array(image.data);
+        imageStr = btoa(String.fromCharCode(...bytes));
+      } else {
+        // Try to convert to string
+        imageStr = String(image);
+      }
+      
       // Check if it's already a data URL (base64)
-      if (user.image.startsWith('data:')) {
-        return user.image;
+      if (imageStr.startsWith('data:')) {
+        return imageStr;
       }
       // If it's base64 without data URL prefix, add it
-      return `data:image/jpeg;base64,${user.image}`;
+      return `data:image/jpeg;base64,${imageStr}`;
     }
     // Fallback to file path
     return `./assets/images/avatars_fanta/${user?.id || 'default'}.png`;

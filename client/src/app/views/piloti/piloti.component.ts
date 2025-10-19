@@ -56,7 +56,7 @@ export class PilotiComponent implements OnInit {
   private readonly CHART_TEXT_SIZE = 12;
 
   // Opzioni comuni per il radar chart
-  radarChartOptions: ChartOptions<'radar'> = {
+  radarChartOptions: any = {
     responsive: true,
     maintainAspectRatio: false, // Mantiene il grafico quadrato
     scales: {
