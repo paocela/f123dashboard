@@ -65,17 +65,11 @@ export class ApiService {
   }
 
   /**
-   * Create headers with user agent
+   * Create headers for API requests
    */
-  createHeaders(includeUserAgent: boolean = true): any {
-    const headers: any = {
+  createHeaders(): any {
+    return {
       'Content-Type': 'application/json'
     };
-
-    if (includeUserAgent) {
-      headers['User-Agent'] = navigator.userAgent;
-    }
-
-    return headers;
   }
 }

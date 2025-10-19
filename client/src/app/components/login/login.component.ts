@@ -112,7 +112,7 @@ export class LoginComponent {
       }, true); // Skip navigation initially
 
       if (response.success) {
-        this.successMessage = 'Login successful! Redirecting...';
+        this.successMessage = 'Login effettuato con successo! Reindirizzamento...';
         this.dropdown.toggleDropdown();
 
         // Check if user has email, if not open registration modal for email completion
@@ -134,10 +134,10 @@ export class LoginComponent {
         const returnUrl = this.currentUser?.isAdmin ? '/admin' : '/fanta';
         this.router.navigate([returnUrl]);
       } else {
-        this.errorMessage = response.message || 'Login failed. Please try again.';
+        this.errorMessage = response.message || 'Login fallito. Riprova.';
       }
     } catch (error) {
-      this.errorMessage = 'An error occurred during login. Please try again.';
+      this.errorMessage = 'Si è verificato un errore durante il login. Riprova.';
       console.error('Login error:', error);
     } finally {
       this.isLoading = false;
@@ -159,12 +159,12 @@ export class LoginComponent {
     this.passwordError = '';
 
     if (!this.username) {
-      this.usernameError = 'Username is required';
+      this.usernameError = 'Nome utente obbligatorio';
       return false;
     }
 
     if (!this.password) {
-      this.passwordError = 'Password is required';
+      this.passwordError = 'Password obbligatoria';
       return false;
     }
 
@@ -203,28 +203,28 @@ export class LoginComponent {
   }
 
   onRegistrationSuccess() {
-    // Handle successful registration
+    // Gestisce la registrazione avvenuta con successo
     this.isLoggedIn = true;
     this.currentUser = this.authService.getCurrentUser();
   }
 
   onUpdateSuccess() {
-    // Handle successful profile update
+    // Gestisce l'aggiornamento del profilo avvenuto con successo
     this.currentUser = this.authService.getCurrentUser();
     
-    // If user just completed their email, mark them as authenticated and navigate
+    // Se l'utente ha appena completato la sua email, segnalo come autenticato e navigo
     if (this.currentUser && this.currentUser.mail && this.currentUser.mail.trim() !== '') {
       this.authService.markUserAsAuthenticated();
       const returnUrl = this.currentUser.isAdmin ? '/admin' : '/fanta';
       this.router.navigate([returnUrl]);
     }
     
-    // Optionally show a success message or refresh user data
+    // Opzionalmente mostra un messaggio di successo o aggiorna i dati utente
   }
 
   onPasswordChanged() {
-    // Handle successful password change
-    console.log('Password changed successfully');
-    // Could show a success message or perform other actions
+    // Gestisce il cambio password avvenuto con successo
+    console.log('Password modificata con successo');
+    // Potrebbe mostrare un messaggio di successo o eseguire altre azioni
   }
 }

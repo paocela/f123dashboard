@@ -222,6 +222,7 @@ export class RegistrationModalComponent implements OnDestroy {
       fileInput.value = '';
     }
   }
+  
   async onRegistration() {
     if (this.mode === 'register') {
       await this.handleRegistration();
@@ -252,14 +253,14 @@ export class RegistrationModalComponent implements OnDestroy {
       });
 
       if (response.success) {
-        this.successMessage = 'Registration successful!';
+        this.successMessage = 'Registrazione completata con successo!';
         this.registrationSuccess.emit();
         setTimeout(() => this.modal.visible = false, 2000);
       } else {
-        this.singInErrorMessage = response.message || 'Registration failed. Please try again.';
+        this.singInErrorMessage = response.message || 'Registrazione fallita. Riprova.';
       }
     } catch (error) {
-      this.singInErrorMessage = 'An error occurred during registration. Please try again.';
+      this.singInErrorMessage = 'Si è verificato un errore durante la registrazione. Riprova.';
       console.error('Registration error:', error);
     } finally {
       this.isLoading = false;
@@ -321,58 +322,58 @@ export class RegistrationModalComponent implements OnDestroy {
 
   private convertFileToBase64(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
-      // Create an image element to resize the image
+      // Crea un elemento immagine per ridimensionare l'immagine
       const img = new Image();
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
 
       if (!ctx) {
-        reject(new Error('Unable to get canvas context'));
+        reject(new Error('Impossibile ottenere il contesto del canvas'));
         return;
       }
 
       img.onload = () => {
-        // Set canvas size to 80x80px
+        // Imposta le dimensioni del canvas a 80x80px
         canvas.width = 80;
         canvas.height = 80;
 
-        // Calculate crop dimensions to maintain aspect ratio
+        // Calcola le dimensioni di ritaglio per mantenere le proporzioni
         const { sourceX, sourceY, sourceWidth, sourceHeight } = this.calculateCropDimensions(img.width, img.height);
 
-        // Draw the cropped image on the canvas
+        // Disegna l'immagine ritagliata sul canvas
         ctx.drawImage(
           img,
-          sourceX, sourceY, sourceWidth, sourceHeight, // Source rectangle (crop area)
-          0, 0, 80, 80                                  // Destination rectangle (canvas)
+          sourceX, sourceY, sourceWidth, sourceHeight, // Rettangolo sorgente (area di ritaglio)
+          0, 0, 80, 80                                  // Rettangolo destinazione (canvas)
         );
 
-        // Convert canvas to base64
+        // Converti il canvas in base64
         try {
-          const base64String = canvas.toDataURL('image/jpeg', 0.8); // 0.8 quality for JPEG compression
-          // Remove the data URL prefix (e.g., "data:image/jpeg;base64,")
+          const base64String = canvas.toDataURL('image/jpeg', 0.8); // Qualità 0.8 per la compressione JPEG
+          // Rimuovi il prefisso dell'URL dei dati (es. "data:image/jpeg;base64,")
           const base64Data = base64String.split(',')[1];
           resolve(base64Data);
         } catch (error) {
-          reject(new Error('Failed to convert resized image to base64'));
+          reject(new Error('Impossibile convertire l\'immagine ridimensionata in base64'));
         } finally {
-          // Clean up object URL
+          // Pulisci l'URL dell'oggetto
           URL.revokeObjectURL(objectUrl);
         }
       };
 
-      img.onerror = () => reject(new Error('Error loading image for resizing'));
+      img.onerror = () => reject(new Error('Errore durante il caricamento dell\'immagine per il ridimensionamento'));
 
-      // Create object URL for the file and set it as image source
+      // Crea l'URL dell'oggetto per il file e impostalo come sorgente dell'immagine
       const objectUrl = URL.createObjectURL(file);
       img.src = objectUrl;
     });
   }
 
   private calculateCropDimensions(imageWidth: number, imageHeight: number) {
-    // Calculate the size of the square crop area (use the smaller dimension)
+    // Calcola la dimensione dell'area di ritaglio quadrata (usa la dimensione più piccola)
     const cropSize = Math.min(imageWidth, imageHeight);
     
-    // Calculate the position to center the crop
+    // Calcola la posizione per centrare il ritaglio
     const sourceX = (imageWidth - cropSize) / 2;
     const sourceY = (imageHeight - cropSize) / 2;
     
@@ -415,8 +416,8 @@ export class RegistrationModalComponent implements OnDestroy {
     }
 
     // Password strength validation
-    if (!this.isPasswordStrong(this.regPassword)) {
-      this.singInErrorMessage = 'La password deve contenere almeno una lettera maiuscola, una lettera minuscola, un numero e un carattere speciale';
+    if (!this.authService.isPasswordStrong(this.regPassword)) {
+      this.singInErrorMessage = 'La password deve contenere almeno una lettera maiuscola, una lettera minuscola e un numero';
       return false;
     }
 
@@ -426,7 +427,7 @@ export class RegistrationModalComponent implements OnDestroy {
   private validateUpdateForm(): boolean {
     this.singInErrorMessage = '';
 
-    // In email completion mode, only email is required
+    // In email completion mode, email and image are required
     if (this.isEmailCompletion) {
       if (!this.email || this.email.trim() === '') {
         this.singInErrorMessage = 'Email è obbligatoria per completare il profilo';
@@ -440,10 +441,16 @@ export class RegistrationModalComponent implements OnDestroy {
         return false;
       }
 
+      // Image validation
+      if (!this.processedImageBase64 || this.processedImageBase64.trim() === '') {
+        this.singInErrorMessage = 'L\'immagine del profilo è obbligatoria';
+        return false;
+      }
+
       return true;
     }
 
-    // In normal update mode, all fields are required
+    // In normal update mode, all fields including image are required
     if (!this.name || !this.surname || !this.email) {
       this.singInErrorMessage = 'Nome, cognome ed email sono obbligatori';
       return false;
@@ -456,16 +463,13 @@ export class RegistrationModalComponent implements OnDestroy {
       return false;
     }
 
+    // Image validation
+    if (!this.processedImageBase64 || this.processedImageBase64.trim() === '') {
+      this.singInErrorMessage = 'L\'immagine del profilo è obbligatoria';
+      return false;
+    }
+
     return true;
-  }
-
-  private isPasswordStrong(password: string): boolean {
-    const hasUpperCase = /[A-Z]/.test(password);
-    const hasLowerCase = /[a-z]/.test(password);
-    const hasNumbers = /\d/.test(password);
-    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-
-    return hasUpperCase && hasLowerCase && hasNumbers && hasSpecialChar;
   }
 
   getModalTitle(): string {
