@@ -38,7 +38,7 @@ import { Constructor } from '@genezio-sdk/f123dashboard';
     CardImgDirective,
     ChartjsComponent,
     Tabs2Module
-  ]
+]
 })
 
 export class PilotiComponent implements OnInit {

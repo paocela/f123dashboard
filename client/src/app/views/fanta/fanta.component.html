@@ -77,19 +77,13 @@
                     <c-col xs="auto">
                       <div class="small">
                           @if (hasNoData(track.track_id)) {
-                            <p style="margin-bottom: 0;" class="warning">
-                              <c-badge color="warning">Votazione Mancante</c-badge>
-                            </p>
+                            <c-badge color="warning">Votazione<br>Mancante</c-badge>
                           }
                           @if (hasUnsavedData(track.track_id)) {
-                            <p style="margin-bottom: 0;" class="error">
-                              <c-badge color="danger">NON SALVATO!</c-badge>
-                            </p>
+                              <c-badge color="danger">NON<br>Salvato</c-badge>
                           }
                           @if (formStatus[track.track_id] == 1) {
-                            <p style="margin-bottom: 0;" class="success">
                               <c-badge color="success">Salvato</c-badge>
-                            </p>
                           }
                       </div>
                     </c-col>
@@ -108,11 +102,11 @@
                  <c-container>
                     @for (posizione of posizioni | keyvalue; track posizione.key) {
                       <c-row
-                        class="my-2"
-                        [gutter]="{g: 0, sm: {g: 3}}"
+                        class="my-2 position-row"
+                        [gutter]="{g: 2, sm: {g: 3}}"
                       >
-                        <c-col xs="4" sm="auto">
-                          <strong>
+                        <c-col xs="5" sm="3" md="auto" class="position-label">
+                          <strong class="text-nowrap">
                             @if (posizione.key <= 8) {
                               {{ posizione?.value }} posto
                             } @else {
@@ -121,22 +115,21 @@
                           </strong>
                           @if (posizione.key <= 3) {
                             <img
-                              class="cIcon"
-                              style="width: 25px"
+                              class="cIcon medal-icon"
                               attr.src="assets/medals/{{ medals.get(posizione.key) }}"
                             />
                           }
                           @if (posizione.key == 9) {
-                            <svg [cIcon]="fireIcon" style="color: purple"></svg>
+                            <svg [cIcon]="fireIcon" class="position-icon" style="color: purple"></svg>
                           }
                           @if (posizione.key == 10) {
-                            <svg [cIcon]="powerIcon" style="color: red"></svg>
+                            <svg [cIcon]="powerIcon" class="position-icon" style="color: red"></svg>
                           }
                           @if (posizione.key == 11) {
-                            <svg [cIcon]="teamIcon" style="color: blue"></svg>
+                            <svg [cIcon]="teamIcon" class="position-icon" style="color: blue"></svg>
                           }
                         </c-col>
-                        <c-col xs="8" sm="auto" class="ms-auto">
+                        <c-col xs="7" sm="9" md="auto" class="ms-auto select-col">
                           @if (posizione.key <= 10) {
                             <select
                               attr.aria-label="seleziona il pilota che arrivera {{posizione?.value}}"
@@ -177,11 +170,12 @@
                         </c-col>
                       </c-row>
                     }
-                    <c-row>
-                      <c-col></c-col>
+                    <c-row class="submit-row">
                       <c-col class="text-center">
-                        <button cButton type="submit" >Conferma</button>
+                        <button cButton type="submit" class="confirm-button">Conferma</button>
       	              </c-col>
+                    </c-row>
+                    <c-row class="status-row">
                       <c-col class="text-center">
                           @if (formStatus[track.track_id] == 2) {
                             <p class="error">
@@ -255,7 +249,7 @@
                       @if(!votazioni.has(track.track_id)){
                         <c-col xs="auto">
                           <div class="small">
-                            <c-badge color="danger">Votazione non effettuata</c-badge>
+                            <c-badge color="danger">Votazione<br>non effettuata</c-badge>
                           </div>
                         </c-col>
                       }
@@ -273,50 +267,62 @@
                   <div class="accordion-body">
                     <c-container>
                       <c-row>
-                        <table
-                          [hover]="true"
-                          [responsive]="true"
-                          [striped]="true"
-                          align="middle"
-                          cTable
-                          class="mb-0 border"
-                        >
-                          <thead class="text-nowrap text-truncate">
-                            <tr>
-                              <th class="bg-body-tertiary text-center">Voto</th>
-                              <th class="bg-body-tertiary text-center">
-                                <svg cIcon name="cilPeople"></svg>
-                              </th>
-                              <th class="bg-body-tertiary">Username</th>
-                              <th class="bg-body-tertiary text-center">
-                                Posizione di arrivo
-                              </th>
-                              <th class="bg-body-tertiary text-center">
-                                Punti fatti
-                              </th>
-                              <th class="bg-body-tertiary text-center">Risultato</th>
-                            </tr>
-                          </thead>
+                        <div class="table-responsive-custom">
+                          <table
+                            [hover]="true"
+                            [striped]="true"
+                            align="middle"
+                            cTable
+                            class="mb-0 border storico-table"
+                          >
+                            <thead>
+                              <tr>
+                                <th class="bg-body-tertiary text-center col-voto">
+                                  <span class="d-none d-md-inline">Voto</span>
+                                  <span class="d-md-none">#</span>
+                                </th>
+                                <th class="bg-body-tertiary text-center col-avatar">
+                                  <svg cIcon name="cilPeople"></svg>
+                                </th>
+                                <th class="bg-body-tertiary col-username">
+                                  <span class="d-none d-sm-inline">Username</span>
+                                  <span class="d-sm-none">Nome</span>
+                                </th>
+                                <th class="bg-body-tertiary text-center col-posizione">
+                                  <span class="d-none d-md-inline">Posizione di arrivo</span>
+                                  <span class="d-md-none">Pos.</span>
+                                </th>
+                                <th class="bg-body-tertiary text-center col-punti">
+                                  <span class="d-none d-sm-inline">Punti fatti</span>
+                                  <span class="d-sm-none">Pt.</span>
+                                </th>
+                                <th class="bg-body-tertiary text-center col-risultato">
+                                  <span class="d-none d-sm-inline">Risultato</span>
+                                  <span class="d-sm-none">✓</span>
+                                </th>
+                              </tr>
+                            </thead>
 
                           <tbody>
                             @for (voto of votazioni.get(track.track_id); track i; let i = $index) {
                               <tr>
-                                <td>
-                                  <div class="text-center fw-semibold">
+                                <td class="col-voto">
+                                  <div class="text-center fw-semibold voto-label">
                                     @if (i + 1 <= 8 ){
-                                      <div [class]="">{{ i + 1 }}</div>
+                                      <div>{{ i + 1 }}</div>
                                     } @else if ( i + 1 == 9) {
-                                      <div [class]="">GV</div>
+                                      <div>GV</div>
                                     } @else if ( i + 1 == 10) {
-                                      <div [class]="">DNF</div>
+                                      <div>DNF</div>
                                     } @else {
-                                      <div [class]="">TEAM</div>
+                                      <div>TEAM</div>
                                     }
                                   </div>
                                 </td>
-                                <td class="text-center">
+                                <td class="text-center col-avatar">
                                   @if (i + 1 <= 10) {
                                     <c-avatar
+                                      class="storico-avatar"
                                       [size]="'md'"
                                       src="./assets/images/avatars/{{
                                         getPilota(voto)? getPilota(voto).driver_username: 'invalid'
@@ -324,6 +330,7 @@
                                     />
                                   } @else {
                                   <c-avatar
+                                      class="storico-avatar"
                                       [size]="'md'"
                                       src="./assets/images/constructors/{{
                                       getConstructor(voto)
@@ -331,23 +338,20 @@
                                     />
                                   }
                                 </td>
-                                <td>
+                                <td class="col-username">
                                   @if (i + 1 <= 10) {
-                                    <div>{{ getPilota(voto)? getPilota(voto).driver_username : '-' }}</div>
+                                    <div class="username-text">{{ getPilota(voto)? getPilota(voto).driver_username : '-' }}</div>
                                   } @else {
-                                    <div>{{ getConstructor(voto) || '-' }}</div>
+                                    <div class="username-text">{{ getConstructor(voto) || '-' }}</div>
                                   }
-                                  <div
-                                    class="small text-body-secondary text-nowrap"
-                                  ></div>
                                 </td>
-                                <td>
+                                <td class="col-posizione">
                                   @if (i + 1 <= 8 ) {
-                                    <div class="fw-semibold text-center">
+                                    <div class="fw-semibold text-center posizione-value">
                                       {{ getPosizioneArrivo(voto, track.track_id) }}
                                     </div>
                                   } @else if ( i + 1 == 9 ) {
-                                    <div class="fw-semibold text-center">
+                                    <div class="fw-semibold text-center posizione-value">
                                       @if (getFastLap(track.track_id) == voto)
                                       {
                                         SI
@@ -356,7 +360,7 @@
                                       }
                                     </div>
                                   } @else if ( i + 1 == 10 ) {
-                                    <div class="fw-semibold text-center">
+                                    <div class="fw-semibold text-center posizione-value">
                                       @if (fantaService.isDnfCorrect(getDnf(track.track_id), voto))
                                       {
                                         SI
@@ -365,7 +369,7 @@
                                       }
                                     </div>
                                   } @else {
-                                    <div class="fw-semibold text-center">
+                                    <div class="fw-semibold text-center posizione-value">
                                       @if (fantaService.getWinningConstructorForTrack(track.track_id) == voto)
                                       {
                                         SI
@@ -375,8 +379,8 @@
                                     </div>
                                   }
                                 </td>
-                                <td>
-                                  <div class="fw-semibold text-center">
+                                <td class="col-punti">
+                                  <div class="fw-semibold text-center punti-value">
                                     @if (i + 1 <= 8 ) {
                                       {{getPunti(voto, track.track_id)}}
                                     } @else if ( i + 1 == 9 ) {
@@ -388,8 +392,8 @@
                                     }
                                   </div>
                                 </td>
-                                <td>
-                                  <div class="text-center">
+                                <td class="col-risultato">
+                                  <div class="text-center risultato-icon">
                                     @if (i + 1 <= 8 ) {
                                       <svg
                                         [cIcon]="isCorrect(voto, track.track_id).icon"
@@ -429,6 +433,7 @@
                             }
                           </tbody>
                         </table>
+                        </div>
                       </c-row>
                       <c-row class="m-3">
                         <h4 class="text-center text-success">
