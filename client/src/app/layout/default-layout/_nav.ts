@@ -59,7 +59,19 @@ export const getNavItems = (isAdmin: boolean): INavData[] => {
       badge: {
         color: 'success',
         text: 'NEW'
-      }
+      },
+      children: [
+        {
+          name: 'Gestione Gare',
+          url: '/admin',
+          iconComponent: { name: 'cil-calendar' }
+        },
+        {
+          name: 'Gestione Utenti',
+          url: '/admin-change-password',
+          iconComponent: { name: 'cil-user' }
+        }
+      ]
     });
   }
 

@@ -1,9 +1,7 @@
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common'; 
 import { DbDataService } from '../../service/db-data.service';  // aggiunto il servizio per dati db
-import {  ChartOptions } from 'chart.js';  // Import per i grafici
 import { 
-  BorderDirective,
   CardBodyComponent,
   CardComponent,
   CardHeaderComponent,
@@ -37,11 +35,10 @@ import { Constructor } from '@genezio-sdk/f123dashboard';
     CardTextDirective,
     ListGroupDirective,
     ListGroupItemDirective,
-    BorderDirective,
     CardImgDirective,
     ChartjsComponent,
     Tabs2Module
-  ]
+]
 })
 
 export class PilotiComponent implements OnInit {

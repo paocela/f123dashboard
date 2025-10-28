@@ -2,6 +2,8 @@ import { GenezioDeploy, GenezioMethod, GenezioHttpRequest, GenezioHttpResponse }
 import pg from "pg";
 import { createHash, randomBytes } from "crypto";
 import jwt from "jsonwebtoken";
+import { EmailService } from "./mail_interfaces";
+import { getPasswordResetEmailTemplate } from "./email_templates";
 const { Pool } = pg;
 
 type User = {
@@ -29,6 +31,12 @@ type AuthResponse = {
 
 type ChangePasswordRequest = {
   currentPassword: string;
+  newPassword: string;
+  jwtToken: string;
+}
+
+type AdminChangePasswordRequest = {
+  userName: string;
   newPassword: string;
   jwtToken: string;
 }
@@ -376,6 +384,91 @@ export class AuthService {
         success: false,
         message: 'Si è verificato un errore durante la modifica della password'
       };
+    }
+  }
+
+  async adminChangePassword(changeData: AdminChangePasswordRequest): Promise<boolean> {
+    try {
+      // Validate JWT token and check if user is admin
+      const sessionData = await this.validateSession(changeData.jwtToken);
+      
+      if (!sessionData.valid) {
+        console.error('Admin change password: Invalid session');
+        return false;
+      }
+
+      // Check if user is admin
+      if (!sessionData.isAdmin) {
+        console.error('Admin change password: User is not admin');
+        return false;
+      }
+
+      // Validate new password
+      this.validateNewPassword(changeData.newPassword);
+
+      // Check if target user exists and get their ID and email
+      const userResult = await this.pool.query(
+        'SELECT id, username, name, surname, mail FROM users WHERE username = $1',
+        [changeData.userName]
+      );
+
+      if (userResult.rows.length === 0) {
+        console.error('Admin change password: Target user not found');
+        return false;
+      }
+
+      const targetUser = userResult.rows[0];
+      const targetUserId = targetUser.id;
+
+      // Hash new password
+      const hashedNewPassword = this.hashPassword(changeData.newPassword);
+
+      // Update password
+      await this.pool.query(
+        'UPDATE users SET password = $1, password_updated_at = NOW() WHERE id = $2',
+        [hashedNewPassword, targetUserId]
+      );
+
+      // Invalidate all sessions for the target user (force re-login)
+      await this.pool.query(
+        'UPDATE user_sessions SET is_active = FALSE WHERE user_id = $1',
+        [targetUserId]
+      );
+
+      // Send email notification if user has email
+      if (targetUser.mail && targetUser.mail.trim() !== '') {
+        try {
+          const emailService = new EmailService();
+          
+          // Generate email template using the email templates module
+          const { html, text } = getPasswordResetEmailTemplate(
+            { 
+              username: targetUser.username, 
+              name: targetUser.name, 
+              surname: targetUser.surname 
+            },
+            changeData.newPassword
+          );
+
+          await emailService.sendGmailEmail(
+            targetUser.mail,
+            'Password Modificata - Race for Federica',
+            html,
+            text
+          );
+
+          console.log(`Password reset email sent to ${targetUser.username} (${targetUser.mail})`);
+        } catch (emailError) {
+          console.error('Failed to send password reset email:', emailError);
+          // Don't fail the password change if email fails
+        }
+      }
+
+      return true;
+
+    } catch (error) {
+      console.error('Admin change password error:', error);
+      return false;
     }
   }
 
@@ -913,6 +1006,16 @@ export class AuthService {
 
     if (!hasUpperCase || !hasLowerCase || !hasNumbers) {
       throw new Error('La nuova password deve contenere almeno una lettera maiuscola, una lettera minuscola e un numero');
+    }
+  }
+
+  private validateNewPassword(newPassword: string): void {
+    if (!newPassword) {
+      throw new Error('La nuova password è obbligatoria');
+    }
+
+    if (newPassword.length < 8) {
+      throw new Error('La nuova password deve contenere almeno 8 caratteri');
     }
   }
 

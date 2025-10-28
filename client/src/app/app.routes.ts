@@ -53,6 +53,12 @@ export const routes: Routes = [
         loadChildren: () => import('./views/admin/routes').then((m) => m.routes),
         canActivate: [adminGuard]
       },
+      /* routing admin change password */
+      {
+        path: 'admin-change-password',
+        loadChildren: () => import('./views/admin-change-password/routes').then((m) => m.routes),
+        canActivate: [adminGuard]
+      },
       /* routing credits */
       {
         path: 'credits',
