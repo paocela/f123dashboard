@@ -58,7 +58,6 @@ export class LoginComponent {
   isLoading: boolean = false;
   isLoggedIn: boolean = false;
   errorMessage: string = '';
-  successMessage: string = '';
 
   // Validation errors
   usernameError: string = '';
@@ -100,6 +99,8 @@ export class LoginComponent {
   }
 
   async onLogin() {
+    this.isLoading = true;
+    this.errorMessage = '';
     if (!this.validateLoginForm()) {
       return;
     }
@@ -112,7 +113,6 @@ export class LoginComponent {
       }, true); // Skip navigation initially
 
       if (response.success) {
-        this.successMessage = 'Login effettuato con successo! Reindirizzamento...';
         this.dropdown.toggleDropdown();
 
         // Check if user has email, if not open registration modal for email completion
