@@ -92,8 +92,8 @@ export class VoteHistoryTableComponent {
       return 0;
     }
     
-    // Both positions are 1-based (1-8), need to convert to 0-based (0-7) for calculation
-    return this.fantaService.pointsWithAbsoluteDifference(posizioneReale - 1, posizioneVotata - 1);
+    // Both positions are 1-based (1-8), pass as-is to match service method usage
+    return this.fantaService.pointsWithAbsoluteDifference(posizioneReale, posizioneVotata);
   }
 
   getPuntiFastLap(): number {
@@ -135,7 +135,7 @@ export class VoteHistoryTableComponent {
       return { icon: cilX, color: 'red' };
     }
     
-    const punti = this.fantaService.pointsWithAbsoluteDifference(posizioneReale - 1, posizioneVotata - 1);
+    const punti = this.fantaService.pointsWithAbsoluteDifference(posizioneReale, posizioneVotata);
     
     if (punti === FantaService.CORRECT_RESPONSE_POINTS[0]) {
       return { icon: cilCheckAlt, color: 'green' };

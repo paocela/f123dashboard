@@ -4,7 +4,7 @@ import { GridModule, TableDirective, ModalComponent, ModalHeaderComponent, Modal
 import { LeaderBoard } from '../../../app/model/leaderboard'
 import { FantaService } from '../../../app/service/fanta.service';
 import { DbDataService } from '../../../app/service/db-data.service';
-import { cilPeople, cilInfo, cilList } from '@coreui/icons';
+import { cilPeople, cilInfo, cilBell } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
 import { AvatarComponent, TextColorDirective } from '@coreui/angular';
 import { User, FantaVote } from '@genezio-sdk/f123dashboard';
@@ -39,6 +39,7 @@ export class LeaderboardComponent {
   @Input() showVotes: boolean = true;
   public cilPeople: string[] = cilPeople;
   public cilInfo: string[] = cilInfo;
+  public cilBell: string[] = cilBell;
   public allFlags = allFlags;
 
   modalVisible: boolean = false;
