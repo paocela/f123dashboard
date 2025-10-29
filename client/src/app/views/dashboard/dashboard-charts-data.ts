@@ -4,20 +4,44 @@ import {
   ChartDataset,
   ChartOptions,
   ChartType,
-  ScaleOptions} from 'chart.js';
+  ScaleOptions
+} from 'chart.js';
 
 import { getStyle } from '@coreui/utils';
-import {DbDataService} from '../../service/db-data.service'; 
+import { DbDataService } from '../../service/db-data.service'; 
 import { CumulativePointsData } from '@genezio-sdk/f123dashboard';
+
+// Constants
+const DEFAULT_CHART_SCALE = 500;
+const MONTH_PERIOD_ELEMENTS = 12;
+const ALL_PERIOD_ELEMENTS = 27;
+const DEFAULT_MAX_RACES = 8;
+const SCALE_ROUNDING = 100;
+const DESKTOP_BREAKPOINT = 900;
+
+const DRIVER_COLORS = [
+  '#8a2be2', '#32cd32', '#c0c0c0', '#f86c6b', '#ffa500', '#6495ed',
+  '#ff6384', '#36a2eb', '#ffce56', '#4bc0c0', '#9966ff', '#ff9f40'
+];
+
+interface Track {
+  name: string;
+  country: string;
+  [key: string]: any;
+}
+
+interface DriverDataMap {
+  [driverUsername: string]: (number | null)[];
+}
 
 export interface IChartProps {
   data?: ChartData;
-  labels?: any;
+  labels?: string[];
   options?: ChartOptions;
   colors?: any;
   type: ChartType;
   legend?: any;
-
+  elements?: number;
   [propName: string]: any;
 }
 
@@ -25,113 +49,262 @@ export interface IChartProps {
   providedIn: 'any'
 })
 export class DashboardChartsData {
+  public mainChart: IChartProps = { type: 'line' };
+  public championshipTrend: CumulativePointsData[] = [];
+  public championshipTracks: Track[] = [];
+
+  private chartScale: number = DEFAULT_CHART_SCALE;
+
   constructor(private dbData: DbDataService) {
     this.initMainChart();
   }
 
-  public mainChart: IChartProps = { type: 'line' };
-  public championshipTrend: CumulativePointsData[] = [];
-  public championshipTracks: any[] = [];
 
-  private chartScale: number = 500;
-
-  public random(min: number, max: number) {
-    return Math.floor(Math.random() * (max - min + 1) + min);
+  /**
+   * Initialize the main championship chart with cumulative points data.
+   * @param period - Chart period: 'Month' shows last N races, 'all' shows entire season
+   * @param maxNumberOfRaces - Maximum number of races to display in Month view
+   */
+  initMainChart(period: string = 'all', maxNumberOfRaces: number = DEFAULT_MAX_RACES): void {
+    this.loadChartData();
+    
+    const completedTracks = this.getCompletedTracks();
+    const uniqueDrivers = this.getUniqueDrivers();
+    
+    this.mainChart.elements = period === 'Month' ? MONTH_PERIOD_ELEMENTS : ALL_PERIOD_ELEMENTS;
+    
+    const { labels, driverData } = period === 'Month' 
+      ? this.prepareMonthPeriodData(completedTracks, maxNumberOfRaces, uniqueDrivers)
+      : this.prepareAllPeriodData(completedTracks.length, uniqueDrivers);
+    
+    this.updateChartConfiguration(labels, driverData, uniqueDrivers);
   }
 
-  initMainChart(period: string = 'all', maxNumberOfRaces: number = 8) {
-
-    this.championshipTrend = this.dbData.getCumulativePoints() ;
+  /**
+   * Load championship trend and track data from the database service.
+   */
+  private loadChartData(): void {
+    this.championshipTrend = this.dbData.getCumulativePoints();
     this.championshipTracks = this.dbData.getAllTracks();
-    const screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+  }
 
-    // mainChart
-    this.mainChart['elements'] = period === 'Month' ? 12 : 27;
+  /**
+   * Get list of tracks that have completed races.
+   */
+  private getCompletedTracks(): Track[] {
+    const completedTrackNames = new Set(
+      this.championshipTrend.map(item => item.track_name)
+    );
     
-    // Dynamically initialize mainChart arrays for each driver found in championshipTrend
-    const uniqueDrivers = [...new Set(this.championshipTrend.map(item => item.driver_username))];
-    for (const driverUsername of uniqueDrivers) {
-      this.mainChart[driverUsername] = [];
+    return this.championshipTracks.filter(track => 
+      completedTrackNames.has(track.name)
+    );
+  }
+
+  /**
+   * Get unique list of driver usernames from championship data.
+   */
+  private getUniqueDrivers(): string[] {
+    return [...new Set(this.championshipTrend.map(item => item.driver_username))];
+  }
+
+  /**
+   * Group championship data by driver username.
+   */
+  private groupDataByDriver(): DriverDataMap {
+    const driverData: DriverDataMap = {};
+    
+    for (const trendItem of this.championshipTrend) {
+      if (!driverData[trendItem.driver_username]) {
+        driverData[trendItem.driver_username] = [];
+      }
+      driverData[trendItem.driver_username].push(Number(trendItem.cumulative_points));
     }
+    
+    return driverData;
+  }
 
-    // Initialize arrays for all drivers found in the data
-    for (let pippo of this.championshipTrend) {
-      if (!this.mainChart[pippo.driver_username]) {
-        this.mainChart[pippo.driver_username] = [];
-      }
-    }
+  /**
+   * Prepare data for the Month period view (showing last N races).
+   */
+  private prepareMonthPeriodData(
+    completedTracks: Track[], 
+    maxNumberOfRaces: number,
+    uniqueDrivers: string[]
+  ): { labels: string[], driverData: DriverDataMap } {
+    const tracksToUse = this.selectTracksForMonthView(completedTracks, maxNumberOfRaces);
+    const labels = tracksToUse.map(track => track.country);
+    
+    const driverData = this.groupDataByDriver();
+    const processedDriverData = this.processMonthPeriodDriverData(
+      driverData, 
+      completedTracks.length, 
+      maxNumberOfRaces
+    );
+    
+    return { labels, driverData: processedDriverData };
+  }
 
-    let labels: string[] = [];
-    if (period === 'Month') {
-      //se minore di 8 record prendi le piste da qui 
-      if (labels.length < maxNumberOfRaces){
-        labels = this.championshipTracks.slice(0, maxNumberOfRaces).map(track => track.country);
-      }else {
-        labels=this.championshipTracks
-          .map(track => track.country)
-          .slice(labels.length - maxNumberOfRaces, labels.length);
-      }
-
-      const driverData: { [key: string]: number[] } = {};
-
-      for (let trendItem of this.championshipTrend) {
-        if (!driverData[trendItem.driver_username]) {
-          driverData[trendItem.driver_username] = [];
-        }
-        driverData[trendItem.driver_username].push(trendItem.cumulative_points);
-      }
-      let maxDriverValue = 0;
-      for (let driver in driverData) {
-        // Recupero ultimi maxNumberOfRaces risultati (o tutti se ce ne sono meno)
-        const data = driverData[driver].slice(-maxNumberOfRaces);
-
-        // Handle edge case: se abbiamo solo una gara o meno gare di maxNumberOfRaces
-        let firstValue = 0;
-        if (driverData[driver].length > maxNumberOfRaces) {
-          // Se abbiamo più gare di maxNumberOfRaces, prendiamo il valore precedente al periodo
-          firstValue = driverData[driver][(driverData[driver].length - maxNumberOfRaces) - 1];
-        } else if (driverData[driver].length > 1) {
-          // Se abbiamo almeno 2 gare ma meno di maxNumberOfRaces, prendiamo il primo valore
-          firstValue = driverData[driver][0];
-        }
-        // Se abbiamo solo 1 gara, firstValue resta 0
-        
-        this.mainChart[driver] = data.map(value => value - firstValue);
-        
-        // Trova il valore massimo per ogni driver e aggiorna maxDriverValue se necessario
-        const driverMax = Math.max(...data) - firstValue;
-        if (driverMax > maxDriverValue) {
-          maxDriverValue = driverMax;
-        }
-      }
-
-      // Setta una variabile con il valore massimo arrotondato alle centinaia per eccesso
-      this.chartScale = Math.ceil(maxDriverValue / 100) * 100;
+  /**
+   * Select which tracks to display in Month view.
+   */
+  private selectTracksForMonthView(completedTracks: Track[], maxNumberOfRaces: number): Track[] {
+    const numberOfCompletedRaces = completedTracks.length;
+    
+    if (numberOfCompletedRaces < maxNumberOfRaces) {
+      // Include upcoming races to fill the chart
+      const racesNeeded = maxNumberOfRaces - numberOfCompletedRaces;
+      const completedTrackNames = new Set(completedTracks.map(t => t.name));
       
+      const upcomingTracks = this.championshipTracks
+        .filter(track => !completedTrackNames.has(track.name))
+        .slice(0, racesNeeded);
+      
+      return [...completedTracks, ...upcomingTracks];
     } else {
-      /* tslint:disable:max-line-length */
-      labels = this.championshipTracks.map(track => track.country);
-
-
-      for (let pippo of this.championshipTrend ){
-        this.mainChart[pippo.driver_username].push(pippo.cumulative_points)
-      }
-
-      // Trova il valore massimo in championshipTrend
-      const maxTrendValue = Math.max(...this.championshipTrend.map(item => item.cumulative_points));
-      // Arrotonda il valore massimo alle centinaia per eccesso
-      this.chartScale = Math.ceil(maxTrendValue / 100) * 100;
+      // Show only the last N completed races
+      const startIndex = Math.max(0, completedTracks.length - maxNumberOfRaces);
+      return completedTracks.slice(startIndex);
     }
+  }
 
-    const defaultColors = [
-      '#8a2be2', '#32cd32', '#c0c0c0', '#f86c6b', '#ffa500', '#6495ed',
-      '#ff6384', '#36a2eb', '#ffce56', '#4bc0c0', '#9966ff', '#ff9f40'
-    ];
+  /**
+   * Process driver data for Month view, calculating relative points from first race.
+   */
+  private processMonthPeriodDriverData(
+    driverData: DriverDataMap, 
+    numberOfCompletedRaces: number, 
+    maxNumberOfRaces: number
+  ): DriverDataMap {
+    const processedData: DriverDataMap = {};
+    let maxDriverValue = 0;
+    
+    for (const driver in driverData) {
+      // Reverse to get chronological order (oldest to newest)
+      const allData = driverData[driver].reverse();
+      
+      // Select data slice to show
+      const dataToShow = this.selectDataSlice(allData, numberOfCompletedRaces, maxNumberOfRaces);
+      
+      // Calculate relative points from baseline (first value)
+      const baselineValue = dataToShow.find(v => v !== null) ?? 0;
+      const relativeData = dataToShow.map((value: number | null) => 
+        value === null ? null : value - baselineValue
+      );
+      
+      processedData[driver] = relativeData;
+      
+      // Track maximum value for chart scaling
+      const driverMax = this.getMaxValue(relativeData);
+      if (driverMax > maxDriverValue) {
+        maxDriverValue = driverMax;
+      }
+    }
+    
+    // Round chart scale up to nearest hundred
+    this.chartScale = Math.ceil(maxDriverValue / SCALE_ROUNDING) * SCALE_ROUNDING;
+    
+    return processedData;
+  }
 
-    // Generate datasets dynamically based on championshipTrend driver_username data
-    const datasets: ChartDataset[] = uniqueDrivers.map((driverUsername, index) => {
-      const colorIndex = index % defaultColors.length;
-      const color = defaultColors[colorIndex];
+  /**
+   * Select appropriate data slice based on completed and requested races.
+   */
+  private selectDataSlice(
+    allData: (number | null)[], 
+    numberOfCompletedRaces: number, 
+    maxNumberOfRaces: number
+  ): (number | null)[] {
+    if (numberOfCompletedRaces < maxNumberOfRaces) {
+      // Pad with nulls for upcoming races
+      const paddingNeeded = maxNumberOfRaces - numberOfCompletedRaces;
+      const padding = new Array(paddingNeeded).fill(null);
+      return [...allData, ...padding];
+    } else {
+      // Take last N races
+      return allData.slice(-maxNumberOfRaces);
+    }
+  }
+
+  /**
+   * Get maximum non-null value from an array.
+   */
+  private getMaxValue(data: (number | null)[]): number {
+    const completedValues = data.filter((v): v is number => v !== null);
+    return completedValues.length > 0 ? Math.max(...completedValues) : 0;
+  }
+
+  /**
+   * Prepare data for the All period view (showing entire season).
+   */
+  private prepareAllPeriodData(
+    numberOfCompletedRaces: number,
+    uniqueDrivers: string[]
+  ): { labels: string[], driverData: DriverDataMap } {
+    const labels = this.championshipTracks.map(track => track.country);
+    
+    const driverData = this.groupDataByDriver();
+    const processedDriverData = this.processAllPeriodDriverData(driverData, numberOfCompletedRaces);
+    
+    return { labels, driverData: processedDriverData };
+  }
+
+  /**
+   * Process driver data for All view, padding with nulls for upcoming races.
+   */
+  private processAllPeriodDriverData(
+    driverData: DriverDataMap, 
+    numberOfCompletedRaces: number
+  ): DriverDataMap {
+    const processedData: DriverDataMap = {};
+    const upcomingRacesCount = this.championshipTracks.length - numberOfCompletedRaces;
+    const padding = new Array(upcomingRacesCount).fill(null);
+    
+    for (const driver in driverData) {
+      // Reverse to get chronological order and pad for upcoming races
+      const completedData = driverData[driver].reverse();
+      processedData[driver] = [...completedData, ...padding];
+    }
+    
+    // Calculate max value and set chart scale
+    const maxTrendValue = Math.max(
+      ...this.championshipTrend.map(item => Number(item.cumulative_points))
+    );
+    this.chartScale = Math.ceil(maxTrendValue / SCALE_ROUNDING) * SCALE_ROUNDING;
+    
+    return processedData;
+  }
+
+  /**
+   * Update the main chart configuration with processed data.
+   */
+  private updateChartConfiguration(
+    labels: string[], 
+    driverData: DriverDataMap, 
+    uniqueDrivers: string[]
+  ): void {
+    // Store driver data in mainChart for Chart.js consumption
+    for (const driver of uniqueDrivers) {
+      this.mainChart[driver] = driverData[driver] || [];
+    }
+    
+    const datasets = this.createDatasets(uniqueDrivers);
+    const options = this.createChartOptions();
+    
+    this.mainChart.type = 'line';
+    this.mainChart.options = options;
+    this.mainChart.data = {
+      datasets,
+      labels
+    };
+  }
+
+  /**
+   * Create Chart.js datasets for each driver.
+   */
+  private createDatasets(uniqueDrivers: string[]): ChartDataset[] {
+    return uniqueDrivers.map((driverUsername, index) => {
+      const color = DRIVER_COLORS[index % DRIVER_COLORS.length];
       
       return {
         data: this.mainChart[driverUsername] || [],
@@ -142,14 +315,22 @@ export class DashboardChartsData {
         borderWidth: 2,
       };
     });
+  }
 
-
+  /**
+   * Create Chart.js options configuration.
+   */
+  private createChartOptions(): ChartOptions {
+    const screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
     const scales = this.getScales();
-    const radius = screenWidth > 900 ? 900 : screenWidth;
-    const options: ChartOptions = {
+    const pointRadius = this.calculatePointRadius(screenWidth);
+    
+    return {
       maintainAspectRatio: false,
       plugins: {
-        // TODO
+        legend: {
+          display: true
+        }
       },
       scales,
       elements: {
@@ -157,28 +338,37 @@ export class DashboardChartsData {
           tension: 0
         },
         point: {
-          radius: radius / 350,
-          hitRadius: radius / 200,
-          hoverRadius:  radius / 250,
-          hoverBorderWidth: radius / 300
+          radius: pointRadius.radius,
+          hitRadius: pointRadius.hitRadius,
+          hoverRadius: pointRadius.hoverRadius,
+          hoverBorderWidth: pointRadius.hoverBorderWidth
         }
       }
     };
+  }
 
-    this.mainChart.type = 'line';
-    this.mainChart.options = options;
-    this.mainChart.data = {
-      datasets,
-      labels
+  /**
+   * Calculate responsive point sizes based on screen width.
+   */
+  private calculatePointRadius(screenWidth: number) {
+    const baseSize = screenWidth > DESKTOP_BREAKPOINT ? DESKTOP_BREAKPOINT : screenWidth;
+    
+    return {
+      radius: baseSize / 350,
+      hitRadius: baseSize / 200,
+      hoverRadius: baseSize / 250,
+      hoverBorderWidth: baseSize / 300
     };
   }
 
- 
-  getScales() {
+  /**
+   * Get Chart.js scale configuration for X and Y axes.
+   */
+  getScales(): ScaleOptions<any> {
     const colorBorderTranslucent = getStyle('--cui-border-color-translucent');
     const colorBody = getStyle('--cui-body-color');
 
-    const scales: ScaleOptions<any> = {
+    return {
       x: {
         grid: {
           color: colorBorderTranslucent,
@@ -204,6 +394,5 @@ export class DashboardChartsData {
         }
       }
     };
-    return scales;
   }
 }
