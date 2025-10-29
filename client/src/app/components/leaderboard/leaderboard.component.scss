@@ -2,4 +2,20 @@
     border-collapse: separate;
     border-spacing: 0;
     overflow: hidden; /* Nasconde i bordi sporgenti */
+}
+
+// Clickable row styling
+tr[style*="cursor: pointer"] {
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.05) !important;
   }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+  tr[style*="cursor: pointer"]:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+  }
+}

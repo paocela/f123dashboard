@@ -258,6 +258,29 @@ The `fanta` table stores fantasy team selections, while the result entry tables 
 
 ---
 
+## 18. Property
+
+- **id**: Primary key (serial4, auto-increment)
+- **name**: Unique property name identifier (VARCHAR 255, NOT NULL, UNIQUE)
+- **description**: Human-readable description of the property (text, nullable)
+- **value**: Property value stored as string (VARCHAR 500, NOT NULL)
+- **created_at**: Timestamp when property was created (default: NOW())
+- **updated_at**: Timestamp when property was last updated (default: NOW())
+
+**Purpose**: Stores application configuration properties and feature flags that can be modified without code deployment.
+
+**Common Use Cases**:
+- Feature toggles (e.g., enabling/disabling cron jobs)
+- Application settings
+- Dynamic configuration values
+
+**Index**: Indexed on `name` column for fast lookups
+
+**Example Properties**:
+- `send_incoming_race_mail_enabled`: Controls the automated email notification cron job (1=enabled, 0=disabled)
+
+---
+
 ## Database Views
 
 The database includes several important views for data analysis:
@@ -305,6 +328,7 @@ Simplified view showing race points by result type and driver.
 - **Constructor Teams**: The `constructors` table manages F1 team structures, linking two drivers per constructor with team branding (name and color).
 - **Result Structure**: Instead of storing positions as separate columns, the new structure uses entry tables with position fields for better normalization.
 - **Session Management**: Sessions are managed through the `user_sessions` table with automatic cleanup capabilities.
+- **Configuration Management**: The `property` table provides a flexible key-value store for application configuration and feature flags, allowing dynamic control of features like cron jobs without code deployment.
 - **Data Integrity**: Foreign key constraints ensure data consistency across related tables.
 
 ---

@@ -1,4 +1,14 @@
 <c-row>
+    <!-- Info Banner -->
+    <div class="d-flex justify-content-center mb-3">
+      <c-alert color="success" class="d-inline-flex align-items-center py-1 px-3 mb-0">
+        <svg cIcon name="cilBell" class="flex-shrink-0 me-2" width="16" height="16"></svg>
+        <span class="small mb-0">
+          <strong>NEW!</strong> Clicca sul giocatore per vedere le votazioni
+        </span>
+      </c-alert>
+    </div>
+
     <table
         [hover]="true"
         [responsive]="true"
@@ -18,7 +28,7 @@
         </thead>
         <tbody>
             @for (leaderBoard of leaderBoards.slice(0, maxDisplayable); track leaderBoard.id; let i = $index) {
-                <tr>
+                <tr (click)="openVoteHistoryModal(leaderBoard.id)" style="cursor: pointer;">
                     <td>
                         <div class="text-center fw-semibold">
                             <div [class]="">#{{ i+1 }}</div>
@@ -50,3 +60,44 @@
     </table>
 </c-row>
 
+<!-- Vote History Modal -->
+<c-modal [visible]="modalVisible" (visibleChange)="modalVisible = $event" size="lg">
+  <c-modal-header>
+    <h5 cModalTitle class="w-100 text-center">
+      <svg cIcon name="cilList" class="me-2" width="24" height="24"></svg>
+      Storico Votazioni di <strong>{{ selectedUser?.username }}</strong>
+    </h5>
+    <button (click)="closeModal()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>
+    @if (userVotes.length === 0) {
+      <p class="text-center text-muted">Nessuna votazione disponibile</p>
+    } @else {
+      @for (voteData of userVotes; track voteData.trackId) {
+        <div class="mb-4">
+          <h6 class="text-center mb-3">
+            <svg
+              class="mx-1"
+              size="lg"
+              [cIcon]="allFlags[voteData.trackCountry]"
+            ></svg>
+            <strong>{{ voteData.trackName }}</strong>
+            <svg
+              class="mx-1"
+              size="lg"
+              [cIcon]="allFlags[voteData.trackCountry]"
+            ></svg>
+          </h6>
+          <app-vote-history-table 
+            [fantaVote]="voteData.vote" 
+            [trackId]="voteData.trackId"
+            [showTotalPoints]="true">
+          </app-vote-history-table>
+        </div>
+        @if (!$last) {
+          <hr class="my-4">
+        }
+      }
+    }
+  </c-modal-body>
+</c-modal>

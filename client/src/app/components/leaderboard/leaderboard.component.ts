@@ -1,13 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import { GridModule, TableDirective } from '@coreui/angular';
+import { GridModule, TableDirective, ModalComponent, ModalHeaderComponent, ModalTitleDirective, ModalBodyComponent, ButtonCloseDirective, ThemeDirective, AlertModule } from '@coreui/angular';
 import { LeaderBoard } from '../../../app/model/leaderboard'
 import { FantaService } from '../../../app/service/fanta.service';
 import { DbDataService } from '../../../app/service/db-data.service';
-import { cilPeople} from '@coreui/icons';
+import { cilPeople, cilInfo, cilList } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
 import { AvatarComponent, TextColorDirective } from '@coreui/angular';
-import { User } from '@genezio-sdk/f123dashboard';
+import { User, FantaVote } from '@genezio-sdk/f123dashboard';
+import { VoteHistoryTableComponent } from '../vote-history-table/vote-history-table.component';
+import { allFlags } from '../../model/constants';
 
 
 @Component({
@@ -18,7 +20,15 @@ import { User } from '@genezio-sdk/f123dashboard';
         TableDirective,
         IconDirective,
         TextColorDirective,
-        AvatarComponent
+        AvatarComponent,
+        ModalComponent,
+        ModalHeaderComponent,
+        ModalTitleDirective,
+        ModalBodyComponent,
+        ButtonCloseDirective,
+        ThemeDirective,
+        VoteHistoryTableComponent,
+        AlertModule
     ],
     templateUrl: './leaderboard.component.html',
     styleUrl: './leaderboard.component.scss'
@@ -28,6 +38,12 @@ export class LeaderboardComponent {
   @Input() maxDisplayable: number | undefined = undefined; // Default value set to 10
   @Input() showVotes: boolean = true;
   public cilPeople: string[] = cilPeople;
+  public cilInfo: string[] = cilInfo;
+  public allFlags = allFlags;
+
+  modalVisible: boolean = false;
+  selectedUser: User | null = null;
+  userVotes: { vote: FantaVote, trackId: number, trackName: string, trackCountry: string }[] = [];
 
   constructor(private fantaService: FantaService, private dbData: DbDataService){}
 
@@ -57,5 +73,50 @@ export class LeaderboardComponent {
     }
     // Fallback to file path
     return `./assets/images/avatars_fanta/${userId}.png`;
+  }
+
+  /**
+   * Open modal with last 2 votes for the selected user
+   */
+  openVoteHistoryModal(userId: number): void {
+    this.selectedUser = this.users.find(u => u.id === userId) || null;
+    if (!this.selectedUser) return;
+
+    // Get all tracks with results
+    const allTracks = this.dbData.getAllTracks();
+    const tracksWithResults = allTracks.filter(track => {
+      const result = this.fantaService.getRaceResult(track.track_id);
+      return result && result.id_1_place != null;
+    });
+
+    // Sort by date descending to get the most recent
+    tracksWithResults.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+    // Get the last 2 races
+    const lastTwoTracks = tracksWithResults.slice(0, 2);
+
+    // Get votes for these races
+    this.userVotes = lastTwoTracks
+      .map(track => {
+        const vote = this.fantaService.getFantaVote(userId, track.track_id);
+        return vote ? {
+          vote,
+          trackId: track.track_id,
+          trackName: track.name,
+          trackCountry: track.country
+        } : null;
+      })
+      .filter(v => v !== null) as { vote: FantaVote, trackId: number, trackName: string, trackCountry: string }[];
+
+    this.modalVisible = true;
+  }
+
+  /**
+   * Close the modal
+   */
+  closeModal(): void {
+    this.modalVisible = false;
+    this.selectedUser = null;
+    this.userVotes = [];
   }
 }

@@ -55,6 +55,20 @@ export class EmailService {
     @GenezioMethod({ type: "cron", cronString: "0 18 * * *" })
     async sendIncomingRaceMail() {
         try {
+            // Check if the job is enabled via property table
+            const propertyResult = await this.pool.query(`
+                SELECT value 
+                FROM property 
+                WHERE name = 'send_incoming_race_mail_enabled'
+                LIMIT 1;
+            `);
+
+            // If property doesn't exist or value is '0', exit early
+            if (propertyResult.rows.length === 0 || propertyResult.rows[0].value === '0') {
+                console.log("sendIncomingRaceMail job is disabled via property table");
+                return;
+            }
+
             // Get upcoming races within 4 hours
             const upcomingRacesResult = await this.pool.query(`
                 SELECT gp.id, gp.date, t.name as track_name, t.country, gp.has_sprint, gp.has_x2

@@ -9,7 +9,6 @@ import { AccordionComponent,
     ButtonDirective, 
     TemplateIdDirective,
     AccordionButtonDirective,
-    TableDirective,
     AvatarComponent,
     UtilitiesModule,
     BadgeComponent} from '@coreui/angular';
@@ -17,12 +16,12 @@ import { AuthService } from './../../service/auth.service';
 import { GridModule } from '@coreui/angular';
 import { DbDataService } from './../../service/db-data.service';
 import { FantaService } from './../../service/fanta.service';
-import { cilX, cilCheckAlt, cilSwapVertical } from '@coreui/icons';
 import { cilFire, cilPowerStandby, cilPeople } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
 import { VoteStatus, VOTE_INDEX, FORM_STATUS, DRIVER_POSITIONS_COUNT, TOTAL_VOTE_FIELDS, FantaVoteHelper } from '../../model/fanta';
 import { medals, allFlags, posizioni } from '../../model/constants';
 import { LeaderboardComponent } from "../../components/leaderboard/leaderboard.component";
+import { VoteHistoryTableComponent } from '../../components/vote-history-table/vote-history-table.component';
 import {
   ButtonCloseDirective,
   ModalBodyComponent,
@@ -32,7 +31,7 @@ import {
   ThemeDirective
 } from '@coreui/angular';
 import { FantaVote } from '@genezio-sdk/f123dashboard/lib/fantaService.sdk';
-import { RaceResult, User } from '@genezio-sdk/f123dashboard';
+import { User } from '@genezio-sdk/f123dashboard';
 
 @Component({
     selector: 'app-fanta',
@@ -49,11 +48,11 @@ import { RaceResult, User } from '@genezio-sdk/f123dashboard';
         AccordionButtonDirective,
         IconDirective,
         DatePipe,
-        TableDirective,
         AvatarComponent,
         UtilitiesModule,
         BadgeComponent,
         LeaderboardComponent,
+        VoteHistoryTableComponent,
         ModalComponent, ModalHeaderComponent, ModalTitleDirective, ThemeDirective, ButtonCloseDirective, ModalBodyComponent
     ],
     templateUrl: './fanta.component.html',
@@ -264,165 +263,6 @@ export class FantaComponent {
     }
   }
 
-  getPilota(id: number): any | null{
-    return this.piloti.find(driver => driver.driver_id === id.toString()) || null;
-  }
-
-  getConstructor(id: number): string | null{
-    return this.constructors.get(id) || null;
-  }
-
-  getPosizioneArrivo(pilota: number, trackId: number): number{
-    const result: RaceResult | undefined = this.fantaService.getRaceResult(trackId);
-    if (result){
-      if (result.id_1_place == pilota) return 1;
-      if (result.id_2_place == pilota) return 2;
-      if (result.id_3_place == pilota) return 3;
-      if (result.id_4_place == pilota) return 4;
-      if (result.id_5_place == pilota) return 5;
-      if (result.id_6_place == pilota) return 6;
-      if (result.id_7_place == pilota) return 7;
-      if (result.id_8_place == pilota) return 8;
-    }
-    return 0;
-  }
-
-  getFastLap(trackId: number): number {
-    trackId = Number(trackId);
-    const result: RaceResult | undefined = this.fantaService.getRaceResult(trackId);
-    if ( result ) return result.id_fast_lap;
-    return 0;
-  }
-
-  getDnf(trackId: number): string {
-    trackId = Number(trackId);
-    const result: RaceResult | undefined = this.fantaService.getRaceResult(trackId);
-    if ( result ) return result.list_dnf;
-    return "";
-  }
-
-  getPunti(pilota: number, trackId: number): number {
-    const posizioneReale: number = this.getPosizioneArrivo(pilota, trackId); // Posizione effettiva del pilota
-    const posizioneVotata: number = this.getVotoPos(trackId, pilota); // Posizione votata dall'utente per il pilota
-    return posizioneReale > 0 && posizioneVotata > 0 ? this.fantaService.pointsWithAbsoluteDifference(posizioneReale, posizioneVotata) : 0;
-  }
-  
-  /**
-   * Calculates points earned for fastest lap vote.
-   */
-  getPuntiFastLap(trackId: number): number {
-    const posizioneArrivo = this.getFastLap(trackId);
-    const votes = this.votazioni.get(trackId) || [];
-    const votazione = votes[VOTE_INDEX.FAST_LAP];
-    return votazione == posizioneArrivo && votazione !== 0 
-      ? this.fantaService.getCorrectResponsePointFastLap() 
-      : 0;
-  }
-
-  /**
-   * Calculates points earned for DNF vote.
-   */
-  getPuntiDnf(trackId: number): number {    
-    const listDnf = this.getDnf(trackId);
-    const votes = this.votazioni.get(trackId) || [];
-    const votazione = votes[VOTE_INDEX.DNF];
-    return this.fantaService.isDnfCorrect(listDnf, votazione) && votazione !== 0 
-      ? this.fantaService.getCorrectResponsePointDnf() 
-      : 0;
-  }
-
-  /**
-   * Calculates points earned for constructor vote.
-   */
-  getPuntiConstructor(trackId: number): number {
-    const winningConstructorId = this.fantaService.getWinningConstructorForTrack(trackId);
-    const votes = this.votazioni.get(trackId) || [];
-    const votazione = votes[VOTE_INDEX.CONSTRUCTOR];
-    return winningConstructorId == votazione && votazione !== 0 
-      ? this.fantaService.getCorrectResponsePointTeam() 
-      : 0;
-  }
-
-  getPuntiGp( trackId: number): number{
-    return this.fantaService.getFantaRacePoints(this.user.id, trackId);
-  }
-
-  /**
-   * Creates a VoteStatus object based on correctness.
-   * Helper method to reduce redundancy.
-   */
-  private createVoteStatus(isCorrect: boolean, isPartial: boolean = false): VoteStatus {
-    if (isCorrect) {
-      return { icon: cilCheckAlt, color: 'green' };
-    }
-    if (isPartial) {
-      return { icon: cilSwapVertical, color: '#FFA600' };
-    }
-    return { icon: cilX, color: 'red' };
-  }
-
-  /**
-   * Checks if a driver position vote is correct and returns visual status.
-   */
-  isCorrect(pilota: number, trackId: number): VoteStatus {
-    const posizioneReale = this.getPosizioneArrivo(pilota, trackId);
-    const posizioneVotata = this.getVotoPos(trackId, pilota);
-    
-    if (posizioneReale === 0 || posizioneVotata === 0) {
-      return this.createVoteStatus(false);
-    }
-    
-    const punti = this.fantaService.pointsWithAbsoluteDifference(posizioneReale, posizioneVotata);
-    
-    // Check if it's a perfect match
-    if (punti === FantaService.CORRECT_RESPONSE_POINTS[0]) {
-      return this.createVoteStatus(true);
-    }
-    
-    // Check if it's a partial match (off by 1 or 2)
-    if (punti === FantaService.CORRECT_RESPONSE_POINTS[1] || 
-        punti === FantaService.CORRECT_RESPONSE_POINTS[2]) {
-      return this.createVoteStatus(false, true);
-    }
-    
-    return this.createVoteStatus(false);
-  }
-
-  /**
-   * Checks if fastest lap vote is correct and returns visual status.
-   */
-  isCorrectFastLap(trackId: number): VoteStatus {
-    const actualFastLap = this.getFastLap(trackId);
-    const votes = this.votazioni.get(trackId) || [];
-    const votedFastLap = votes[VOTE_INDEX.FAST_LAP];
-    
-    return this.createVoteStatus(votedFastLap == actualFastLap && votedFastLap !== 0);
-  }
-
-  /**
-   * Checks if DNF vote is correct and returns visual status.
-   */
-  isCorrectDnf(trackId: number): VoteStatus {
-    const dnfList = this.getDnf(trackId);
-    const votes = this.votazioni.get(trackId) || [];
-    const votedDnf = votes[VOTE_INDEX.DNF];
-    
-    return this.createVoteStatus(this.fantaService.isDnfCorrect(dnfList, votedDnf));
-  }
-
-  /**
-   * Checks if constructor vote is correct and returns visual status.
-   */
-  isCorrectConstructor(trackId: number): VoteStatus {
-    const winningConstructorId = this.fantaService.getWinningConstructorForTrack(trackId);
-    const votes = this.votazioni.get(trackId) || [];
-    const votedConstructor = votes[VOTE_INDEX.CONSTRUCTOR];
-    
-    return this.createVoteStatus(
-      winningConstructorId === votedConstructor && votedConstructor !== 0
-    );
-  }
-
   toggleModalRanking() {
     this.modalRankingVisible = !this.modalRankingVisible;
   }
@@ -473,6 +313,29 @@ export class FantaComponent {
   
   get avatarSrc(): string {
     return this.dbData.getAvatarSrc(this.user);
+  }
+
+  /**
+   * Convert vote array to FantaVote object for the reusable component
+   */
+  getFantaVoteObject(trackId: number): FantaVote {
+    const voteArray = this.votazioni.get(trackId) || [];
+    return {
+      fanta_player_id: this.user.id,
+      username: this.user.username,
+      track_id: trackId,
+      id_1_place: voteArray[VOTE_INDEX.PLACE_1] || 0,
+      id_2_place: voteArray[VOTE_INDEX.PLACE_2] || 0,
+      id_3_place: voteArray[VOTE_INDEX.PLACE_3] || 0,
+      id_4_place: voteArray[VOTE_INDEX.PLACE_4] || 0,
+      id_5_place: voteArray[VOTE_INDEX.PLACE_5] || 0,
+      id_6_place: voteArray[VOTE_INDEX.PLACE_6] || 0,
+      id_7_place: voteArray[VOTE_INDEX.PLACE_7] || 0,
+      id_8_place: voteArray[VOTE_INDEX.PLACE_8] || 0,
+      id_fast_lap: voteArray[VOTE_INDEX.FAST_LAP] || 0,
+      id_dnf: voteArray[VOTE_INDEX.DNF] || 0,
+      constructor_id: voteArray[VOTE_INDEX.CONSTRUCTOR] || 0
+    };
   }
 
 }
