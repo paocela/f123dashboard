@@ -82,10 +82,6 @@ export class LoginComponent {
     this.authService.isAuthenticated$.subscribe(isAuth => {
       if (isAuth) {
         const user = this.authService.getCurrentUser();
-        // Only navigate if user has email
-        if (user && user.mail && user.mail.trim() !== '') {
-          this.router.navigate(['/fanta']);
-        }
         this.currentUser = user;
         this.isLoggedIn = true;
       }
