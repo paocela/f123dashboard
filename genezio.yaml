@@ -15,13 +15,11 @@ frontend:
             - npm start
     sdk:
         language: ts
-        runtime: nodejs22.x
     subdomain: f123dashboard
 backend:
   path: ./server
   language:
     name: js
-    runtime: nodejs22.x
   scripts:
     deploy:
       - npm install
