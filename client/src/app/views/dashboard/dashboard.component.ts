@@ -20,7 +20,8 @@ import {
   CarouselInnerComponent,
   CarouselItemComponent,
   ThemeDirective,
-  Tabs2Module
+  Tabs2Module,
+  ButtonCloseDirective
 } from '@coreui/angular';
 import { RouterLink } from '@angular/router';
 import { IconDirective } from '@coreui/icons-angular';
@@ -31,7 +32,9 @@ import { TwitchApiService } from '../../service/twitch-api.service';
 import { BehaviorSubject } from 'rxjs';
 import { LoadingService } from '../../service/loading.service';
 import { ChampionshipTrendComponent } from '../../components/championship-trend/championship-trend.component';
-import { Constructor } from '@genezio-sdk/f123dashboard';
+import { Constructor, DriverData } from '@genezio-sdk/f123dashboard';
+import { PilotCardComponent } from '../../components/pilot-card/pilot-card.component';
+import { ConstructorCardComponent } from '../../components/constructor-card/constructor-card.component';
 
 export interface DriverOfWeek {
   driver_username: string;
@@ -76,7 +79,10 @@ export interface ConstructorOfWeek {
     TableDirective,
     AvatarComponent,
     ChampionshipTrendComponent,
-    Tabs2Module
+    Tabs2Module,
+    PilotCardComponent,
+    ButtonCloseDirective,
+    ConstructorCardComponent
 ]
 })
 export class DashboardComponent implements OnInit {
@@ -108,6 +114,16 @@ export class DashboardComponent implements OnInit {
                                                   constructor_driver_1_id: 0, 
                                                   constructor_driver_2_id: 0, 
                                                   points: 0 };
+
+  // Pilot modal
+  public pilotModalVisible = false;
+  public selectedPilot: DriverData | null = null;
+  public selectedPilotPosition: number = 0;
+
+  // Constructor modal
+  public constructorModalVisible = false;
+  public selectedConstructor: Constructor | null = null;
+  public selectedConstructorPosition: number = 0;
 
   public allFlags: {[key: string]: any} = {
     "Bahrain": cifBh,
@@ -222,5 +238,41 @@ export class DashboardComponent implements OnInit {
     }
 
     this.constructorOfWeek = constructorsOfWeek_tmp.sort((a, b) => b.points - a.points)[0];
+  }
+
+  /**
+   * Opens the pilot modal with the selected pilot data
+   */
+  openPilotModal(pilot: DriverData, position: number): void {
+    this.selectedPilot = pilot;
+    this.selectedPilotPosition = position;
+    this.pilotModalVisible = true;
+  }
+
+  /**
+   * Closes the pilot modal
+   */
+  closePilotModal(): void {
+    this.pilotModalVisible = false;
+    this.selectedPilot = null;
+    this.selectedPilotPosition = 0;
+  }
+
+  /**
+   * Opens the constructor modal with the selected constructor data
+   */
+  openConstructorModal(constructor: Constructor, position: number): void {
+    this.selectedConstructor = constructor;
+    this.selectedConstructorPosition = position;
+    this.constructorModalVisible = true;
+  }
+
+  /**
+   * Closes the constructor modal
+   */
+  closeConstructorModal(): void {
+    this.constructorModalVisible = false;
+    this.selectedConstructor = null;
+    this.selectedConstructorPosition = 0;
   }
 }

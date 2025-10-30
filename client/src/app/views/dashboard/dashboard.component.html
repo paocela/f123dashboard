@@ -69,7 +69,7 @@
                 <tbody>
                   @for (user of championship_standings_users; track
                   user.driver_username; let i = $index) {
-                  <tr>
+                  <tr (click)="openPilotModal(user, i + 1)" style="cursor: pointer;">
                     <td>
                       <div class="fw-semibold text-center">#{{ i + 1 }}</div>
                     </td>
@@ -162,7 +162,7 @@
                   <tbody>
                     @for (constructor of constructors; track
                       constructor.constructor_name; let i = $index) {
-                    <tr>
+                    <tr (click)="openConstructorModal(constructor, i + 1)" style="cursor: pointer;">
                       <td>
                         <div class="fw-semibold text-center">#{{ i + 1 }}</div>
                       </td>
@@ -421,6 +421,62 @@
       Risultati Piloti
     </button>
   </c-modal-footer>
+</c-modal>
+
+<!-- Pilot Details Modal -->
+<c-modal
+  id="pilotDetailsModal"
+  alignment="center"
+  size="lg"
+  class="modalAnimation"
+  [visible]="pilotModalVisible"
+  (visibleChange)="pilotModalVisible = $event"
+>
+  <c-modal-header>
+    <h5 cModalTitle class="w-100 text-center">
+      <strong>Dettagli Pilota</strong>
+    </h5>
+    <button (click)="closePilotModal()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>
+    @if (selectedPilot) {
+      <div class="d-flex justify-content-center">
+        <app-pilot-card 
+          [pilota]="selectedPilot" 
+          [position]="selectedPilotPosition"
+          style="max-width: 400px; width: 100%;">
+        </app-pilot-card>
+      </div>
+    }
+  </c-modal-body>
+</c-modal>
+
+<!-- Constructor Details Modal -->
+<c-modal
+  id="constructorDetailsModal"
+  alignment="center"
+  size="lg"
+  class="modalAnimation"
+  [visible]="constructorModalVisible"
+  (visibleChange)="constructorModalVisible = $event"
+>
+  <c-modal-header>
+    <h5 cModalTitle class="w-100 text-center">
+      <strong>Dettagli Costruttore</strong>
+    </h5>
+    <button (click)="closeConstructorModal()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>
+    @if (selectedConstructor) {
+      <div class="d-flex justify-content-center">
+        <app-constructor-card 
+          [constructorData]="selectedConstructor" 
+          [position]="selectedConstructorPosition"
+          style="max-width: 500px; width: 100%;">
+        </app-constructor-card>
+      </div>
+    }
+  </c-modal-body>
 </c-modal>
 
 <script src="https://embed.twitch.tv/embed/v1.js"></script>

@@ -1,0 +1,84 @@
+// Variabili per la personalizzazione rapida
+$card-inner-padding: 0rem; // Padding interno delle card
+$card-text-size: 0.875rem; // Dimensione testo base (14px)
+$card-title-size: 0.9rem; // Dimensione titolo (16px)
+$card-description-height: 65px; // Altezza sezione descrizione
+$list-item-padding: 0; // Padding delle voci della lista
+
+// Stili della card
+.pilot-card {
+  margin-bottom: 0.5rem;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+
+  // Header della card con immagine e descrizione
+  .card-header {
+    padding: $card-inner-padding;
+    
+    img {
+      width: 70%;
+      height: auto;
+      display: block;
+      margin: 5px auto;
+    }
+
+    .card-avatar {
+      border-radius: 50%; /* makes it round (circle/ellipse) */
+    }
+    
+    .card-body {
+      height: $card-description-height;
+      padding: $card-inner-padding;
+      
+      h5 {
+        font-size: $card-title-size;
+        margin-bottom: 0.25rem;
+      }
+      
+      p {
+        font-size: $card-text-size;
+        margin-bottom: 0;
+      }
+    }
+  }
+  
+  // Lista delle statistiche
+  .stats-list {
+    font-size: $card-text-size;
+    
+    .list-group-item {
+      padding: $list-item-padding $card-inner-padding;
+      
+      .row {
+        margin: 0;
+        
+        > div {
+          padding: 0.1rem;
+          
+          &.border-end {
+            border-right-width: 1px;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Stili del grafico radar
+.radar-chart-container {
+  padding: $card-inner-padding;
+  aspect-ratio: 1;
+  width: 100%;
+  max-height: 150px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+
+  c-chart {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100%;
+    margin: 0;
+  }
+}
