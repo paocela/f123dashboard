@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable, OnDestroy, inject } from '@angular/core';
 import { DbDataService } from './db-data.service';
 import { size } from 'lodash-es';
 import { Subscription } from 'rxjs';
@@ -8,6 +8,8 @@ import { FantaVote, RaceResult } from '@genezio-sdk/f123dashboard';
   providedIn: 'root'
 })
 export class FantaService implements OnDestroy {
+  private dbData = inject(DbDataService);
+
   fantaPoints: Map<number,number> = new Map<number,number>(); // track fanta point per player
   fantaNumberVotes: Map<number, number> = new Map<number, number>(); // track how many times a fanta player voted out of all possible votes
   fantaRacePoints: Map<string, number> = new Map<string, number>(); // track points per race per player (key: "playerId_raceId")
@@ -15,9 +17,9 @@ export class FantaService implements OnDestroy {
   raceResults: RaceResult[] = [];
   private subscription: Subscription = new Subscription();
 
-  CORRECT_RESPONSE_FAST_LAP_POINTS: number = 5;
-  CORRECT_RESPONSE_DNF_POINTS: number = 5;
-  CORRECT_RESPONSE_TEAM: number= 5;
+  CORRECT_RESPONSE_FAST_LAP_POINTS = 5;
+  CORRECT_RESPONSE_DNF_POINTS = 5;
+  CORRECT_RESPONSE_TEAM= 5;
   public static CORRECT_RESPONSE_POINTS: Readonly<Record<number, number>> = {
     0: 7,
     1: 4,
@@ -25,7 +27,7 @@ export class FantaService implements OnDestroy {
   };
 
 
-  constructor(private dbData: DbDataService) {
+  constructor() {
     this.initializeData();
     
     // Subscribe to fantaVote changes directly
@@ -53,7 +55,7 @@ export class FantaService implements OnDestroy {
 
     this.raceResults.forEach(raceResult => {
       const raceVotes = this.fantaVotes.filter(item => item.track_id == raceResult.track_id && item.id_1_place != null);
-      if (raceVotes.length === 0) return;
+      if (raceVotes.length === 0) {return;}
 
       raceVotes.forEach(raceVote => {
         const racePoints: number =  this.calculateFantaPoints(raceResult, raceVote);
@@ -87,14 +89,14 @@ export class FantaService implements OnDestroy {
     return this.fantaRacePoints.get(raceKey) ?? 0;
    }
 
-   getFantaRacePointsBreakdown(userId: number): Array<{raceId: number, points: number}> {
-    const breakdown: Array<{raceId: number, points: number}> = [];
+   getFantaRacePointsBreakdown(userId: number): {raceId: number, points: number}[] {
+    const breakdown: {raceId: number, points: number}[] = [];
     
     this.fantaRacePoints.forEach((points, key) => {
       const [playerId, raceId] = key.split('_').map(Number);
-      if (playerId === userId) {
-        breakdown.push({ raceId, points });
-      }
+      if (playerId === userId) 
+        {breakdown.push({ raceId, points });}
+      
     });
     
     return breakdown.sort((a, b) => a.raceId - b.raceId);
@@ -131,7 +133,7 @@ export class FantaService implements OnDestroy {
    }
 
   calculateFantaPoints(raceResult: RaceResult, fantaVote: FantaVote): number {
-    let points: number = 0;
+    let points = 0;
     // Create arrays of positions for both result and vote
     const resultPositions = [
       Number(raceResult.id_1_place), Number(raceResult.id_2_place), Number(raceResult.id_3_place), Number(raceResult.id_4_place),
@@ -146,7 +148,7 @@ export class FantaService implements OnDestroy {
     this.dbData.getDrivers().forEach(driver =>  {
       const realPosition = resultPositions.indexOf(Number(driver.id));
       const votedPosition = votePositions.indexOf(Number(driver.id));
-      if(votedPosition == -1 || realPosition == -1) return;
+      if(votedPosition == -1 || realPosition == -1) {return;}
 
       points += this.pointsWithAbsoluteDifference(realPosition, votedPosition);
     });
@@ -178,7 +180,7 @@ export class FantaService implements OnDestroy {
     //let fantaVoteDnfUsername: string = this.allDrivers.find(driver => driver.driver_id == fantaVoteDnfId)?.driver_username;
     //return raceResultDnf.includes(fantaVoteDnfUsername) ;
     // now list_dnf contains the driver_id, so we can check directly
-    if (!raceResultDnf || !fantaVoteDnfId) return false;
+    if (!raceResultDnf || !fantaVoteDnfId) {return false;}
     // raceResultDnf is a string like "{1,4}", so extract numbers
     const dnfStr = typeof raceResultDnf === 'string' ? raceResultDnf : String(raceResultDnf ?? '');
     const ids = dnfStr.replace(/[{}]/g, '').split(',').map(id => Number(id.trim())).filter(id => !isNaN(id));
@@ -187,7 +189,7 @@ export class FantaService implements OnDestroy {
   }
 
   pointsWithAbsoluteDifference(raceResult: number, fantaVote: number) : number{
-    let absDiff = Math.abs(raceResult - fantaVote);
+    const absDiff = Math.abs(raceResult - fantaVote);
     return FantaService.CORRECT_RESPONSE_POINTS[absDiff] ?? 0;
   }
   

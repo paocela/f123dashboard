@@ -11,11 +11,9 @@ import { CalloutComponent } from '@coreui/angular';
 })
 export class DocsCalloutComponent {
 
-  @Input() name: string = '';
+  @Input() name = '';
 
-  constructor() { }
-
-  private _href: string = 'https://coreui.io/angular/docs/';
+  private _href = 'https://coreui.io/angular/docs/';
 
   get href(): string {
     return this._href;

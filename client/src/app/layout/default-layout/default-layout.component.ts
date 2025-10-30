@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { NgScrollbar } from 'ngx-scrollbar';
 import { Subscription } from 'rxjs';
@@ -50,11 +50,9 @@ function isOverflown(element: HTMLElement) {
     ]
 })
 export class DefaultLayoutComponent implements OnInit, OnDestroy {
+  private authService = inject(AuthService);
+
   private userSubscription?: Subscription;
-  
-  constructor(
-    private authService: AuthService, 
-  ) {}
 
   public navItems = getNavItems(false);
 

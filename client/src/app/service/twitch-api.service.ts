@@ -7,7 +7,7 @@ import { DreandosTwitchInterface, TwitchStreamResponse } from "@genezio-sdk/f123
   providedIn: 'root',
 })
 export class TwitchApiService {
-  private channelId: string = 'dreandos';
+  private channelId = 'dreandos';
   private _isLive = new BehaviorSubject<boolean>(false);
   //public readonly isLive$ = this._isLive.asObservable();
   //public isLive: boolean = false;

@@ -13,5 +13,5 @@ import { TableDirective } from '@coreui/angular';
 export class PodiumCardComponent {
   @Input() podio: any[] = [];
   @Input() classifica: any[] = [];
-  @Input() championshipTitle: string = '';
+  @Input() championshipTitle = '';
 }

@@ -19,10 +19,10 @@ export const adminGuard: CanActivateFn = (route, state) => {
       }
 
       // Check if user is admin
-      if (!currentUser?.isAdmin) {
+      if (!currentUser?.isAdmin) 
         // Redirect non-admin users to dashboard
-        return router.createUrlTree(['/dashboard']);
-      }
+        {return router.createUrlTree(['/dashboard']);}
+      
 
       // Allow access for admin users
       return true;

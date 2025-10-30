@@ -190,7 +190,7 @@ export class DbDataService {
   }
 
 
-  async setGpResult(trackId: Number, gpResult: GpResult): Promise<string> {
+  async setGpResult(trackId: number, gpResult: GpResult): Promise<string> {
     try {
       const result = await PostgresService.setGpResult(
         +trackId,

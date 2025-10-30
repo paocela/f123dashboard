@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ConfigService } from './config.service';
 
@@ -6,9 +6,12 @@ import { ConfigService } from './config.service';
   providedIn: 'root'
 })
 export class ApiService {
+  private http = inject(HttpClient);
+  private configService = inject(ConfigService);
+
   private readonly baseUrl: string;
 
-  constructor(private http: HttpClient, private configService: ConfigService) {
+  constructor() {
     this.baseUrl = this.configService.apiBaseUrl;
   }
 

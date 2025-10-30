@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, inject, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -44,24 +44,29 @@ import { User } from '@genezio-sdk/f123dashboard';
   styleUrl: './login.component.scss',
   standalone: true
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private dbData = inject(DbDataService);
+
   icons = { cilUser, cilLockLocked };
   
   // Current user data
   currentUser: User | null = null;
 
   // Login form fields
-  username: string = '';
-  password: string = '';
+  username = '';
+  password = '';
 
   // State management
-  isLoading: boolean = false;
-  isLoggedIn: boolean = false;
-  errorMessage: string = '';
+  isLoading = false;
+  isLoggedIn = false;
+  errorMessage = '';
 
   // Validation errors
-  usernameError: string = '';
-  passwordError: string = '';
+  usernameError = '';
+  passwordError = '';
 
   public warningIcon: string[] = cilWarning;
   public logoutIcon: string[] = cilAccountLogout;
@@ -69,13 +74,6 @@ export class LoginComponent {
   @ViewChild('loginDropdown') dropdown!: DropdownComponent;
   @ViewChild('registrationModal') registrationModal!: RegistrationModalComponent;
   @ViewChild('passwordChangeModal') passwordChangeModal!: PasswordChangeModalComponent;
-
-  constructor(
-    private authService: AuthService,
-    private router: Router,
-    private route: ActivatedRoute,
-    private dbData: DbDataService
-  ) {}
 
   ngOnInit(): void {
     // Check if user is already logged in
@@ -97,10 +95,9 @@ export class LoginComponent {
   async onLogin() {
     this.isLoading = true;
     this.errorMessage = '';
-    if (!this.validateLoginForm()) {
+    if (!this.validateLoginForm()){
       return;
     }
-
     try {
       // First try login without navigation to check if email is missing
       const response = await this.authService.login({

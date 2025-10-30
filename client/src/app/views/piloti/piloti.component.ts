@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common'; 
 import { DbDataService } from '../../service/db-data.service';
 import { 
@@ -26,15 +26,13 @@ import { ConstructorCardComponent } from '../../components/constructor-card/cons
 })
 
 export class PilotiComponent implements OnInit {
+  private dbData = inject(DbDataService);
+  private cdr = inject(ChangeDetectorRef);
+
 
   piloti: DriverData[] = [];
   constructors: Constructor[] = [];
   isLoading = true;
-
-  constructor(
-    private dbData: DbDataService,
-    private cdr: ChangeDetectorRef
-  ) {}
 
   ngOnInit() {
     try {

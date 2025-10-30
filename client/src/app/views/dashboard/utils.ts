@@ -6,7 +6,7 @@ export type DeepPartial<T> = { [P in keyof T]?: _DeepPartial<T[P]> };
 /** @private */
 export type _DeepPartial<T> = T extends Function
                               ? T
-                              : T extends Array<infer U>
+                              : T extends (infer U)[]
                                 ? _DeepPartialArray<U>
                                 : T extends object
                                   ? DeepPartial<T>

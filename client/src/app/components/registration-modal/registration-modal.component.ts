@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, ViewChild, OnDestroy, Input } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild, OnDestroy, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -33,36 +33,36 @@ import { User } from '@genezio-sdk/f123dashboard';
   standalone: true
 })
 export class RegistrationModalComponent implements OnDestroy {
+  private authService = inject(AuthService);
+
   // Modal mode - 'register' for new users, 'update' for editing profile
   @Input() mode: 'register' | 'update' = 'register';
   @Input() userData: User | null = null;
   
   // Flag to track if we're completing email for existing user
-  public isEmailCompletion: boolean = false;
+  public isEmailCompletion = false;
 
   // Registration form fields
-  name: string = '';
-  surname: string = '';
-  regUsername: string = '';
-  regPassword: string = '';
-  confirmPassword: string = '';
-  email: string = '';
+  name = '';
+  surname = '';
+  regUsername = '';
+  regPassword = '';
+  confirmPassword = '';
+  email = '';
   selectedFile: File | null = null;
-  imagePreviewUrl: string = '';
+  imagePreviewUrl = '';
   // Store the processed base64 data
-  processedImageBase64: string = '';
+  processedImageBase64 = '';
 
   // State management
-  isLoading: boolean = false;
-  singInErrorMessage: string = '';
-  successMessage: string = '';
+  isLoading = false;
+  singInErrorMessage = '';
+  successMessage = '';
 
   @ViewChild('verticallyCenteredModal') public modal!: ModalComponent;
 
   @Output() registrationSuccess = new EventEmitter<void>();
   @Output() updateSuccess = new EventEmitter<void>();
-
-  constructor(private authService: AuthService) {}
 
   ngOnDestroy() {
     // Clean up any preview URL and processed data
@@ -223,23 +223,23 @@ export class RegistrationModalComponent implements OnDestroy {
     this.selectedFile = null;
     // Reset the file input
     const fileInput = document.getElementById('profileImage') as HTMLInputElement;
-    if (fileInput) {
-      fileInput.value = '';
-    }
+    if (fileInput) 
+      {fileInput.value = '';}
+    
   }
   
   async onRegistration() {
-    if (this.mode === 'register') {
-      await this.handleRegistration();
-    } else {
-      await this.handleUpdate();
-    }
+    if (this.mode === 'register') 
+      {await this.handleRegistration();}
+     else 
+      {await this.handleUpdate();}
+    
   }
 
   private async handleRegistration() {
-    if (!this.validateRegistrationForm()) {
-      return;
-    }
+    if (!this.validateRegistrationForm()) 
+      {return;}
+    
 
     this.isLoading = true;
     this.singInErrorMessage = '';
@@ -261,9 +261,9 @@ export class RegistrationModalComponent implements OnDestroy {
         this.successMessage = 'Registrazione completata con successo!';
         this.registrationSuccess.emit();
         setTimeout(() => this.modal.visible = false, 2000);
-      } else {
-        this.singInErrorMessage = response.message || 'Registrazione fallita. Riprova.';
-      }
+      } else 
+        {this.singInErrorMessage = response.message || 'Registrazione fallita. Riprova.';}
+      
     } catch (error) {
       this.singInErrorMessage = 'Si è verificato un errore durante la registrazione. Riprova.';
       console.error('Registration error:', error);
@@ -273,9 +273,9 @@ export class RegistrationModalComponent implements OnDestroy {
   }
 
   private async handleUpdate() {
-    if (!this.validateUpdateForm()) {
-      return;
-    }
+    if (!this.validateUpdateForm()) 
+      {return;}
+    
 
     this.isLoading = true;
     this.singInErrorMessage = '';
@@ -286,19 +286,19 @@ export class RegistrationModalComponent implements OnDestroy {
       
       if (this.userData) {
         // Only include fields that have changed
-        if (this.name !== this.userData.name) {
-          updateData.name = this.name;
-        }
-        if (this.surname !== this.userData.surname) {
-          updateData.surname = this.surname;
-        }
-        if (this.email !== this.userData.mail) {
-          updateData.mail = this.email;
-        }
+        if (this.name !== this.userData.name) 
+          {updateData.name = this.name;}
+        
+        if (this.surname !== this.userData.surname) 
+          {updateData.surname = this.surname;}
+        
+        if (this.email !== this.userData.mail) 
+          {updateData.mail = this.email;}
+        
         // Include image if a new one was selected or if existing image was removed
-        if (this.selectedFile || (this.processedImageBase64 !== this.userData.image)) {
-          updateData.image = this.processedImageBase64;
-        }
+        if (this.selectedFile || (this.processedImageBase64 !== this.userData.image)) 
+          {updateData.image = this.processedImageBase64;}
+        
       }
 
       // Check if there are any changes
@@ -314,9 +314,9 @@ export class RegistrationModalComponent implements OnDestroy {
         this.successMessage = 'Profilo aggiornato con successo!';
         this.updateSuccess.emit();
         setTimeout(() => this.modal.visible = false, 2000);
-      } else {
-        this.singInErrorMessage = response.message || 'Aggiornamento fallito. Riprova.';
-      }
+      } else 
+        {this.singInErrorMessage = response.message || 'Aggiornamento fallito. Riprova.';}
+      
     } catch (error) {
       this.singInErrorMessage = 'Si è verificato un errore durante l\'aggiornamento. Riprova.';
       console.error('Update error:', error);
@@ -478,12 +478,12 @@ export class RegistrationModalComponent implements OnDestroy {
   }
 
   getModalTitle(): string {
-    if (this.mode === 'register') {
-      return 'Crea il tuo account';
-    } else if (this.isEmailCompletion) {
-      return 'Completa il tuo profilo';
-    } else {
-      return 'Modifica il tuo profilo';
-    }
+    if (this.mode === 'register') 
+      {return 'Crea il tuo account';}
+     else if (this.isEmailCompletion) 
+      {return 'Completa il tuo profilo';}
+     else 
+      {return 'Modifica il tuo profilo';}
+    
   }
 }

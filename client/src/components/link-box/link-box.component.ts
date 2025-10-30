@@ -17,13 +17,13 @@ import { cilLink, cibInstagram, cibTwitch } from '@coreui/icons';
 
 export class LinkBoxComponent implements OnDestroy {
 
-  @Input() title: string = '';
-  @Input() linkName: string = '';
-  @Input() linkUrl: string = '';
+  @Input() title = '';
+  @Input() linkName = '';
+  @Input() linkUrl = '';
   @Input() icon : string[] = cilLink;
-  @Input() color: string = '#000000'; // Default color
+  @Input() color = '#000000'; // Default color
 
-  isLargeScreen: boolean = false;
+  isLargeScreen = false;
   private resizeHandler = () => this.checkScreenSize();
 
   constructor() {

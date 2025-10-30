@@ -20,6 +20,11 @@ import { TwitchApiService } from './service/twitch-api.service';
     imports: [RouterOutlet,]
 })
 export class AppComponent implements OnInit {
+  private dbData = inject(DbDataService);
+  private cdr = inject(ChangeDetectorRef);
+  private seasonsService = inject(SeasonService);
+  private twitchApiService = inject(TwitchApiService);
+
   title = 'F1 RaceForFederica';
 
   readonly #destroyRef: DestroyRef = inject(DestroyRef);
@@ -30,12 +35,7 @@ export class AppComponent implements OnInit {
   readonly #colorModeService = inject(ColorModeService);
   readonly #iconSetService = inject(IconSetService);
 
-  constructor(
-    private dbData: DbDataService, 
-    private cdr: ChangeDetectorRef, 
-    private seasonsService: SeasonService,
-     private twitchApiService: TwitchApiService
-  ) {
+  constructor() {
     this.#titleService.setTitle(this.title);
     // iconSet singleton
     this.#iconSetService.icons = { ...iconSubset, cilCoffee };
@@ -50,15 +50,15 @@ export class AppComponent implements OnInit {
     this.#router.events.pipe(
         takeUntilDestroyed(this.#destroyRef)
       ).subscribe((evt) => {
-      if (!(evt instanceof NavigationEnd)) {
-        return;
-      }
+      if (!(evt instanceof NavigationEnd)) 
+        {return;}
+      
     });
 
     this.#activatedRoute.queryParams
       .pipe(
         delay(1),
-        map(params => <string>params['theme']?.match(/^[A-Za-z0-9\s]+/)?.[0]),
+        map(params => (params['theme']?.match(/^[A-Za-z0-9\s]+/)?.[0] as string)),
         filter(theme => ['dark', 'light', 'auto'].includes(theme)),
         tap(theme => {
           this.#colorModeService.colorMode.set(theme);

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common'; 
 import { BadgeComponent, RowComponent, ColComponent, TextColorDirective, CardComponent, CardHeaderComponent, CardBodyComponent, TableDirective, TableColorDirective, TableActiveDirective, BorderDirective, AlignDirective, ContainerComponent } from '@coreui/angular';
 import { cifBh, cifAt, cifMc, cifJp, cifHu, cifCn, cifCa, cifEs, cifGb, cifBe, cifNl, cifAz, cifSg, cifIt, cifUs, cifAu, cifMx, cifBr, cifQa, cifAe, cifSa } from '@coreui/icons';
@@ -14,9 +14,11 @@ import { ChampionshipData, SessionResult } from '@genezio-sdk/f123dashboard';
     styleUrl: './championship.component.scss'
 })
 export class ChampionshipComponent implements OnInit{
+  private dbData = inject(DbDataService);
+
 
   public championship_data: ChampionshipData[] = [];
-  public allFlags: {[key: string]: any} = {
+  public allFlags: Record<string, any> = {
     "Barhain": cifBh,
     "Arabia Saudita": cifSa,
     "Australia": cifAu,
@@ -40,9 +42,7 @@ export class ChampionshipComponent implements OnInit{
     "Emirati Arabi Uniti": cifAe,
   };
 
-  public fireIcon: string[] = cilFire; 
-  
-  constructor(private dbData: DbDataService) { }
+  public fireIcon: string[] = cilFire;
 
   ngOnInit(): void {
     this.championship_data = this.dbData.getChampionship();
@@ -50,14 +50,14 @@ export class ChampionshipComponent implements OnInit{
 
   // Helper method to get driver by position in a session
   getDriverByPosition(session: SessionResult[] | undefined, position: number): string {
-    if (!session) return '';
+    if (!session) {return '';}
     const result = session.find(r => r.position === position);
     return result?.driver_username || '';
   }
 
   // Helper method to get DNF drivers
   getDNFDrivers(session: SessionResult[] | undefined): string {
-    if (!session) return '';
+    if (!session) {return '';}
     const dnfDrivers = session.filter(r => r.position === 0);
     return dnfDrivers.map(d => d.driver_username).join(', ');
   }
@@ -80,7 +80,7 @@ export class ChampionshipComponent implements OnInit{
 
   // Helper method to get sorted results (excluding DNFs for position display)
   getSortedResults(session: SessionResult[] | undefined): SessionResult[] {
-    if (!session) return [];
+    if (!session) {return [];}
     return session
       .filter(result => result.position > 0) // Exclude DNFs (position 0)
       .sort((a, b) => a.position - b.position);
@@ -100,13 +100,13 @@ export class ChampionshipComponent implements OnInit{
     ];
 
     sessions.forEach(session => {
-      if (session) {
-        session.forEach(result => {
-          if (result.position > 0) { // Exclude DNFs
-            positions.add(result.position);
-          }
-        });
-      }
+      if (session) 
+        {session.forEach(result => {
+          if (result.position > 0)  // Exclude DNFs
+            {positions.add(result.position);}
+          
+        });}
+      
     });
 
     // Convert to sorted array
@@ -114,9 +114,9 @@ export class ChampionshipComponent implements OnInit{
   }
 
   // Helper method to get position styling
-  getPositionStyle(position: number): { [key: string]: string } {
-    if (position === 1) return { 'color': 'green' };
-    if (position === 8) return { 'color': 'red' };
+  getPositionStyle(position: number): Record<string, string> {
+    if (position === 1) {return { 'color': 'green' };}
+    if (position === 8) {return { 'color': 'red' };}
     // No styling for other positions (was previously black)
     return {};
   }

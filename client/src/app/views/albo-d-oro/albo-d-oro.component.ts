@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CardModule, TableModule } from '@coreui/angular';
 // Import CoreUI Card
@@ -15,13 +15,13 @@ import { DriverData } from '@genezio-sdk/f123dashboard';
   styleUrls: ['./albo-d-oro.component.scss']
 })
 export class AlboDOroComponent implements OnInit {
+  private dbDataService = inject(DbDataService);
+
   podio: { posizione: number; nome: string; img: string; colore: string; punti: string; }[] = [];
   classifica: { posizione: string; nome: string; punti: string; }[] = [];
 
   podioFanta: { posizione: number; nome: string; punti: string; img: string; colore: string; }[] = [];
   classificaFanta: { posizione: string; nome: string; punti: string }[] = [];
-
-  constructor(private dbDataService: DbDataService) {}
 
   ngOnInit(): void {
     this.loadAlboDoro();
@@ -64,25 +64,25 @@ export class AlboDOroComponent implements OnInit {
           { posizione: 1, nome: first.driver_username, img: `/assets/images/avatars/${first.driver_username}.png`, colore: first.driver_color, punti: first.total_points.toString() },
           { posizione: 3, nome: third.driver_username, img: `/assets/images/avatars/${third.driver_username}.png`, colore: third.driver_color, punti: third.total_points.toString() }
         ];
-      } else if (sortedDrivers.length > 0) {
+      } else if (sortedDrivers.length > 0) 
         // Handle cases with fewer than 3 drivers for the podium
-        this.podio = sortedDrivers.map((driver, index) => ({
+        {this.podio = sortedDrivers.map((driver, index) => ({
             posizione: index + 1,
             nome: driver.driver_username,
             img: `/assets/images/avatars/${driver.driver_username}.png`,
             colore: driver.driver_color,
             punti: driver.total_points.toString()
-        }));
-      }
+        }));}
+      
 
       // Classifica setup
-      if (sortedDrivers.length > 3) {
-        this.classifica = sortedDrivers.slice(3).map((driver, index) => ({
+      if (sortedDrivers.length > 3) 
+        {this.classifica = sortedDrivers.slice(3).map((driver, index) => ({
           posizione: `#${index + 4}`,
           nome: driver.driver_username,
           punti: driver.total_points.toString()
-        }));
-      }
+        }));}
+      
     } catch (error) {
       console.error('Error loading albo d\'oro:', error);
     }

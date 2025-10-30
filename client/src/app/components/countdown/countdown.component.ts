@@ -1,18 +1,8 @@
-import { Component, DestroyRef, effect, inject, OnInit, OnDestroy, Renderer2, signal, WritableSignal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common'; // Importa CommonModule
-import { cilArrowRight, cilChartPie } from '@coreui/icons';
-import { IconDirective } from '@coreui/icons-angular';
 import {
-  ButtonDirective,
   CardBodyComponent,
-  CardComponent,
-  CardHeaderComponent,
-  CardTextDirective,
-  CardTitleDirective,
-  ColComponent,
-  RowComponent,
-  TextColorDirective
-} from '@coreui/angular';
+  CardComponent} from '@coreui/angular';
 import {DbDataService} from 'src/app/service/db-data.service';  //aggiunto il servizio per dati db
 
 interface timeInterface {
@@ -32,8 +22,8 @@ interface timeInterface {
     styleUrl: './countdown.component.scss'
 })
 export class CountdownComponent implements OnInit, OnDestroy {
+  private dbData = inject(DbDataService);
 
-  constructor(private dbData: DbDataService) {}
 
   public championshipNextTracks: any[] = [];
 
@@ -52,9 +42,9 @@ export class CountdownComponent implements OnInit, OnDestroy {
     this.championshipNextTracks = this.dbData.getAllTracks();
     
     // filter next championship track
-    var i = 0;
+    const i = 0;
     const current_date: Date = new Date();
-    for (let track of this.championshipNextTracks){
+    for (const track of this.championshipNextTracks){
       const db_date: Date = new Date(track.date);
       if ( db_date >= current_date )
       {
@@ -63,7 +53,7 @@ export class CountdownComponent implements OnInit, OnDestroy {
       }
     }
 
-    if (this.targetDate) this.startCountdown();
+    if (this.targetDate) {this.startCountdown();}
    
   }
 
@@ -100,8 +90,8 @@ export class CountdownComponent implements OnInit, OnDestroy {
 
 
   ngOnDestroy(): void {
-    if (this.timer) {
-      clearInterval(this.timer); // Cleanup the interval when the component is destroyed
-    }
+    if (this.timer) 
+      {clearInterval(this.timer);} // Cleanup the interval when the component is destroyed
+    
   }
 }

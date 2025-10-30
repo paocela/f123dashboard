@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { TableDirective, AvatarComponent } from '@coreui/angular';
 import { IconDirective } from '@coreui/icons-angular';
 import { cilPeople, cilCheckAlt, cilX, cilSwapVertical } from '@coreui/icons';
@@ -21,25 +21,23 @@ import { VoteStatus, VOTE_INDEX } from '../../model/fanta';
   styleUrl: './vote-history-table.component.scss'
 })
 export class VoteHistoryTableComponent {
+  fantaService = inject(FantaService);
+  private dbData = inject(DbDataService);
+
   @Input() fantaVote!: FantaVote;
   @Input() trackId!: number;
-  @Input() showTotalPoints: boolean = true;
+  @Input() showTotalPoints = true;
 
   public cilPeople: string[] = cilPeople;
   public cilCheckAlt: string[] = cilCheckAlt;
   public cilX: string[] = cilX;
   public cilSwapVertical: string[] = cilSwapVertical;
 
-  constructor(
-    public fantaService: FantaService,
-    private dbData: DbDataService
-  ) {}
-
   /**
    * Get vote array from FantaVote object
    */
   getVoteArray(): number[] {
-    if (!this.fantaVote) return [];
+    if (!this.fantaVote) {return [];}
     
     return [
       this.fantaVote.id_1_place,
@@ -67,7 +65,7 @@ export class VoteHistoryTableComponent {
 
   getPosizioneArrivo(pilotaId: number): number {
     const result = this.fantaService.getRaceResult(this.trackId);
-    if (!result) return 0;
+    if (!result) {return 0;}
     
     const positions = [
       result.id_1_place, result.id_2_place, result.id_3_place, result.id_4_place,
@@ -88,9 +86,9 @@ export class VoteHistoryTableComponent {
     const posizioneReale = this.getPosizioneArrivo(pilotaId);
     const posizioneVotata = this.getVotoPos(pilotaId);
     
-    if (posizioneReale === 0 || posizioneVotata === 0) {
-      return 0;
-    }
+    if (posizioneReale === 0 || posizioneVotata === 0) 
+      {return 0;}
+    
     
     // Both positions are 1-based (1-8), pass as-is to match service method usage
     return this.fantaService.pointsWithAbsoluteDifference(posizioneReale, posizioneVotata);
@@ -98,7 +96,7 @@ export class VoteHistoryTableComponent {
 
   getPuntiFastLap(): number {
     const result = this.fantaService.getRaceResult(this.trackId);
-    if (!result) return 0;
+    if (!result) {return 0;}
     
     return +result.id_fast_lap === +this.fantaVote.id_fast_lap && this.fantaVote.id_fast_lap !== 0
       ? this.fantaService.getCorrectResponsePointFastLap()
@@ -107,7 +105,7 @@ export class VoteHistoryTableComponent {
 
   getPuntiDnf(): number {
     const result = this.fantaService.getRaceResult(this.trackId);
-    if (!result) return 0;
+    if (!result) {return 0;}
     
     return this.fantaService.isDnfCorrect(result.list_dnf, this.fantaVote.id_dnf) && this.fantaVote.id_dnf !== 0
       ? this.fantaService.getCorrectResponsePointDnf()
@@ -116,7 +114,7 @@ export class VoteHistoryTableComponent {
 
   getPuntiConstructor(): number {
     const winningConstructorId = this.fantaService.getWinningConstructorForTrack(this.trackId);
-    if (!winningConstructorId) return 0;
+    if (!winningConstructorId) {return 0;}
     
     return +winningConstructorId === +this.fantaVote.constructor_id && this.fantaVote.constructor_id !== 0
       ? this.fantaService.getCorrectResponsePointTeam()
@@ -131,27 +129,27 @@ export class VoteHistoryTableComponent {
     const posizioneReale = this.getPosizioneArrivo(pilotaId);
     const posizioneVotata = this.getVotoPos(pilotaId);
     
-    if (posizioneReale === 0 || posizioneVotata === 0) {
-      return { icon: cilX, color: 'red' };
-    }
+    if (posizioneReale === 0 || posizioneVotata === 0) 
+      {return { icon: cilX, color: 'red' };}
+    
     
     const punti = this.fantaService.pointsWithAbsoluteDifference(posizioneReale, posizioneVotata);
     
-    if (punti === FantaService.CORRECT_RESPONSE_POINTS[0]) {
-      return { icon: cilCheckAlt, color: 'green' };
-    }
+    if (punti === FantaService.CORRECT_RESPONSE_POINTS[0]) 
+      {return { icon: cilCheckAlt, color: 'green' };}
+    
     
     if (punti === FantaService.CORRECT_RESPONSE_POINTS[1] || 
-        punti === FantaService.CORRECT_RESPONSE_POINTS[2]) {
-      return { icon: cilSwapVertical, color: '#FFA600' };
-    }
+        punti === FantaService.CORRECT_RESPONSE_POINTS[2]) 
+      {return { icon: cilSwapVertical, color: '#FFA600' };}
+    
     
     return { icon: cilX, color: 'red' };
   }
 
   isCorrectFastLap(): VoteStatus {
     const result = this.fantaService.getRaceResult(this.trackId);
-    if (!result) return { icon: cilX, color: 'red' };
+    if (!result) {return { icon: cilX, color: 'red' };}
     
     const isCorrect = +result.id_fast_lap === +this.fantaVote.id_fast_lap && this.fantaVote.id_fast_lap !== 0;
     return isCorrect 
@@ -161,7 +159,7 @@ export class VoteHistoryTableComponent {
 
   isCorrectDnf(): VoteStatus {
     const result = this.fantaService.getRaceResult(this.trackId);
-    if (!result) return { icon: cilX, color: 'red' };
+    if (!result) {return { icon: cilX, color: 'red' };}
     
     const isCorrect = this.fantaService.isDnfCorrect(result.list_dnf, this.fantaVote.id_dnf);
     return isCorrect 
@@ -171,7 +169,7 @@ export class VoteHistoryTableComponent {
 
   isCorrectConstructor(): VoteStatus {
     const winningConstructorId = this.fantaService.getWinningConstructorForTrack(this.trackId);
-    if (!winningConstructorId) return { icon: cilX, color: 'red' };
+    if (!winningConstructorId) {return { icon: cilX, color: 'red' };}
     
     const isCorrect = +winningConstructorId === +this.fantaVote.constructor_id && this.fantaVote.constructor_id !== 0;
     return isCorrect 

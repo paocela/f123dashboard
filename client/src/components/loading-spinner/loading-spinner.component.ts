@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LoadingService } from '../../app/service/loading.service';
 import { SpinnerComponent } from '@coreui/angular';
@@ -10,9 +10,11 @@ import { SpinnerComponent } from '@coreui/angular';
     imports: [CommonModule, SpinnerComponent]
 })
 export class LoadingSpinnerComponent {
+  private loadingService = inject(LoadingService);
+
   loading$;
 
-  constructor(private loadingService: LoadingService) {
+  constructor() {
     this.loading$ = this.loadingService.loading$;
   }
 }

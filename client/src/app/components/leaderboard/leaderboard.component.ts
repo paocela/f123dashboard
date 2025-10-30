@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject, OnInit } from '@angular/core';
 import { GridModule, TableDirective, ModalComponent, ModalHeaderComponent, ModalTitleDirective, ModalBodyComponent, ButtonCloseDirective, ThemeDirective, AlertModule } from '@coreui/angular';
 import { LeaderBoard } from '../../../app/model/leaderboard'
 import { FantaService } from '../../../app/service/fanta.service';
@@ -34,19 +34,20 @@ import { allFlags } from '../../model/constants';
     styleUrl: './leaderboard.component.scss'
 })
 
-export class LeaderboardComponent {
+export class LeaderboardComponent implements OnInit {
+  private fantaService = inject(FantaService);
+  private dbData = inject(DbDataService);
+
   @Input() maxDisplayable: number | undefined = undefined; // Default value set to 10
-  @Input() showVotes: boolean = true;
+  @Input() showVotes = true;
   public cilPeople: string[] = cilPeople;
   public cilInfo: string[] = cilInfo;
   public cilBell: string[] = cilBell;
   public allFlags = allFlags;
 
-  modalVisible: boolean = false;
+  modalVisible = false;
   selectedUser: User | null = null;
   userVotes: { vote: FantaVote, trackId: number, trackName: string, trackCountry: string }[] = [];
-
-  constructor(private fantaService: FantaService, private dbData: DbDataService){}
 
    users: User[] = this.dbData.getUsers();
    leaderBoards: LeaderBoard[] = [];
@@ -55,7 +56,7 @@ export class LeaderboardComponent {
   ngOnInit(): void {
     //this.users = this.users.filter(u => u.id !== 0); //remove admin user
     this.users.forEach(user => {
-      let newUser: LeaderBoard = {
+      const newUser: LeaderBoard = {
         id: user.id,
         username: user.username,
         points: this.fantaService.getFantaPoints(user.id),
@@ -69,9 +70,9 @@ export class LeaderboardComponent {
   }
 
     GetAvatar(userId: number, image?: string): string {
-    if (image) {
-      return `data:image/jpeg;base64,${image}`;
-    }
+    if (image) 
+      {return `data:image/jpeg;base64,${image}`;}
+    
     // Fallback to file path
     return `./assets/images/avatars_fanta/${userId}.png`;
   }
@@ -81,13 +82,13 @@ export class LeaderboardComponent {
    */
   openVoteHistoryModal(userId: number): void {
     this.selectedUser = this.users.find(u => u.id === userId) || null;
-    if (!this.selectedUser) return;
+    if (!this.selectedUser) {return;}
 
     // Get all tracks with results
     const allTracks = this.dbData.getAllTracks();
     const tracksWithResults = allTracks.filter(track => {
       const result = this.fantaService.getRaceResult(track.track_id);
-      return result && result.id_1_place != null;
+      return result && result.id_1_place !== null && result.id_1_place !== undefined;
     });
 
     // Sort by date descending to get the most recent

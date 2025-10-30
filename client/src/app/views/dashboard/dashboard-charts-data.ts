@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {
   ChartData,
   ChartDataset,
@@ -30,9 +30,7 @@ interface Track {
   [key: string]: any;
 }
 
-interface DriverDataMap {
-  [driverUsername: string]: (number | null)[];
-}
+type DriverDataMap = Record<string, (number | null)[]>;
 
 export interface IChartProps {
   data?: ChartData;
@@ -49,13 +47,15 @@ export interface IChartProps {
   providedIn: 'any'
 })
 export class DashboardChartsData {
+  private dbData = inject(DbDataService);
+
   public mainChart: IChartProps = { type: 'line' };
   public championshipTrend: CumulativePointsData[] = [];
   public championshipTracks: Track[] = [];
 
   private chartScale: number = DEFAULT_CHART_SCALE;
 
-  constructor(private dbData: DbDataService) {
+  constructor() {
     this.initMainChart();
   }
 
@@ -65,7 +65,7 @@ export class DashboardChartsData {
    * @param period - Chart period: 'Month' shows last N races, 'all' shows entire season
    * @param maxNumberOfRaces - Maximum number of races to display in Month view
    */
-  initMainChart(period: string = 'all', maxNumberOfRaces: number = DEFAULT_MAX_RACES): void {
+  initMainChart(period = 'all', maxNumberOfRaces: number = DEFAULT_MAX_RACES): void {
     this.loadChartData();
     
     const completedTracks = this.getCompletedTracks();
@@ -115,9 +115,9 @@ export class DashboardChartsData {
     const driverData: DriverDataMap = {};
     
     for (const trendItem of this.championshipTrend) {
-      if (!driverData[trendItem.driver_username]) {
-        driverData[trendItem.driver_username] = [];
-      }
+      if (!driverData[trendItem.driver_username]) 
+        {driverData[trendItem.driver_username] = [];}
+      
       driverData[trendItem.driver_username].push(Number(trendItem.cumulative_points));
     }
     
@@ -196,9 +196,9 @@ export class DashboardChartsData {
       
       // Track maximum value for chart scaling
       const driverMax = this.getMaxValue(relativeData);
-      if (driverMax > maxDriverValue) {
-        maxDriverValue = driverMax;
-      }
+      if (driverMax > maxDriverValue) 
+        {maxDriverValue = driverMax;}
+      
     }
     
     // Round chart scale up to nearest hundred
@@ -220,10 +220,10 @@ export class DashboardChartsData {
       const paddingNeeded = maxNumberOfRaces - numberOfCompletedRaces;
       const padding = new Array(paddingNeeded).fill(null);
       return [...allData, ...padding];
-    } else {
+    } else 
       // Take last N races
-      return allData.slice(-maxNumberOfRaces);
-    }
+      {return allData.slice(-maxNumberOfRaces);}
+    
   }
 
   /**
@@ -284,9 +284,9 @@ export class DashboardChartsData {
     uniqueDrivers: string[]
   ): void {
     // Store driver data in mainChart for Chart.js consumption
-    for (const driver of uniqueDrivers) {
-      this.mainChart[driver] = driverData[driver] || [];
-    }
+    for (const driver of uniqueDrivers) 
+      {this.mainChart[driver] = driverData[driver] || [];}
+    
     
     const datasets = this.createDatasets(uniqueDrivers);
     const options = this.createChartOptions();

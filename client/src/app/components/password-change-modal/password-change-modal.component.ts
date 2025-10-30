@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, ViewChild, OnDestroy } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -32,20 +32,20 @@ import { AuthService } from '../../service/auth.service';
   standalone: true
 })
 export class PasswordChangeModalComponent implements OnDestroy {
+  private authService = inject(AuthService);
+
   @ViewChild('passwordChangeModal') modal!: ModalComponent;
   @Output() passwordChanged = new EventEmitter<void>();
 
   // Form fields
-  currentPassword: string = '';
-  newPassword: string = '';
-  confirmPassword: string = '';
+  currentPassword = '';
+  newPassword = '';
+  confirmPassword = '';
 
   // UI state
-  isLoading: boolean = false;
-  errorMessage: string = '';
-  successMessage: string = '';
-
-  constructor(private authService: AuthService) {}
+  isLoading = false;
+  errorMessage = '';
+  successMessage = '';
 
   get currentUser() {
     return this.authService.getCurrentUser();

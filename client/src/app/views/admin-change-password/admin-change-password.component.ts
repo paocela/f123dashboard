@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -46,6 +46,10 @@ import { AuthService as AuthServiceBackend } from '@genezio-sdk/f123dashboard';
   styleUrl: './admin-change-password.component.scss'
 })
 export class AdminChangePasswordComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
   changePasswordForm: FormGroup;
   isLoading = false;
   showSuccess = false;
@@ -60,11 +64,7 @@ export class AdminChangePasswordComponent implements OnInit {
   cilCheckCircle = cilCheckCircle;
   cilXCircle = cilXCircle;
 
-  constructor(
-    private fb: FormBuilder,
-    private authService: AuthService,
-    private router: Router
-  ) {
+  constructor() {
     this.changePasswordForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(3)]]
     });
@@ -73,9 +73,9 @@ export class AdminChangePasswordComponent implements OnInit {
   ngOnInit(): void {
     // Check if user is admin
     const currentUser = this.authService.getCurrentUser();
-    if (!currentUser?.isAdmin) {
-      this.router.navigate(['/dashboard']);
-    }
+    if (!currentUser?.isAdmin) 
+      {this.router.navigate(['/dashboard']);}
+    
   }
 
   generateRandomPassword(): string {
@@ -146,19 +146,19 @@ export class AdminChangePasswordComponent implements OnInit {
   getErrorMessage(fieldName: string): string {
     const control = this.changePasswordForm.get(fieldName);
     
-    if (!control || !control.touched || !control.errors) {
-      return '';
-    }
+    if (!control || !control.touched || !control.errors) 
+      {return '';}
+    
 
-    if (control.errors['required']) {
-      return 'Questo campo è obbligatorio';
-    }
+    if (control.errors['required']) 
+      {return 'Questo campo è obbligatorio';}
+    
 
-    if (fieldName === 'username') {
-      if (control.errors['minlength']) {
-        return 'Il nome utente deve contenere almeno 3 caratteri';
-      }
-    }
+    if (fieldName === 'username') 
+      {if (control.errors['minlength']) 
+        {return 'Il nome utente deve contenere almeno 3 caratteri';}}
+      
+    
 
     return '';
   }

@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';    
 import { FormsModule, NgForm } from '@angular/forms';
 import { AccordionComponent, 
@@ -58,13 +58,17 @@ import { User } from '@genezio-sdk/f123dashboard';
     templateUrl: './fanta.component.html',
     styleUrl: './fanta.component.scss'
 })
-export class FantaComponent {
+export class FantaComponent implements OnInit {
+  authService = inject(AuthService);
+  private dbData = inject(DbDataService);
+  fantaService = inject(FantaService);
+
   // Form submission status per track (uses FORM_STATUS constants)
   formStatus: Record<number, number> = {};
   forms: Record<number, NgForm> = {};
   
   user!: User;
-  userFantaPoints: number = 0;
+  userFantaPoints = 0;
   piloti: any[] = [];
   tracks: any[] = [];
   constructors = new Map<number, string>();
@@ -84,9 +88,6 @@ export class FantaComponent {
   public posizioni = posizioni;
   public medals = medals;
   public allFlags = allFlags;
-  
-
-  constructor(public authService: AuthService, private dbData: DbDataService, public fantaService: FantaService){}
 
   ngOnInit(): void {
     
@@ -118,10 +119,10 @@ export class FantaComponent {
      * Applies previously saved vote data to a track.
      */
     const applyPreviousVote = (track: any) => {
-      if (!this.user?.id) return;
+      if (!this.user?.id) {return;}
       
       const previousVote = this.fantaService.getFantaVote(this.user.id, track.track_id);
-      if (!previousVote) return;
+      if (!previousVote) {return;}
       
       // Convert Fanta object to array using helper
       const previousVoteArray = Array.from(FantaVoteHelper.toArray(previousVote));
@@ -172,9 +173,9 @@ export class FantaComponent {
       this.formStatus[trackId] = FORM_STATUS.SUCCESS;
       // Update the original votazioni to reflect the saved state
       const currentVotes = this.votazioni.get(trackId);
-      if (currentVotes) {
-        this.originalVotazioni.set(trackId, [...currentVotes]);
-      }
+      if (currentVotes) 
+        {this.originalVotazioni.set(trackId, [...currentVotes]);}
+      
     } catch (error) {
       console.error('Error saving fantasy vote:', error);
       this.formStatus[trackId] = FORM_STATUS.SAVE_ERROR;
@@ -190,13 +191,13 @@ export class FantaComponent {
     const votoArray = this.votazioni.get(trackId) || [];
     
     // Check if all required fields are present
-    if (votoArray.length < TOTAL_VOTE_FIELDS) {
-      return false;
-    }
+    if (votoArray.length < TOTAL_VOTE_FIELDS) 
+      {return false;}
+    
     
     // Check for empty votes in all required positions
     const hasEmptyVotes = votoArray.some((v, i) => i <= VOTE_INDEX.CONSTRUCTOR && v == 0);
-    if (hasEmptyVotes) return false;
+    if (hasEmptyVotes) {return false;}
     
     // Check for duplicates only in driver positions (indices 0-7)
     const driverVotes = votoArray.slice(0, DRIVER_POSITIONS_COUNT);
@@ -247,7 +248,7 @@ export class FantaComponent {
   setVoto(trackId: number, index: number, valore: number, form: NgForm): void {
     this.forms[trackId] = form;
     
-    if (!valore) return;
+    if (!valore) {return;}
     
     let votoArray = this.votazioni.get(trackId);
     if (!votoArray) {
@@ -258,9 +259,9 @@ export class FantaComponent {
     votoArray[index - 1] = +valore;
     
     // Reset form status when data is changed, so user knows they need to save
-    if (this.formStatus[trackId] === FORM_STATUS.SUCCESS) {
-      delete this.formStatus[trackId];
-    }
+    if (this.formStatus[trackId] === FORM_STATUS.SUCCESS) 
+      {delete this.formStatus[trackId];}
+    
   }
 
   toggleModalRanking() {
@@ -275,21 +276,21 @@ export class FantaComponent {
     const originalVotes = this.originalVotazioni.get(trackId) || [];
     
     // If form was just saved successfully, no unsaved data
-    if (this.formStatus[trackId] === FORM_STATUS.SUCCESS) {
-      return false;
-    }
+    if (this.formStatus[trackId] === FORM_STATUS.SUCCESS) 
+      {return false;}
+    
     
     // Check if there are any votes entered
     const hasVotes = currentVotes.some(vote => vote && vote > 0);
     
     // If no votes at all, no unsaved data
-    if (!hasVotes)  return false;
+    if (!hasVotes)  {return false;}
     
     // If there are no original votes but current votes exist, it's unsaved
-    if (originalVotes.length === 0) return true;
+    if (originalVotes.length === 0) {return true;}
     
     // Compare current votes with original votes
-    if (currentVotes.length !== originalVotes.length) return true;
+    if (currentVotes.length !== originalVotes.length) {return true;}
     
     // Check if any vote has changed
     return currentVotes.some((vote, i) => vote !== originalVotes[i]);
@@ -302,9 +303,9 @@ export class FantaComponent {
     const currentVotes = this.votazioni.get(trackId) || [];
     
     // If form is already saved, don't show "Votazione Mancante"
-    if (this.formStatus[trackId] === FORM_STATUS.SUCCESS) {
-      return false;
-    }
+    if (this.formStatus[trackId] === FORM_STATUS.SUCCESS) 
+      {return false;}
+    
     
     // Show "Votazione Mancante" if no votes are entered at all
     const hasAnyVotes = currentVotes.some(vote => vote && vote > 0);

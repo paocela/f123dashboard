@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, firstValueFrom } from 'rxjs';
 import { 
@@ -18,6 +18,10 @@ import { ConfigService } from './config.service';
   providedIn: 'root'
 })
 export class AuthService {
+  private router = inject(Router);
+  private apiService = inject(ApiService);
+  private configService = inject(ConfigService);
+
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
   private tokenRefreshTimer: any;
@@ -25,7 +29,7 @@ export class AuthService {
   public currentUser$ = this.currentUserSubject.asObservable();
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
-  constructor(private router: Router, private apiService: ApiService, private configService: ConfigService) {
+  constructor() {
     this.initializeAuth();
   }
 
@@ -39,18 +43,18 @@ export class AuthService {
     const token = this.getToken();
     const storedUser = sessionStorage.getItem('user');
     
-    if (storedUser) {
-      try {
+    if (storedUser) 
+      {try {
         const user = JSON.parse(storedUser);
         this.setAuthenticatedUser(user);
       } catch (error) {
         console.error('Error parsing stored user data:', error);
-      }
-    }
+      }}
     
-    if (token) {
-      this.validateTokenAndSetUser(token);
-    }
+    
+    if (token) 
+      {this.validateTokenAndSetUser(token);}
+    
   }
 
   private async validateTokenAndSetUser(token: string): Promise<void> {
@@ -70,16 +74,16 @@ export class AuthService {
         
         this.setAuthenticatedUser(userData);
         this.scheduleTokenRefresh();
-      } else {
-        this.clearAuth();
-      }
+      } else 
+        {this.clearAuth();}
+      
     } catch (error) {
       console.error('Token validation error:', error);
       this.clearAuth();
     }
   }
 
-  async login(loginData: LoginRequest, skipNavigation: boolean = false): Promise<AuthResponse> {
+  async login(loginData: LoginRequest, skipNavigation = false): Promise<AuthResponse> {
     try {
       const clientInfo = this.getClientInfo();
       loginData.userAgent = clientInfo.userAgent;
@@ -88,9 +92,9 @@ export class AuthService {
       if (response.success && response.user && response.token) {
         this.setToken(response.token);
         this.scheduleTokenRefresh();
-        if (response.user.mail && response.user.mail.trim() !== '') {
-          this.setAuthenticatedUser(response.user);
-        }
+        if (response.user.mail && response.user.mail.trim() !== '') 
+          {this.setAuthenticatedUser(response.user);}
+        
 
         
         // Navigate to fanta or admin page only if navigation is not skipped
@@ -130,12 +134,12 @@ export class AuthService {
       console.error('Registration error:', error);
       
       // Handle HTTP error responses
-      if (error.error && error.error.message) {
-        return {
+      if (error.error && error.error.message) 
+        {return {
           success: false,
           message: error.error.message
-        };
-      }
+        };}
+      
       
       return {
         success: false,
@@ -147,12 +151,12 @@ export class AuthService {
   async changePassword(currentPassword: string, newPassword: string): Promise<{ success: boolean; message: string }> {
     try {
       const token = this.getToken();
-      if (!token) {
-        return {
+      if (!token) 
+        {return {
           success: false,
           message: 'Token di autenticazione non trovato'
-        };
-      }
+        };}
+      
       const changeData: ChangePasswordRequest = {
         currentPassword,
         newPassword,
@@ -173,32 +177,32 @@ export class AuthService {
   async updateUserInfo(updateData: UpdateUserInfoRequest): Promise<AuthResponse> {
     try {
       const token = this.getToken();
-      if (!token) {
-        return {
+      if (!token) 
+        {return {
           success: false,
           message: 'Token di autenticazione non trovato'
-        };
-      }
+        };}
+      
       updateData.jwt = token;
     
       const response: AuthResponse = await BackendAuthService.updateUserInfo(updateData);
 
-      if (response.success && response.user) {
+      if (response.success && response.user) 
         // Update the current user data in the service
-        this.setAuthenticatedUser(response.user);
-      }
+        {this.setAuthenticatedUser(response.user);}
+      
       
       return response;
     } catch (error: any) {
       console.error('Update user info error:', error);
       
       // Handle HTTP error responses
-      if (error.error && error.error.message) {
-        return {
+      if (error.error && error.error.message) 
+        {return {
           success: false,
           message: error.error.message
-        };
-      }
+        };}
+      
       return {
         success: false,
         message: 'Si è verificato un errore durante l\'aggiornamento delle informazioni utente. Riprova.'
@@ -209,9 +213,9 @@ export class AuthService {
   async refreshToken(): Promise<boolean> {
     try {
       const currentToken = this.getToken();
-      if (!currentToken) {
-        return false;
-      }
+      if (!currentToken) 
+        {return false;}
+      
 
       const clientInfo = this.getClientInfo();
       const response = await BackendAuthService.refreshToken(
@@ -235,14 +239,14 @@ export class AuthService {
   async logout(): Promise<void> {
     try {
       const token = this.getToken();
-      if (token) {
+      if (token) 
         // Call backend to invalidate session
-        try {
+        {try {
           await BackendAuthService.logout(token);
         } catch (methodError) {
           console.warn('Backend logout error:', methodError);
-        }
-      }
+        }}
+      
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
@@ -283,9 +287,9 @@ export class AuthService {
     sessionStorage.removeItem('isLoggedIn');
     
     // Clear token refresh timer
-    if (this.tokenRefreshTimer) {
-      clearTimeout(this.tokenRefreshTimer);
-    }
+    if (this.tokenRefreshTimer) 
+      {clearTimeout(this.tokenRefreshTimer);}
+    
   }
 
   private setToken(token: string): void {
@@ -301,16 +305,16 @@ export class AuthService {
 
   private scheduleTokenRefresh(): void {
     // Clear existing timer
-    if (this.tokenRefreshTimer) {
-      clearTimeout(this.tokenRefreshTimer);
-    }
+    if (this.tokenRefreshTimer) 
+      {clearTimeout(this.tokenRefreshTimer);}
+    
 
     // Schedule refresh using configured time before expiry
     this.tokenRefreshTimer = setTimeout(() => {
       this.refreshToken().then(success => {
-        if (!success) {
-          this.logout();
-        }
+        if (!success) 
+          {this.logout();}
+        
       });
     }, this.configService.tokenRefreshTimeBeforeExpiry);
   }
@@ -342,9 +346,9 @@ export class AuthService {
   async getUserSessions(): Promise<SessionsResponse> {
     try {
       const token = this.getToken();
-      if (!token) {
-        return { success: false, message: 'Token di autenticazione non trovato' };
-      }
+      if (!token) 
+        {return { success: false, message: 'Token di autenticazione non trovato' };}
+      
 
       const response = await BackendAuthService.getUserSessions(token);
       return response;
@@ -357,9 +361,9 @@ export class AuthService {
   async logoutAllSessions(): Promise<{ success: boolean; message: string }> {
     try {
       const token = this.getToken();
-      if (!token) {
-        return { success: false, message: 'Token di autenticazione non trovato' };
-      }
+      if (!token) 
+        {return { success: false, message: 'Token di autenticazione non trovato' };}
+      
 
       const response = await BackendAuthService.logoutAllSessions(token);
       
@@ -381,28 +385,28 @@ export class AuthService {
     const userAgent = navigator.userAgent;
     let deviceInfo = 'Unknown Device';
 
-    if (userAgent.includes('Windows')) {
-      deviceInfo = 'Windows Device';
-    } else if (userAgent.includes('Mac')) {
-      deviceInfo = 'Mac Device';
-    } else if (userAgent.includes('Linux')) {
-      deviceInfo = 'Linux Device';
-    } else if (userAgent.includes('Android')) {
-      deviceInfo = 'Android Device';
-    } else if (userAgent.includes('iPhone') || userAgent.includes('iPad')) {
-      deviceInfo = 'iOS Device';
-    }
+    if (userAgent.includes('Windows')) 
+      {deviceInfo = 'Windows Device';}
+     else if (userAgent.includes('Mac')) 
+      {deviceInfo = 'Mac Device';}
+     else if (userAgent.includes('Linux')) 
+      {deviceInfo = 'Linux Device';}
+     else if (userAgent.includes('Android')) 
+      {deviceInfo = 'Android Device';}
+     else if (userAgent.includes('iPhone') || userAgent.includes('iPad')) 
+      {deviceInfo = 'iOS Device';}
+    
 
     // Add browser info
-    if (userAgent.includes('Chrome')) {
-      deviceInfo += ' (Chrome)';
-    } else if (userAgent.includes('Firefox')) {
-      deviceInfo += ' (Firefox)';
-    } else if (userAgent.includes('Safari')) {
-      deviceInfo += ' (Safari)';
-    } else if (userAgent.includes('Edge')) {
-      deviceInfo += ' (Edge)';
-    }
+    if (userAgent.includes('Chrome')) 
+      {deviceInfo += ' (Chrome)';}
+     else if (userAgent.includes('Firefox')) 
+      {deviceInfo += ' (Firefox)';}
+     else if (userAgent.includes('Safari')) 
+      {deviceInfo += ' (Safari)';}
+     else if (userAgent.includes('Edge')) 
+      {deviceInfo += ' (Edge)';}
+    
 
     return deviceInfo;
   }
