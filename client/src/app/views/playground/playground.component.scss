@@ -60,7 +60,6 @@
 }
 
 .lights-wrapper {
-  min-height: 100vh; /* take full screen height */
   display: flex;
   flex-direction: column;
   justify-content: center; /* center vertically */
@@ -112,4 +111,13 @@
     border-collapse: separate;
     border-spacing: 0;
     overflow: hidden; /* Nasconde i bordi sporgenti */
+}
+
+.table-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  height: 100%;
 }

@@ -1,7 +1,11 @@
-import { Component, AfterViewInit, ChangeDetectionStrategy } from '@angular/core';
-import { GridModule, TableDirective } from '@coreui/angular';
-import { cilPeople } from '@coreui/icons';
+import { Component, AfterViewInit, ChangeDetectionStrategy, inject } from '@angular/core';
+import { DatePipe, CommonModule } from '@angular/common';
+import { GridModule, TableDirective, AvatarComponent, AlertComponent } from '@coreui/angular';
+import { cilPeople, cilWarning } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
+import { PlaygroundService, PlaygroundBestScore } from '../../service/playground.service';
+import { User } from '@genezio-sdk/f123dashboard';
+import { AuthService } from 'src/app/service/auth.service';
 
 
 @Component({
@@ -10,7 +14,11 @@ import { IconDirective } from '@coreui/icons-angular';
   imports: [
     GridModule,
     TableDirective,
-    IconDirective
+    IconDirective,
+    AvatarComponent,
+    AlertComponent,
+    DatePipe,
+    CommonModule
   ],
   templateUrl: './playground.component.html',
   styleUrls: ['./playground.component.scss'],
@@ -18,7 +26,17 @@ import { IconDirective } from '@coreui/icons-angular';
 })
 export class PlaygroundComponent implements AfterViewInit {
 
+  playgroundService = inject(PlaygroundService);
+  private authService = inject(AuthService);
+  
+
+  playgroundLeaederboard: PlaygroundBestScore[] = [];
+
+  currentUser: User | null = null;
+  isLoggedIn = false;
+
   public cilPeople: string[] = cilPeople;
+  public cilWarning: string[] = cilWarning;
 
   bulbs_up: NodeListOf<HTMLElement> | null = null;
   bulbs: NodeListOf<HTMLElement> | null = null;
@@ -31,6 +49,31 @@ export class PlaygroundComponent implements AfterViewInit {
   playerScore: number | null = null;
   playerBestScore: number = 9999;
   jumpStartFlag: boolean = false;
+
+  ngOnInit(): void {
+    this.playgroundLeaederboard = this.playgroundService.getPlaygroundLeaderboard();
+
+    // Check if user is already logged in
+    this.authService.isAuthenticated$.subscribe(isAuth => {
+      if (isAuth) {
+        const user = this.authService.getCurrentUser();
+        this.currentUser = user;
+        this.isLoggedIn = true;
+      }
+    });
+
+    // Subscribe to current user changes
+    this.authService.currentUser$.subscribe(user => {
+      this.currentUser = user;
+      this.isLoggedIn = !!user;
+    });
+
+    // set best score for current user
+    if ( this.isLoggedIn ) {
+      this.playerBestScore = this.playgroundService.getUserBestScore(this.currentUser?.id ?? 0);
+    }
+  }
+
 
   ngAfterViewInit(): void {
     this.bulbs_up = document.querySelectorAll<HTMLElement>('.bulb_up');
@@ -65,6 +108,8 @@ export class PlaygroundComponent implements AfterViewInit {
           this.lightsError();
         } else {
           // Start light up sequence
+          this.playerStatus = `SEI PRONTO?`;
+          this.playerStatusColor = "#FFFFFF";
           this.lightsTriggeredFlag = true;
           this.lightsUp();
         }
@@ -128,6 +173,14 @@ export class PlaygroundComponent implements AfterViewInit {
     this.playerStatusColor = "#FFFFFF";
 
     this.lightsErrorFlag = false;
+  }
+
+  getAvatar(userId: number, image?: string): string {
+    if (image) 
+      {return `data:image/jpeg;base64,${image}`;}
+    
+    // Fallback to file path
+    return `./assets/images/avatars_fanta/${userId}.png`;
   }
 
 }

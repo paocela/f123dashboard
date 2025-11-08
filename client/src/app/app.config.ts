@@ -15,11 +15,13 @@ import { DropdownModule, SidebarModule } from '@coreui/angular';
 import { IconSetService } from '@coreui/icons-angular';
 import { routes } from './app.routes';
 import { TwitchApiService } from './service/twitch-api.service';
+import { PlaygroundService } from './service/playground.service';
 
-export function initializeApp(dbDataService: DbDataService, twitchApiService: TwitchApiService) {
+export function initializeApp(dbDataService: DbDataService, twitchApiService: TwitchApiService, playgroundService: PlaygroundService) {
   return async () => {
     await Promise.all([
       dbDataService.AllData(),
+      playgroundService.AllData(),
       twitchApiService.checkStreamStatus()
     ]);
   };
@@ -47,7 +49,7 @@ export const appConfig: ApplicationConfig = {
     DbDataService,
     TwitchApiService,
     provideAppInitializer(() => {
-        const initializerFn = (initializeApp)(inject(DbDataService), inject(TwitchApiService));
+        const initializerFn = (initializeApp)(inject(DbDataService), inject(TwitchApiService), inject(PlaygroundService));
         return initializerFn();
       })
   ]
