@@ -68,6 +68,11 @@ export const routes: Routes = [
       {
         path: 'albo-d-oro',
         loadChildren: () => import('./views/albo-d-oro/routes').then((m) => m.routes)
+      },
+      /* routing playground */
+      {
+        path: 'playground',
+        loadChildren: () => import('./views/playground/routes').then((m) => m.routes)
       }
     ]
   },

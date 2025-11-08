@@ -21,7 +21,7 @@ export const getNavItems = (isAdmin: boolean): INavData[] => {
       iconComponent: { name: 'cil-description' },
     },
     {
-      name: 'Championship',
+      name: 'Campionato',
       url: '/championship',
       iconComponent: { name: 'cil-calendar' },
     },
@@ -40,9 +40,18 @@ export const getNavItems = (isAdmin: boolean): INavData[] => {
       }
     },
     {
-      name: 'Credits',
+      name: 'Crediti',
       url: '/credits',
       iconComponent: { name: 'cil-coffee' },
+      badge: {
+        color: 'success',
+        text: 'NEW'
+      }
+    },
+    {
+      name: 'Playground',
+      url: '/playground',
+      iconComponent: { name: 'cil-happy' },
       badge: {
         color: 'success',
         text: 'NEW'

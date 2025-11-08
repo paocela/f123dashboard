@@ -1,0 +1,107 @@
+<c-row (click)="gameTrigger()" (touchstart)="gameTrigger()">
+    <c-col xs="12" md="6" lg="6" class="lights-wrapper">
+        <!-- lights column -->
+        <c-row>
+            <c-col xs="12" class="text-center">
+            <h2 class="lights-help">
+                Tocca lo schermo o clicca per iniziare. Tocca o clicca di nuovo quando le luci si spengono.
+            </h2>
+            </c-col>
+        </c-row>
+
+        <c-row>
+            <c-col xs="12" class="text-center">
+            <div id="lights_container">
+                <div class="bulbs_container">
+                <div class="bulb_up logo"></div>
+                <div class="bulb"></div>
+                </div>
+                <div class="bulbs_container">
+                <div class="bulb_up logo"></div>
+                <div class="bulb"></div>
+                </div>
+                <div class="bulbs_container">
+                <div class="bulb_up logo"></div>
+                <div class="bulb"></div>
+                </div>
+                <div class="bulbs_container">
+                <div class="bulb_up logo"></div>
+                <div class="bulb"></div>
+                </div>
+                <div class="bulbs_container">
+                <div class="bulb_up logo"></div>
+                <div class="bulb"></div>
+                </div>
+            </div>
+            </c-col>
+        </c-row>
+        <c-row>
+            <c-col xs="12" class="text-center">
+                <h2 class="lights-score" [style.color]="playerStatusColor">{{ playerStatus }}</h2>
+            </c-col>
+        </c-row>
+        <c-row>
+            <c-col xs="12" class="text-center">
+                <h2 class="lights-best-score">Il tuo miglior punteggio è: {{ playerBestScore }} ms</h2>
+            </c-col>
+        </c-row>
+    </c-col>
+    <c-col xs="12" md="6" lg="6" class="lights-wrapper">
+    <!-- dashboard column -->
+        <table
+            [hover]="true"
+            [responsive]="true"
+            [striped]="true"
+            align="middle"
+            cTable
+            class="mb-0 border rounded custom-table"
+        >
+            <thead class="text-nowrap text-truncate">
+                <tr>
+                    <th class="bg-body-tertiary text-center">Pos.</th>
+                    <th class="bg-body-tertiary text-center"><svg cIcon name="cilPeople"></svg></th>
+                    <th class="bg-body-tertiary">Username</th>
+                    <th class="bg-body-tertiary text-center">Punteggio</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-center">1</td>
+                    <td class="text-center">2</td>
+                    <td class="text-center">3</td>
+                    <td class="text-center">4</td>
+                </tr>
+                <!-- @for (leaderBoard of leaderBoards.slice(0, maxDisplayable); track leaderBoard.id; let i = $index) {
+                    <tr (click)="openVoteHistoryModal(leaderBoard.id)" style="cursor: pointer;">
+                        <td>
+                            <div class="text-center fw-semibold">
+                                <div [class]="">#{{ i+1 }}</div>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <c-avatar
+                                [size]="'md'"
+                                [src]="GetAvatar(leaderBoard.id, leaderBoard.avatarImage)"
+                            />
+                        </td>
+                        <td>
+                            <div>{{ leaderBoard.username }}</div>
+                            <div class="small text-body-secondary text-nowrap"></div>
+                        </td>
+                        <td *ngIf="showVotes">
+                            <div class="text-center">
+                                {{ leaderBoard.numberVotes }} / {{totNumberVotes}}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="fw-semibold text-center">
+                                {{ leaderBoard.points }}
+                            </div>
+                        </td>
+                    </tr>
+                } -->
+            </tbody>
+        </table>
+
+    </c-col>
+</c-row>
