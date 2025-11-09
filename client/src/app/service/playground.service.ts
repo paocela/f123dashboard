@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
 import { PlaygroundInterface, PlaygroundBestScore } from "@genezio-sdk/f123dashboard" 
 
 @Injectable({
@@ -35,7 +34,11 @@ export class PlaygroundService {
 
   getUserBestScore(userId: number): number {
     const userScore = this.playgroundLeaderboard.find(score => score.user_id === userId);
-    return userScore ? userScore.best_time : 9999; // return 9999 if no score found
+    return userScore ? userScore.best_score : 9999; // return 9999 if no score found
+  }
+
+  async setUserBestScore(voto: PlaygroundBestScore): Promise<void> {
+    await PlaygroundInterface.setUserBestScore(voto);
   }
 }
 

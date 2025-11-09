@@ -49,7 +49,7 @@ export const getNavItems = (isAdmin: boolean): INavData[] => {
       }
     },
     {
-      name: 'Playground',
+      name: 'Minigiochi',
       url: '/playground',
       iconComponent: { name: 'cil-happy' },
       badge: {

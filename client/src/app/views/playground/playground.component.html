@@ -74,7 +74,7 @@
                 </tr>
             </thead>
             <tbody>
-                @for (leaderboardBestScore of playgroundLeaederboard.slice(0, 12); 
+                @for (leaderboardBestScore of playgroundLeaederboard.slice(0, 13); 
                         track leaderboardBestScore.user_id;
                         let i = $index) {
                     <tr>
@@ -93,7 +93,7 @@
                         </td>
                         <td>
                             <div class="fw-semibold text-center">
-                                {{ leaderboardBestScore.best_time }}
+                                {{ leaderboardBestScore.best_score }}
                             </div>
                         </td>
                         <td>

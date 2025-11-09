@@ -89,14 +89,37 @@ export class PlaygroundComponent implements AfterViewInit {
       this.playerScore = elapsedTime;
       this.playerStatus = `Tempo di reazione: ${this.playerScore} ms`;
       this.playerStatusColor = "#0E8F5F"
-      
-      if ( this.playerScore < this.playerBestScore ) {
-        this.playerBestScore = this.playerScore;
-      }
 
       this.timerStarted = false;
       this.timerStartTime = null;
       this.lightsTriggeredFlag = false;
+      
+      if ( this.playerScore < this.playerBestScore ) {
+        this.playerBestScore = this.playerScore;
+        if ( this.isLoggedIn && this.currentUser?.id ) {
+          // update DB with new best score
+          const newBestScore: PlaygroundBestScore = {
+            user_id: this.currentUser?.id ?? 0,
+            username: this.currentUser?.username ?? "",
+            image: this.currentUser?.image ?? "",
+            best_score: this.playerBestScore,
+            best_date: new Date(),
+          };
+          this.playgroundService.setUserBestScore(newBestScore);
+
+          // update local leaderboard
+          let tmp: PlaygroundBestScore[] = this.playgroundLeaederboard;
+          let found = tmp.find(best_score => best_score.user_id === this.currentUser?.id);
+          if ( !found ) {
+            // New entry
+            tmp.push(newBestScore);
+          } else {
+            tmp.find(best_score => best_score.user_id === this.currentUser?.id)!.best_score = this.playerBestScore;
+          }
+          this.playgroundLeaederboard = [];
+          this.playgroundLeaederboard = tmp;
+        }
+      }
     } else {
       if ( !this.lightsErrorFlag ) {
         if ( this.lightsTriggeredFlag ) {
