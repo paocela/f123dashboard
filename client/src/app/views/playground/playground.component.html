@@ -70,7 +70,7 @@
                     <th class="bg-body-tertiary">Username</th>
                     <th class="bg-body-tertiary text-center"><svg cIcon name="cilPeople"></svg></th>
                     <th class="bg-body-tertiary text-center">Punteggio [ms]</th>
-                    <th class="bg-body-tertiary text-center">Data</th>
+                    <th class="bg-body-tertiary text-center" *ngIf="showColumn()">Data</th>
                 </tr>
             </thead>
             <tbody>
@@ -96,7 +96,7 @@
                                 {{ leaderboardBestScore.best_score }}
                             </div>
                         </td>
-                        <td>
+                        <td *ngIf="showColumn()">
                             <div class="text-center">
                                 {{ leaderboardBestScore.best_date | date:'dd/MM/yyyy' }}                            
                             </div>

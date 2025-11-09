@@ -1,6 +1,6 @@
 import { Component, AfterViewInit, ChangeDetectionStrategy, inject } from '@angular/core';
 import { DatePipe, CommonModule } from '@angular/common';
-import { GridModule, TableDirective, AvatarComponent, AlertComponent } from '@coreui/angular';
+import { GridModule, TableDirective, AvatarComponent, AlertComponent, ColorModeService } from '@coreui/angular';
 import { cilPeople, cilWarning } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
 import { PlaygroundService, PlaygroundBestScore } from '../../service/playground.service';
@@ -28,7 +28,10 @@ export class PlaygroundComponent implements AfterViewInit {
 
   playgroundService = inject(PlaygroundService);
   private authService = inject(AuthService);
-  
+  readonly #colorModeService = inject(ColorModeService);
+
+
+  public screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 
   playgroundLeaederboard: PlaygroundBestScore[] = [];
 
@@ -44,8 +47,8 @@ export class PlaygroundComponent implements AfterViewInit {
   lightsTriggeredFlag: boolean = false;
   lightsErrorFlag: boolean = false;
   timerStartTime: number | null = null;
-  playerStatus: string = "SEI PRONTO?";
-  playerStatusColor: string = "#FFFFFF";  
+  playerStatus: string = "";
+  playerStatusColor: string = "";  
   playerScore: number | null = null;
   playerBestScore: number = 9999;
   jumpStartFlag: boolean = false;
@@ -72,12 +75,18 @@ export class PlaygroundComponent implements AfterViewInit {
     if ( this.isLoggedIn ) {
       this.playerBestScore = this.playgroundService.getUserBestScore(this.currentUser?.id ?? 0);
     }
+
+    this.resetGameText();
   }
 
 
   ngAfterViewInit(): void {
     this.bulbs_up = document.querySelectorAll<HTMLElement>('.bulb_up');
     this.bulbs = document.querySelectorAll<HTMLElement>('.bulb');
+  }
+
+  showColumn(): boolean {
+    return this.screenWidth > 1600;
   }
 
   gameTrigger(): void {
@@ -131,8 +140,8 @@ export class PlaygroundComponent implements AfterViewInit {
           this.lightsError();
         } else {
           // Start light up sequence
-          this.playerStatus = `SEI PRONTO?`;
-          this.playerStatusColor = "#FFFFFF";
+          this.resetGameText();
+
           this.lightsTriggeredFlag = true;
           this.lightsUp();
         }
@@ -192,8 +201,7 @@ export class PlaygroundComponent implements AfterViewInit {
       await sleep(500);
     }
 
-    this.playerStatus = `SEI PRONTO?`;
-    this.playerStatusColor = "#FFFFFF";
+    this.resetGameText();
 
     this.lightsErrorFlag = false;
   }
@@ -205,6 +213,16 @@ export class PlaygroundComponent implements AfterViewInit {
     // Fallback to file path
     return `./assets/images/avatars_fanta/${userId}.png`;
   }
+
+  resetGameText(): void {
+    this.playerStatus = `SEI PRONTO?`;
+    if ( this.#colorModeService.colorMode.name == 'dark' ) {
+      this.playerStatusColor = "#FFFFFF";
+    } else {
+      this.playerStatusColor = "#000000"; 
+    }
+  }
+
 
 }
 
