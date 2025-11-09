@@ -1,0 +1,109 @@
+<c-row class=" justify-content-center align-items-center" (click)="gameTrigger()" (touchstart)="gameTrigger()">
+    <c-col xs="12" md="6" lg="6" class="lights-wrapper">
+        <!-- lights column -->
+        <c-row class=" justify-content-center align-items-center">
+            <div *ngIf="!isLoggedIn" class="text-center">
+                <c-alert color="warning" class="d-inline-flex align-items-center shadow-sm rounded-3 px-4 py-2 gap-2">
+                <svg cIcon name="cilWarning" size="xl" class="me-2 text-warning"></svg>
+                <div class="fs-5">You are not logged in</div>
+                </c-alert>
+            </div>
+        </c-row>
+        <c-row>
+            <c-col xs="12" class="text-center">
+            <h2 class="lights-help">
+                Tocca lo schermo o clicca per iniziare. Tocca o clicca di nuovo quando le luci si spengono.
+            </h2>
+            </c-col>
+        </c-row>
+
+        <c-row>
+            <c-col xs="12" class="text-center">
+            <div id="lights_container">
+                <div class="bulbs_container">
+                <div class="bulb_up logo"></div>
+                <div class="bulb"></div>
+                </div>
+                <div class="bulbs_container">
+                <div class="bulb_up logo"></div>
+                <div class="bulb"></div>
+                </div>
+                <div class="bulbs_container">
+                <div class="bulb_up logo"></div>
+                <div class="bulb"></div>
+                </div>
+                <div class="bulbs_container">
+                <div class="bulb_up logo"></div>
+                <div class="bulb"></div>
+                </div>
+                <div class="bulbs_container">
+                <div class="bulb_up logo"></div>
+                <div class="bulb"></div>
+                </div>
+            </div>
+            </c-col>
+        </c-row>
+        <c-row>
+            <c-col xs="12" class="text-center">
+                <h2 class="lights-score" [style.color]="playerStatusColor">{{ playerStatus }}</h2>
+            </c-col>
+        </c-row>
+        <c-row>
+            <c-col xs="12" class="text-center">
+                <h2 class="lights-best-score">Il tuo miglior punteggio è: {{ playerBestScore }} ms</h2>
+            </c-col>
+        </c-row>
+    </c-col>
+    <c-col xs="12" md="6" lg="6" class="table-wrapper">
+    <!-- dashboard column -->
+        <table
+            [hover]="true"
+            [responsive]="true"
+            [striped]="true"
+            align="middle"
+            cTable
+            class="mb-5 border rounded custom-table"
+        >
+            <thead class="text-nowrap text-truncate">
+                <tr>
+                    <th class="bg-body-tertiary text-center">Pos.</th>
+                    <th class="bg-body-tertiary">Username</th>
+                    <th class="bg-body-tertiary text-center"><svg cIcon name="cilPeople"></svg></th>
+                    <th class="bg-body-tertiary text-center">Punteggio [ms]</th>
+                    <th class="bg-body-tertiary text-center" *ngIf="showColumn()">Data</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (leaderboardBestScore of playgroundLeaederboard.slice(0, 13); 
+                        track leaderboardBestScore.user_id;
+                        let i = $index) {
+                    <tr>
+                        <td>
+                            <div>#{{i + 1}}</div>
+                        </td>
+                        <td>
+                            <div>{{ leaderboardBestScore.username }}</div>
+                            <div class="small text-body-secondary text-nowrap"></div>
+                        </td>
+                        <td class="text-center">
+                            <c-avatar
+                                [size]="'md'"
+                                [src]="getAvatar(leaderboardBestScore.user_id, leaderboardBestScore.image)"
+                            />
+                        </td>
+                        <td>
+                            <div class="fw-semibold text-center">
+                                {{ leaderboardBestScore.best_score }}
+                            </div>
+                        </td>
+                        <td *ngIf="showColumn()">
+                            <div class="text-center">
+                                {{ leaderboardBestScore.best_date | date:'dd/MM/yyyy' }}                            
+                            </div>
+                        </td>
+                    </tr>
+                }                
+            </tbody>
+        </table>
+    </c-col>
+</c-row>
