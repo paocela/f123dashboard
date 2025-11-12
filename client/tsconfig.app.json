@@ -11,6 +11,12 @@
       ],
       "jszip": [
         "./node_modules/jszip/dist/jszip.min.js"
+      ],
+      "node_modules/chart.js/dist/types/basic": [
+        "../node_modules/chart.js/dist/types/basic.d.ts"
+      ],
+      "node_modules/chart.js/dist/types/utils": [
+        "../node_modules/chart.js/dist/types/utils.d.ts"
       ]
     }
   },

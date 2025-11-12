@@ -42,7 +42,7 @@
     "@genezio-sdk/f123dashboard": "^1.0.0-prod",
     "@ng-bootstrap/ng-bootstrap": "^19.0.1",
     "angularx-flatpickr": "^8.0.0",
-    "chart.js": "^4.4.4",
+    "chart.js": "^4.5.1",
     "flag-icons": "^7.2.3",
     "flatpickr": "^4.6.13",
     "genezio": "^2.6.3",

@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@genezio/email-service": "^1.0.2",
-    "@genezio/types": "^1.0.19",
+    "@genezio/types": "^1.0.20",
     "@types/bcrypt": "^5.0.2",
     "@types/jsonwebtoken": "^9.0.10",
     "axios": "^1.8.4",
