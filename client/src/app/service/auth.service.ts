@@ -61,7 +61,7 @@ export class AuthService {
   private async validateTokenAndSetUser(token: string): Promise<void> {
     try {
       const validation = await firstValueFrom(
-        this.apiService.get<TokenValidationResponse>('/auth/validate', this.apiService.createAuthHeaders(token))
+        this.apiService.post<TokenValidationResponse>('/auth/validate', this.apiService.createAuthHeaders(token))
       );
       if (validation.valid && validation.userId && validation.username && validation.name && validation.surname) {
         // Get full user data (you might want to create a separate method for this)

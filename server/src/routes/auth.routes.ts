@@ -7,7 +7,7 @@ const router = Router();
 // Public endpoints (no auth required)
 router.post('/login', (req, res) => authController.login(req, res));
 router.post('/register', (req, res) => authController.register(req, res));
-router.post('/validate-token', (req, res) => authController.validateToken(req, res));
+router.post('/validate', (req, res) => authController.validateToken(req, res));
 router.post('/users', (req, res) => authController.getUsers(req, res));
 
 // Protected endpoints (requires authentication)

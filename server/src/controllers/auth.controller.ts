@@ -74,7 +74,16 @@ export class AuthController {
 
   async validateToken(req: Request, res: Response): Promise<void> {
     try {
-      const { token } = req.body;
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        res.status(401).json({
+          valid: false,
+          message: 'No token provided'
+        });
+        return;
+      }
+      
+      const token = authHeader.substring(7); // Remove 'Bearer ' prefix
       const result = await authService.validateToken(token);
       res.json(result);
     } catch (error) {

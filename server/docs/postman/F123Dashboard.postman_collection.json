@@ -24,7 +24,7 @@
 					"// Auto-authentication script",
 					"// This script automatically logs in if the JWT token is missing or expired",
 					"",
-					"const authEndpoints = ['/login', '/register', '/validate-token', '/health'];",
+					"const authEndpoints = ['/login', '/register', '/validate', '/health'];",
 					"const currentPath = pm.request.url.getPath();",
 					"const isAuthEndpoint = authEndpoints.some(endpoint => currentPath.includes(endpoint));",
 					"",
@@ -89,16 +89,15 @@
 					"} else {",
 					"    // Validate existing token",
 					"    pm.sendRequest({",
-					"        url: pm.collectionVariables.get('base_url') + '/api/auth/validate-token',",
+					"        url: pm.collectionVariables.get('base_url') + '/api/auth/validate',",
 					"        method: 'POST',",
 					"        header: {",
-					"            'Content-Type': 'application/json'",
+					"            'Content-Type': 'application/json',",
+					"            'Authorization': 'Bearer ' + jwtToken",
 					"        },",
 					"        body: {",
 					"            mode: 'raw',",
-					"            raw: JSON.stringify({",
-					"                token: jwtToken",
-					"            })",
+					"            raw: '{}'",
 					"        }",
 					"    }, function (err, response) {",
 					"        if (err) {",
@@ -360,7 +359,14 @@
 							"name": "Validate Token",
 							"request": {
 								"auth": {
-									"type": "noauth"
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{jwt_token}}",
+											"type": "string"
+										}
+									]
 								},
 								"method": "POST",
 								"header": [
@@ -371,20 +377,20 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"token\": \"{{jwt_token}}\"\n}"
+									"raw": "{}"
 								},
 								"url": {
-									"raw": "{{base_url}}/api/auth/validate-token",
+									"raw": "{{base_url}}/api/auth/validate",
 									"host": [
 										"{{base_url}}"
 									],
 									"path": [
 										"api",
 										"auth",
-										"validate-token"
+										"validate"
 									]
 								},
-								"description": "Validate JWT token"
+								"description": "Validate JWT token using Authorization header"
 							},
 							"response": []
 						}
