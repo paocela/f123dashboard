@@ -1,17 +1,18 @@
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, firstValueFrom } from 'rxjs';
-import { 
+import type { 
   AuthResponse,
-  AuthService as BackendAuthService,
   ChangePasswordRequest,
+  ChangePasswordResponse,
   LoginRequest,
+  RefreshTokenResponse,
   RegisterRequest,
   SessionsResponse,
   TokenValidationResponse,
   UpdateUserInfoRequest,
   User
-} from "@genezio-sdk/f123dashboard";
+} from '@f123dashboard/shared';
 import { ApiService } from './api.service';
 import { ConfigService } from './config.service';
 @Injectable({
@@ -59,7 +60,9 @@ export class AuthService {
 
   private async validateTokenAndSetUser(token: string): Promise<void> {
     try {
-      const validation = await BackendAuthService.validateToken(token) as any as TokenValidationResponse;
+      const validation = await firstValueFrom(
+        this.apiService.get<TokenValidationResponse>('/auth/validate', this.apiService.createAuthHeaders(token))
+      );
       if (validation.valid && validation.userId && validation.username && validation.name && validation.surname) {
         // Get full user data (you might want to create a separate method for this)
         const userData: User = {
@@ -87,7 +90,9 @@ export class AuthService {
     try {
       const clientInfo = this.getClientInfo();
       loginData.userAgent = clientInfo.userAgent;
-      const response = await BackendAuthService.login(loginData);
+      const response = await firstValueFrom(
+        this.apiService.post<AuthResponse>('/auth/login', loginData)
+      );
       
       if (response.success && response.user && response.token) {
         this.setToken(response.token);
@@ -118,7 +123,9 @@ export class AuthService {
     try {
       // Prepare the request body for the HTTP endpoint
 
-      const response: AuthResponse = await BackendAuthService.register(registerData);
+      const response = await firstValueFrom(
+        this.apiService.post<AuthResponse>('/auth/register', registerData)
+      );
       
       if (response.success && response.user && response.token) {
         this.setToken(response.token);
@@ -163,7 +170,9 @@ export class AuthService {
         jwtToken: token
       };
 
-      const response = await BackendAuthService.changePassword(changeData);
+      const response = await firstValueFrom(
+        this.apiService.post<ChangePasswordResponse>('/auth/change-password', changeData, this.apiService.createAuthHeaders(token))
+      );
       return response;
     } catch (error) {
       console.error('Change password error:', error);
@@ -185,7 +194,9 @@ export class AuthService {
       
       updateData.jwt = token;
     
-      const response: AuthResponse = await BackendAuthService.updateUserInfo(updateData);
+      const response = await firstValueFrom(
+        this.apiService.post<AuthResponse>('/auth/update-user-info', updateData, this.apiService.createAuthHeaders(token))
+      );
 
       if (response.success && response.user) 
         // Update the current user data in the service
@@ -218,9 +229,11 @@ export class AuthService {
       
 
       const clientInfo = this.getClientInfo();
-      const response = await BackendAuthService.refreshToken(
-        currentToken, 
-        clientInfo.userAgent
+      const response = await firstValueFrom(
+        this.apiService.post<RefreshTokenResponse>('/auth/refresh-token', {
+          token: currentToken,
+          userAgent: clientInfo.userAgent
+        })
       );
       
       if (response.success && response.token) {
@@ -242,7 +255,9 @@ export class AuthService {
       if (token) 
         // Call backend to invalidate session
         {try {
-          await BackendAuthService.logout(token);
+          await firstValueFrom(
+            this.apiService.post('/auth/logout', {}, this.apiService.createAuthHeaders(token))
+          );
         } catch (methodError) {
           console.warn('Backend logout error:', methodError);
         }}
@@ -350,7 +365,9 @@ export class AuthService {
         {return { success: false, message: 'Token di autenticazione non trovato' };}
       
 
-      const response = await BackendAuthService.getUserSessions(token);
+      const response = await firstValueFrom(
+        this.apiService.get<SessionsResponse>('/auth/sessions', this.apiService.createAuthHeaders(token))
+      );
       return response;
     } catch (error) {
       console.error('Get user sessions error:', error);
@@ -365,7 +382,9 @@ export class AuthService {
         {return { success: false, message: 'Token di autenticazione non trovato' };}
       
 
-      const response = await BackendAuthService.logoutAllSessions(token);
+      const response = await firstValueFrom(
+        this.apiService.post<{ success: boolean; message: string }>('/auth/logout-all-sessions', {}, this.apiService.createAuthHeaders(token))
+      );
       
       if (response.success) {
         // Clear local auth state since all sessions are logged out

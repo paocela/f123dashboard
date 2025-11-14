@@ -1,7 +1,7 @@
 import { createHash, randomBytes } from "crypto";
 import jwt from "jsonwebtoken";
-import { EmailService } from "../mail_interfaces.js";
-import { getPasswordResetEmailTemplate } from "../email_templates.js";
+import { EmailService } from "./mail.service.js";
+import { getPasswordResetEmailTemplate } from "../config/email_templates.js";
 export class AuthService {
     constructor(pool) {
         this.pool = pool;
@@ -12,7 +12,7 @@ export class AuthService {
     }
     async getUsers() {
         const result = await this.pool.query(`
-  SELECT id, username, name, surname, password, mail, encode(image, 'escape') as image
+  SELECT id, username, name, surname, mail, encode(image, 'escape') as image
   FROM users;
     `);
         return result.rows;
@@ -508,10 +508,11 @@ export class AuthService {
     generateSessionToken() {
         return randomBytes(32).toString('hex');
     }
-    generateJWTToken(userId, username) {
+    generateJWTToken(userId, username, isAdmin = false) {
         return jwt.sign({
             userId: userId,
-            username: username
+            username: username,
+            isAdmin: isAdmin
         }, this.jwtSecret, { expiresIn: AuthService.TOKEN_EXPIRY_JWT });
     }
     async createSession(userId, userAgent) {
@@ -519,8 +520,8 @@ export class AuthService {
         const expiresAt = new Date();
         expiresAt.setDate(expiresAt.getDate() + AuthService.TOKEN_EXPIRY_DAYS); // 7 days from now
         // Generate JWT token
-        const user = await this.pool.query('SELECT username FROM users WHERE id = $1', [userId]);
-        const jwtToken = this.generateJWTToken(userId, user.rows[0].username);
+        const user = await this.pool.query('SELECT username, is_admin FROM users WHERE id = $1', [userId]);
+        const jwtToken = this.generateJWTToken(userId, user.rows[0].username, user.rows[0].is_admin);
         // Sanitize user agent for database storage
         const sanitizedUserAgent = this.sanitizeUserAgent(userAgent);
         await this.pool.query(`INSERT INTO user_sessions (user_id, session_token, expires_at, ip_address, user_agent) 

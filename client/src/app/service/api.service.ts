@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { ConfigService } from './config.service';
 
 @Injectable({
@@ -32,35 +33,39 @@ export class ApiService {
   /**
    * Make a POST request to an endpoint
    */
-  post<T>(endpoint: string, body: any, options?: any): any {
+  post<T>(endpoint: string, body: unknown, headers?: Record<string, string>): Observable<T> {
+    const options = headers ? { headers: new HttpHeaders(headers) } : {};
     return this.http.post<T>(this.getEndpointUrl(endpoint), body, options);
   }
 
   /**
    * Make a GET request to an endpoint
    */
-  get<T>(endpoint: string, options?: any): any {
+  get<T>(endpoint: string, headers?: Record<string, string>): Observable<T> {
+    const options = headers ? { headers: new HttpHeaders(headers) } : {};
     return this.http.get<T>(this.getEndpointUrl(endpoint), options);
   }
 
   /**
    * Make a PUT request to an endpoint
    */
-  put<T>(endpoint: string, body: any, options?: any): any {
+  put<T>(endpoint: string, body: unknown, headers?: Record<string, string>): Observable<T> {
+    const options = headers ? { headers: new HttpHeaders(headers) } : {};
     return this.http.put<T>(this.getEndpointUrl(endpoint), body, options);
   }
 
   /**
    * Make a DELETE request to an endpoint
    */
-  delete<T>(endpoint: string, options?: any): any {
+  delete<T>(endpoint: string, headers?: Record<string, string>): Observable<T> {
+    const options = headers ? { headers: new HttpHeaders(headers) } : {};
     return this.http.delete<T>(this.getEndpointUrl(endpoint), options);
   }
 
   /**
    * Create headers with authentication token
    */
-  createAuthHeaders(token: string): any {
+  createAuthHeaders(token: string): Record<string, string> {
     return {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
@@ -70,7 +75,7 @@ export class ApiService {
   /**
    * Create headers for API requests
    */
-  createHeaders(): any {
+  createHeaders(): Record<string, string> {
     return {
       'Content-Type': 'application/json'
     };

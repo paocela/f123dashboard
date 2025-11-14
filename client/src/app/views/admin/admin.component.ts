@@ -25,7 +25,7 @@ import { DbDataService } from 'src/app/service/db-data.service';
 import { AuthService } from 'src/app/service/auth.service';
 import { GpResult } from '../../model/championship';
 import { medals, allFlags, posizioni } from '../../model/constants';
-import { ChampionshipData, Driver, Season, TrackData } from '@genezio-sdk/f123dashboard';
+import type { ChampionshipData, Driver, Season, TrackData } from '@f123dashboard/shared';
 
 @Component({
   selector: 'app-admin',

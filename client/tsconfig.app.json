@@ -9,6 +9,9 @@
       "@docs-components/*": [
         "./src/components/*"
       ],
+      "@f123dashboard/shared": [
+        "../shared/src/index.ts"
+      ],
       "jszip": [
         "./node_modules/jszip/dist/jszip.min.js"
       ],

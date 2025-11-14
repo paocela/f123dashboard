@@ -1,23 +1,5 @@
 import axios from 'axios';
-
-export type TwitchTokenResponse = {
-  access_token: string;
-  expires_in: number;
-}
-
-export type TwitchStreamResponse = {
-  data: Array<{
-    id: string;
-    user_id: string;
-    user_login: string;
-    type: string;
-    title: string;
-    viewer_count: number;
-    started_at: string;
-    language: string;
-    thumbnail_url: string;
-  }>;
-}
+import type { TwitchTokenResponse, TwitchStreamResponse } from '@f123dashboard/shared';
 
 export class TwitchService {
   private clientId: string = '76pgow7h813kegw9ivqb9c63anh2uc';

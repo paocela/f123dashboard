@@ -1,5 +1,6 @@
 import { AuthService } from '../services/auth.service.js';
 import pool from '../config/db.js';
+import logger from '../config/logger.js';
 const authService = new AuthService(pool);
 export class AuthController {
     async getUsers(req, res) {
@@ -8,7 +9,7 @@ export class AuthController {
             res.json(users);
         }
         catch (error) {
-            console.error('Error getting users:', error);
+            logger.error('Error getting users:', error);
             res.status(500).json({
                 success: false,
                 message: error instanceof Error ? error.message : 'Failed to get users'
@@ -21,7 +22,7 @@ export class AuthController {
             res.json(result);
         }
         catch (error) {
-            console.error('Error cleaning up expired sessions:', error);
+            logger.error('Error cleaning up expired sessions:', error);
             res.status(500).json({
                 success: false,
                 message: error instanceof Error ? error.message : 'Failed to cleanup sessions'
@@ -43,7 +44,7 @@ export class AuthController {
             }
         }
         catch (error) {
-            console.error('Error during login:', error);
+            logger.error('Error during login:', error);
             res.status(500).json({
                 success: false,
                 message: error instanceof Error ? error.message : 'Failed to login'
@@ -61,7 +62,7 @@ export class AuthController {
             }
         }
         catch (error) {
-            console.error('Error during registration:', error);
+            logger.error('Error during registration:', error);
             res.status(500).json({
                 success: false,
                 message: error instanceof Error ? error.message : 'Failed to register'
@@ -70,12 +71,12 @@ export class AuthController {
     }
     async validateToken(req, res) {
         try {
-            const { jwtToken } = req.body;
-            const result = await authService.validateToken(jwtToken);
+            const { token } = req.body;
+            const result = await authService.validateToken(token);
             res.json(result);
         }
         catch (error) {
-            console.error('Error validating token:', error);
+            logger.error('Error validating token:', error);
             res.status(500).json({
                 valid: false,
                 message: error instanceof Error ? error.message : 'Failed to validate token'
@@ -93,7 +94,7 @@ export class AuthController {
             }
         }
         catch (error) {
-            console.error('Error changing password:', error);
+            logger.error('Error changing password:', error);
             res.status(500).json({
                 success: false,
                 message: error instanceof Error ? error.message : 'Failed to change password'
@@ -106,7 +107,7 @@ export class AuthController {
             res.json({ success: result });
         }
         catch (error) {
-            console.error('Error in admin change password:', error);
+            logger.error('Error in admin change password:', error);
             res.status(500).json({
                 success: false,
                 message: error instanceof Error ? error.message : 'Failed to change password'
@@ -126,7 +127,7 @@ export class AuthController {
             }
         }
         catch (error) {
-            console.error('Error refreshing token:', error);
+            logger.error('Error refreshing token:', error);
             res.status(500).json({
                 success: false,
                 message: error instanceof Error ? error.message : 'Failed to refresh token'
@@ -140,7 +141,7 @@ export class AuthController {
             res.json(result);
         }
         catch (error) {
-            console.error('Error during logout:', error);
+            logger.error('Error during logout:', error);
             res.status(500).json({
                 success: false,
                 message: error instanceof Error ? error.message : 'Failed to logout'
@@ -154,7 +155,7 @@ export class AuthController {
             res.json(result);
         }
         catch (error) {
-            console.error('Error logging out all sessions:', error);
+            logger.error('Error logging out all sessions:', error);
             res.status(500).json({
                 success: false,
                 message: error instanceof Error ? error.message : 'Failed to logout all sessions'
@@ -173,7 +174,7 @@ export class AuthController {
             }
         }
         catch (error) {
-            console.error('Error getting user sessions:', error);
+            logger.error('Error getting user sessions:', error);
             res.status(500).json({
                 success: false,
                 message: error instanceof Error ? error.message : 'Failed to get sessions'
@@ -191,7 +192,7 @@ export class AuthController {
             }
         }
         catch (error) {
-            console.error('Error updating user info:', error);
+            logger.error('Error updating user info:', error);
             res.status(500).json({
                 success: false,
                 message: error instanceof Error ? error.message : 'Failed to update user info'

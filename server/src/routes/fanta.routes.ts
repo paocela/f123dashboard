@@ -4,8 +4,11 @@ import { authMiddleware } from '../middleware/auth.middleware.js';
 
 const router = Router();
 
-// All fanta endpoints require authentication (user-specific data)
-router.post('/votes', authMiddleware, (req, res) => fantaController.getFantaVote(req, res));
+// Fanta endpoints no authentication
+router.post('/votes', (req, res) => fantaController.getFantaVote(req, res));
+
+// fanta endpoints require authentication (user-specific data)
+router.post('/votes', (req, res) => fantaController.getFantaVote(req, res));
 router.post('/set-vote', authMiddleware, (req, res) => fantaController.setFantaVoto(req, res));
 
 export { router as fantaRouter };

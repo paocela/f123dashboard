@@ -1,12 +1,5 @@
 import pg from "pg";
-
-export type PlaygroundBestScore = {
-  user_id: number;
-  username: string;
-  image: string;
-  best_score: number;
-  best_date: Date;
-};
+import type { PlaygroundBestScore } from '@f123dashboard/shared';
 
 export class PlaygroundService {
   constructor(private pool: pg.Pool) {}

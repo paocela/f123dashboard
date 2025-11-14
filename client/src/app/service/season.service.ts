@@ -1,9 +1,11 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-import { PostgresService, Season } from "@genezio-sdk/f123dashboard" 
+import { Injectable, inject } from '@angular/core';
+import { BehaviorSubject, firstValueFrom } from 'rxjs';
+import type { Season } from '@f123dashboard/shared';
+import { ApiService } from './api.service';
 
 @Injectable({ providedIn: 'root' })
 export class SeasonService {
+  private apiService = inject(ApiService);
   private allSesons: Season[] = [];
   private _currentSeason = new BehaviorSubject<Season>(null!);
   public readonly season$ = this._currentSeason.asObservable();
@@ -21,7 +23,9 @@ export class SeasonService {
   }
 
   public setAllSeasons() {
-    PostgresService.getAllSeasons().then((seasons: Season[]) => {
+    firstValueFrom(
+      this.apiService.post<Season[]>('/database/seasons', {})
+    ).then((seasons: Season[]) => {
       if (seasons.length === 0) {
         console.error("No seasons found in the database.");
         return;
@@ -32,7 +36,7 @@ export class SeasonService {
         , this.allSesons[0]
       );
       this.setCurreentSeason(latestSeason);
-    }).catch((error: any) => {
+    }).catch((error: unknown) => {
       console.error("Error fetching seasons:", error);
     });
   }

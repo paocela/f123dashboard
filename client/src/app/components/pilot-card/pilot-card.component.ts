@@ -10,7 +10,7 @@ import {
   ListGroupItemDirective
 } from '@coreui/angular';
 import { ChartjsComponent } from '@coreui/angular-chartjs';
-import { DriverData } from '@genezio-sdk/f123dashboard';
+import type { DriverData } from '@f123dashboard/shared';
 
 @Component({
   selector: 'app-pilot-card',

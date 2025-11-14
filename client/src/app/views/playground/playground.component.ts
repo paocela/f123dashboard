@@ -4,7 +4,7 @@ import { GridModule, TableDirective, AvatarComponent, AlertComponent, ColorModeS
 import { cilPeople, cilWarning } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
 import { PlaygroundService, PlaygroundBestScore } from '../../service/playground.service';
-import { User } from '@genezio-sdk/f123dashboard';
+import type { User } from '@f123dashboard/shared';
 import { AuthService } from 'src/app/service/auth.service';
 
 

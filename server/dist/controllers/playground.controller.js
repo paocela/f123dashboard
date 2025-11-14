@@ -1,5 +1,6 @@
 import { PlaygroundService } from '../services/playground.service.js';
 import pool from '../config/db.js';
+import logger from '../config/logger.js';
 const playgroundService = new PlaygroundService(pool);
 export class PlaygroundController {
     async getPlaygroundLeaderboard(req, res) {
@@ -8,7 +9,7 @@ export class PlaygroundController {
             res.json(leaderboard);
         }
         catch (error) {
-            console.error('Error getting playground leaderboard:', error);
+            logger.error('Error getting playground leaderboard:', error);
             res.status(500).json({
                 success: false,
                 message: error instanceof Error ? error.message : 'Failed to get leaderboard'
@@ -24,7 +25,7 @@ export class PlaygroundController {
             });
         }
         catch (error) {
-            console.error('Error setting best score:', error);
+            logger.error('Error setting best score:', error);
             res.status(500).json({
                 success: false,
                 message: error instanceof Error ? error.message : 'Failed to set best score'

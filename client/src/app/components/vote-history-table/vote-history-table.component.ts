@@ -5,7 +5,7 @@ import { IconDirective } from '@coreui/icons-angular';
 import { cilPeople, cilCheckAlt, cilX, cilSwapVertical } from '@coreui/icons';
 import { FantaService } from '../../service/fanta.service';
 import { DbDataService } from '../../service/db-data.service';
-import { FantaVote, RaceResult } from '@genezio-sdk/f123dashboard';
+import type { FantaVote, RaceResult } from '@f123dashboard/shared';
 import { VoteStatus, VOTE_INDEX } from '../../model/fanta';
 
 @Component({

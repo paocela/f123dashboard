@@ -1,4 +1,5 @@
 import { TwitchService } from '../services/twitch.service.js';
+import logger from '../config/logger.js';
 const twitchService = new TwitchService();
 export class TwitchController {
     async getStreamInfo(req, res) {
@@ -15,7 +16,7 @@ export class TwitchController {
             res.json(streamInfo);
         }
         catch (error) {
-            console.error('Error getting stream info:', error);
+            logger.error('Error getting stream info:', error);
             res.status(500).json({
                 success: false,
                 message: error instanceof Error ? error.message : 'Failed to get stream info'

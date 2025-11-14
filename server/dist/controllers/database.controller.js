@@ -1,15 +1,16 @@
 import { DatabaseService } from '../services/database.service.js';
 import pool from '../config/db.js';
+import logger from '../config/logger.js';
 const databaseService = new DatabaseService(pool);
 export class DatabaseController {
     async getAllDrivers(req, res) {
         try {
-            const seasonId = req.body.seasonId ? parseInt(req.body.seasonId) : undefined;
+            const seasonId = req.body?.seasonId ? parseInt(req.body.seasonId) : undefined;
             const drivers = await databaseService.getAllDrivers(seasonId);
             res.json(drivers);
         }
         catch (error) {
-            console.error('Error getting all drivers:', error);
+            logger.error('Error getting all drivers:', error);
             res.status(500).json({
                 success: false,
                 message: error instanceof Error ? error.message : 'Failed to get drivers'
@@ -18,12 +19,12 @@ export class DatabaseController {
     }
     async getDriversData(req, res) {
         try {
-            const seasonId = req.body.seasonId ? parseInt(req.body.seasonId) : undefined;
+            const seasonId = req.body?.seasonId ? parseInt(req.body.seasonId) : undefined;
             const drivers = await databaseService.getDriversData(seasonId);
             res.json(drivers);
         }
         catch (error) {
-            console.error('Error getting drivers data:', error);
+            logger.error('Error getting drivers data:', error);
             res.status(500).json({
                 success: false,
                 message: error instanceof Error ? error.message : 'Failed to get drivers data'
@@ -32,12 +33,12 @@ export class DatabaseController {
     }
     async getChampionship(req, res) {
         try {
-            const seasonId = req.body.seasonId ? parseInt(req.body.seasonId) : undefined;
+            const seasonId = req.body?.seasonId ? parseInt(req.body.seasonId) : undefined;
             const championship = await databaseService.getChampionship(seasonId);
             res.json(championship);
         }
         catch (error) {
-            console.error('Error getting championship:', error);
+            logger.error('Error getting championship:', error);
             res.status(500).json({
                 success: false,
                 message: error instanceof Error ? error.message : 'Failed to get championship'
@@ -46,12 +47,12 @@ export class DatabaseController {
     }
     async getCumulativePoints(req, res) {
         try {
-            const seasonId = req.body.seasonId ? parseInt(req.body.seasonId) : undefined;
+            const seasonId = req.body?.seasonId ? parseInt(req.body.seasonId) : undefined;
             const points = await databaseService.getCumulativePoints(seasonId);
             res.json(points);
         }
         catch (error) {
-            console.error('Error getting cumulative points:', error);
+            logger.error('Error getting cumulative points:', error);
             res.status(500).json({
                 success: false,
                 message: error instanceof Error ? error.message : 'Failed to get cumulative points'
@@ -60,12 +61,12 @@ export class DatabaseController {
     }
     async getAllTracks(req, res) {
         try {
-            const seasonId = req.body.seasonId ? parseInt(req.body.seasonId) : undefined;
+            const seasonId = req.body?.seasonId ? parseInt(req.body.seasonId) : undefined;
             const tracks = await databaseService.getAllTracks(seasonId);
             res.json(tracks);
         }
         catch (error) {
-            console.error('Error getting all tracks:', error);
+            logger.error('Error getting all tracks:', error);
             res.status(500).json({
                 success: false,
                 message: error instanceof Error ? error.message : 'Failed to get tracks'
@@ -74,12 +75,12 @@ export class DatabaseController {
     }
     async getRaceResult(req, res) {
         try {
-            const seasonId = req.body.seasonId ? parseInt(req.body.seasonId) : undefined;
+            const seasonId = req.body?.seasonId ? parseInt(req.body.seasonId) : undefined;
             const results = await databaseService.getRaceResult(seasonId);
             res.json(results);
         }
         catch (error) {
-            console.error('Error getting race results:', error);
+            logger.error('Error getting race results:', error);
             res.status(500).json({
                 success: false,
                 message: error instanceof Error ? error.message : 'Failed to get race results'
@@ -92,7 +93,7 @@ export class DatabaseController {
             res.json(seasons);
         }
         catch (error) {
-            console.error('Error getting all seasons:', error);
+            logger.error('Error getting all seasons:', error);
             res.status(500).json({
                 success: false,
                 message: error instanceof Error ? error.message : 'Failed to get seasons'
@@ -101,12 +102,12 @@ export class DatabaseController {
     }
     async getConstructors(req, res) {
         try {
-            const seasonId = req.body.seasonId ? parseInt(req.body.seasonId) : undefined;
+            const seasonId = req.body?.seasonId ? parseInt(req.body.seasonId) : undefined;
             const constructors = await databaseService.getConstructors(seasonId);
             res.json(constructors);
         }
         catch (error) {
-            console.error('Error getting constructors:', error);
+            logger.error('Error getting constructors:', error);
             res.status(500).json({
                 success: false,
                 message: error instanceof Error ? error.message : 'Failed to get constructors'
@@ -115,12 +116,12 @@ export class DatabaseController {
     }
     async getConstructorGrandPrixPoints(req, res) {
         try {
-            const seasonId = req.body.seasonId ? parseInt(req.body.seasonId) : undefined;
+            const seasonId = req.body?.seasonId ? parseInt(req.body.seasonId) : undefined;
             const points = await databaseService.getConstructorGrandPrixPoints(seasonId);
             res.json(points);
         }
         catch (error) {
-            console.error('Error getting constructor grand prix points:', error);
+            logger.error('Error getting constructor grand prix points:', error);
             res.status(500).json({
                 success: false,
                 message: error instanceof Error ? error.message : 'Failed to get constructor points'
@@ -139,7 +140,7 @@ export class DatabaseController {
             }
         }
         catch (error) {
-            console.error('Error setting GP result:', error);
+            logger.error('Error setting GP result:', error);
             res.status(500).json({
                 success: false,
                 message: error instanceof Error ? error.message : 'Failed to set GP result'
