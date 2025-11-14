@@ -3,12 +3,14 @@ import { BehaviorSubject, Observable, firstValueFrom } from 'rxjs';
 import type { FantaVote, DriverData, Driver, ChampionshipData, Season, CumulativePointsData, TrackData, User, RaceResult, ConstructorGrandPrixPoints, Constructor } from '@f123dashboard/shared';
 import { GpResult } from '../model/championship';
 import { ApiService } from './api.service';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DbDataService {
   private apiService = inject(ApiService);
+  private authService = inject(AuthService);
 
 /****************************************************************/
 //variabili locali
@@ -201,7 +203,7 @@ export class DbDataService {
 
   async setFantaVoto(voto: FantaVote): Promise<void> {
     await firstValueFrom(
-      this.apiService.post('/fanta/set-vote', voto)
+      this.apiService.post('/fanta/set-vote', voto, this.apiService.createAuthHeaders(this.authService.getToken() ?? ''))
     );
     
     // Refresh the fanta votes and notify subscribers

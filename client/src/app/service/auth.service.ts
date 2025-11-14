@@ -61,7 +61,7 @@ export class AuthService {
   private async validateTokenAndSetUser(token: string): Promise<void> {
     try {
       const validation = await firstValueFrom(
-        this.apiService.post<TokenValidationResponse>('/auth/validate', this.apiService.createAuthHeaders(token))
+        this.apiService.post<TokenValidationResponse>('/auth/validate', {}, this.apiService.createAuthHeaders(token))
       );
       if (validation.valid && validation.userId && validation.username && validation.name && validation.surname) {
         // Get full user data (you might want to create a separate method for this)
@@ -312,7 +312,7 @@ export class AuthService {
     document.cookie = `authToken=${token}; path=/; max-age=${7 * 24 * 60 * 60}; Secure; SameSite=Strict`;
   }
 
-  private getToken(): string | null {
+  public getToken(): string | null {
     // Read JWT from cookie
     const match = document.cookie.match(/(^|;) ?authToken=([^;]*)(;|$)/);
     return match ? match[2] : null;
