@@ -1,0 +1,1190 @@
+{
+	"info": {
+		"_postman_id": "f123-dashboard-api",
+		"name": "F123 Dashboard API",
+		"description": "Complete API collection for F1 Fantasy Dashboard backend services",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{jwt_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Auto-authentication script",
+					"// This script automatically logs in if the JWT token is missing or expired",
+					"",
+					"const authEndpoints = ['/login', '/register', '/validate-token', '/health'];",
+					"const currentPath = pm.request.url.getPath();",
+					"const isAuthEndpoint = authEndpoints.some(endpoint => currentPath.includes(endpoint));",
+					"",
+					"// Skip auto-login for auth endpoints and public endpoints without auth requirement",
+					"if (isAuthEndpoint) {",
+					"    console.log('Skipping auto-login for auth endpoint');",
+					"    return;",
+					"}",
+					"",
+					"const jwtToken = pm.collectionVariables.get('jwt_token');",
+					"",
+					"// Function to perform auto-login",
+					"function autoLogin() {",
+					"    const username = pm.collectionVariables.get('auto_login_username');",
+					"    const password = pm.collectionVariables.get('auto_login_password');",
+					"    ",
+					"    if (!username || !password) {",
+					"        console.log('Auto-login credentials not set. Please set auto_login_username and auto_login_password variables.');",
+					"        return;",
+					"    }",
+					"    ",
+					"    console.log('Attempting auto-login...');",
+					"    ",
+					"    pm.sendRequest({",
+					"        url: pm.collectionVariables.get('base_url') + '/api/auth/login',",
+					"        method: 'POST',",
+					"        header: {",
+					"            'Content-Type': 'application/json'",
+					"        },",
+					"        body: {",
+					"            mode: 'raw',",
+					"            raw: JSON.stringify({",
+					"                username: username,",
+					"                password: password",
+					"            })",
+					"        }",
+					"    }, function (err, response) {",
+					"        if (err) {",
+					"            console.error('Auto-login failed:', err);",
+					"            return;",
+					"        }",
+					"        ",
+					"        const jsonResponse = response.json();",
+					"        ",
+					"        if (jsonResponse.success && jsonResponse.token) {",
+					"            pm.collectionVariables.set('jwt_token', jsonResponse.token);",
+					"            pm.collectionVariables.set('user_id', jsonResponse.user.id);",
+					"            pm.collectionVariables.set('is_admin', jsonResponse.user.is_admin);",
+					"            console.log('✅ Auto-login successful! Token saved.');",
+					"            console.log('User ID:', jsonResponse.user.id);",
+					"            console.log('Is Admin:', jsonResponse.user.is_admin);",
+					"        } else {",
+					"            console.error('❌ Auto-login failed:', jsonResponse.message || 'Unknown error');",
+					"        }",
+					"    });",
+					"}",
+					"",
+					"// Check if token exists and is valid",
+					"if (!jwtToken || jwtToken === '') {",
+					"    console.log('No JWT token found. Attempting auto-login...');",
+					"    autoLogin();",
+					"} else {",
+					"    // Validate existing token",
+					"    pm.sendRequest({",
+					"        url: pm.collectionVariables.get('base_url') + '/api/auth/validate-token',",
+					"        method: 'POST',",
+					"        header: {",
+					"            'Content-Type': 'application/json'",
+					"        },",
+					"        body: {",
+					"            mode: 'raw',",
+					"            raw: JSON.stringify({",
+					"                token: jwtToken",
+					"            })",
+					"        }",
+					"    }, function (err, response) {",
+					"        if (err) {",
+					"            console.error('Token validation error:', err);",
+					"            autoLogin();",
+					"            return;",
+					"        }",
+					"        ",
+					"        const jsonResponse = response.json();",
+					"        ",
+					"        if (!jsonResponse.valid) {",
+					"            console.log('Token expired or invalid. Attempting auto-login...');",
+					"            autoLogin();",
+					"        } else {",
+					"            console.log('✅ Token is valid');",
+					"        }",
+					"    });",
+					"}",
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Global test script for JWT token management",
+					"",
+					"// Check if response contains a new JWT token and save it",
+					"if (pm.response.code === 200 || pm.response.code === 201) {",
+					"    try {",
+					"        const jsonResponse = pm.response.json();",
+					"        ",
+					"        // Save JWT token if present in response",
+					"        if (jsonResponse.token) {",
+					"            pm.collectionVariables.set('jwt_token', jsonResponse.token);",
+					"            console.log('🔑 JWT token updated from response');",
+					"        }",
+					"        ",
+					"        // Save user information if present",
+					"        if (jsonResponse.user && jsonResponse.user.id) {",
+					"            pm.collectionVariables.set('user_id', jsonResponse.user.id);",
+					"            pm.collectionVariables.set('is_admin', jsonResponse.user.is_admin);",
+					"            console.log('👤 User info saved:', jsonResponse.user.username);",
+					"        }",
+					"    } catch (e) {",
+					"        // Response is not JSON or doesn't contain expected fields",
+					"    }",
+					"}",
+					"",
+					"// Handle 401 Unauthorized - token might be expired",
+					"if (pm.response.code === 401) {",
+					"    console.warn('⚠️ 401 Unauthorized - Token may be expired. Run Login request or set auto_login credentials.');",
+					"    pm.collectionVariables.set('jwt_token', '');",
+					"}",
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "jwt_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "user_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "season_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "is_admin",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "auto_login_username",
+			"value": "",
+			"type": "string",
+			"description": "Set this to enable auto-login (e.g., 'testuser')"
+		},
+		{
+			"key": "auto_login_password",
+			"value": "",
+			"type": "string",
+			"description": "Set this to enable auto-login (e.g., 'password123')"
+		}
+	],
+	"item": [
+		{
+			"name": "Health Check",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/health",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"health"
+							]
+						},
+						"description": "Check server health and status"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Public",
+					"item": [
+						{
+							"name": "Login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"// Enhanced login test script",
+											"pm.test('Status code is 200', function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test('Response has success field', function () {",
+											"    const jsonData = pm.response.json();",
+											"    pm.expect(jsonData).to.have.property('success');",
+											"});",
+											"",
+											"if (pm.response.code === 200) {",
+											"    const response = pm.response.json();",
+											"    ",
+											"    if (response.success && response.token) {",
+											"        // Save authentication data",
+											"        pm.collectionVariables.set('jwt_token', response.token);",
+											"        pm.collectionVariables.set('user_id', response.user.id);",
+											"        pm.collectionVariables.set('is_admin', response.user.is_admin);",
+											"        ",
+											"        // Optional: Save credentials for auto-login",
+											"        const requestBody = JSON.parse(pm.request.body.raw);",
+											"        pm.collectionVariables.set('auto_login_username', requestBody.username);",
+											"        pm.collectionVariables.set('auto_login_password', requestBody.password);",
+											"        ",
+											"        console.log('✅ Login successful!');",
+											"        console.log('🔑 JWT Token:', response.token.substring(0, 20) + '...');",
+											"        console.log('👤 User ID:', response.user.id);",
+											"        console.log('👤 Username:', response.user.username);",
+											"        console.log('👤 Name:', response.user.name, response.user.surname);",
+											"        console.log('🔐 Is Admin:', response.user.is_admin);",
+											"        console.log('💾 Auto-login credentials saved');",
+											"        ",
+											"        pm.test('JWT token received', function () {",
+											"            pm.expect(response.token).to.be.a('string');",
+											"            pm.expect(response.token.length).to.be.above(0);",
+											"        });",
+											"        ",
+											"        pm.test('User object received', function () {",
+											"            pm.expect(response.user).to.be.an('object');",
+											"            pm.expect(response.user.id).to.exist;",
+											"            pm.expect(response.user.username).to.exist;",
+											"        });",
+											"    } else {",
+											"        console.error('❌ Login failed:', response.message);",
+											"    }",
+											"} else {",
+											"    console.error('❌ Login request failed with status:', pm.response.code);",
+											"}",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"testuser\",\n    \"password\": \"password123\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/auth/login",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"login"
+									]
+								},
+								"description": "Login with username and password. Saves JWT token automatically."
+							},
+							"response": []
+						},
+						{
+							"name": "Register",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"newuser\",\n    \"password\": \"password123\",\n    \"name\": \"John\",\n    \"surname\": \"Doe\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/auth/register",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"register"
+									]
+								},
+								"description": "Register a new user account"
+							},
+							"response": []
+						},
+						{
+							"name": "Validate Token",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"token\": \"{{jwt_token}}\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/auth/validate-token",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"validate-token"
+									]
+								},
+								"description": "Validate JWT token"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Protected",
+					"item": [
+						{
+							"name": "Refresh Token",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/auth/refresh-token",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"refresh-token"
+									]
+								},
+								"description": "Refresh JWT token (requires authentication)"
+							},
+							"response": []
+						},
+						{
+							"name": "Logout",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/auth/logout",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"logout"
+									]
+								},
+								"description": "Logout current session"
+							},
+							"response": []
+						},
+						{
+							"name": "Logout All Sessions",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/auth/logout-all",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"logout-all"
+									]
+								},
+								"description": "Logout from all active sessions"
+							},
+							"response": []
+						},
+						{
+							"name": "Get User Sessions",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/auth/sessions",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"sessions"
+									]
+								},
+								"description": "Get all active sessions for current user"
+							},
+							"response": []
+						},
+						{
+							"name": "Change Password",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"userId\": {{user_id}},\n    \"currentPassword\": \"oldpassword123\",\n    \"newPassword\": \"newpassword123\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/auth/change-password",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"change-password"
+									]
+								},
+								"description": "Change user password"
+							},
+							"response": []
+						},
+						{
+							"name": "Update User Info",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"userId\": {{user_id}},\n    \"name\": \"Updated Name\",\n    \"surname\": \"Updated Surname\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/auth/update-user-info",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"update-user-info"
+									]
+								},
+								"description": "Update user information"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Admin Only",
+					"item": [
+						{
+							"name": "Get All Users",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/auth/users",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"users"
+									]
+								},
+								"description": "Get all users (admin only)"
+							},
+							"response": []
+						},
+						{
+							"name": "Admin Change Password",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"userId\": 1,\n    \"newPassword\": \"newpassword123\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/auth/admin-change-password",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"admin-change-password"
+									]
+								},
+								"description": "Change any user's password (admin only)"
+							},
+							"response": []
+						},
+						{
+							"name": "Cleanup Expired Sessions",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/auth/cleanup-sessions",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"cleanup-sessions"
+									]
+								},
+								"description": "Cleanup expired sessions (admin only)"
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Database",
+			"item": [
+				{
+					"name": "Drivers",
+					"item": [
+						{
+							"name": "Get All Drivers",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"seasonId\": {{season_id}}\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/database/drivers",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"database",
+										"drivers"
+									]
+								},
+								"description": "Get all drivers for a season"
+							},
+							"response": []
+						},
+						{
+							"name": "Get Drivers Data",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"seasonId\": {{season_id}}\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/database/drivers-data",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"database",
+										"drivers-data"
+									]
+								},
+								"description": "Get detailed driver data including stats"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Championship",
+					"item": [
+						{
+							"name": "Get Championship",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"seasonId\": {{season_id}}\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/database/championship",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"database",
+										"championship"
+									]
+								},
+								"description": "Get championship standings"
+							},
+							"response": []
+						},
+						{
+							"name": "Get Cumulative Points",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"seasonId\": {{season_id}}\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/database/cumulative-points",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"database",
+										"cumulative-points"
+									]
+								},
+								"description": "Get cumulative points over the season"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Tracks",
+					"item": [
+						{
+							"name": "Get All Tracks",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"seasonId\": {{season_id}}\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/database/tracks",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"database",
+										"tracks"
+									]
+								},
+								"description": "Get all tracks for a season"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Race Results",
+					"item": [
+						{
+							"name": "Get Race Results",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"seasonId\": {{season_id}}\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/database/race-results",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"database",
+										"race-results"
+									]
+								},
+								"description": "Get race results"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Seasons",
+					"item": [
+						{
+							"name": "Get All Seasons",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/database/seasons",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"database",
+										"seasons"
+									]
+								},
+								"description": "Get all available seasons"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Constructors",
+					"item": [
+						{
+							"name": "Get Constructors",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"seasonId\": {{season_id}}\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/database/constructors",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"database",
+										"constructors"
+									]
+								},
+								"description": "Get constructor teams"
+							},
+							"response": []
+						},
+						{
+							"name": "Get Constructor Grand Prix Points",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"seasonId\": {{season_id}}\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/database/constructor-grand-prix-points",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"database",
+										"constructor-grand-prix-points"
+									]
+								},
+								"description": "Get constructor points per Grand Prix"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Admin",
+					"item": [
+						{
+							"name": "Set GP Result",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"gpId\": 1,\n    \"sessionType\": \"race\",\n    \"results\": [\n        {\n            \"position\": 1,\n            \"pilotId\": 1,\n            \"fastLap\": true\n        },\n        {\n            \"position\": 2,\n            \"pilotId\": 2,\n            \"fastLap\": false\n        }\n    ]\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/database/set-gp-result",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"database",
+										"set-gp-result"
+									]
+								},
+								"description": "Set Grand Prix results (admin only)"
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Fanta (Fantasy)",
+			"item": [
+				{
+					"name": "Get Fanta Vote",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": {{user_id}},\n    \"raceId\": 1,\n    \"seasonId\": {{season_id}}\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/fanta/votes",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"fanta",
+								"votes"
+							]
+						},
+						"description": "Get fantasy votes for a race"
+					},
+					"response": []
+				},
+				{
+					"name": "Set Fanta Vote",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": {{user_id}},\n    \"raceId\": 1,\n    \"seasonId\": {{season_id}},\n    \"1_place_id\": 1,\n    \"2_place_id\": 2,\n    \"3_place_id\": 3,\n    \"4_place_id\": 4,\n    \"5_place_id\": 5,\n    \"6_place_id\": 6,\n    \"7_place_id\": 7,\n    \"8_place_id\": 8,\n    \"fast_lap_id\": 1,\n    \"dnf_id\": 9,\n    \"team_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/fanta/set-vote",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"fanta",
+								"set-vote"
+							]
+						},
+						"description": "Submit fantasy vote for a race"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Twitch",
+			"item": [
+				{
+					"name": "Get Stream Info",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"channelName\": \"your_channel_name\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/twitch/stream-info",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"twitch",
+								"stream-info"
+							]
+						},
+						"description": "Get Twitch stream information"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Playground",
+			"item": [
+				{
+					"name": "Get Playground Leaderboard",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/playground/leaderboard",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"playground",
+								"leaderboard"
+							]
+						},
+						"description": "Get playground leaderboard"
+					},
+					"response": []
+				},
+				{
+					"name": "Set User Best Score",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": {{user_id}},\n    \"score\": 1000,\n    \"track\": \"Monaco\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/playground/score",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"playground",
+								"score"
+							]
+						},
+						"description": "Submit user's best score (requires authentication)"
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

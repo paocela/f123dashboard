@@ -1,9 +1,7 @@
-import { GenezioDeploy, GenezioMethod  } from "@genezio/types";
 import { Pool } from "pg";
-import { getUpcomingRaceEmailTemplate } from "./email_templates";
-const nodemailer = require("nodemailer");
+import { getUpcomingRaceEmailTemplate } from "../config/email_templates.js";
+import nodemailer from "nodemailer";
 
-@GenezioDeploy()
 export class EmailService {
     FROM = "noreply@raceforfederica.com";
     pool = new Pool({
@@ -52,7 +50,7 @@ export class EmailService {
         }
     }
 
-    @GenezioMethod({ type: "cron", cronString: "0 18 * * *" })
+    // Scheduled chron job to send emails about upcoming races
     async sendIncomingRaceMail() {
         try {
             // Check if the job is enabled via property table

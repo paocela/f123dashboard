@@ -70,3 +70,10 @@ package.json
 node_modules
 vars.ps1
 script.ps1
+
+# Environment variables
+server/.env
+
+# Logs
+server/logs
+*.log
