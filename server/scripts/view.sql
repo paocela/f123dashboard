@@ -1,4 +1,5 @@
 -- public.driver_grand_prix_points source
+--//TODO fix drivers not showing when they have 0 points and no results are submitted for the session
 CREATE OR REPLACE VIEW public.driver_grand_prix_points
 AS WITH session_points AS (
          SELECT gp.id AS grand_prix_id,
