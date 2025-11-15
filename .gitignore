@@ -48,23 +48,8 @@ Thumbs.db
 
 # SDK
 client/dist
-node_modules/.package-lock.json
-node_modules/@genezio-sdk/f123dashboard/package.json
-node_modules/@genezio-sdk/f123dashboard/lib/index.d.ts
-node_modules/@genezio-sdk/f123dashboard/lib/index.js
-node_modules/@genezio-sdk/f123dashboard/lib/postgresService.sdk.d.ts
-node_modules/@genezio-sdk/f123dashboard/lib/postgresService.sdk.js
-node_modules/@genezio-sdk/f123dashboard/lib/storage.d.ts
-node_modules/@genezio-sdk/f123dashboard/lib/storage.js
-node_modules/@genezio-sdk/f123dashboard/node_modules/genezio-remote/package.json
-node_modules/@genezio-sdk/f123dashboard/node_modules/genezio-remote/dist/lib/index.d.ts
-node_modules/@genezio-sdk/f123dashboard/node_modules/genezio-remote/dist/lib/index.js
-node_modules/@genezio-sdk/f123dashboard/node_modules/genezio-remote/dist/lib/index.node.d.ts
-node_modules/@genezio-sdk/f123dashboard/node_modules/genezio-remote/dist/lib/index.node.js
-node_modules/@genezio-sdk/f123dashboard/node_modules/genezio-remote/dist/lib/remote.d.ts
-node_modules/@genezio-sdk/f123dashboard/node_modules/genezio-remote/dist/lib/remote.js
-node_modules/@genezio-sdk/f123dashboard/node_modules/genezio-remote/dist/lib/remote.node.d.ts
-node_modules/@genezio-sdk/f123dashboard/node_modules/genezio-remote/dist/lib/remote.node.js
+server/dist
+shared/dist
 package-lock.json
 package.json
 node_modules
