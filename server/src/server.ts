@@ -89,24 +89,24 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 const emailService = new EmailService();
 
 // Schedule cron job to send upcoming race emails daily at 18:00 (6:00 PM)
-cron.schedule('0 18 * * *', async () => {
-  logger.info('🕐 Running scheduled task: sendIncomingRaceMail');
-  try {
-    await emailService.sendIncomingRaceMail();
-    logger.info('✅ Scheduled email task completed successfully');
-  } catch (error) {
-    logger.error('❌ Error running scheduled email task:', error);
-  }
-}, {
-  timezone: 'Europe/Rome' // Adjust timezone as needed
-});
+// cron.schedule('0 18 * * *', async () => {
+//   logger.info('🕐 Running scheduled task: sendIncomingRaceMail');
+//   try {
+//     await emailService.sendIncomingRaceMail();
+//     logger.info('✅ Scheduled email task completed successfully');
+//   } catch (error) {
+//     logger.error('❌ Error running scheduled email task:', error);
+//   }
+// }, {
+//   timezone: 'Europe/Rome' // Adjust timezone as needed
+// });
 
 // Start server
 app.listen(PORT, () => {
   logger.info(`🚀 Server running on http://localhost:${PORT}`);
   logger.info(`📦 Environment: ${process.env.NODE_ENV || 'development'}`);
   logger.info(`🔧 Health check: http://localhost:${PORT}/api/health`);
-  logger.info('⏰ Cron job scheduled: sendIncomingRaceMail at 18:00 daily');
+//logger.info('⏰ Cron job scheduled: sendIncomingRaceMail at 18:00 daily');
 });
 
 export default app;
