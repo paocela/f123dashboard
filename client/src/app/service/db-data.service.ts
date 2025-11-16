@@ -106,24 +106,26 @@ export class DbDataService {
     return this.drivers;
   }
 
+
+  //TODO fix hardcoded drivers in constructors
   getConstructors(): Constructor[] {
-    for (let constructor of this.constructors) {
-      if (constructor.constructor_id == 1) {
+    for (const constructor of this.constructors) {
+      if (constructor.constructor_id === 1) {
         constructor.driver_1_id = 10;
         constructor.driver_1_username = "Marcogang96";
         constructor.driver_2_id = 11;
         constructor.driver_2_username = "GiannisCorbe";
-      } else if (constructor.constructor_id == 4) {
+      } else if (constructor.constructor_id === 4) {
         constructor.driver_1_id = 14;
         constructor.driver_1_username = "redmamba_99_";
         constructor.driver_2_id = 16;
         constructor.driver_2_username = "JJKudos";
-      } else if (constructor.constructor_id == 2) {
+      } else if (constructor.constructor_id === 2) {
         constructor.driver_1_id = 12;
         constructor.driver_1_username = "Lil Mvrck";
         constructor.driver_2_id = 17;
         constructor.driver_2_username = "Octimus10";
-      } else if (constructor.constructor_id == 3) {
+      } else if (constructor.constructor_id === 3) {
         constructor.driver_1_id = 13;
         constructor.driver_1_username = "FASTman";
         constructor.driver_2_id = 15;
