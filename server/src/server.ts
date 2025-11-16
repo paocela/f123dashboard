@@ -11,7 +11,6 @@ import { EmailService } from './services/mail.service.js';
 
 // Load environment variables
 dotenv.config();
-
 // Get current directory in ES module
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -45,6 +44,7 @@ import { authRouter } from './routes/auth.routes.js';
 import { fantaRouter } from './routes/fanta.routes.js';
 import { twitchRouter } from './routes/twitch.routes.js';
 import { playgroundRouter } from './routes/playground.routes.js';
+import { existsSync } from 'fs';
 
 app.use('/api/database', databaseRouter);
 app.use('/api/auth', authRouter);
@@ -59,7 +59,7 @@ if (process.env.NODE_ENV === 'production') {
   
   logger.info(`📂 Attempting to serve static files from: ${angularDistPath}`);
   
-  if (require('fs').existsSync(angularDistPath)) {
+  if (existsSync(angularDistPath)) {
     app.use(express.static(angularDistPath));
 
     // All other routes return the Angular app
