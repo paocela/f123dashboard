@@ -1,0 +1,198 @@
+import { cpSync, mkdirSync, writeFileSync, existsSync } from 'fs';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const rootDir = join(__dirname, '..');
+
+console.log('📦 Copying files to dist/...');
+
+// Create dist directory
+mkdirSync(join(rootDir, 'dist'), { recursive: true });
+
+// Copy shared
+console.log('  → Copying shared types...');
+if (existsSync(join(rootDir, 'shared/dist'))) {
+  cpSync(
+    join(rootDir, 'shared/dist'),
+    join(rootDir, 'dist/shared'),
+    { recursive: true }
+  );
+} else {
+  console.warn('  ⚠️  shared/dist not found, skipping...');
+}
+
+// Copy server
+console.log('  → Copying server...');
+if (existsSync(join(rootDir, 'server/dist'))) {
+  cpSync(
+    join(rootDir, 'server/dist'),
+    join(rootDir, 'dist/server'),
+    { recursive: true }
+  );
+} else {
+  console.warn('  ⚠️  server/dist not found, skipping...');
+}
+
+// Copy client
+console.log('  → Copying client...');
+if (existsSync(join(rootDir, 'client/dist/browser'))) {
+  cpSync(
+    join(rootDir, 'client/dist/browser'),
+    join(rootDir, 'dist/client/browser'),
+    { recursive: true }
+  );
+} else {
+  console.warn('  ⚠️  client/dist/browser not found, skipping...');
+}
+
+// Copy node_modules from server (production dependencies)
+console.log('  → Copying node_modules...');
+if (existsSync(join(rootDir, 'server/node_modules'))) {
+  cpSync(
+    join(rootDir, 'server/node_modules'),
+    join(rootDir, 'dist/node_modules'),
+    { 
+      recursive: true,
+      filter: (src) => {
+        // Skip dev dependencies and cache directories
+        return !src.includes('.bin') && 
+               !src.includes('.cache') && 
+               !src.includes('.nyc_output') &&
+               !src.includes('.vscode-test');
+      }
+    }
+  );
+} else {
+  console.warn('  ⚠️  server/node_modules not found, you may need to run npm install in server/');
+}
+
+// Create production package.json
+console.log('  → Creating production package.json...');
+const prodPackage = {
+  name: "f123dashboard-server",
+  version: "1.0.0",
+  type: "module",
+  scripts: {
+    start: "node server/server.js"
+  },
+  dependencies: {
+    "express": "^4.18.2",
+    "pg": "^8.11.3",
+    "bcrypt": "^5.1.1",
+    "jsonwebtoken": "^9.0.2",
+    "dotenv": "^16.3.1",
+    "winston": "^3.11.0",
+    "winston-daily-rotate-file": "^4.7.1",
+    "morgan": "^1.10.0",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "compression": "^1.7.4",
+    "express-rate-limit": "^7.1.5",
+    "nodemailer": "^6.9.7",
+    "node-cron": "^3.0.3"
+  }
+};
+
+writeFileSync(
+  join(rootDir, 'dist/package.json'),
+  JSON.stringify(prodPackage, null, 2)
+);
+
+// Create .env template
+console.log('  → Creating .env template...');
+const envTemplate = `# Database
+RACEFORFEDERICA_DB_DATABASE_URL=postgresql://user:pass@localhost:5432/f123dashboard
+
+# Authentication
+JWT_SECRET=your-production-secret-key-min-32-chars
+
+# Email
+MAIL_USER=noreply@yourdomain.com
+MAIL_PASS=your-email-password
+
+# Twitch
+RACEFORFEDERICA_DREANDOS_SECRET=your-twitch-webhook-secret
+
+# Server
+PORT=3000
+NODE_ENV=production
+LOG_LEVEL=info
+`;
+
+writeFileSync(join(rootDir, 'dist/.env.example'), envTemplate);
+
+// Create README for deployment
+console.log('  → Creating deployment README...');
+const deployReadme = `# F123 Dashboard - Production Build
+
+## Deployment Instructions
+
+### 1. Transfer files to server
+\`\`\`bash
+scp -r dist/ user@server:/var/www/f123dashboard/
+\`\`\`
+
+### 2. On the server
+\`\`\`bash
+cd /var/www/f123dashboard
+cp .env.example .env
+nano .env  # Edit with production values
+\`\`\`
+
+### 3. Start with PM2 (recommended)
+\`\`\`bash
+pm2 start server/server.js --name f123dashboard
+pm2 save
+pm2 startup
+\`\`\`
+
+### 4. Or start directly
+\`\`\`bash
+npm start
+\`\`\`
+
+## Directory Structure
+\`\`\`
+dist/
+├── package.json          # Production package.json
+├── .env.example          # Environment template
+├── node_modules/         # Production dependencies
+├── shared/               # Compiled shared types
+├── server/               # Compiled Express backend
+│   └── server.js        # Entry point
+└── client/
+    └── browser/          # Angular production build
+        └── index.html
+\`\`\`
+
+## Health Check
+\`\`\`bash
+curl http://localhost:3000/api/health
+\`\`\`
+`;
+
+writeFileSync(join(rootDir, 'dist/README.md'), deployReadme);
+
+console.log('\n✅ Build copied to dist/');
+console.log('\n📁 Dist structure:');
+console.log('dist/');
+console.log('├── package.json');
+console.log('├── .env.example');
+console.log('├── README.md');
+console.log('├── node_modules/');
+console.log('├── shared/');
+console.log('├── server/');
+console.log('│   ├── server.js');
+console.log('│   ├── controllers/');
+console.log('│   ├── services/');
+console.log('│   ├── routes/');
+console.log('│   ├── middleware/');
+console.log('│   └── config/');
+console.log('└── client/');
+console.log('    └── browser/');
+console.log('        └── index.html');
+console.log('\n🚀 Ready for deployment!');
+console.log('   Run: npm start:prod (for local testing)');
+console.log('   Or copy dist/ folder to your production server');

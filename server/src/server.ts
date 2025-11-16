@@ -54,13 +54,23 @@ app.use('/api/playground', playgroundRouter);
 
 // Serve Angular static files in production
 if (process.env.NODE_ENV === 'production') {
-  const angularDistPath = path.join(__dirname, '../../../client/dist/browser');
-  app.use(express.static(angularDistPath));
+  // Production build structure: dist/server/server.js -> dist/client/browser/
+  const angularDistPath = path.join(__dirname, '../client/browser');
+  
+  logger.info(`📂 Attempting to serve static files from: ${angularDistPath}`);
+  
+  if (require('fs').existsSync(angularDistPath)) {
+    app.use(express.static(angularDistPath));
 
-  // All other routes return the Angular app
-  app.get('*', (req: Request, res: Response) => {
-    res.sendFile(path.join(angularDistPath, 'index.html'));
-  });
+    // All other routes return the Angular app
+    app.get('*', (req: Request, res: Response) => {
+      res.sendFile(path.join(angularDistPath, 'index.html'));
+    });
+    
+    logger.info(`✅ Serving Angular static files from: ${angularDistPath}`);
+  } else {
+    logger.warn(`⚠️  Angular build not found at: ${angularDistPath}`);
+  }
 }
 
 // Error handling middleware
