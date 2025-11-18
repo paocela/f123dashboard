@@ -204,8 +204,6 @@ export class DashboardComponent implements OnInit {
     const sortedCumulativePoints = championshipTrend.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     const lastRacePoints = sortedCumulativePoints.slice(0, this.championship_standings_users.length);
 
-    console.log("lastRacePoints:", lastRacePoints);
-
     const constructorsOfWeek_tmp: ConstructorOfWeek[] = [];
     for (const constructor of this.constructors) 
       {constructorsOfWeek_tmp.push({ constructor_name: constructor.constructor_name,
