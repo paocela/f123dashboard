@@ -203,7 +203,8 @@ export class DashboardComponent implements OnInit {
     // Get best driver and constructor of the week
     const sortedCumulativePoints = championshipTrend.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     const lastRacePoints = sortedCumulativePoints.slice(0, this.championship_standings_users.length);
-    const secondToLastRacePoints = sortedCumulativePoints.slice(this.championship_standings_users.length, 2*this.championship_standings_users.length);
+
+    console.log("lastRacePoints:", lastRacePoints);
 
     const constructorsOfWeek_tmp: ConstructorOfWeek[] = [];
     for (const constructor of this.constructors) 
@@ -218,7 +219,7 @@ export class DashboardComponent implements OnInit {
     let currentPoints = 0;
 
     for (i = 0; i < lastRacePoints.length; i++) {
-      currentPoints = lastRacePoints[i].cumulative_points - secondToLastRacePoints[i].cumulative_points;
+      currentPoints = Number(lastRacePoints[i].cumulative_points);
       if ( currentPoints > bestPoints ) {
         bestPoints = currentPoints;
         this.driverOfWeek.driver_username = lastRacePoints[i].driver_username;
@@ -227,12 +228,12 @@ export class DashboardComponent implements OnInit {
       } 
 
       constructorsOfWeek_tmp.forEach(constructor => {
-        if (constructor.constructor_driver_1_id === lastRacePoints[i].driver_id || constructor.constructor_driver_2_id === lastRacePoints[i].driver_id) 
-          {constructor.points += currentPoints;}
+        if (constructor.constructor_driver_1_id == lastRacePoints[i].driver_id || constructor.constructor_driver_2_id == lastRacePoints[i].driver_id)  {
+          constructor.points += currentPoints;
+        }
         
       });
     }
-
     this.constructorOfWeek = constructorsOfWeek_tmp.sort((a, b) => b.points - a.points)[0];
   }
 
