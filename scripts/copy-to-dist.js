@@ -91,7 +91,8 @@ const prodPackage = {
     "compression": "^1.7.4",
     "express-rate-limit": "^7.1.5",
     "nodemailer": "^6.9.7",
-    "node-cron": "^3.0.3"
+    "node-cron": "^3.0.3",
+    "axios": "^1.8.4"
   }
 };
 
@@ -124,56 +125,7 @@ LOG_LEVEL=info
 writeFileSync(join(rootDir, 'dist/.env.example'), envTemplate);
 
 // Create README for deployment
-console.log('  → Creating deployment README...');
-const deployReadme = `# F123 Dashboard - Production Build
 
-## Deployment Instructions
-
-### 1. Transfer files to server
-\`\`\`bash
-scp -r dist/ user@server:/var/www/f123dashboard/
-\`\`\`
-
-### 2. On the server
-\`\`\`bash
-cd /var/www/f123dashboard
-cp .env.example .env
-nano .env  # Edit with production values
-\`\`\`
-
-### 3. Start with PM2 (recommended)
-\`\`\`bash
-pm2 start server/server.js --name f123dashboard
-pm2 save
-pm2 startup
-\`\`\`
-
-### 4. Or start directly
-\`\`\`bash
-npm start
-\`\`\`
-
-## Directory Structure
-\`\`\`
-dist/
-├── package.json          # Production package.json
-├── .env.example          # Environment template
-├── node_modules/         # Production dependencies
-├── shared/               # Compiled shared types
-├── server/               # Compiled Express backend
-│   └── server.js        # Entry point
-└── client/
-    └── browser/          # Angular production build
-        └── index.html
-\`\`\`
-
-## Health Check
-\`\`\`bash
-curl http://localhost:3000/api/health
-\`\`\`
-`;
-
-writeFileSync(join(rootDir, 'dist/README.md'), deployReadme);
 
 console.log('\n✅ Build copied to dist/');
 console.log('\n📁 Dist structure:');

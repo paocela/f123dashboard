@@ -30,7 +30,6 @@ winston.addColors(colors);
 
 // Define log format for files (readable, no colors)
 const fileFormat = winston.format.combine(
-  winston.format.colorize({ all: true }),
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
   winston.format.errors({ stack: true }),
   winston.format.splat(),
@@ -88,7 +87,7 @@ if (process.env.NODE_ENV === 'production') {
 
 // Create the logger
 const logger = winston.createLogger({
-  level: process.env.LOG_LEVEL || (process.env.NODE_ENV === 'production' ? 'info' : 'debug'),
+  level: process.env.LOG_LEVEL || (process.env.NODE_ENV === 'production' ? 'http' : 'debug'),
   levels,
   transports,
   exitOnError: false,
