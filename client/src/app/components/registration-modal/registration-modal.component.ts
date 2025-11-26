@@ -61,6 +61,9 @@ export class RegistrationModalComponent implements OnDestroy {
 
   @ViewChild('verticallyCenteredModal') public modal!: ModalComponent;
 
+  //property to control visibility
+  visible = false;
+
   @Output() registrationSuccess = new EventEmitter<void>();
   @Output() updateSuccess = new EventEmitter<void>();
 
@@ -78,7 +81,7 @@ export class RegistrationModalComponent implements OnDestroy {
     this.singInErrorMessage = '';
     this.successMessage = '';
     this.populateUserData(user);
-    this.modal.visible = true;
+    this.visible = true;
   }
 
   // New method to open modal in register mode
@@ -89,7 +92,7 @@ export class RegistrationModalComponent implements OnDestroy {
     this.clearForm();
     this.singInErrorMessage = '';
     this.successMessage = '';
-    this.modal.visible = true;
+    this.visible = true;
   }
 
   // New method to open modal for email completion
@@ -100,7 +103,7 @@ export class RegistrationModalComponent implements OnDestroy {
     this.singInErrorMessage = '';
     this.successMessage = '';
     this.populateUserDataForEmailCompletion(user);
-    this.modal.visible = true;
+    this.visible = true;
   }
 
   private populateUserData(user: User) {
@@ -161,8 +164,13 @@ export class RegistrationModalComponent implements OnDestroy {
   }
 
   public close(): void {
-    this.modal.visible = false;
+    this.visible = false;
     this.clearForm();
+  }
+
+  // Add this method to handle two-way binding
+  handleVisibilityChange(event: boolean) {
+    this.visible = event;
   }
 
 
@@ -260,7 +268,7 @@ export class RegistrationModalComponent implements OnDestroy {
       if (response.success) {
         this.successMessage = 'Registrazione completata con successo!';
         this.registrationSuccess.emit();
-        setTimeout(() => this.modal.visible = false, 2000);
+        setTimeout(() => this.visible = false, 2000);
       } else 
         {this.singInErrorMessage = response.message || 'Registrazione fallita. Riprova.';}
       
@@ -313,7 +321,7 @@ export class RegistrationModalComponent implements OnDestroy {
       if (response.success) {
         this.successMessage = 'Profilo aggiornato con successo!';
         this.updateSuccess.emit();
-        setTimeout(() => this.modal.visible = false, 2000);
+        setTimeout(() => this.visible = false, 2000);
       } else 
         {this.singInErrorMessage = response.message || 'Aggiornamento fallito. Riprova.';}
       

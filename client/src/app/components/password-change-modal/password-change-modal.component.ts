@@ -37,6 +37,9 @@ export class PasswordChangeModalComponent implements OnDestroy {
   @ViewChild('passwordChangeModal') modal!: ModalComponent;
   @Output() passwordChanged = new EventEmitter<void>();
 
+  // Add this property to control visibility
+  visible = false;
+
   // Form fields
   currentPassword = '';
   newPassword = '';
@@ -57,12 +60,17 @@ export class PasswordChangeModalComponent implements OnDestroy {
 
   public open(): void {
     this.resetForm();
-    this.modal.visible = true;
+    this.visible = true;
   }
 
   public close(): void {
-    this.modal.visible = false;
+    this.visible = false;
     this.resetForm();
+  }
+
+  // method to handle two-way binding
+  handleVisibilityChange(event: boolean) {
+    this.visible = event;
   }
 
   private resetForm(): void {
