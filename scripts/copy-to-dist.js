@@ -5,18 +5,19 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const rootDir = join(__dirname, '..');
+const distDir = join(__dirname, '..', '..', 'dist');
 
-console.log('📦 Copying files to dist/...');
+console.log('📦 Copying files to ../dist/...');
 
 // Create dist directory
-mkdirSync(join(rootDir, 'dist'), { recursive: true });
+mkdirSync(distDir, { recursive: true });
 
 // Copy shared
 console.log('  → Copying shared types...');
 if (existsSync(join(rootDir, 'shared/dist'))) {
   cpSync(
     join(rootDir, 'shared/dist'),
-    join(rootDir, 'dist/shared'),
+    join(distDir, 'shared'),
     { recursive: true }
   );
 } else {
@@ -28,7 +29,7 @@ console.log('  → Copying server...');
 if (existsSync(join(rootDir, 'server/dist'))) {
   cpSync(
     join(rootDir, 'server/dist'),
-    join(rootDir, 'dist/server'),
+    join(distDir, 'server'),
     { recursive: true }
   );
 } else {
@@ -40,7 +41,7 @@ console.log('  → Copying client...');
 if (existsSync(join(rootDir, 'client/dist/browser'))) {
   cpSync(
     join(rootDir, 'client/dist/browser'),
-    join(rootDir, 'dist/client/browser'),
+    join(distDir, 'client/browser'),
     { recursive: true }
   );
 } else {
@@ -81,7 +82,7 @@ const prodPackage = {
 };
 
 writeFileSync(
-  join(rootDir, 'dist/package.json'),
+  join(distDir, 'package.json'),
   JSON.stringify(prodPackage, null, 2)
 );
 
@@ -106,7 +107,7 @@ NODE_ENV=production
 LOG_LEVEL=info
 `;
 
-writeFileSync(join(rootDir, 'dist/.env.example'), envTemplate);
+writeFileSync(join(distDir, '.env.example'), envTemplate);
 
 // Create README for deployment
 
