@@ -47,28 +47,12 @@ if (existsSync(join(rootDir, 'client/dist/browser'))) {
   console.warn('  ⚠️  client/dist/browser not found, skipping...');
 }
 
-// Copy node_modules from server (production dependencies)
-console.log('  → Copying node_modules...');
-if (existsSync(join(rootDir, 'server/node_modules'))) {
-  cpSync(
-    join(rootDir, 'server/node_modules'),
-    join(rootDir, 'dist/node_modules'),
-    { 
-      recursive: true,
-      filter: (src) => {
-        // Skip dev dependencies and cache directories
-        return !src.includes('.bin') && 
-               !src.includes('.cache') && 
-               !src.includes('.nyc_output') &&
-               !src.includes('.vscode-test');
-      }
-    }
-  );
-} else {
-  console.warn('  ⚠️  server/node_modules not found, you may need to run npm install in server/');
-}
+// REMOVED: Copying node_modules is unnecessary and buggy with workspaces.
+// Node will resolve dependencies from the root node_modules folder.
 
-// Create production package.json
+// Create production package.json (Optional, mostly for reference now)
+console.log('  → Creating production package.json...');
+// Create production package.json (Optional, mostly for reference now)
 console.log('  → Creating production package.json...');
 const prodPackage = {
   name: "f123dashboard-server",
