@@ -25,7 +25,7 @@ export class DeployController {
 
     // 3. Execute Script
     // Go up from src/controllers to root/scripts
-    const scriptPath = path.resolve(__dirname, '../../../scripts/deploy.sh');
+    const scriptPath = path.resolve(__dirname, '../../../../deploy.sh');
     
     exec(`bash "${scriptPath}"`, (error, stdout, stderr) => {
       if (error) {

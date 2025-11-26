@@ -48,17 +48,6 @@ if (existsSync(join(rootDir, 'client/dist/browser'))) {
   console.warn('  ⚠️  client/dist/browser not found, skipping...');
 }
 
-// Copy deployment script
-console.log('  → Copying deployment script...');
-if (existsSync(join(rootDir, 'scripts/deploy.sh'))) {
-  mkdirSync(join(distDir, 'scripts'), { recursive: true });
-  cpSync(
-    join(rootDir, 'scripts/deploy.sh'),
-    join(distDir, 'scripts/deploy.sh')
-  );
-} else {
-  console.warn('  ⚠️  scripts/deploy.sh not found, skipping...');
-}
 
 // REMOVED: Copying node_modules is unnecessary and buggy with workspaces.
 // Node will resolve dependencies from the root node_modules folder.
