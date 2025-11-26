@@ -23,8 +23,11 @@ npm install
 log "🏗️  Building project..."
 npm run build
 
+log "Installing dist dependencies..."
+cd /var/www/rff/dist || { log "❌ Failed to navigate to dist directory"; exit 1; }
+npm install
+
 log "🔄 Restarting application..."
-# Assuming you are using PM2 to manage the process
 pm2 reload rff --update-env 
 
 log "✅ Deployment complete!"
