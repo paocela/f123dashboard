@@ -51,7 +51,6 @@ client/dist
 server/dist
 shared/dist
 package-lock.json
-package.json
 node_modules
 vars.ps1
 script.ps1
