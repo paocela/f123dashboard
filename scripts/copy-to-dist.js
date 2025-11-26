@@ -110,8 +110,6 @@ LOG_LEVEL=info
 
 writeFileSync(join(distDir, '.env.example'), envTemplate);
 
-// Create README for deployment
-
 
 console.log('\n✅ Build copied to dist/');
 console.log('\n📁 Dist structure:');

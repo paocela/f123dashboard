@@ -29,6 +29,7 @@ export class DeployController {
     
     exec(`bash "${scriptPath}"`, (error, stdout, stderr) => {
       if (error) {
+        logger.error(`❌ Deployment script log: ${stdout}`);
         logger.error(`❌ Deployment failed: ${error.message}`);
         return;
       }
