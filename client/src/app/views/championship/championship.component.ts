@@ -46,6 +46,7 @@ export class ChampionshipComponent implements OnInit{
 
   ngOnInit(): void {
     this.championship_data = this.dbData.getChampionship();
+    console.log(this.championship_data);
   }
 
   // Helper method to get driver by position in a session
