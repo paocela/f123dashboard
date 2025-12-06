@@ -15,7 +15,7 @@ cd /var/www/rff/f123dashboard || { log "❌ Failed to navigate to project direct
 
 log "⬇️  Pulling latest changes..."
 #git pull origin main
-git pull origin server-migration
+git pull origin main
 
 log "📦 Installing dependencies..."
 NODE_ENV=development npm install
