@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
@@ -28,7 +28,8 @@ import { medals, allFlags, posizioni } from '../../model/constants';
 import type { ChampionshipData, Driver, Season, TrackData } from '@f123dashboard/shared';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,selector: 'app-admin',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'app-admin',
   imports: [
     AccordionComponent,
     AccordionItemComponent,
@@ -57,6 +58,7 @@ export class AdminComponent implements OnInit {
   private dbData = inject(DbDataService);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
   
   // VARIABLE DEFINITIONS
@@ -88,7 +90,6 @@ export class AdminComponent implements OnInit {
   // FUNCTION DEFINTIONS
   async ngOnInit(): Promise<void> {
     this.isInitialLoading = true;
-    
     try {
       // Additional security check
       const currentUser = this.authService.getCurrentUser();
@@ -107,8 +108,13 @@ export class AdminComponent implements OnInit {
 
       // Load data for the selected season
       await this.loadSeasonData();
+    } catch (error) {
+      console.error('Errore durante il caricamento dei dati della stagione:', error);
+      this.isInitialLoading = false;
+      this.cdr.markForCheck();
     } finally {
       this.isInitialLoading = false;
+      this.cdr.markForCheck();
     }
   }
 
@@ -116,22 +122,30 @@ export class AdminComponent implements OnInit {
     this.isSeasonLoading = true;
     try {
       if (this.selectedSeason) {
-        // Load data for specific season
-
-        this.piloti = await this.dbData.getDriversData(this.selectedSeason);
-        this.tracks = await this.dbData.getAllTracksBySeason(this.selectedSeason);
-        this.championshipData = await this.dbData.getChampionshipBySeason(this.selectedSeason);
+        // Load data for specific season concurrently
+        [this.piloti, this.tracks, this.championshipData] = await Promise.all([
+          this.dbData.getDriversData(this.selectedSeason),
+          this.dbData.getAllTracksBySeason(this.selectedSeason),
+          this.dbData.getChampionshipBySeason(this.selectedSeason)
+        ]);
       } else {
-        // Load data for latest season (default)
-        this.piloti = await this.dbData.getDriversData();
-        this.tracks = await this.dbData.getAllTracksBySeason();
-        this.championshipData = await this.dbData.getChampionshipBySeason();
+        // Load data for latest season (default) concurrently
+        [this.piloti, this.tracks, this.championshipData] = await Promise.all([
+          this.dbData.getDriversData(),
+          this.dbData.getAllTracksBySeason(),
+          this.dbData.getChampionshipBySeason()
+        ]);
       }
       
       this.initializeResults();
+    } catch (error) {
+      console.error('Errore durante il caricamento dei dati della stagione:', error);
+      this.isSeasonLoading = false;
+      this.cdr.markForCheck();
     } finally {
       this.isSeasonLoading = false;
-    }
+      this.cdr.markForCheck();
+    } 
   }
 
   async onSeasonChange(): Promise<void> {
@@ -289,6 +303,7 @@ export class AdminComponent implements OnInit {
       console.error('Errore generale in publishResult:', error);
     } finally {
       this.isSubmitting[trackId] = false;
+      this.cdr.markForCheck();
     }
   }
 
