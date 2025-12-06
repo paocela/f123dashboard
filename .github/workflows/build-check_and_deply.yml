@@ -43,7 +43,7 @@ jobs:
     steps:
       - name: Trigger Deployment Webhook
         run: |
-          curl -X POST https://nflpzdcn8dbcz0pm.myfritz.net/api/deploy \
+          curl -X POST "${{ secrets.DEPLOY_WEBHOOK_URL }}" \
           -H "Content-Type: application/json" \
-          -H "x-deploy-secret: 1iLUistNS2" \
+          -H "x-deploy-secret: ${{ secrets.DEPLOY_SECRET }}" \
           -d '{"ref": "${{ github.ref }}", "commit": "${{ github.sha }}"}'

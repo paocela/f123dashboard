@@ -18,7 +18,7 @@ log "⬇️  Pulling latest changes..."
 git pull origin server-migration
 
 log "📦 Installing dependencies..."
-npm install
+NODE_ENV=development npm install
 
 log "🏗️  Building project..."
 npm run build
