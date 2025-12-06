@@ -10,7 +10,7 @@ import logger, { stream } from './config/logger.js';
 import { EmailService } from './services/mail.service.js';
 
 // Load environment variables
-process.env.NODE_ENV === 'production' ? dotenv.config({path: '/var/www/rff/f123dashboard/.env'}): dotenv.config();
+process.env.NODE_ENV === 'production' ? dotenv.config({path: '/var/www/rff/f123dashboard'}): dotenv.config();
 // Get current directory in ES module
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
