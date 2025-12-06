@@ -10,10 +10,10 @@ const __dirname = path.dirname(__filename);
 export class DeployController {
   async deploy(req: Request, res: Response): Promise<void> {
     const deploySecret = req.headers['x-deploy-secret'];
-
     // 1. Validate Secret
     if (deploySecret !== process.env.DEPLOY_SECRET) {
       logger.warn('⛔ Unauthorized deployment attempt', { ip: req.ip });
+      logger.warn(`Provided secret: ${deploySecret} Expected secret: ${process.env.DEPLOY_SECRET}`);
       res.status(401).json({ success: false, message: 'Unauthorized' });
       return;
     }
