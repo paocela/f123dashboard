@@ -1,12 +1,13 @@
-import { Injectable } from '@angular/core';
-import { PlaygroundInterface, PlaygroundBestScore } from "@genezio-sdk/f123dashboard" 
+import { Injectable, inject } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
+import type { PlaygroundBestScore } from '@f123dashboard/shared';
+import { ApiService } from './api.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PlaygroundService {
-
-  constructor() { }
+  private apiService = inject(ApiService);
 
 /****************************************************************/
 //variabili locali
@@ -22,7 +23,7 @@ export class PlaygroundService {
     const [
       playgroundLeaderboard
     ] = await Promise.all([
-      PlaygroundInterface.getPlaygroundLeaderboard()
+      firstValueFrom(this.apiService.post<PlaygroundBestScore[]>('/playground/leaderboard', {}))
     ]);
 
     this.playgroundLeaderboard = playgroundLeaderboard;
@@ -38,7 +39,9 @@ export class PlaygroundService {
   }
 
   async setUserBestScore(voto: PlaygroundBestScore): Promise<void> {
-    await PlaygroundInterface.setUserBestScore(voto);
+    await firstValueFrom(
+      this.apiService.post('/playground/score', voto)
+    );
   }
 }
 

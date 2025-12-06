@@ -6,7 +6,7 @@ import {
   RowComponent,
   Tabs2Module,
 } from '@coreui/angular';
-import { Constructor, DriverData } from '@genezio-sdk/f123dashboard';
+import type { Constructor, DriverData } from '@f123dashboard/shared';
 import { PilotCardComponent } from '../../components/pilot-card/pilot-card.component';
 import { ConstructorCardComponent } from '../../components/constructor-card/constructor-card.component';
 

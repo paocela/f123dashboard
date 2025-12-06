@@ -1,10 +1,12 @@
-<div class="custom-backdrop" *ngIf="modal?.visible"></div>
+<div class="custom-backdrop" *ngIf="visible"></div>
 <c-modal
   #verticallyCenteredModal
   alignment="center"
   id="verticallyCenteredModal"
   [backdrop]="isEmailCompletion ? 'static' : false"
   class="registration-modal"
+  [visible]="visible"
+  (visibleChange)="handleVisibilityChange($event)"
 >
   <c-modal-header class="modal-header-custom">
     <h5 cModalTitle class="modal-title-custom">

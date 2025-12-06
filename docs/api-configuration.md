@@ -56,9 +56,7 @@ constructor(private apiService: ApiService) {}
 
 // Make authenticated POST request
 const response = await firstValueFrom(
-  this.apiService.post<AuthResponse>('AuthService/login', requestBody, {
-    headers: this.apiService.createAuthHeaders(token)
-  })
+  this.apiService.post<AuthResponse>('AuthService/login', requestBody)
 );
 
 // Get endpoint URL

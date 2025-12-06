@@ -16,7 +16,8 @@ applyTo: '**'
 - Use `standalone: true` in all new components.
 - Use `ChangeDetectionStrategy.OnPush` for performance in components that do not require default change detection.
 - Use Angular CLI commands for scaffolding (e.g., `ng generate component`, `ng generate service`).
-- use `PostgresService` from `"@genezio-sdk/f123dashboard"` for database interactions and model/type definitions.
+- Use `ApiService` for all HTTP API calls to the Express backend.
+- Import types from `@f123dashboard/shared` package for type definitions.
 
 ## Components
 - Place view components in `src/app/views/<feature>/`.
@@ -35,11 +36,12 @@ applyTo: '**'
 ## Services
 - Place new services in `src/app/service/`.
 - Use `@Injectable({ providedIn: 'root' })` for singleton services.
-- Use Angular's `HttpClient` for API calls.
+- Use `ApiService` for all API calls to the Express backend (never use `HttpClient` directly).
+- Use RxJS `firstValueFrom()` to convert Observables to Promises when needed.
 - Use RxJS for asynchronous operations and state management.
-- Inject services into components via the constructor.
+- Inject services using the `inject()` function for modern Angular.
 - Name services with the `Service` suffix (e.g., `UserService`).
-- use `PostgresService` from `"@genezio-sdk/f123dashboard"` for database interactions.
+- Import all types from `@f123dashboard/shared` package.
 
 ## Routing
 - Add new routes in `src/app/app.routes.ts` and/or feature-specific `routes.ts` files.
@@ -136,11 +138,40 @@ applyTo: '**'
 - Reference issues and breaking changes in the footer as needed.
 - See the `.github/COMMIT_CONVENTION.md` file for detailed examples and rules.
 
-## Genezio 
-- in `server/` there is the genezio backend, which is used to connect to the database and other service like twitch.
-- in `server/src/` there is the genezio interface to the database, and the type use as model for frontend to backend communication.
-- in `client/` there is the genezio client, witch is the angular application.
-- 
+## Backend Architecture
+- **Express Backend**: `server/` contains the Express.js backend
+  - `server/src/services/` - Business logic services
+  - `server/src/controllers/` - Request/response handlers
+  - `server/src/routes/` - API route definitions
+  - `server/src/middleware/` - Authentication and other middleware
+  - `server/src/config/` - Database and configuration files
+- **Shared Types**: `shared/` contains TypeScript type definitions
+  - `shared/src/models/` - Type definitions (auth, database, fanta, playground, twitch)
+  - `shared/src/index.ts` - Barrel export for all types
+  - Both client and server import from `@f123dashboard/shared`
+- **Angular Client**: `client/` contains the Angular application
+  - Uses `ApiService` for all HTTP calls to Express backend
+  - Imports types from `@f123dashboard/shared`
+  
+## API Communication
+- **Development**: Angular dev server proxies `/api/*` requests to `http://localhost:3000`
+- **Production**: Express serves the built Angular app and handles `/api/*` routes
+- **Endpoints**: All API routes are prefixed with `/api/` (e.g., `/api/database/drivers`, `/api/auth/login`)
+- **Authentication**: JWT tokens passed via `Authorization: Bearer <token>` header
+- Use `ApiService.post<T>()`, `ApiService.get<T>()`, etc. for type-safe API calls
+
+## Type Definitions
+- **Never** define types inline in services or components
+- **Always** import types from `@f123dashboard/shared`
+- Example: `import type { User, DriverData, FantaVote } from '@f123dashboard/shared';`
+- Use `type` imports for better tree-shaking and clarity
+
+## Development Workflow
+- **Shared Package**: Run `npm run build` in `shared/` after modifying types
+- **Server**: Run `npm run dev` in `server/` for development with auto-reload
+- **Client**: Run `npm start` in `client/` for Angular dev server with proxy
+- **Full Build**: Run `npm run build` from root to build all packages in order
+
 ---
 
 These instructions are designed to help AI agents generate code that fits seamlessly into this Angular project.

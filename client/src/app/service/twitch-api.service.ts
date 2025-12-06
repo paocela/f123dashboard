@@ -1,12 +1,13 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { DreandosTwitchInterface, TwitchStreamResponse } from "@genezio-sdk/f123dashboard" 
-
+import { Injectable, inject } from '@angular/core';
+import { BehaviorSubject, Observable, firstValueFrom } from 'rxjs';
+import type { TwitchStreamResponse } from '@f123dashboard/shared';
+import { ApiService } from './api.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TwitchApiService {
+  private apiService = inject(ApiService);
   private channelId = 'dreandos';
   private _isLive = new BehaviorSubject<boolean>(false);
   //public readonly isLive$ = this._isLive.asObservable();
@@ -14,7 +15,9 @@ export class TwitchApiService {
   private twitchStreamResponse: TwitchStreamResponse |null = null;
 
   async checkStreamStatus(){
-    this.twitchStreamResponse = await DreandosTwitchInterface.getStreamInfo(this.channelId);
+    this.twitchStreamResponse = await firstValueFrom(
+      this.apiService.post<TwitchStreamResponse>('/twitch/stream-info', { channelName: this.channelId })
+    );
   }
   
   isLive(): boolean {

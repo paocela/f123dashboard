@@ -1,117 +1,32 @@
-import { GenezioDeploy } from "@genezio/types";
 import pg from "pg";
 import { createHash, randomBytes } from "crypto";
 import jwt from "jsonwebtoken";
-import { EmailService } from "./mail_interfaces";
-import { getPasswordResetEmailTemplate } from "./email_templates";
-const { Pool } = pg;
+import { EmailService } from "./mail.service.js";
+import { getPasswordResetEmailTemplate } from "../config/email_templates.js";
+import type {
+  User,
+  LoginRequest,
+  AuthResponse,
+  ChangePasswordRequest,
+  AdminChangePasswordRequest,
+  ChangePasswordResponse,
+  UserSession,
+  SessionsResponse,
+  TokenValidationResponse,
+  RefreshTokenResponse,
+  LogoutResponse,
+  RegisterRequest,
+  UpdateUserInfoRequest
+} from "@f123dashboard/shared";
 
-type User = {
-  id: number;
-  username: string;
-  name: string;
-  surname: string;
-  mail?: string;
-  image?: string;
-  isAdmin?: boolean;
-}
-
-type LoginRequest = {
-  username: string;
-  password: string;
-  userAgent?: string;
-}
-
-type AuthResponse = {
-  success: boolean;
-  message: string;
-  user?: User;
-  token?: string;
-}
-
-type ChangePasswordRequest = {
-  currentPassword: string;
-  newPassword: string;
-  jwtToken: string;
-}
-
-type AdminChangePasswordRequest = {
-  userName: string;
-  newPassword: string;
-  jwtToken: string;
-}
-
-type ChangePasswordResponse = {
-  success: boolean;
-  message: string;
-}
-
-type UserSession = {
-  sessionToken: string;
-  createdAt: string;
-  lastActivity: string;
-  expiresAt: string;
-  isActive: boolean;
-  isCurrent: boolean;
-}
-
-type SessionsResponse = {
-  success: boolean;
-  message?: string;
-  sessions?: UserSession[];
-}
-
-type TokenValidationResponse = {
-  valid: boolean;
-  userId?: number;
-  username?: string;
-  name?: string;
-  surname?: string;
-  mail?: string;
-  image?: string;
-  isAdmin?: boolean;
-}
-
-type RefreshTokenResponse = {
-  success: boolean;
-  token?: string;
-  message: string;
-}
-
-type LogoutResponse = {
-  success: boolean;
-  message: string;
-}
-
-type RegisterRequest = {
-  username: string;
-  name: string;
-  surname: string;
-  password: string;
-  mail: string;
-  image: string;
-}
-
-export type UpdateUserInfoRequest = {
-  name?: string;
-  surname?: string;
-  mail?: string;
-  image?: string;
-  jwt: string;
-}
-
-@GenezioDeploy()
 export class AuthService {
   private pool: pg.Pool;
   private jwtSecret: string;
   private static readonly TOKEN_EXPIRY_DAYS = 7;
   private static readonly TOKEN_EXPIRY_JWT = '7d';
 
-  constructor() {
-    this.pool = new Pool({
-      connectionString: process.env.RACEFORFEDERICA_DB_DATABASE_URL,
-      ssl: true,
-    });
+  constructor(pool: pg.Pool) {
+    this.pool = pool;
     if (!process.env.JWT_SECRET) {
       throw new Error('JWT_SECRET environment variable is required');
     }
@@ -120,7 +35,7 @@ export class AuthService {
 
   async getUsers(): Promise<User[]> {
     const result = await this.pool.query (`
-  SELECT id, username, name, surname, password, mail, encode(image, 'escape') as image
+  SELECT id, username, name, surname, mail, encode(image, 'escape') as image
   FROM users;
     `);
       return result.rows as User[];
@@ -768,11 +683,12 @@ export class AuthService {
     return randomBytes(32).toString('hex');
   }
 
-  private generateJWTToken(userId: number, username: string): string {
+  private generateJWTToken(userId: number, username: string, isAdmin: boolean = false): string {
     return jwt.sign(
       { 
         userId: userId, 
-        username: username 
+        username: username,
+        isAdmin: isAdmin
       },
       this.jwtSecret,
       { expiresIn: AuthService.TOKEN_EXPIRY_JWT }
@@ -786,11 +702,11 @@ export class AuthService {
 
     // Generate JWT token
     const user = await this.pool.query(
-      'SELECT username FROM users WHERE id = $1',
+      'SELECT username, is_admin FROM users WHERE id = $1',
       [userId]
     );
     
-    const jwtToken = this.generateJWTToken(userId, user.rows[0].username);
+    const jwtToken = this.generateJWTToken(userId, user.rows[0].username, user.rows[0].is_admin);
 
     // Sanitize user agent for database storage
     const sanitizedUserAgent = this.sanitizeUserAgent(userAgent);

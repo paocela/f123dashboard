@@ -1,39 +1,9 @@
-import { GenezioDeploy } from "@genezio/types";
 import pg from "pg";
-const { Pool } = pg;
+import type { FantaVote } from '@f123dashboard/shared';
 
-
-  type FantaVote =  {
-    fanta_player_id: number,
-    username: string,
-    track_id: number,
-    id_1_place: number,
-    id_2_place: number,
-    id_3_place: number,
-    id_4_place: number,
-    id_5_place: number,
-    id_6_place: number,
-    id_7_place: number,
-    id_8_place: number,
-    id_fast_lap: number,
-    id_dnf: number,
-    season_id?: number,
-    constructor_id: number
-  };
-@GenezioDeploy()
 export class FantaService {
-  private pool: pg.Pool;
+  constructor(private pool: pg.Pool) {}
 
-  constructor() {
-    this.pool = new Pool({
-        connectionString: process.env.RACEFORFEDERICA_DB_DATABASE_URL,
-        ssl: true,
-    });
-  }
-
-
-
-  /* All fanta vote */
   async getFantaVote(seasonId?: number): Promise<FantaVote[]> {
     const result = await this.pool.query(`
       WITH latest_season AS (
@@ -63,10 +33,11 @@ export class FantaService {
     return result.rows as FantaVote[];
   }
 
-  async setFantaVoto( fantaVote : FantaVote ): Promise<string> {
+  async setFantaVoto(fantaVote: FantaVote): Promise<{ success: boolean; message: string }> {
     try {
       // Validate input
       this.validateFantaVoto(fantaVote);
+
       // Get the season_id (use provided or get latest)
       let season_id = fantaVote.season_id;
       if (season_id == null || season_id == undefined) {
@@ -118,17 +89,17 @@ export class FantaService {
 
       console.log(`Successfully saved fanta vote for player ${fantaVote.fanta_player_id} on race ${fantaVote.track_id} for season ${fantaVote.season_id}`);
       
-      return JSON.stringify({
+      return {
         success: true,
         message: 'Fanta vote saved successfully'
-      });
+      };
     } catch (error) {
       console.error('Error saving fanta vote:', error);
       throw new Error(`Failed to save fanta vote: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
-  private validateFantaVoto(fantavote: FantaVote  ): void {
+  private validateFantaVoto(fantavote: FantaVote): void {
     // Validate required fields
     if (!fantavote.fanta_player_id || !fantavote.track_id) throw new Error('Fanta player ID and track ID are required');
     if (!fantavote.id_fast_lap) throw new Error('Fast lap driver ID is required');
@@ -136,48 +107,14 @@ export class FantaService {
     if (!fantavote.constructor_id) throw new Error("Constructor ID is required");
 
     // Validate that all 8 places are different (if provided)
-    const places = [fantavote.id_1_place, fantavote.id_2_place, fantavote.id_3_place, fantavote.id_4_place, fantavote.id_5_place, fantavote.id_6_place, fantavote.id_7_place, fantavote.id_8_place]
-      .filter(place => place !== null && place !== undefined);
+    const places = [
+      fantavote.id_1_place, fantavote.id_2_place, fantavote.id_3_place, fantavote.id_4_place,
+      fantavote.id_5_place, fantavote.id_6_place, fantavote.id_7_place, fantavote.id_8_place
+    ].filter(place => place !== null && place !== undefined);
 
     const uniquePlaces = new Set(places);
     if (places.length !== uniquePlaces.size) {
       throw new Error('All driver positions must be unique');
-    }
-  }
-
-  private validateFantaPlayer(username: string, name: string, surname: string, password: string): void {
-    // Validate required fields
-    if (!username || !name || !surname || !password) {
-      throw new Error('Username, name, surname, and password are required');
-    }
-
-    // Validate field types
-    if (typeof username !== 'string' || typeof name !== 'string' || 
-        typeof surname !== 'string' || typeof password !== 'string') {
-      throw new Error('All player fields must be strings');
-    }
-
-    // Validate field lengths
-    if (username.length < 3 || username.length > 50) {
-      throw new Error('Username must be between 3 and 50 characters');
-    }
-
-    if (name.length < 1 || name.length > 50) {
-      throw new Error('Name must be between 1 and 50 characters');
-    }
-
-    if (surname.length < 1 || surname.length > 50) {
-      throw new Error('Surname must be between 1 and 50 characters');
-    }
-
-    if (password.length < 6) {
-      throw new Error('Password must be at least 6 characters long');
-    }
-
-    // Validate username format (alphanumeric and underscore only)
-    const usernameRegex = /^[a-zA-Z0-9_]+$/;
-    if (!usernameRegex.test(username)) {
-      throw new Error('Username can only contain letters, numbers, and underscores');
     }
   }
 }

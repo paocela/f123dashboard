@@ -20,7 +20,7 @@ import { IconDirective } from '@coreui/icons-angular';
 import { cilUser } from '@coreui/icons';
 import { RegistrationModalComponent } from '../registration-modal/registration-modal.component';
 import { PasswordChangeModalComponent } from '../password-change-modal/password-change-modal.component';
-import { User } from '@genezio-sdk/f123dashboard';
+import type { User } from '@f123dashboard/shared';
 
 @Component({
   selector: 'login-component',

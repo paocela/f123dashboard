@@ -2,7 +2,7 @@ import { Injectable, OnDestroy, inject } from '@angular/core';
 import { DbDataService } from './db-data.service';
 import { size } from 'lodash-es';
 import { Subscription } from 'rxjs';
-import { FantaVote, RaceResult } from '@genezio-sdk/f123dashboard';
+import type { FantaVote, RaceResult } from '@f123dashboard/shared';
 
 @Injectable({
   providedIn: 'root'

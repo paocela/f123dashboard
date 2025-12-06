@@ -9,7 +9,7 @@ import {
 
 import { getStyle } from '@coreui/utils';
 import { DbDataService } from '../../service/db-data.service'; 
-import { CumulativePointsData } from '@genezio-sdk/f123dashboard';
+import type { CumulativePointsData } from '@f123dashboard/shared';
 
 // Constants
 const DEFAULT_CHART_SCALE = 500;

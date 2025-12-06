@@ -20,7 +20,8 @@ import { IconDirective } from '@coreui/icons-angular';
 import { cilLockLocked, cilUser, cilCheckCircle, cilXCircle } from '@coreui/icons';
 
 import { AuthService } from 'src/app/service/auth.service';
-import { AuthService as AuthServiceBackend } from '@genezio-sdk/f123dashboard';
+import { ApiService } from 'src/app/service/api.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-admin-change-password',
@@ -117,11 +118,14 @@ export class AdminChangePasswordComponent implements OnInit {
       const newPassword = this.generateRandomPassword();
       this.generatedPassword = newPassword;
 
-      const result = await AuthServiceBackend.adminChangePassword({
-        userName: username,
-        newPassword: newPassword,
-        jwtToken: token
-      });
+      const apiService = inject(ApiService);
+      const result = await firstValueFrom(
+        apiService.post<{ success: boolean; message: string }>('/auth/admin-change-password', {
+          userName: username,
+          newPassword: newPassword,
+          jwtToken: token
+        })
+      );
 
       this.isLoading = false;
 
