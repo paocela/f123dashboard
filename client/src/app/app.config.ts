@@ -22,7 +22,9 @@ export function initializeApp(dbDataService: DbDataService, twitchApiService: Tw
     await Promise.all([
       dbDataService.AllData(),
       playgroundService.AllData(),
-      twitchApiService.checkStreamStatus()
+      twitchApiService.checkStreamStatus().catch(err => {
+        console.error('Error during Twitch stream status check:', err);
+      })
     ]);
   };
 }
