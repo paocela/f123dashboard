@@ -5,7 +5,7 @@ import { CardModule, TableModule } from '@coreui/angular';
 import { PodiumCardComponent } from '../../components/podium-card/podium-card.component';
 import { GridModule } from '@coreui/angular';
 import { DbDataService } from '../../service/db-data.service';
-import { DriverData } from '@genezio-sdk/f123dashboard';
+import type { DriverData } from '@f123dashboard/shared';
 
 @Component({
   selector: 'app-albo-d-oro',

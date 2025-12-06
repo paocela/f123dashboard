@@ -5,7 +5,7 @@ import { cifBh, cifAt, cifMc, cifJp, cifHu, cifCn, cifCa, cifEs, cifGb, cifBe, c
 import { cilFire } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
 import { DbDataService } from '../../service/db-data.service';
-import { ChampionshipData, SessionResult } from '@genezio-sdk/f123dashboard';
+import type { ChampionshipData, SessionResult } from '@f123dashboard/shared';
 
 @Component({
     selector: 'app-championship',

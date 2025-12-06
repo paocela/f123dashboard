@@ -7,7 +7,7 @@ import { DbDataService } from '../../../app/service/db-data.service';
 import { cilPeople, cilInfo, cilBell } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
 import { AvatarComponent, TextColorDirective } from '@coreui/angular';
-import { User, FantaVote } from '@genezio-sdk/f123dashboard';
+import type { User, FantaVote } from '@f123dashboard/shared';
 import { VoteHistoryTableComponent } from '../vote-history-table/vote-history-table.component';
 import { allFlags } from '../../model/constants';
 

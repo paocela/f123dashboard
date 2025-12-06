@@ -1,0 +1,24 @@
+{
+  "name": "@f123dashboard/shared",
+  "version": "1.0.0",
+  "description": "Shared TypeScript types for F123 Dashboard",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "clean": "rimraf dist"
+  },
+  "keywords": [
+    "types",
+    "shared",
+    "f123"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^5.7.2",
+    "rimraf": "^6.0.1"
+  }
+}

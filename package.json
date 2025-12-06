@@ -1,0 +1,37 @@
+{
+  "name": "f123dashboard",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "-": "^0.0.1",
+    "@coreui/coreui": "^5.4.1",
+    "g": "^2.0.1",
+    "nodemailer": "^7.0.6"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.54.2",
+    "@types/node": "^24.2.1",
+    "concurrently": "^9.2.1",
+    "sass": "^1.89.2"
+  },
+  "scripts": {
+    "start:client": "npm start --prefix client",
+    "build:client": "npm run build --prefix client",
+    "test:client": "npm test --prefix client",
+    "start:server": "npm run dev --prefix server",
+    "build:server": "npm run build --prefix server",
+    "build:shared": "npm run build --prefix shared",
+    "build": "npm run clean && npm run build:all && npm run copy:all",
+    "build:all": "npm run build:shared && npm run build:server && npm run build:client",
+    "clean": "node scripts/clean.js",
+    "copy:all": "node scripts/copy-to-dist.js",
+    "start:prod": "node dist/server/server.js",
+    "dev": "concurrently \"npm run build:shared -- --watch\" \"npm run start:server\" \"npm run start:client\""
+  },
+  "workspaces": [
+    "client",
+    "server",
+    "shared"
+  ]
+}

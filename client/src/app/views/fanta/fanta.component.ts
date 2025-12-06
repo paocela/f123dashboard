@@ -30,8 +30,7 @@ import {
   ModalTitleDirective,
   ThemeDirective
 } from '@coreui/angular';
-import { FantaVote } from '@genezio-sdk/f123dashboard/lib/fantaService.sdk';
-import { User } from '@genezio-sdk/f123dashboard';
+import type { FantaVote, User } from '@f123dashboard/shared';
 
 @Component({
     selector: 'app-fanta',

@@ -7,7 +7,7 @@ import {
   ListGroupDirective,
   ListGroupItemDirective
 } from '@coreui/angular';
-import { Constructor } from '@genezio-sdk/f123dashboard';
+import type { Constructor } from '@f123dashboard/shared';
 
 @Component({
   selector: 'app-constructor-card',

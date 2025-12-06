@@ -1,4 +1,4 @@
-import { FantaVote } from "@genezio-sdk/f123dashboard";
+import type { FantaVote } from '@f123dashboard/shared';
 
 export interface FantaPlayer {
     username: string,

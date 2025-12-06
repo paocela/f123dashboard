@@ -1,0 +1,49 @@
+name: Build Check and Deploy
+
+on:
+  push:
+    branches-ignore:
+      - "dependabot/**"
+  pull_request:
+    branches:
+      - main
+      - v5.*
+  schedule:
+    - cron: '15 4 * * *'
+
+env:
+  FORCE_COLOR: 2
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        platform: [ubuntu-latest]
+        node-version: [20.x]
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install npm dependencies
+        run: npm install
+
+      - name: Run build
+        run: npm run build
+
+  deploy:
+    needs: build
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/server-migration')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Deployment Webhook
+        run: |
+          curl -X POST "${{ secrets.DEPLOY_WEBHOOK_URL }}" \
+          -H "Content-Type: application/json" \
+          -H "x-deploy-secret: ${{ secrets.DEPLOY_SECRET }}" \
+          -d '{"ref": "${{ github.ref }}", "commit": "${{ github.sha }}"}'

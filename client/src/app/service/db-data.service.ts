@@ -1,14 +1,16 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { PostgresService, FantaService, FantaVote, DriverData, Driver, ChampionshipData, Season, CumulativePointsData, TrackData, AuthService, User, RaceResult, ConstructorGrandPrixPoints, Constructor } from "@genezio-sdk/f123dashboard" 
-import { GpResult } from '../model/championship'
+import { Injectable, inject } from '@angular/core';
+import { BehaviorSubject, Observable, firstValueFrom } from 'rxjs';
+import type { FantaVote, DriverData, Driver, ChampionshipData, Season, CumulativePointsData, TrackData, User, RaceResult, ConstructorGrandPrixPoints, Constructor } from '@f123dashboard/shared';
+import { GpResult } from '../model/championship';
+import { ApiService } from './api.service';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DbDataService {
-
-  constructor() { }
+  private apiService = inject(ApiService);
+  private authService = inject(AuthService);
 
 /****************************************************************/
 //variabili locali
@@ -44,16 +46,16 @@ export class DbDataService {
       constructorGrandPrixPoints
 
     ] = await Promise.all([
-      PostgresService.getAllDrivers(),
-      PostgresService.getChampionship(),
-      PostgresService.getCumulativePoints(),
-      PostgresService.getAllTracks(),
-      FantaService.getFantaVote(),
-      AuthService.getUsers(),
-      PostgresService.getRaceResoult(),
-      PostgresService.getConstructors(),
-      PostgresService.getDriversData(),
-      PostgresService.getConstructorGrandPrixPoints()
+      firstValueFrom(this.apiService.post<DriverData[]>('/database/drivers', {})),
+      firstValueFrom(this.apiService.post<ChampionshipData[]>('/database/championship', {})),
+      firstValueFrom(this.apiService.post<CumulativePointsData[]>('/database/cumulative-points', {})),
+      firstValueFrom(this.apiService.post<TrackData[]>('/database/tracks', {})),
+      firstValueFrom(this.apiService.post<FantaVote[]>('/fanta/votes', {})),
+      firstValueFrom(this.apiService.post<User[]>('/auth/users', {})),
+      firstValueFrom(this.apiService.post<RaceResult[]>('/database/race-results', {})),
+      firstValueFrom(this.apiService.post<Constructor[]>('/database/constructors', {})),
+      firstValueFrom(this.apiService.post<Driver[]>('/database/drivers-data', {})),
+      firstValueFrom(this.apiService.post<ConstructorGrandPrixPoints[]>('/database/constructor-grand-prix-points', {}))
     ]);
 
     this.allDrivers = allDrivers;
@@ -162,71 +164,95 @@ export class DbDataService {
 /****************************************************************/
 
   async getDriversBySeason(seasonId?: number): Promise<DriverData[]> {
-    const drivers = await PostgresService.getAllDrivers(seasonId);
+    const drivers = await firstValueFrom(
+      this.apiService.post<DriverData[]>('/database/drivers', { seasonId })
+    );
     return drivers;
   }
 
   async getDriversData(seasonId?: number): Promise<Driver[]> {
-    const drivers = await PostgresService.getDriversData(seasonId);
+    const drivers = await firstValueFrom(
+      this.apiService.post<Driver[]>('/database/drivers-data', { seasonId })
+    );
     return drivers;
   }
 
   async getChampionshipBySeason(seasonId?: number): Promise<ChampionshipData[]> {
-    const championship = await PostgresService.getChampionship(seasonId);
+    const championship = await firstValueFrom(
+      this.apiService.post<ChampionshipData[]>('/database/championship', { seasonId })
+    );
     return championship;
   }
 
   async getCumulativePointsBySeason(seasonId?: number): Promise<CumulativePointsData[]> {
-    const cumulativePoints = await PostgresService.getCumulativePoints(seasonId);
+    const cumulativePoints = await firstValueFrom(
+      this.apiService.post<CumulativePointsData[]>('/database/cumulative-points', { seasonId })
+    );
     return cumulativePoints;
   }
 
   async getAllTracksBySeason(seasonId?: number): Promise<TrackData[]> {
-    const tracks = await PostgresService.getAllTracks(seasonId);
+    const tracks = await firstValueFrom(
+      this.apiService.post<TrackData[]>('/database/tracks', { seasonId })
+    );
     return tracks;
   }
 
   async getRaceResultBySeason(seasonId?: number): Promise<RaceResult[]> {
-    const raceResult = await PostgresService.getRaceResoult(seasonId);
+    const raceResult = await firstValueFrom(
+      this.apiService.post<RaceResult[]>('/database/race-results', { seasonId })
+    );
     return raceResult;
   }
 
   async getAllSeasons(): Promise<Season[]> {
-    const seasons = await PostgresService.getAllSeasons();
+    const seasons = await firstValueFrom(
+      this.apiService.post<Season[]>('/database/seasons', {})
+    );
     return seasons;
   }
 
   async getConstructorsBySeason(seasonId?: number): Promise<Constructor[]> {
-    const constructors = await PostgresService.getConstructors(seasonId);
+    const constructors = await firstValueFrom(
+      this.apiService.post<Constructor[]>('/database/constructors', { seasonId })
+    );
     return constructors;
   }
 
   async getConstructorGrandPrixPoints(seasonId?: number): Promise<ConstructorGrandPrixPoints[]> {
-    const constructorGpPoints = await (PostgresService as any).getConstructorGrandPrixPoints(seasonId);
+    const constructorGpPoints = await firstValueFrom(
+      this.apiService.post<ConstructorGrandPrixPoints[]>('/database/constructor-grand-prix-points', { seasonId })
+    );
     return constructorGpPoints;
   }
 
   async setFantaVoto(voto: FantaVote): Promise<void> {
-    await FantaService.setFantaVoto(voto);
+    await firstValueFrom(
+      this.apiService.post('/fanta/set-vote', voto)
+    );
     
     // Refresh the fanta votes and notify subscribers
-    const updatedFantaVote = await FantaService.getFantaVote();
+    const updatedFantaVote = await firstValueFrom(
+      this.apiService.post<FantaVote[]>('/fanta/votes', {})
+    );
     this.fantaVoteSubject.next(updatedFantaVote);
   }
 
 
   async setGpResult(trackId: number, gpResult: GpResult): Promise<string> {
     try {
-      const result = await PostgresService.setGpResult(
-        +trackId,
-        gpResult.hasSprint,
-        gpResult.raceResult,
-        gpResult.raceDnfResult,
-        gpResult.sprintResult,
-        gpResult.sprintDnfResult,
-        gpResult.qualiResult,
-        gpResult.fpResult,
-        gpResult.seasonId
+      const result = await firstValueFrom(
+        this.apiService.post<string>('/database/set-gp-result', {
+          trackId: +trackId,
+          hasSprint: gpResult.hasSprint,
+          raceResult: gpResult.raceResult,
+          raceDnfResult: gpResult.raceDnfResult,
+          sprintResult: gpResult.sprintResult,
+          sprintDnfResult: gpResult.sprintDnfResult,
+          qualiResult: gpResult.qualiResult,
+          fpResult: gpResult.fpResult,
+          seasonId: gpResult.seasonId
+        })
       );
       return result;
     } catch (error) {
