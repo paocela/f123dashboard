@@ -34,6 +34,7 @@ export class ApiService {
    * Make a POST request to an endpoint
    */
   post<T>(endpoint: string, body: unknown, headers?: Record<string, string>): Observable<T> {
+    headers = { ...headers, ...this.setHeaderToken() };
     const options = headers ? { headers: new HttpHeaders(headers) } : {};
     return this.http.post<T>(this.getEndpointUrl(endpoint), body, options);
   }
@@ -42,6 +43,7 @@ export class ApiService {
    * Make a GET request to an endpoint
    */
   get<T>(endpoint: string, headers?: Record<string, string>): Observable<T> {
+    headers = { ...headers, ...this.setHeaderToken() };
     const options = headers ? { headers: new HttpHeaders(headers) } : {};
     return this.http.get<T>(this.getEndpointUrl(endpoint), options);
   }
@@ -50,6 +52,7 @@ export class ApiService {
    * Make a PUT request to an endpoint
    */
   put<T>(endpoint: string, body: unknown, headers?: Record<string, string>): Observable<T> {
+    headers = { ...headers, ...this.setHeaderToken() };
     const options = headers ? { headers: new HttpHeaders(headers) } : {};
     return this.http.put<T>(this.getEndpointUrl(endpoint), body, options);
   }
@@ -58,8 +61,14 @@ export class ApiService {
    * Make a DELETE request to an endpoint
    */
   delete<T>(endpoint: string, headers?: Record<string, string>): Observable<T> {
+    headers = { ...headers, ...this.setHeaderToken() };
     const options = headers ? { headers: new HttpHeaders(headers) } : {};
     return this.http.delete<T>(this.getEndpointUrl(endpoint), options);
+  }
+
+  private setHeaderToken(): Record<string, string> {
+    const match = document.cookie.match(/(^|;) ?authToken=([^;]*)(;|$)/);
+    return match ? this.createAuthHeaders(match[2]) : this.createHeaders();
   }
 
   /**

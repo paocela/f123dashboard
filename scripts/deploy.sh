@@ -28,6 +28,6 @@ cd /var/www/rff/dist || { log "❌ Failed to navigate to dist directory"; exit 1
 npm install
 
 log "🔄 Restarting application..."
-pm2 reload rff --update-env 
+pm2 restart rff --update-env
 
 log "✅ Deployment complete!"

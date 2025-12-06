@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
@@ -28,7 +28,7 @@ import { medals, allFlags, posizioni } from '../../model/constants';
 import type { ChampionshipData, Driver, Season, TrackData } from '@f123dashboard/shared';
 
 @Component({
-  selector: 'app-admin',
+  changeDetection: ChangeDetectionStrategy.OnPush,selector: 'app-admin',
   imports: [
     AccordionComponent,
     AccordionItemComponent,

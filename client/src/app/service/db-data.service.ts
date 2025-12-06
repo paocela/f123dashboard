@@ -228,7 +228,7 @@ export class DbDataService {
 
   async setFantaVoto(voto: FantaVote): Promise<void> {
     await firstValueFrom(
-      this.apiService.post('/fanta/set-vote', voto, this.apiService.createAuthHeaders(this.authService.getToken() ?? ''))
+      this.apiService.post('/fanta/set-vote', voto)
     );
     
     // Refresh the fanta votes and notify subscribers

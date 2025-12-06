@@ -61,7 +61,7 @@ export class AuthService {
   private async validateTokenAndSetUser(token: string): Promise<void> {
     try {
       const validation = await firstValueFrom(
-        this.apiService.post<TokenValidationResponse>('/auth/validate', {}, this.apiService.createAuthHeaders(token))
+        this.apiService.post<TokenValidationResponse>('/auth/validate', {})
       );
       if (validation.valid && validation.userId && validation.username && validation.name && validation.surname) {
         // Get full user data (you might want to create a separate method for this)
@@ -171,7 +171,7 @@ export class AuthService {
       };
 
       const response = await firstValueFrom(
-        this.apiService.post<ChangePasswordResponse>('/auth/change-password', changeData, this.apiService.createAuthHeaders(token))
+        this.apiService.post<ChangePasswordResponse>('/auth/change-password', changeData)
       );
       return response;
     } catch (error) {
@@ -195,7 +195,7 @@ export class AuthService {
       updateData.jwt = token;
     
       const response = await firstValueFrom(
-        this.apiService.post<AuthResponse>('/auth/update-user-info', updateData, this.apiService.createAuthHeaders(token))
+        this.apiService.post<AuthResponse>('/auth/update-user-info', updateData)
       );
 
       if (response.success && response.user) 
@@ -256,7 +256,7 @@ export class AuthService {
         // Call backend to invalidate session
         {try {
           await firstValueFrom(
-            this.apiService.post('/auth/logout', {}, this.apiService.createAuthHeaders(token))
+            this.apiService.post('/auth/logout', {})
           );
         } catch (methodError) {
           console.warn('Backend logout error:', methodError);
@@ -366,7 +366,7 @@ export class AuthService {
       
 
       const response = await firstValueFrom(
-        this.apiService.get<SessionsResponse>('/auth/sessions', this.apiService.createAuthHeaders(token))
+        this.apiService.get<SessionsResponse>('/auth/sessions')
       );
       return response;
     } catch (error) {
@@ -383,7 +383,7 @@ export class AuthService {
       
 
       const response = await firstValueFrom(
-        this.apiService.post<{ success: boolean; message: string }>('/auth/logout-all-sessions', {}, this.apiService.createAuthHeaders(token))
+        this.apiService.post<{ success: boolean; message: string }>('/auth/logout-all-sessions', {})
       );
       
       if (response.success) {
