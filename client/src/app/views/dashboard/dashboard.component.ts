@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common'; // Importa CommonModule
 import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import {DbDataService} from '../../service/db-data.service';  //aggiunto il servizio per dati db
 import { ModalModule, ModalComponent } from '@coreui/angular';
 import {
@@ -88,11 +89,13 @@ export interface ConstructorOfWeek {
 export class DashboardComponent implements OnInit {
   private dbData = inject(DbDataService);
   private twitchApiService = inject(TwitchApiService);
+  private sanitizer = inject(DomSanitizer);
   loadingService = inject(LoadingService);
 
   @ViewChild('championshipResoult', { static: true }) championshipResoult!: ModalComponent; 
 
   public screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+  public twitchEmbedUrl: SafeResourceUrl;
 
   public showColumn(): boolean {
     return this.screenWidth > 1600;
@@ -159,8 +162,14 @@ export class DashboardComponent implements OnInit {
   public streamTitle$ = new BehaviorSubject<string>('');
 
   ngOnInit(){
+
     //richiesta dati al db
     this.isLive = this.twitchApiService.isLive();
+    if (this.isLive) {
+          const currentHostname = window.location.hostname;
+          const twitchUrl = `https://player.twitch.tv/?channel=${this.twitchApiService.getChannel()}&parent=${currentHostname}&autoplay=false&muted=false&time=0s`;
+          this.twitchEmbedUrl = this.sanitizer.bypassSecurityTrustResourceUrl(twitchUrl);
+    }
     this.championship_standings_users = this.dbData.getAllDrivers();
     const championshipTrend = this.dbData.getCumulativePoints();
     this.championshipTracks = this.dbData.getAllTracks();
