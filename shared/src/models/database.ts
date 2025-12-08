@@ -114,6 +114,7 @@ export type Constructor = {
   constructor_sprint_points?: number;
   constructor_qualifying_points?: number;
   constructor_free_practice_points?: number;
+  constructor_gained_points?: number;
 }
 
 export type ConstructorGrandPrixPoints = {

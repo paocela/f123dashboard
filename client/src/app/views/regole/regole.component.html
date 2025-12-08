@@ -21,7 +21,7 @@
               <li><strong>Formato:</strong> 2 GP per serata, con qualifiche e gara (+sprint) per ogni GP</li>
               <li><strong>Meteo:</strong> dinamico, e se bisogna rifare le gara si mette lo stesso meteo</li>
               <li><strong>Scuderie Pilota:</strong> prestazioni reali, e scuderie assegnate inversamente all'abilità del pilota. Da stabilire all'inizio, ma possono subire variazioni</li>
-              <li><strong>Durata prove libere:</strong> dalla fine della giornata precedente, alle 21:00 della giornata corrente</li>
+              <li><strong>Durata prove libere:</strong> dalla fine della giornata precedente, alle 00:00 della giornata di gara</li>
               <li><strong>Durata qualifiche:</strong> sessione unica, dalla durata di 17 min (circa 3 giri lanciati)</li>
               <li><strong>Durata sprint:</strong> gara 5 giri</li>
               <li><strong>Durata gara:</strong> gara 35% (se GP sprint, gara 25%)</li>
@@ -124,10 +124,14 @@
           </div>
           <div class="card-body">
             <ul>
-              <li><strong>Contatto con colpa, danno terzo parziale:</strong> penalità di 5 sec, dopo voto con o senza prova video</li>
-              <li><strong>Contatto con colpa, danno terzo terminale:</strong> penalità di 10 sec, dopo voto con o senza prova video</li>
-              <li><strong>Contatto con colpa e sorpasso, no danno terzo:</strong> restituire posizione entro 1 giro</li>
-              <li><strong>Contatto con colpa che causa spin/fuori pista e sorpasso, no danno terzo:</strong> penalità di 5 sec, dopo voto con o senza prova video/li>
+              <li><strong>Contatto con colpa parziale, danno terzo parziale, tempo perso minimo:</strong> penalità di 5 sec, dopo voto con prova video</li>
+              <li><strong>Contatto con colpa parziale, danno terzo terminale:</strong> penalità di 10 sec e eventuale -1 punto patente, dopo voto con prova video</li>
+              <li><strong>Contatto con colpa parziale e sorpasso, no danno terzo, tempo perso minimo:</strong> restituire posizione entro 1 giro, se no 5 sec a fine gara, dopo voto con prova video</li>
+              <li><strong>Contatto con colpa parziale, no danno o danno terzo parziale, tempo perso significativo (spin/fuori pista):</strong> penalità di 10 sec, dopo voto con prova video/li>
+              <li><strong>Contatto con colpa totale, danno terzo parziale, tempo perso minimo:</strong> penalità di 5 sec, dopo voto con prova video</li>
+              <li><strong>Contatto con colpa totale, danno terzo terminale:</strong> penalità di 20 sec e eventuale -1 punto patente, dopo voto con prova video</li>
+              <li><strong>Contatto con colpa totale e sorpasso, no danno terzo, tempo perso minimo:</strong> restituire posizione entro 1 giro, se no 5 a fine gara, dopo voto con prova video</li>
+              <li><strong>Contatto con colpa totale, no danno o danno terzo parziale, tempo perso significativo (spin/fuori pista):</strong> penalità di 10 sec, dopo voto con prova video/li>
               <li><strong>Ostruzione in qualifiche:</strong> arretramento 1 posizione in griglia</li>
               <li><strong>Uso improprio della chat vocale:</strong> lavori socialmente utili in Ruanda</li>
               <li><strong>Danno non terminale per 2o+ piloti nelle prime 2 curve della gara (non sprint):</strong> ricominciare (max 1 volta), e penalità di 5s contatto da fianco, 10s da dietro, e -1p patente per chi causa incidente se ripetuti (vedi sotto)</li>
@@ -143,6 +147,15 @@
               <li><strong>Problemi di connessione / corrente / gioco / esterni da gara F123 3o+ piloti:</strong> prima del 75% di gara, gara da rifare con posizioni di partenza correnti; dopo il 75% di gara, si usa posizioni correnti come classifica </li>
               <li><strong>Problemi di connessione / corrente / gioco / esterni da gara F123 1o2 piloti:</strong> prima del 25% di gara, DNF; dopo il 25% di gara, punti delle ultime posizioni disponibili per i piloti con problemi, nell'ordine corrente</li>
               <li><strong>La gara deve essere continuata in un secondo momento (non rifatta da zero):</strong>La configurazione di macchine, posizioni, pista e meteo non può essere variata</li>
+            </ul>
+            <strong>Legenda:</strong>
+            <ul>
+              <li><strong>Colpa parziale:</strong> in ingresso curva ruota anteriore di chi segue al livello o davanti alla ruota posteriore di chi predece, frenata controllata</li>
+              <li><strong>Colpa totale:</strong> in ingresso curva ruota anteriore di chi segue dietro alla ruota posteriore di chi precede, frenata non controllata / bloccato da lontano</li>
+              <li><strong>Danno parziale:</strong> qualunque danno che ti permetta di continuare la gara</li>
+              <li><strong>Danno totale:</strong> morto</li>
+              <li><strong>Tempo perso minimo:</strong> 1/2/3 sec persi ma non posizioni dagli altri piloti (non parte dell'incidente)</li>
+              <li><strong>Tempo perso significativo:</strong> >4 sec persi e eventualmente posizioni dagli altri piloti (non parte dell'incidente)</li>
             </ul>
           </div>
         </div>
