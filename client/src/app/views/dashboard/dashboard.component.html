@@ -45,7 +45,6 @@
                 [hover]="true"
                 [responsive]="true"
                 [striped]="true"
-                align="middle"
                 cTable
                 class="mb-0 border rounded custom-table"
               >
@@ -63,7 +62,9 @@
                       Pilota
                     </th>
                     <th class="bg-body-tertiary text-center">Punti</th>
-                    <th class="bg-body-tertiary text-center" *ngIf="showGainedPointsColumn">+/-</th>
+                    <th class="bg-body-tertiary text-center" *ngIf="showGainedPointsColumn">
+                      <svg cIcon name="cilChevronDoubleUp" alt="Punti guadagnati" ></svg>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -119,7 +120,6 @@
                   [hover]="true"
                   [responsive]="true"
                   [striped]="true"
-                  align="middle"
                   cTable
                   class="mb-0 border rounded custom-table"
                 >
@@ -136,7 +136,9 @@
                         Piloti
                       </th>
                       <th class="bg-body-tertiary text-center">Punti</th>
-                      <th class="bg-body-tertiary text-center" *ngIf="showGainedPointsColumn">+/-</th>
+                      <th class="bg-body-tertiary text-center" *ngIf="showGainedPointsColumn">
+                        <svg cIcon name="cilChevronDoubleUp"></svg>
+                      </th>
                     </tr>
                   </thead>
                   <tbody>

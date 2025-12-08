@@ -33,7 +33,7 @@ import { TwitchApiService } from '../../service/twitch-api.service';
 import { BehaviorSubject } from 'rxjs';
 import { LoadingService } from '../../service/loading.service';
 import { ChampionshipTrendComponent } from '../../components/championship-trend/championship-trend.component';
-import type { Constructor, CumulativePointsData, Driver, DriverData, TrackData } from '@f123dashboard/shared';
+import type { Constructor, CumulativePointsData, DriverData, TrackData } from '@f123dashboard/shared';
 import { PilotCardComponent } from '../../components/pilot-card/pilot-card.component';
 import { ConstructorCardComponent } from '../../components/constructor-card/constructor-card.component';
 
@@ -179,7 +179,7 @@ export class DashboardComponent implements OnInit {
       ...driver,
       gainedPoints: 0
     }));
-    const championshipTrend: CumulativePointsData[] = this.dbData.getCumulativePoints();
+    const championshipTrend: CumulativePointsData[] = this.dbData.getCumulativePoints().sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     this.championshipTracks = this.dbData.getAllTracks();
     this.constructors =  this.dbData.getConstructors();
     // filter next championship track
@@ -198,12 +198,13 @@ export class DashboardComponent implements OnInit {
         ...track,
         date: track.dbDate.toLocaleDateString("it-CH")
       }));
+
     // Calculate delta points for the last 2 tracks
     for (const user of this.championship_standings_users) {
       const userTracks = championshipTrend.filter((track: CumulativePointsData) => track.driver_username === user.driver_username);
-      if (userTracks.length >= 3) {
-        const lastPoints = userTracks[userTracks.length - 1].cumulative_points;
-        const thirdToLastPoints = userTracks[userTracks.length - 3].cumulative_points;
+      if (userTracks.length > 2) {
+        const lastPoints = userTracks[0].cumulative_points;
+        const thirdToLastPoints = userTracks[2].cumulative_points;
         user.gainedPoints = lastPoints - thirdToLastPoints;
         this.showGainedPointsColumn = true;
       } else 
@@ -225,9 +226,8 @@ export class DashboardComponent implements OnInit {
     
     if ( championshipTrend.length > 3 * this.championship_standings_users.length) {
       // Get best driver and constructor of the week
-      const sortedCumulativePoints = championshipTrend.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-      const lastRacePoints = sortedCumulativePoints.slice(0,this.championship_standings_users.length);
-      const thirdLastRacePoints = sortedCumulativePoints.slice(2 * this.championship_standings_users.length,3 * this.championship_standings_users.length);
+      const lastRacePoints = championshipTrend.slice(0,this.championship_standings_users.length);
+      const thirdLastRacePoints = championshipTrend.slice(2 * this.championship_standings_users.length,3 * this.championship_standings_users.length);
 
       const constructorsOfWeekTmp: ConstructorOfWeek[] = [];
       for (const constructor of this.constructors) {

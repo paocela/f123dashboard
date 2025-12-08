@@ -80,6 +80,10 @@ c-card-body {
   overflow: hidden; /* Nasconde i bordi sporgenti */
   width: 100%; /* force table to use full width */
   table-layout: auto; /* or fixed, depending on how you want column widths */
+
+  td {
+    vertical-align: middle;
+  }
 }
 
 .custom-c-tab {
