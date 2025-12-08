@@ -192,47 +192,59 @@ export class DashboardComponent implements OnInit {
         this.showGainedPointsColumn = true;
       } else 
         {user.gainedPoints = 0;}
-      
+    }
+    
+    for (const constructor of this.constructors) {
+      constructor.constructor_gained_points = 0;
+      for (const user of this.championship_standings_users) {
+        if ( user.driver_username == constructor.driver_1_username || user.driver_username == constructor.driver_2_username ) {
+          constructor.constructor_gained_points += user.gainedPoints;
+        }
+      }
     }
 
     //  delta points from the pilot above
     for (let i = 1; i < this.championship_standings_users.length; i++) 
       {this.championship_standings_users[i].deltaPoints = this.championship_standings_users[i - 1].total_points - this.championship_standings_users[i].total_points;}
     
+    if ( championshipTrend.length > 3 * this.championship_standings_users.length) {
+      // Get best driver and constructor of the week
+      const sortedCumulativePoints = championshipTrend.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      const lastRacePoints = sortedCumulativePoints.slice(0,this.championship_standings_users.length);
+      const thirdLastRacePoints = sortedCumulativePoints.slice(2 * this.championship_standings_users.length,3 * this.championship_standings_users.length);
 
-    // Get best driver and constructor of the week
-    const sortedCumulativePoints = championshipTrend.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    const lastRacePoints = sortedCumulativePoints.slice(0, this.championship_standings_users.length);
+      const constructorsOfWeek_tmp: ConstructorOfWeek[] = [];
+      for (const constructor of this.constructors) {
+        constructorsOfWeek_tmp.push({ constructor_name: constructor.constructor_name,
+                                      constructor_id: constructor.constructor_id,
+                                      constructor_driver_1_id: constructor.driver_1_id,
+                                      constructor_driver_2_id: constructor.driver_2_id,
+                                      points: 0 });
+      }
+      
 
-    const constructorsOfWeek_tmp: ConstructorOfWeek[] = [];
-    for (const constructor of this.constructors) 
-      {constructorsOfWeek_tmp.push({ constructor_name: constructor.constructor_name,
-                                    constructor_id: constructor.constructor_id,
-                                    constructor_driver_1_id: constructor.driver_1_id,
-                                    constructor_driver_2_id: constructor.driver_2_id,
-                                    points: 0 });}
-    
+      let bestPoints = 0;
+      let currentPoints = 0;
 
-    let bestPoints = 0;
-    let currentPoints = 0;
+      for (i = 0; i < lastRacePoints.length; i++) {
+        currentPoints = Number(lastRacePoints[i].cumulative_points) - Number(thirdLastRacePoints[i].cumulative_points);
+        if ( currentPoints > bestPoints ) {
+          bestPoints = currentPoints;
+          this.driverOfWeek.driver_username = lastRacePoints[i].driver_username;
+          this.driverOfWeek.driver_id = lastRacePoints[i].driver_id;
+          this.driverOfWeek.points = currentPoints;
+        } 
 
-    for (i = 0; i < lastRacePoints.length; i++) {
-      currentPoints = Number(lastRacePoints[i].cumulative_points);
-      if ( currentPoints > bestPoints ) {
-        bestPoints = currentPoints;
-        this.driverOfWeek.driver_username = lastRacePoints[i].driver_username;
-        this.driverOfWeek.driver_id = lastRacePoints[i].driver_id;
-        this.driverOfWeek.points = currentPoints;
-      } 
-
-      constructorsOfWeek_tmp.forEach(constructor => {
-        if (constructor.constructor_driver_1_id == lastRacePoints[i].driver_id || constructor.constructor_driver_2_id == lastRacePoints[i].driver_id)  {
-          constructor.points += currentPoints;
-        }
-        
-      });
+        constructorsOfWeek_tmp.forEach(constructor => {
+          if (constructor.constructor_driver_1_id == lastRacePoints[i].driver_id || constructor.constructor_driver_2_id == lastRacePoints[i].driver_id)  {
+            constructor.points += currentPoints;
+          }
+          
+        });
+      }
+      this.constructorOfWeek = constructorsOfWeek_tmp.sort((a, b) => b.points - a.points)[0];
     }
-    this.constructorOfWeek = constructorsOfWeek_tmp.sort((a, b) => b.points - a.points)[0];
+
   }
 
   /**

@@ -102,29 +102,8 @@
                     <td *ngIf="showGainedPointsColumn">
                       <div
                         class="fw-semibold text-center"
-                        [ngClass]="{
-                          'text-success':
-                            championship_standings_users[i - 1] &&
-                            user.gainedPoints -
-                              championship_standings_users[i - 1].gainedPoints >
-                              0,
-                          'text-danger':
-                            championship_standings_users[i - 1] &&
-                            user.gainedPoints -
-                              championship_standings_users[i - 1].gainedPoints <
-                              0,
-                          'text-warning':
-                            championship_standings_users[i - 1] &&
-                            user.gainedPoints -
-                              championship_standings_users[i - 1].gainedPoints ===
-                              0
-                        }"
                       >
-                        @if (championship_standings_users[i - 1]) {
-                          {{ user.gainedPoints - championship_standings_users[i - 1].gainedPoints }}
-                        } @else {
-                          -
-                        }
+                      {{ user.gainedPoints }}
                       </div>
                     </td>
                   </tr>
@@ -196,30 +175,8 @@
                       <td *ngIf="showGainedPointsColumn">
                         <div
                           class="fw-semibold text-center"
-                          [ngClass]="{
-                            'text-success':
-                              constructors[i - 1] &&
-                              constructor.constructor_tot_points -
-                                constructors[i - 1].constructor_tot_points >
-                                0,
-                            'text-danger':
-                              constructors[i - 1] &&
-                              constructor.constructor_tot_points -
-                                constructors[i - 1].constructor_tot_points <
-                                0,
-                            'text-warning':
-                              constructors[i - 1] &&
-                              constructor.constructor_tot_points -
-                                constructors[i - 1].constructor_tot_points ===
-                                0
-                          }"
                         >
-                          {{
-                            constructors[i - 1]
-                              ? constructor.constructor_tot_points -
-                                constructors[i - 1].constructor_tot_points
-                              : "-"
-                          }}
+                          {{constructor.constructor_gained_points}}
                         </div>
                       </td>
                     </tr>
