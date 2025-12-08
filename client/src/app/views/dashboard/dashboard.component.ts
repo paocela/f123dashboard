@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common'; // Importa CommonModule
 import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import {DbDataService} from '../../service/db-data.service';  //aggiunto il servizio per dati db
 import { ModalModule, ModalComponent } from '@coreui/angular';
 import {
@@ -88,11 +89,13 @@ export interface ConstructorOfWeek {
 export class DashboardComponent implements OnInit {
   private dbData = inject(DbDataService);
   private twitchApiService = inject(TwitchApiService);
+  private sanitizer = inject(DomSanitizer);
   loadingService = inject(LoadingService);
 
   @ViewChild('championshipResoult', { static: true }) championshipResoult!: ModalComponent; 
 
   public screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+  public twitchEmbedUrl: SafeResourceUrl = "";
 
   public showColumn(): boolean {
     return this.screenWidth > 1600;
@@ -159,10 +162,16 @@ export class DashboardComponent implements OnInit {
   public streamTitle$ = new BehaviorSubject<string>('');
 
   ngOnInit(){
+
     //richiesta dati al db
     this.isLive = this.twitchApiService.isLive();
+    if (this.isLive) {
+          const currentHostname = window.location.hostname;
+          const twitchUrl = `https://player.twitch.tv/?channel=${this.twitchApiService.getChannel()}&parent=${currentHostname}&autoplay=false&muted=false&time=0s`;
+          this.twitchEmbedUrl = this.sanitizer.bypassSecurityTrustResourceUrl(twitchUrl);
+    }
     this.championship_standings_users = this.dbData.getAllDrivers();
-    const championshipTrend = this.dbData.getCumulativePoints();
+    const championshipTrend = this.dbData.getCumulativePoints().sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     this.championshipTracks = this.dbData.getAllTracks();
     this.constructors =  this.dbData.getConstructors();
 
@@ -182,12 +191,15 @@ export class DashboardComponent implements OnInit {
         ...track,
         date: track.db_date.toLocaleDateString("it-CH")
       }));
+
     // Calculate delta points for the last 2 tracks
     for (const user of this.championship_standings_users) {
       const userTracks = championshipTrend.filter((track: any) => track.driver_username === user.driver_username);
-      if (userTracks.length >= 3) {
-        const lastPoints = userTracks[userTracks.length - 1].cumulative_points;
-        const thirdToLastPoints = userTracks[userTracks.length - 3].cumulative_points;
+      console.log(userTracks)
+      if (userTracks.length > 2) {
+        const lastPoints = userTracks[0].cumulative_points;
+        const thirdToLastPoints = userTracks[2].cumulative_points;
+        console.log(lastPoints, thirdToLastPoints)
         user.gainedPoints = lastPoints - thirdToLastPoints;
         this.showGainedPointsColumn = true;
       } else 
@@ -203,15 +215,16 @@ export class DashboardComponent implements OnInit {
       }
     }
 
+    console.log(this.constructors)
+
     //  delta points from the pilot above
     for (let i = 1; i < this.championship_standings_users.length; i++) 
       {this.championship_standings_users[i].deltaPoints = this.championship_standings_users[i - 1].total_points - this.championship_standings_users[i].total_points;}
     
     if ( championshipTrend.length > 3 * this.championship_standings_users.length) {
       // Get best driver and constructor of the week
-      const sortedCumulativePoints = championshipTrend.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-      const lastRacePoints = sortedCumulativePoints.slice(0,this.championship_standings_users.length);
-      const thirdLastRacePoints = sortedCumulativePoints.slice(2 * this.championship_standings_users.length,3 * this.championship_standings_users.length);
+      const lastRacePoints = championshipTrend.slice(0,this.championship_standings_users.length);
+      const thirdLastRacePoints = championshipTrend.slice(2 * this.championship_standings_users.length,3 * this.championship_standings_users.length);
 
       const constructorsOfWeek_tmp: ConstructorOfWeek[] = [];
       for (const constructor of this.constructors) {

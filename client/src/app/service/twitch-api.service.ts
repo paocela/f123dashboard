@@ -23,5 +23,8 @@ export class TwitchApiService {
   isLive(): boolean {
     return  this.twitchStreamResponse && this.twitchStreamResponse.data.length > 0 ? true : false;
   }
+  getChannel(): string {
+    return this.channelId;
+  }
 
 }
