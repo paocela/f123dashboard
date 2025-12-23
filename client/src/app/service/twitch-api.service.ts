@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, Observable, firstValueFrom } from 'rxjs';
+import { BehaviorSubject, firstValueFrom } from 'rxjs';
 import type { TwitchStreamResponse } from '@f123dashboard/shared';
 import { ApiService } from './api.service';
 

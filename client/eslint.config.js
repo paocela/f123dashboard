@@ -56,7 +56,7 @@ module.exports = [
       "@angular-eslint/no-output-native": "error",
       "@angular-eslint/no-output-on-prefix": "error",
       "@angular-eslint/use-lifecycle-interface": "error",
-      "@angular-eslint/prefer-on-push-component-change-detection": "warn",
+      "@angular-eslint/prefer-on-push-component-change-detection": "off",
       
       // TypeScript-specific rules
       "@typescript-eslint/explicit-function-return-type": "off",

@@ -45,7 +45,6 @@
                 [hover]="true"
                 [responsive]="true"
                 [striped]="true"
-                align="middle"
                 cTable
                 class="mb-0 border rounded custom-table"
               >
@@ -64,7 +63,7 @@
                     </th>
                     <th class="bg-body-tertiary text-center">Punti</th>
                     <th class="bg-body-tertiary text-center" *ngIf="showGainedPointsColumn">
-                      <svg cIcon name="cilChevronDoubleUp"></svg>
+                      <svg cIcon name="cilChevronDoubleUp" alt="Punti guadagnati" ></svg>
                     </th>
                   </tr>
                 </thead>
@@ -84,11 +83,12 @@
                     <td>
                       <div>{{ user.driver_username }}</div>
                     </td>
-                    <td class="text-center" *ngIf="showColumn()">
+                    <td class="text-center p-0" *ngIf="showColumn()">
                       <img
-                        width="100%"
-                        height="40px"
-                        src="./assets/images/constructors/{{ user.car_name }}.svg"
+                        width="auto"
+                        height="50px"
+                        src="./assets/images/constructors/{{ getConstructorForDriver(user.driver_username) }}.png"
+                        alt="{{ getConstructorForDriver(user.driver_username) }} logo"
                       />
                     </td>
                     <td class="pilot" *ngIf="showColumn()">
@@ -120,7 +120,6 @@
                   [hover]="true"
                   [responsive]="true"
                   [striped]="true"
-                  align="middle"
                   cTable
                   class="mb-0 border rounded custom-table"
                 >
@@ -130,10 +129,10 @@
                       <th class="bg-body-tertiary text-center">
                         <svg cIcon name="cilPeople"></svg>
                       </th>
-                      <th class="bg-body-tertiary text-center" *ngIf="showColumn()">
+                      <th class="bg-body-tertiary text-center" >
                         Scuderia
                       </th>
-                      <th class="bg-body-tertiary pilot" *ngIf="showColumn()">
+                      <th class="bg-body-tertiary pilot" >
                         Piloti
                       </th>
                       <th class="bg-body-tertiary text-center">Punti</th>
@@ -149,17 +148,18 @@
                       <td>
                         <div class="fw-semibold text-center">#{{ i + 1 }}</div>
                       </td>
-                      <td class="text-center">
+                      <td class="text-center p-0">
                         <img
                           width="auto"
-                          height="40px"
+                          height="50px"
                           src="./assets/images/constructors/{{ constructor.constructor_name }}.png"
+                          alt="{{ constructor.constructor_name }} logo"
                         />
                       </td>
-                      <td *ngIf="showColumn()">
+                      <td >
                         <div>{{ constructor.constructor_name }}</div>
                       </td>
-                      <td class="text-center" *ngIf="showColumn()">
+                      <td class="text-center p-0" >
                         <div class="d-flex align-items-center justify-content-center gap-2">
                           <c-avatar
                             [size]="'md'"
@@ -228,6 +228,7 @@
                 <img
                   style="width: 100%; height: 100%; object-fit: contain;"
                   src="./assets/images/tracks/{{ next_track.track_id }}.png"
+                  alt="Track image for {{ next_track.name }}"
                 />
               </div>
               <c-row>
@@ -348,6 +349,7 @@
       <img
         src="./assets/images/championshipResoult/classifica2025.jpg"
         style="width: 100%; height: auto"
+        alt="Classifica Campionato 2025"
       />
     </c-row>
   </c-modal-body>
@@ -397,6 +399,7 @@
     <h5 cModalTitle class="w-100 text-center">
       <strong>Dettagli Pilota</strong>
     </h5>
+    <!-- eslint-disable-next-line @angular-eslint/template/elements-content -->
     <button (click)="closePilotModal()" cButtonClose></button>
   </c-modal-header>
   <c-modal-body>
@@ -425,6 +428,7 @@
     <h5 cModalTitle class="w-100 text-center">
       <strong>Dettagli Costruttore</strong>
     </h5>
+    <!-- eslint-disable-next-line @angular-eslint/template/elements-content -->
     <button (click)="closeConstructorModal()" cButtonClose></button>
   </c-modal-header>
   <c-modal-body>
