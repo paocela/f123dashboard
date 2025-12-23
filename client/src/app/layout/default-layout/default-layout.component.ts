@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { NgScrollbar } from 'ngx-scrollbar';
 import { Subscription } from 'rxjs';
@@ -32,6 +33,7 @@ function isOverflown(element: HTMLElement) {
     templateUrl: './default-layout.component.html',
     styleUrls: ['./default-layout.component.scss'],
     imports: [
+        CommonModule,
         SidebarComponent,
         SidebarHeaderComponent,
         SidebarBrandComponent,

@@ -5,7 +5,7 @@
   "type": "module",
   "dependencies": {
     "-": "^0.0.1",
-    "@coreui/coreui": "^5.4.1",
+    "@coreui/coreui": "~5.5.0",
     "g": "^2.0.1",
     "nodemailer": "^7.0.6"
   },
@@ -13,7 +13,10 @@
     "@playwright/test": "^1.54.2",
     "@types/node": "^24.2.1",
     "concurrently": "^9.2.1",
-    "sass": "^1.89.2"
+    "sass": "^1.97.0"
+  },
+  "overrides": {
+    "sass": "^1.97.0"
   },
   "scripts": {
     "start:client": "npm start --prefix client",
