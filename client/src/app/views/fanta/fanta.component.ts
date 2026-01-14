@@ -18,10 +18,11 @@ import { DbDataService } from './../../service/db-data.service';
 import { FantaService } from './../../service/fanta.service';
 import { cilFire, cilPowerStandby, cilPeople } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
-import { VoteStatus, VOTE_INDEX, FORM_STATUS, DRIVER_POSITIONS_COUNT, TOTAL_VOTE_FIELDS, FantaVoteHelper } from '../../model/fanta';
+import { VOTE_INDEX, FORM_STATUS, DRIVER_POSITIONS_COUNT, TOTAL_VOTE_FIELDS, FantaVoteHelper } from '../../model/fanta';
 import { medals, allFlags, posizioni } from '../../model/constants';
 import { LeaderboardComponent } from "../../components/leaderboard/leaderboard.component";
 import { VoteHistoryTableComponent } from '../../components/vote-history-table/vote-history-table.component';
+import { FantaRulesComponent } from '../../components/fanta-rules/fanta-rules.component';
 import {
   ButtonCloseDirective,
   ModalBodyComponent,
@@ -30,7 +31,7 @@ import {
   ModalTitleDirective,
   ThemeDirective
 } from '@coreui/angular';
-import type { FantaVote, User } from '@f123dashboard/shared';
+import type { FantaVote, User, DriverData, TrackData } from '@f123dashboard/shared';
 
 @Component({
     selector: 'app-fanta',
@@ -52,6 +53,7 @@ import type { FantaVote, User } from '@f123dashboard/shared';
         BadgeComponent,
         LeaderboardComponent,
         VoteHistoryTableComponent,
+        FantaRulesComponent,
         ModalComponent, ModalHeaderComponent, ModalTitleDirective, ThemeDirective, ButtonCloseDirective, ModalBodyComponent
     ],
     templateUrl: './fanta.component.html',
@@ -68,11 +70,11 @@ export class FantaComponent implements OnInit {
   
   user!: User;
   userFantaPoints = 0;
-  piloti: any[] = [];
-  tracks: any[] = [];
+  piloti: DriverData[] = [];
+  tracks: TrackData[] = [];
   constructors = new Map<number, string>();
-  nextTracks: any[] = [];
-  previusTracks: any[] = [];
+  nextTracks: TrackData[] = [];
+  previusTracks: TrackData[] = [];
   
   // Maps track ID to vote array [place1-8, fastLap, dnf, constructor]
   votazioni = new Map<number, number[]>();
@@ -80,6 +82,7 @@ export class FantaComponent implements OnInit {
   originalVotazioni = new Map<number, number[]>();
   
   public modalRankingVisible = false;
+  public modalRulesVisible = false;
 
   public fireIcon: string[] = cilFire;
   public powerIcon: string[] = cilPowerStandby;
@@ -117,7 +120,7 @@ export class FantaComponent implements OnInit {
     /**
      * Applies previously saved vote data to a track.
      */
-    const applyPreviousVote = (track: any) => {
+    const applyPreviousVote = (track: TrackData) => {
       if (!this.user?.id) {return;}
       
       const previousVote = this.fantaService.getFantaVote(this.user.id, track.track_id);
@@ -265,6 +268,10 @@ export class FantaComponent implements OnInit {
 
   toggleModalRanking() {
     this.modalRankingVisible = !this.modalRankingVisible;
+  }
+
+  toggleModalRules() {
+    this.modalRulesVisible = !this.modalRulesVisible;
   }
 
   /**

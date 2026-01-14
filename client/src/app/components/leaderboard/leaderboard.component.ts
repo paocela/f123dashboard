@@ -65,11 +65,11 @@ export class LeaderboardComponent implements OnInit {
       };
       this.leaderBoards.push(newUser);
     });
-    // this.leaderBoards = this.leaderBoards.filter(lb => lb.numberVotes > 0);
+    this.leaderBoards = this.leaderBoards.filter(lb => lb.numberVotes > 0);
     this.leaderBoards.sort((a, b) => b.points - a.points);
   }
 
-    GetAvatar(userId: number, image?: string): string {
+  getAvatar(userId: number, image?: string): string {
     if (image) 
       {return `data:image/jpeg;base64,${image}`;}
     

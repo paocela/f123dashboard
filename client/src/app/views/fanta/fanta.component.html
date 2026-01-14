@@ -30,8 +30,9 @@
         </table>
       </c-col>
       <c-col>
-        <div class="align">
-          <button (click)="toggleModalRanking()" cButton>Classifica Fanta</button>
+        <div class="d-grid gap-2 d-md-block align">
+          <button (click)="toggleModalRanking()" cButton class="me-md-2">Classifica Fanta</button>
+          <button (click)="toggleModalRules()" cButton color="info">Regolamento</button>
         </div>
       </c-col>
     </c-row>
@@ -50,7 +51,7 @@
             #item0="cAccordionItem"
             [visible]="false"
           >
-            <strong>{{ track.track_name }}</strong>
+            <strong>{{ track.name }}</strong>
             <ng-template cTemplateId="accordionHeaderTemplate">
               <button
                 (click)="item0.toggleItem()"
@@ -222,7 +223,7 @@
               #item0="cAccordionItem"
               [visible]="false"
             >
-              <strong>{{ track.track_name }}</strong>
+              <strong>{{ track.name }}</strong>
               <ng-template cTemplateId="accordionHeaderTemplate">
                 <button
                   (click)="votazioni.has(track.track_id) ? item0.toggleItem() : null"
@@ -291,5 +292,14 @@
   </c-modal-header>
   <c-modal-body>
     <app-leaderboard></app-leaderboard>
+  </c-modal-body>
+</c-modal>
+<c-modal id="rulesModal" [visible]="modalRulesVisible" size="lg">
+  <c-modal-header>
+    <h5 cModalTitle>Regolamento Punteggi Fanta</h5>
+    <button (click)="toggleModalRules()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>
+    <app-fanta-rules></app-fanta-rules>
   </c-modal-body>
 </c-modal>
