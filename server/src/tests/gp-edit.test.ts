@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import request from 'supertest';
 import app from '../server.js'; // Ensure server.ts exports 'app' default (it does)
 import pool from '../config/db.js';
+process.env.JWT_SECRET = 'test-secret';
 
 // Mock auth middleware to bypass checks
 vi.mock('../middleware/auth.middleware.js', async () => {
