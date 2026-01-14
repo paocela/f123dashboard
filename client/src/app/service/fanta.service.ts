@@ -17,10 +17,10 @@ export class FantaService implements OnDestroy {
   raceResults: RaceResult[] = [];
   private subscription: Subscription = new Subscription();
 
-  CORRECT_RESPONSE_FAST_LAP_POINTS = 5;
-  CORRECT_RESPONSE_DNF_POINTS = 5;
-  CORRECT_RESPONSE_TEAM= 5;
-  public static CORRECT_RESPONSE_POINTS: Readonly<Record<number, number>> = {
+  public static readonly CORRECT_RESPONSE_FAST_LAP_POINTS: number = 5;
+  public static readonly CORRECT_RESPONSE_DNF_POINTS: number = 5;
+  public static readonly CORRECT_RESPONSE_TEAM: number = 5;
+  public static readonly CORRECT_RESPONSE_POINTS: Readonly<Record<number, number>> = {
     0: 7,
     1: 4,
     2: 2
@@ -122,7 +122,10 @@ export class FantaService implements OnDestroy {
    getWinningConstructorForTrack(trackId: number): number | undefined {
     const winningConstructors = this.dbData.getWinningConstructorGrandPrixPointsData();
     const winner = winningConstructors.find(constructor => +constructor.track_id === +trackId);
-    return winner?.constructor_id;
+    if (!winner || winner.constructor_id === null || winner.constructor_id === undefined) {
+      return undefined;
+    }
+    return +winner.constructor_id;
    }
 
    /**
@@ -154,26 +157,26 @@ export class FantaService implements OnDestroy {
     });
 
     // Calculate points for Fast Lap and DNF
-    points = (raceResult.id_fast_lap == fantaVote.id_fast_lap && fantaVote.id_fast_lap != 0) ? points + this.CORRECT_RESPONSE_FAST_LAP_POINTS : points;
-    points = (this.isDnfCorrect(raceResult.list_dnf, fantaVote.id_dnf) && fantaVote.id_dnf != 0) ? points + this.CORRECT_RESPONSE_DNF_POINTS : points;
+    points = (raceResult.id_fast_lap == fantaVote.id_fast_lap && fantaVote.id_fast_lap != 0) ? points + FantaService.CORRECT_RESPONSE_FAST_LAP_POINTS : points;
+    points = (this.isDnfCorrect(raceResult.list_dnf, fantaVote.id_dnf) && fantaVote.id_dnf != 0) ? points + FantaService.CORRECT_RESPONSE_DNF_POINTS : points;
     
     // Calculate points for Constructor Team
     const winningConstructorId = this.getWinningConstructorForTrack(+raceResult.track_id);
-    points = (winningConstructorId === fantaVote.constructor_id && fantaVote.constructor_id != 0) ? points + this.CORRECT_RESPONSE_TEAM : points;
+    points = (winningConstructorId === fantaVote.constructor_id && fantaVote.constructor_id != 0) ? points + FantaService.CORRECT_RESPONSE_TEAM : points;
 
     return points;
   }
 
   getCorrectResponsePointFastLap(): number {
-    return this.CORRECT_RESPONSE_FAST_LAP_POINTS;
+    return FantaService.CORRECT_RESPONSE_FAST_LAP_POINTS;
   }
 
   getCorrectResponsePointDnf(): number {
-    return this.CORRECT_RESPONSE_DNF_POINTS;
+    return FantaService.CORRECT_RESPONSE_DNF_POINTS;
   }
 
   getCorrectResponsePointTeam(): number {
-    return this.CORRECT_RESPONSE_TEAM;
+    return FantaService.CORRECT_RESPONSE_TEAM;
   }
 
   isDnfCorrect(raceResultDnf: string, fantaVoteDnfId: number) {

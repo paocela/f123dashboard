@@ -227,6 +227,12 @@ const seasonId = req.body?.seasonId ? parseInt(req.body.seasonId) : undefined;
 { success: true, data: [...] }
 { success: false, message: 'Error description' }
 ```
+## Unit Testing
+when implementing a new feature or fixin/refacroring Create unit tests for all possible scenarios, including edge cases.
+tests must mock database interactions and external resources to ensure isolation and reliability.
+**Testing Framework**: vitest
+**Test Files**: server/tests/*.test.ts
+
 
 ## Testing with Postman
 

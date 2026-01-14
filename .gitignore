@@ -50,7 +50,6 @@ Thumbs.db
 client/dist
 server/dist
 shared/dist
-package-lock.json
 node_modules
 vars.ps1
 script.ps1

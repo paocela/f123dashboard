@@ -1,0 +1,45 @@
+// Enhanced Input Styling for Datetime Pickers
+.global-datetime {
+    width: 100%;
+    padding: 0.5rem 1rem;
+    border: 2px solid var(--cui-border-color);
+    border-radius: 8px;
+    background: var(--cui-body-bg);
+    color: var(--cui-body-color);
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    min-height: 48px; 
+
+    &:focus {
+      border-color: var(--cui-primary);
+      box-shadow: 0 0 0 0.2rem rgba(var(--cui-primary-rgb), 0.25);
+      outline: none;
+    }
+
+    &:hover:not(:focus) {
+      border-color: rgba(var(--cui-primary-rgb), 0.5);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    &:disabled {
+      background-color: var(--cui-gray-100);
+      color: var(--cui-gray-600);
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
+    // Style the calendar icon
+    &::-webkit-calendar-picker-indicator {
+        cursor: pointer;
+        opacity: 0.6;
+        transition: 0.2s;
+        padding: 5px;
+        
+        &:hover {
+            opacity: 1;
+            background-color: rgba(var(--cui-primary-rgb), 0.1);
+            border-radius: 4px;
+        }
+    }
+}

@@ -10,7 +10,6 @@ import type {
   ChangePasswordRequest,
   AdminChangePasswordRequest,
   ChangePasswordResponse,
-  UserSession,
   SessionsResponse,
   TokenValidationResponse,
   RefreshTokenResponse,

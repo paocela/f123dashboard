@@ -1,0 +1,162 @@
+<c-container fluid>
+    <c-row>
+        <h2 class="mt-4 mb-4 text-center">Gestione GranPremi</h2>
+    </c-row>
+    <c-row class="mb-4">
+      <c-col xs="12">
+        <c-card>
+          <c-card-header>
+            <strong>Azioni di Massa</strong>
+          </c-card-header>
+          <c-card-body>
+            <form [formGroup]="bulkForm" (ngSubmit)="onBulkUpdate()" cForm inline class="row g-3 align-items-center">
+              <c-col xs="auto">
+                <label cLabel for="daysOffset">Sposta tutte le date (Giorni)</label>
+              </c-col>
+              <c-col xs="auto">
+                <input cFormControl type="number" formControlName="daysOffset" id="daysOffset" placeholder="0">
+              </c-col>
+              <c-col xs="auto">
+                <button cButton color="warning" type="submit" [disabled]="loading">
+                  Sposta Calendario
+                </button>
+              </c-col>
+            </form>
+          </c-card-body>
+        </c-card>
+      </c-col>
+    </c-row>
+  
+    <c-row class="mb-4">
+      <c-col xs="12">
+        <c-card>
+          <c-card-header>
+            <strong>Aggiungi Nuovo Gran Premio</strong>
+          </c-card-header>
+          <c-card-body>
+            <form [formGroup]="createForm" (ngSubmit)="onCreate()" cForm class="row g-3">
+              <c-col md="3" class="global-select-group">
+                <label cLabel for="track" class="global-select-label">Pista</label>
+                <select cFormControl formControlName="track_id" id="track" class="global-select">
+                  <option *ngFor="let track of tracks" [value]="track.id">{{ track.name }}</option>
+                </select>
+              </c-col>
+              <c-col md="3">
+                <label cLabel for="date" class="global-select-label">Data e Ora</label>
+                <input cFormControl type="datetime-local" formControlName="date" id="date" class="global-datetime">
+              </c-col>
+              <c-col md="2" class="d-flex align-items-center">
+                <div class="form-check">
+                  <input cFormCheckInput type="checkbox" formControlName="has_sprint" id="newSprint">
+                  <label cFormCheckLabel for="newSprint">Sprint</label>
+                </div>
+              </c-col>
+              <c-col md="2" class="d-flex align-items-center">
+                <div class="form-check">
+                  <input cFormCheckInput type="checkbox" formControlName="has_x2" id="newX2">
+                  <label cFormCheckLabel for="newX2">Punti Doppi</label>
+                </div>
+              </c-col>
+              <c-col md="2" class="d-flex align-items-center">
+                <button cButton color="success" type="submit" [disabled]="loading || createForm.invalid">
+                  Aggiungi GP
+                </button>
+              </c-col>
+            </form>
+          </c-card-body>
+        </c-card>
+      </c-col>
+    </c-row>
+  
+    <c-row>
+      <c-col xs="12">
+        <c-card>
+          <c-card-header>
+            <strong>Prossime Gare</strong>
+          </c-card-header>
+          <c-card-body>
+            <div *ngIf="loading" class="text-center">
+              <c-spinner></c-spinner>
+            </div>
+            
+            <table [striped]="true" cTable hover *ngIf="!loading">
+              <thead>
+                <tr>
+                  <th>Pista</th>
+                  <th>Data (UTC)</th>
+                  <th>Sprint</th>
+                  <th>Punti Doppi</th>
+                  <th>Azioni</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let gp of gps">
+                  <td>
+                    <!-- Track Name (Read Only as implies changing track) -->
+                    {{ gp.track_name }}
+                  </td>
+                  <td>
+                    <input cFormControl type="datetime-local" [(ngModel)]="gp.date" class="global-datetime table-datetime">
+                  </td>
+                  <td>
+                    <div class="form-check">
+                        <input cFormCheckInput type="checkbox" [(ngModel)]="gp.has_sprint">
+                    </div>
+                  </td>
+                  <td>
+                    <div class="form-check">
+                        <input cFormCheckInput type="checkbox" [(ngModel)]="gp.has_x2">
+                    </div>
+                  </td>
+                  <td>
+                    <button cButton color="primary" size="sm" class="me-2" (click)="onSave(gp)">
+                      Salva
+                    </button>
+                    <button cButton color="danger" size="sm" (click)="onDelete(gp.id)">
+                      Elimina
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </c-card-body>
+        </c-card>
+      </c-col>
+    </c-row>
+
+  <c-toaster [placement]="'top-end'" class="p-3" position="fixed">
+    <c-toast 
+      *ngFor="let toast of toasts" 
+      [visible]="true" 
+      [autohide]="true"
+      [delay]="5000"
+      [color]="toast.color" 
+      (visibleChange)="onToastVisibleChange($event, toast)">
+      <c-toast-header>
+        <strong>{{ toast.title }}</strong>
+      </c-toast-header>
+      <c-toast-body>
+        {{ toast.message }}
+      </c-toast-body>
+    </c-toast>
+  </c-toaster>
+
+  <c-modal [visible]="modalVisible" (visibleChange)="modalVisible = $event" alignment="center">
+    <c-modal-header>
+      <h5 cModalTitle>{{ modalTitle }}</h5>
+<!-- eslint-disable-next-line @angular-eslint/template/elements-content -->
+      <button (click)="modalVisible = false" cButtonClose></button>
+    </c-modal-header>
+    <c-modal-body>
+      {{ modalMessage }}
+    </c-modal-body>
+    <c-modal-footer>
+      <button (click)="onCancelAction()" cButton color="secondary">
+        Cancel
+      </button>
+      <button (click)="onConfirmAction()" cButton color="primary">
+        Confirm
+      </button>
+    </c-modal-footer>
+  </c-modal>
+</c-container>

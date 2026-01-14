@@ -1,0 +1,42 @@
+<c-card class="mb-4 border-0 shadow-sm">
+  <c-card-header class="bg-transparent border-bottom-0 pb-0">
+    <h5 class="mb-0 text-center">Regolamento Punteggi</h5>
+  </c-card-header>
+  <c-card-body class="pt-2">
+    <ul cListGroup flush class="rules-list">
+      <li cListGroupItem class="d-flex justify-content-between align-items-center border-0 px-2 py-2">
+        <span class="rule-text">Posizione Pilota Esatta</span>
+        <span class="points-badge">{{ exactPositionPoints }} pt</span>
+      </li>
+      <li cListGroupItem class="d-flex justify-content-between align-items-center border-0 px-2 py-2">
+        <div class="d-flex flex-column">
+          <span class="rule-text">Errore di 1 posizione</span>
+          <span class="text-body-secondary small">es. 2° invece di 1°</span>
+        </div>
+        <span class="points-badge">{{ oneOffPoints }} pt</span>
+      </li>
+      <li cListGroupItem class="d-flex justify-content-between align-items-center border-0 px-2 py-2">
+        <div class="d-flex flex-column">
+          <span class="rule-text">Errore di 2 posizioni</span>
+          <span class="text-body-secondary small">es. 3° invece di 1°</span>
+        </div>
+        <span class="points-badge">{{ twoOffPoints }} pt</span>
+      </li>
+      <li cListGroupItem class="d-flex justify-content-between align-items-center border-0 px-2 py-2">
+        <span class="rule-text">Giro Veloce</span>
+        <span class="points-badge">{{ fastLapPoints }} pt</span>
+      </li>
+      <li cListGroupItem class="d-flex justify-content-between align-items-center border-0 px-2 py-2">
+        <div class="d-flex flex-column">
+          <span class="rule-text">Pilota DNF</span>
+          <span class="text-body-secondary small">Ritirato / Non Partito</span>
+        </div>
+        <span class="points-badge">{{ dnfPoints }} pt</span>
+      </li>
+      <li cListGroupItem class="d-flex justify-content-between align-items-center border-0 px-2 py-2">
+        <span class="rule-text">Scuderia Vincente</span>
+        <span class="points-badge">{{ teamPoints }} pt</span>
+      </li>
+    </ul>
+  </c-card-body>
+</c-card>

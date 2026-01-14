@@ -6,6 +6,11 @@
 // custom tweaks for scrollbar styling (wip)
 @use "scrollbar";
 
+// custom tweaks for select styling
+@use "custom-select";
+// custom tweaks for datetime input styling
+@use "custom-datetime";
+
  // custom calendar today cell color
 .calendar-cell.today {
   --cui-calendar-cell-today-color: var(--cui-info) !important;
