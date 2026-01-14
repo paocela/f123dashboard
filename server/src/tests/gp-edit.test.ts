@@ -1,5 +1,3 @@
-process.env.JWT_SECRET = 'test-secret';
-
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import request from 'supertest';
 import app from '../server.js'; // Ensure server.ts exports 'app' default (it does)
