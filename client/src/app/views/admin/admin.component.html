@@ -8,15 +8,15 @@
         </c-row>
         <c-row class="mb-4">
             <c-col xs="12" md="6" lg="4" class="mx-auto">
-                <div class="season-selector-group">
-                    <label for="seasonSelect" class="season-label">Seleziona Stagione</label>
+                <div class="global-select-group">
+                    <label for="seasonSelect" class="global-select-label">Seleziona Stagione</label>
                     <select 
                         id="seasonSelect"
                         [(ngModel)]="selectedSeason" 
                         (ngModelChange)="onSeasonChange()"
                         cSelect
                         cFormControl
-                        class="season-select"
+                        class="global-select"
                         [disabled]="isInitialLoading || isSeasonLoading">
                         @for (season of seasons; track season.id) {
                             <option [value]="season.id">
@@ -129,6 +129,7 @@
                                                       class="cIcon"
                                                       style="width: 25px"
                                                       attr.src="assets/medals/{{ medals.get(posizione.key) }}"
+                                                      [attr.alt]="'Medaglia per la posizione ' + posizione?.value"
                                                     />
                                                     <svg *ngIf="posizione.key == 9" [cIcon]="fireIcon" style="color: purple"></svg>
                                                     <svg *ngIf="posizione.key == 10" [cIcon]="powerIcon" style="color: red"></svg>

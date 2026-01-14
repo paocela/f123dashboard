@@ -1,0 +1,17 @@
+:host {
+    display: block;
+}
+
+.form-check {
+    min-height: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0;
+}
+
+.table-datetime {
+    padding: 0.4rem 0.5rem;
+    min-height: 38px;
+    font-size: 0.85rem;
+}

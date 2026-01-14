@@ -71,13 +71,18 @@ export const getNavItems = (isAdmin: boolean): INavData[] => {
       },
       children: [
         {
-          name: 'Gestione Gare',
-          url: '/admin',
+          name: 'Gestione Risultati',
+          url: '/admin/result-edit',
+          iconComponent: { name: 'cil-pencil' }
+        },
+        {
+          name: 'Modifica GP',
+          url: '/admin/gp-edit',
           iconComponent: { name: 'cil-calendar' }
         },
         {
           name: 'Gestione Utenti',
-          url: '/admin-change-password',
+          url: '/admin/change-password',
           iconComponent: { name: 'cil-user' }
         }
       ]
