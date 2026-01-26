@@ -1,0 +1,254 @@
+<div class="card shadow-sm">
+  <div class="card-header p-3">
+    <div class="row align-items-center g-3">
+      <div class="col-md-4">
+        <h5 class="mb-0 fw-bold">{{ title }}</h5>
+        <div class="text-muted small text-uppercase fw-bold">{{ currentLabel() }}</div>
+      </div>
+      
+      <div class="col-md-8 d-flex justify-content-md-end gap-2 flex-wrap">
+        <c-button-group role="group" aria-label="Navigation">
+          <button cButton color="secondary" variant="outline" size="sm" (click)="prev()">
+             &lt; Prec
+          </button>
+          <button cButton color="secondary" variant="outline" size="sm" (click)="today()">
+            Oggi
+          </button>
+          <button cButton color="secondary" variant="outline" size="sm" (click)="next()">
+            Succ &gt;
+          </button>
+        </c-button-group>
+
+        <c-button-group role="group" aria-label="View Switcher">
+          <button cButton [color]="view() === 'week' ? 'primary' : 'secondary'" [variant]="view() === 'week' ? undefined : 'outline'" size="sm" (click)="setView('week')">
+            Settimana
+          </button>
+          <button cButton [color]="view() === 'month' ? 'primary' : 'secondary'" [variant]="view() === 'month' ? undefined : 'outline'" size="sm" (click)="setView('month')">
+            Mese
+          </button>
+          <button cButton [color]="view() === 'list' ? 'primary' : 'secondary'" [variant]="view() === 'list' ? undefined : 'outline'" size="sm" (click)="setView('list')">
+            Lista
+          </button>
+        </c-button-group>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-body p-0">
+    <!-- Week View -->
+    @if (view() === 'week') {
+    <!-- Desktop Table View -->
+    @if (!compactView) {
+    <div class="table-responsive d-none d-md-block">
+      <table class="table table-bordered mb-0 calendar-table week-view-table">
+        <thead class="sticky-top text-center sticky-header">
+          <tr>
+            <th class="time-column align-middle" scope="col">Orario</th>
+            @for (day of weekDays(); track day.date) {
+            <th [class.today-highlight]="day.isToday" 
+                class="day-header" scope="col">
+              <div class="text-uppercase small text-muted">{{ day.label.split(' ')[0] }}</div>
+              <div class="fs-5">{{ day.label.split(' ')[1] }}</div>
+            </th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (hour of hours; track hour) {
+          <tr>
+            <td class="time-column text-muted small align-middle text-center">
+              {{ hour < 10 ? '0' + hour : hour }}:00
+            </td>
+            @for (day of weekDays(); track day.date) {
+            <td [class.today-highlight]="day.isToday"
+                class="event-slot p-1 align-top position-relative">
+              
+              @for (event of getEventsForSlot(day.date, hour); track $index) {
+              <div class="event-card mb-1 p-1 rounded border-start border-3 border-primary bg-primary bg-opacity-10 shadow-sm"
+                   [title]="event.description || event.name"
+                   role="button"
+                   tabindex="0"
+                   (click)="handleEventClick(event)"
+                   (keydown.enter)="handleEventClick(event)"
+                   (keydown.space)="handleEventClick(event)">
+                <div class="fw-bold small text-wrap">{{ event.name }}</div>
+                @if (event.description) {
+                <div class="text-muted small text-truncate" style="font-size: 0.75rem;">
+                  {{ event.description }}
+                </div>
+                }
+              </div>
+              }
+
+            </td>
+            }
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    }
+
+    <!-- Mobile List View -->
+    <div [class.d-md-none]="!compactView">
+      <div class="list-group list-group-flush">
+        @for (day of weekDays(); track day.date) {
+        <div class="list-group-item" [class.today-highlight]="day.isToday">
+          <div class="d-flex w-100 justify-content-between align-items-center mb-2">
+            <h6 class="mb-0" [class.fw-bold]="day.isToday" [class.text-primary]="day.isToday">
+              {{ day.label }}
+            </h6>
+          </div>
+          
+          <div class="d-flex flex-column gap-2">
+            <!-- Get all events for this day -->
+            @let dayEvents = getEventsForSlot(day.date);
+            
+            @if (dayEvents.length > 0) {
+              @for (event of dayEvents; track $index) {
+              <div class="border rounded p-2 border-start border-3 border-primary bg-primary bg-opacity-10 mobile-event-card"
+                   role="button"
+                   tabindex="0"
+                   (click)="handleEventClick(event)"
+                   (keydown.enter)="handleEventClick(event)"
+                   (keydown.space)="handleEventClick(event)">
+                <div class="d-flex align-items-center">
+                  <span class="badge bg-primary me-2">{{ event.parsedDate | date:'HH:mm' }}</span>
+                  <div class="fw-bold">{{ event.name }}</div>
+                </div>
+                @if (event.description) {
+                  <div class="small text-muted mt-1 ms-1">{{ event.description }}</div>
+                }
+              </div>
+              }
+            } @else {
+              <div class="text-muted small fst-italic ps-2">Nessun evento pianificato</div>
+            }
+          </div>
+        </div>
+        }
+      </div>
+    </div>
+    }
+
+    <!-- List View (New) -->
+    @if (view() === 'list') {
+      <div class="list-group list-group-flush">
+        @if (visibleListDays().length === 0) {
+           <div class="p-4 text-center text-muted">
+              Nessun evento trovato.
+           </div>
+        }
+
+        @for (day of visibleListDays(); track day.date) {
+        <div class="list-group-item" [class.today-highlight]="day.isToday">
+          <div class="d-flex w-100 justify-content-between align-items-center mb-2">
+            <h6 class="mb-0 text-capitalize" [class.fw-bold]="day.isToday" [class.text-primary]="day.isToday">
+              {{ day.label }}
+            </h6>
+          </div>
+          
+          <div class="d-flex flex-column gap-2">
+            @let dayEvents = getEventsForSlot(day.date);
+            
+            @for (event of dayEvents; track $index) {
+            <div class="border rounded p-2 border-start border-3 border-primary bg-primary bg-opacity-10 mobile-event-card"
+                 role="button"
+                 tabindex="0"
+                 (click)="handleEventClick(event)"
+                 (keydown.enter)="handleEventClick(event)"
+                 (keydown.space)="handleEventClick(event)">
+              <div class="d-flex align-items-center">
+                <span class="badge bg-primary me-2">{{ event.parsedDate | date:'HH:mm' }}</span>
+                <div class="fw-bold">{{ event.name }}</div>
+              </div>
+              @if (event.description) {
+                <div class="small text-muted mt-1 ms-1">{{ event.description }}</div>
+              }
+            </div>
+            }
+          </div>
+        </div>
+        }
+      </div>
+    }
+
+    <!-- Month View -->
+    @if (view() === 'month') {
+    <div class="table-responsive">
+      <table class="table table-bordered mb-0 calendar-table month-view-table">
+        <thead class="bg-body-tertiary text-center">
+          <tr>
+            @for (dayName of weekHeaders(); track dayName) {
+            <th scope="col" class="month-header-cell">{{ dayName.slice(0, 3) }}<span class="d-none d-md-inline">{{ dayName.slice(3) }}</span></th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (week of monthgrid(); track $index) {
+          <tr>
+            @for (day of week; track day.date) {
+            <td [class.outside-month]="!day.isCurrentMonth"
+                [class.today-highlight]="day.isToday"
+                class="p-1 align-top position-relative month-cell"> 
+              
+              <div class="d-flex justify-content-between mb-1">
+                <span [class.text-muted]="!day.isCurrentMonth" 
+                      [class.fw-bold]="day.isToday"
+                      class="small ms-1 day-number">{{ day.dayNumber }}</span>
+              </div>
+
+              <!-- Event List (Visible on all screens) -->
+              <div class="d-flex flex-column gap-1">
+                @for (event of getEventsForSlot(day.date); track $index) {
+                <div class="small px-1 rounded text-truncate border-start border-3 border-primary bg-primary bg-opacity-10 month-event-item"
+                     [title]="event.name"
+                     role="button"
+                     tabindex="0"
+                     (click)="handleEventClick(event)"
+                     (keydown.enter)="handleEventClick(event)"
+                     (keydown.space)="handleEventClick(event)">
+                   <span class="d-md-none" style="font-size: 0.7rem;">{{ event.name }}</span>
+                   <span class="d-none d-md-inline">{{ event.name }}</span>
+                </div>
+                }
+              </div>
+
+              <!-- Mobile: Dot indicators (Removed) -->
+
+            </td>
+            }
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    }
+  </div>
+</div>
+
+<c-modal [visible]="eventModalVisible()" (visibleChange)="handleModalChange($event)" alignment="center">
+  <c-modal-header>
+    <h5 cModalTitle>{{ selectedEvent()?.name }}</h5>
+    <button (click)="handleModalChange(false)" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>
+    @if (selectedEvent()) {
+      <div class="mb-3">
+        <strong>Data:</strong> {{ selectedEvent()!.parsedDate | date:'fullDate':'':'it-IT' }}
+      </div>
+      <div class="mb-3">
+        <strong>Orario:</strong> {{ selectedEvent()!.parsedDate | date:'HH:mm' }}
+      </div>
+      @if (selectedEvent()?.description) {
+        <div>
+          <strong>Descrizione:</strong>
+          <p class="mt-1">{{ selectedEvent()!.description }}</p>
+        </div>
+      }
+    }
+  </c-modal-body>
+  <c-modal-footer>
+    <button (click)="handleModalChange(false)" cButton color="secondary">Chiudi</button>
+  </c-modal-footer>
+</c-modal>
