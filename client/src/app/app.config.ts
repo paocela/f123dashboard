@@ -16,6 +16,10 @@ import { IconSetService } from '@coreui/icons-angular';
 import { routes } from './app.routes';
 import { TwitchApiService } from './service/twitch-api.service';
 import { PlaygroundService } from './service/playground.service';
+import { registerLocaleData } from '@angular/common';
+import localeIt from '@angular/common/locales/it';
+
+registerLocaleData(localeIt, 'it-IT');
 
 export function initializeApp(dbDataService: DbDataService, twitchApiService: TwitchApiService, playgroundService: PlaygroundService) {
   return async () => {

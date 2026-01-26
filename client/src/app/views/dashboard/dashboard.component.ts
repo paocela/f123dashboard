@@ -6,7 +6,6 @@ import {DbDataService} from '../../service/db-data.service';  //aggiunto il serv
 import { ModalModule, ModalComponent } from '@coreui/angular';
 import {
   AvatarComponent,
-  ButtonDirective,
   CardBodyComponent,
   CardComponent,
   CardHeaderComponent,
@@ -36,6 +35,7 @@ import { ChampionshipTrendComponent } from '../../components/championship-trend/
 import type { Constructor, CumulativePointsData, DriverData, TrackData } from '@f123dashboard/shared';
 import { PilotCardComponent } from '../../components/pilot-card/pilot-card.component';
 import { ConstructorCardComponent } from '../../components/constructor-card/constructor-card.component';
+import { CalendarComponent, CalendarEvent } from '../../components/calendar/calendar.component';
 
 export interface DriverOfWeek {
   driver_username: string;
@@ -78,7 +78,6 @@ export interface DriverDataWithGainedPoints extends DriverData {
     CardBodyComponent,
     RowComponent,
     ColComponent,
-    ButtonDirective,
     IconDirective,
     ReactiveFormsModule,
     CardHeaderComponent,
@@ -88,7 +87,8 @@ export interface DriverDataWithGainedPoints extends DriverData {
     Tabs2Module,
     PilotCardComponent,
     ButtonCloseDirective,
-    ConstructorCardComponent
+    ConstructorCardComponent,
+    CalendarComponent
 ]
 })
 export class DashboardComponent implements OnInit {
@@ -101,6 +101,7 @@ export class DashboardComponent implements OnInit {
 
   public screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
   public twitchEmbedUrl: SafeResourceUrl = '' as SafeResourceUrl;
+  calendarEvents: CalendarEvent[] = [];
 
   public showColumn(): boolean {
     return this.screenWidth > 1600;
@@ -181,6 +182,20 @@ export class DashboardComponent implements OnInit {
     }));
     const championshipTrend: CumulativePointsData[] = this.dbData.getCumulativePoints().sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     this.championshipTracks = this.dbData.getAllTracks();
+    
+    // Map tracks to calendar events
+    this.calendarEvents = this.championshipTracks.map(track => {
+      let desc = `Paese: ${track.country}`;
+      if (track.has_sprint == 1) {desc += '\n• Sprint Race';}
+      if (track.has_x2 == 1) {desc += '\n• Punti Doppi (x2)';}
+      
+      return {
+        name: track.name,
+        date: track.date, // Assuming track.date is a string ISO or Date object
+        description: desc
+      };
+    });
+
     this.constructors =  this.dbData.getConstructors();
     // filter next championship track
     let i = 0;

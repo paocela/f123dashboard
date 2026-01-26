@@ -329,10 +329,23 @@
    
   </c-col>
 </c-row>
+
+
 <div id="twitch-embed"></div>
 
 <app-championship-trend></app-championship-trend>
 
+<c-row class="mt-4 mb-4">
+  <c-col>
+    <app-calendar 
+      title="Prossimi Eventi 📅" 
+      defaultView="month" 
+      [compactView]="true"
+      [events]="calendarEvents">
+    </app-calendar>
+  </c-col>
+</c-row>
+<!-- 
 <c-modal
   alignment="center"
   id="championshipResoult"
@@ -384,7 +397,7 @@
       Risultati Piloti
     </button>
   </c-modal-footer>
-</c-modal>
+</c-modal> -->
 
 <!-- Pilot Details Modal -->
 <c-modal
