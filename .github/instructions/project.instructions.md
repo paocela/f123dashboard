@@ -18,6 +18,10 @@ applyTo: '**'
 - Use Angular CLI commands for scaffolding (e.g., `ng generate component`, `ng generate service`).
 - Use `ApiService` for all HTTP API calls to the Express backend.
 - Import types from `@f123dashboard/shared` package for type definitions.
+- Use simple methods .
+- Use constant and do not repeat yourself.
+- Make the code simple to read with clear variable and method names.
+- Comments shuld be avoided and used only to explain public class/method /variable with TSDoc standard.
 
 ## Components
 - Place view components in `src/app/views/<feature>/`.
@@ -52,11 +56,6 @@ applyTo: '**'
 - Place unit tests alongside the code, using the `.spec.ts` suffix.
 - Use Angular's `TestBed` for setting up tests.
 - Test creation and basic logic for all components and services.
-
-## Naming Conventions
-- Use PascalCase for class names and file names (e.g., `FantaComponent`, `LeaderboardComponent`).
-- Use camelCase for variables and methods.
-- Use kebab-case for file and folder names (e.g., `leaderboard.component.ts`).
 
 ## Folder Structure
 - Follow the existing structure:
@@ -174,4 +173,3 @@ applyTo: '**'
 
 ---
 
-These instructions are designed to help AI agents generate code that fits seamlessly into this Angular project.

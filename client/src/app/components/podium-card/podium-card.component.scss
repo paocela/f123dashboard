@@ -61,6 +61,27 @@ $font-family: 'Roboto', sans-serif;
   &.first {
     min-height: 230px;
     height: 310px;
+    animation: gold-pulse 3s infinite ease-in-out;
+    border: 1px solid #ffd700;
+    z-index: 10;
+    position: relative;
+    overflow: visible;
+
+    // Sparks pseudo-element
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 4px;
+      height: 4px;
+      background: transparent;
+      border-radius: 50%;
+      z-index: -1;
+      opacity: 0;
+      animation: sparks 4s linear infinite;
+      pointer-events: none;
+    }
   }
 
   &.second {
@@ -152,6 +173,65 @@ $font-family: 'Roboto', sans-serif;
 }
 
 /* Responsive adjustments */
+@keyframes gold-pulse {
+  0% {
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.8), 0 0 50px rgba(255, 140, 0, 0.5);
+    transform: scale(1.03);
+  }
+  100% {
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    transform: scale(1);
+  }
+}
+
+// Generate random moving sparks
+$n-sparks: 50;
+$w: 220;
+$h: 320;
+$wander: 60; // How far they move
+
+$shadows-0: ();
+$shadows-25: ();
+$shadows-50: ();
+$shadows-75: ();
+
+@for $i from 1 through $n-sparks {
+  $x-base: random($w) - ($w / 2);
+  $y-base: random($h) - ($h / 2);
+  $color: if(random(2) > 1, #ffd700, #fff);
+  $blur: random(3) + px;
+  
+  // Create a wandering path that returns to start
+  $x0: $x-base;
+  $y0: $y-base;
+  
+  $x1: $x-base + (random($wander) - ($wander/2));
+  $y1: $y-base + (random($wander) - ($wander/2));
+  
+  $x2: $x-base + (random($wander) - ($wander/2));
+  $y2: $y-base + (random($wander) - ($wander/2));
+  
+  $x3: $x-base + (random($wander) - ($wander/2));
+  $y3: $y-base + (random($wander) - ($wander/2));
+
+  $shadows-0: append($shadows-0, #{$x0}px #{$y0}px #{$blur} #{$color}, comma);
+  $shadows-25: append($shadows-25, #{$x1}px #{$y1}px #{$blur} #{$color}, comma);
+  $shadows-50: append($shadows-50, #{$x2}px #{$y2}px #{$blur} #{$color}, comma);
+  $shadows-75: append($shadows-75, #{$x3}px #{$y3}px #{$blur} #{$color}, comma);
+}
+
+@keyframes sparks {
+  0% { box-shadow: $shadows-0; opacity: 1; }
+  25% { box-shadow: $shadows-25; opacity: 0.8; }
+  50% { box-shadow: $shadows-50; opacity: 1; }
+  75% { box-shadow: $shadows-75; opacity: 0.8; }
+  100% { box-shadow: $shadows-0; opacity: 1; }
+}
+
 @media (max-width: 768px) {
   .albo-container {
     padding: 1rem;
