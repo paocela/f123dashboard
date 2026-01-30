@@ -3,6 +3,20 @@ import { CommonModule } from '@angular/common';
 import { CardModule, TableModule } from '@coreui/angular';
 import { TableDirective } from '@coreui/angular';
 
+interface PodiumEntry {
+  posizione: number;
+  nome: string;
+  img: string;
+  colore: string;
+  punti: string;
+}
+
+interface ClassificaEntry {
+  posizione: string;
+  nome: string;
+  punti: string;
+}
+
 @Component({
   selector: 'app-podium-card',
   standalone: true,
@@ -11,7 +25,7 @@ import { TableDirective } from '@coreui/angular';
   styleUrls: ['./podium-card.component.scss']
 })
 export class PodiumCardComponent {
-  @Input() podio: any[] = [];
-  @Input() classifica: any[] = [];
+  @Input() podio: PodiumEntry[] = [];
+  @Input() classifica: ClassificaEntry[] = [];
   @Input() championshipTitle = '';
 }
