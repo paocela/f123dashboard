@@ -1,3 +1,5 @@
-<div *ngIf="loading$ | async" class="loading-overlay">
-  <c-spinner color="dark"  />
-</div>
+@if (loading$ | async) {
+  <div class="loading-overlay">
+    <c-spinner color="dark"  />
+  </div>
+}

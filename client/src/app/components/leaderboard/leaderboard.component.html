@@ -22,7 +22,9 @@
                 <th class="bg-body-tertiary text-center">Pos.</th>
                 <th class="bg-body-tertiary text-center"><svg cIcon name="cilPeople"></svg></th>
                 <th class="bg-body-tertiary">Username</th>
-                <th class="bg-body-tertiary text-center" *ngIf="showVotes">Voti</th>
+                @if (showVotes) {
+                  <th class="bg-body-tertiary text-center">Voti</th>
+                }
                 <th class="bg-body-tertiary text-center">Punti</th>
             </tr>
         </thead>
@@ -44,11 +46,13 @@
                         <div>{{ leaderBoard.username }}</div>
                         <div class="small text-body-secondary text-nowrap"></div>
                     </td>
-                    <td *ngIf="showVotes">
+                    @if (showVotes) {
+                      <td>
                         <div class="text-center">
-                            {{ leaderBoard.numberVotes }} / {{totNumberVotes}}
+                          {{ leaderBoard.numberVotes }} / {{totNumberVotes}}
                         </div>
-                    </td>
+                      </td>
+                    }
                     <td>
                         <div class="fw-semibold text-center">
                             {{ leaderBoard.points }}

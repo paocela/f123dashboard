@@ -1,3 +1,5 @@
+@use 'sass:math';
+
 // Variables
 $font-family: 'Roboto', sans-serif;
 
@@ -200,23 +202,23 @@ $shadows-50: ();
 $shadows-75: ();
 
 @for $i from 1 through $n-sparks {
-  $x-base: random($w) - ($w / 2);
-  $y-base: random($h) - ($h / 2);
-  $color: if(random(2) > 1, #ffd700, #fff);
-  $blur: random(3) + px;
+  $x-base: math.random($w) - math.div($w, 2);
+  $y-base: math.random($h) - math.div($h, 2);
+  $color: if(math.random(2) > 1, #ffd700, #fff);
+  $blur: math.random(3) + px;
   
   // Create a wandering path that returns to start
   $x0: $x-base;
   $y0: $y-base;
   
-  $x1: $x-base + (random($wander) - ($wander/2));
-  $y1: $y-base + (random($wander) - ($wander/2));
+  $x1: $x-base + (math.random($wander) - math.div($wander, 2));
+  $y1: $y-base + (math.random($wander) - math.div($wander, 2));
   
-  $x2: $x-base + (random($wander) - ($wander/2));
-  $y2: $y-base + (random($wander) - ($wander/2));
+  $x2: $x-base + (math.random($wander) - math.div($wander, 2));
+  $y2: $y-base + (math.random($wander) - math.div($wander, 2));
   
-  $x3: $x-base + (random($wander) - ($wander/2));
-  $y3: $y-base + (random($wander) - ($wander/2));
+  $x3: $x-base + (math.random($wander) - math.div($wander, 2));
+  $y3: $y-base + (math.random($wander) - math.div($wander, 2));
 
   $shadows-0: append($shadows-0, #{$x0}px #{$y0}px #{$blur} #{$color}, comma);
   $shadows-25: append($shadows-25, #{$x1}px #{$y1}px #{$blur} #{$color}, comma);
