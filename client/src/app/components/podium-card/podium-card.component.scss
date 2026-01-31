@@ -1,4 +1,5 @@
 @use 'sass:math';
+@use 'sass:list';
 
 // Variables
 $font-family: 'Roboto', sans-serif;
@@ -204,7 +205,10 @@ $shadows-75: ();
 @for $i from 1 through $n-sparks {
   $x-base: math.random($w) - math.div($w, 2);
   $y-base: math.random($h) - math.div($h, 2);
-  $color: if(math.random(2) > 1, #ffd700, #fff);
+  $color: #fff;
+  @if math.random(2) > 1 {
+    $color: #ffd700;
+  }
   $blur: math.random(3) + px;
   
   // Create a wandering path that returns to start
@@ -220,10 +224,10 @@ $shadows-75: ();
   $x3: $x-base + (math.random($wander) - math.div($wander, 2));
   $y3: $y-base + (math.random($wander) - math.div($wander, 2));
 
-  $shadows-0: append($shadows-0, #{$x0}px #{$y0}px #{$blur} #{$color}, comma);
-  $shadows-25: append($shadows-25, #{$x1}px #{$y1}px #{$blur} #{$color}, comma);
-  $shadows-50: append($shadows-50, #{$x2}px #{$y2}px #{$blur} #{$color}, comma);
-  $shadows-75: append($shadows-75, #{$x3}px #{$y3}px #{$blur} #{$color}, comma);
+  $shadows-0: list.append($shadows-0, #{$x0}px #{$y0}px #{$blur} #{$color}, comma);
+  $shadows-25: list.append($shadows-25, #{$x1}px #{$y1}px #{$blur} #{$color}, comma);
+  $shadows-50: list.append($shadows-50, #{$x2}px #{$y2}px #{$blur} #{$color}, comma);
+  $shadows-75: list.append($shadows-75, #{$x3}px #{$y3}px #{$blur} #{$color}, comma);
 }
 
 @keyframes sparks {
