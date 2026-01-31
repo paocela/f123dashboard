@@ -130,7 +130,7 @@ The Express server serves the Angular build from `/` and API endpoints from `/ap
 
 ### Authentication
 
-- **JWT tokens** with 24-hour expiration
+- **JWT tokens**
 - **Middleware chain**: `authMiddleware` → `adminMiddleware` for protected routes
 - **Session management**: Tokens stored in `user_sessions` table
 
@@ -140,20 +140,6 @@ The Express server serves the Angular build from `/` and API endpoints from `/ap
 - **Production**: JSON file logs in `server/logs/` (level: info)
 - **Configuration**: Set `LOG_LEVEL` in `.env`
 
-## API Documentation 📚
-
-API endpoints are mounted at `/api/*`:
-
-- `/api/auth/*` - Authentication (login, register, token management)
-- `/api/database/*` - Database queries (drivers, tracks, championships)
-- `/api/fanta/*` - Fantasy F1 votes and results
-- `/api/twitch/*` - Twitch stream integration
-- `/api/playground/*` - Playground best scores
-
-See `server/docs/` for detailed API documentation.
-
-## Testing 🧪
-
 ### Postman Collections
 
 Pre-configured Postman collections are available in `server/docs/postman/`:
@@ -162,32 +148,6 @@ Pre-configured Postman collections are available in `server/docs/postman/`:
 - `F123Dashboard.postman_environment.prod.json` - Production environment
 
 Auto-authentication flow is implemented. See `server/docs/postman/POSTMAN_README.md` for details.
-
-## Database Notes 📋
-
-- **Result Structure**: Entry-based tables with position fields (not separate columns per position)
-- **Session Types**: Race, Sprint, Qualifying, Free Practice, Full Race
-- To reset a sequence:
-  ```sql
-  SELECT pg_get_serial_sequence('table_name', 'column_name');
-  ALTER SEQUENCE public.sequence_name RESTART WITH 1;
-  ```
-- See `.github/instructions/db.instructions.md` for complete schema documentation
-
-## Migration Status ✅
-
-This project has been successfully migrated from Genezio to self-hosted Express.js:
-
-- ✅ Express.js backend with TypeScript
-- ✅ Shared types package (`@f123dashboard/shared`)
-- ✅ JWT authentication with session management
-- ✅ Winston logging (console + file)
-- ✅ Development proxy configuration
-- ✅ Production build serving Angular app
-- ✅ All services migrated (Auth, Database, Fanta, Twitch, Playground)
-- ⏳ CI/CD deployment workflow (pending)
-
-See `.github/prompts/plan-fullBackendMigration.prompt.md` and `.github/prompts/plan-frontendMigration.prompt.md` for migration details.
 
 ## Credits 🙇
 
