@@ -1,0 +1,22 @@
+/* Mobile optimization for table */
+@media (max-width: 767.98px) {
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    
+    table {
+      th, td {
+        white-space: wrap;
+        vertical-align: middle;
+        padding: 0.3rem;
+        font-size: 0.8rem;
+      }
+    }
+  }
+}
+
+/* Ensure medal icons are consistent */
+img.cIcon {
+  width: 25px;
+  vertical-align: middle;
+}

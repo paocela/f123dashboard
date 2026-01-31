@@ -20,7 +20,7 @@ export const posizioni = new Map<number, string>([
   [11, "Team Vincente"]
 ]);
 
-export const allFlags: Record<string, any> = {
+export const allFlags: Record<string, string[]> = {
   "Barhain": cifBh,
   "Arabia Saudita": cifSa,
   "Australia": cifAu,
