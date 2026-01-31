@@ -5,6 +5,7 @@ import { cifBh, cifAt, cifMc, cifJp, cifHu, cifCn, cifCa, cifEs, cifGb, cifBe, c
 import { cilFire } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
 import { DbDataService } from '../../service/db-data.service';
+import { allFlags } from '../../model/constants';
 import type { ChampionshipData, SessionResult } from '@f123dashboard/shared';
 
 @Component({
@@ -18,35 +19,13 @@ export class ChampionshipComponent implements OnInit{
 
 
   public championship_data: ChampionshipData[] = [];
-  public allFlags: Record<string, any> = {
-    "Barhain": cifBh,
-    "Arabia Saudita": cifSa,
-    "Australia": cifAu,
-    "Giappone": cifJp,
-    "Cina": cifCn,
-    "USA": cifUs,
-    "Monaco": cifMc,
-    "Canada": cifCa,
-    "Spagna": cifEs,
-    "Austria": cifAt,
-    "UK": cifGb,
-    "Ungheria": cifHu,
-    "Belgio": cifBe,
-    "Olanda": cifNl,
-    "Italia": cifIt,
-    "Azerbaijan": cifAz,
-    "Singapore": cifSg,
-    "Messico": cifMx,
-    "Brasile": cifBr,
-    "Qatar": cifQa,
-    "Emirati Arabi Uniti": cifAe,
-  };
+  public allFlags = allFlags;
+
 
   public fireIcon: string[] = cilFire;
 
   ngOnInit(): void {
     this.championship_data = this.dbData.getChampionship();
-    console.log(this.championship_data);
   }
 
   // Helper method to get driver by position in a session
@@ -130,5 +109,10 @@ export class ChampionshipComponent implements OnInit{
       case 3: return 'third';
       default: return '';
     }
+  }
+  isDone(gp: ChampionshipData): boolean {
+    return gp.sessions.race !== undefined || 
+      gp.sessions.full_race !== undefined || 
+      gp.sessions.qualifying !== undefined;
   }
 }

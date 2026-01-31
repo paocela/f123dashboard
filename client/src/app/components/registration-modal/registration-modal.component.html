@@ -1,4 +1,6 @@
-<div class="custom-backdrop" *ngIf="visible"></div>
+@if (visible) {
+  <div class="custom-backdrop"></div>
+}
 <c-modal
   #verticallyCenteredModal
   alignment="center"
@@ -15,9 +17,11 @@
   </c-modal-header>
   <c-modal-body class="modal-body-custom">
     <!-- Email completion message -->
-    <c-alert *ngIf="isEmailCompletion" color="info" class="mb-3">
-      <strong>Profilo incompleto!</strong> Per accedere alle funzionalità complete dell'applicazione, è necessario fornire un indirizzo email valido.
-    </c-alert>
+    @if (isEmailCompletion) {
+      <c-alert color="info" class="mb-3">
+        <strong>Profilo incompleto!</strong> Per accedere alle funzionalità complete dell'applicazione, è necessario fornire un indirizzo email valido.
+      </c-alert>
+    }
     
     <form cForm (ngSubmit)="onRegistration()" class="registration-form">
       <!-- Hidden username field for accessibility -->

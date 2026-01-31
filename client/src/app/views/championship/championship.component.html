@@ -1,103 +1,107 @@
 <c-row ngPreserveWhitespaces>
-    <c-col xs="12" *ngFor="let gp of championship_data; let id_gp = index">
-      <c-card class="mb-4">
-        <c-card-header class="px-1 px-sm-4">
-          <c-container>
-            <c-row>
-              <c-col xs="auto" class="me-auto">
-                <h5 class="card-title mb-0" id="traffic">
-                  <svg size='lg' [cIcon]="allFlags[gp.track_country]"></svg>
-                  <strong>{{gp.track_name}}</strong>
-                  <svg size='lg' [cIcon]="allFlags[gp.track_country]"></svg>
-                </h5>
-              </c-col>
-              @if (gp.gran_prix_has_sprint == 1) {
-                <c-col xs="auto">
-                  <c-badge color="info">Sprint</c-badge>
+    @for (gp of championship_data; track $index) {
+      <c-col xs="12">
+        <c-card class="mb-4">
+          <c-card-header class="px-1 px-sm-4">
+            <c-container>
+              <c-row>
+                <c-col xs="auto" class="me-auto">
+                  <h5 class="card-title mb-0" id="traffic">
+                    <svg size='lg' [cIcon]="allFlags[gp.track_country]"></svg>
+                    <strong>{{gp.track_name}}</strong>
+                    <svg size='lg' [cIcon]="allFlags[gp.track_country]"></svg>
+                  </h5>
                 </c-col>
-              }
-              @if (gp.gran_prix_has_x2 == 1) {
+                @if (gp.gran_prix_has_sprint == 1) {
+                  <c-col xs="auto">
+                    <c-badge color="info">Sprint</c-badge>
+                  </c-col>
+                }
+                @if (gp.gran_prix_has_x2 == 1) {
+                  <c-col xs="auto">
+                    <c-badge color="danger">Points X2</c-badge>
+                  </c-col>
+                }
                 <c-col xs="auto">
-                  <c-badge color="danger">Points X2</c-badge>
+                  <div class="small">{{gp.gran_prix_date | date: 'dd/MM/yyyy'}}</div>
                 </c-col>
-              }
-              <c-col xs="auto">
-                <div class="small">{{gp.gran_prix_date | date: 'dd/MM/yyyy'}}</div>
-              </c-col>
-          </c-row>
-        </c-container>
-        </c-card-header>
-        <c-card-body class="px-1 px-sm-4">
-          <div class="table-responsive">
-            <table [striped]="true" cTable>
-              <thead>
-                <tr>
-                  <th scope="col">#</th>
-                  <th scope="col">Gara</th>
-                  @if (gp.gran_prix_has_sprint == 1) {
-                    <th scope="col">Sprint</th>
-                  }
-                  <th scope="col">Qualifica</th>
-                  <th scope="col">Prove Libere</th>
-                </tr>
-              </thead>
-              <tbody>
-                <!-- Dynamic rows for all finishing positions -->
-                @for (position of getAllPositions(gp); track position) {
-                  <tr>
-                    <th scope="row" [ngStyle]="getPositionStyle(position)">
-                      @if (position <= 3) {
-                        <img
-                          class="cIcon"
-                          style="width: 25px"
-                          [src]="'assets/medals/medal_' + getPositionName(position) + '.svg'"
-                        />
-                      } @else {
-                        {{position}}
+            </c-row>
+          </c-container>
+          </c-card-header>
+          @if (isDone(gp)) {
+            <c-card-body class="px-1 px-sm-4">
+              <div class="table-responsive">
+                <table [striped]="true" cTable>
+                  <thead>
+                    <tr>
+                      <th scope="col" class="text-center">#</th>
+                      <th scope="col">Gara</th>
+                      @if (gp.gran_prix_has_sprint == 1) {
+                        <th scope="col">Sprint</th>
                       }
-                    </th>
-                    <td [ngStyle]="getPositionStyle(position)">{{getDriverByPosition(getActiveRaceSession(gp), position)}}</td>
-                    @if (gp.gran_prix_has_sprint == 1) {
-                      <td [ngStyle]="getPositionStyle(position)">{{getDriverByPosition(gp.sessions.sprint, position)}}</td>
+                      <th scope="col">Qualifica</th>
+                      <th scope="col">Prove Libere</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- Dynamic rows for all finishing positions -->
+                    @for (position of getAllPositions(gp); track position) {
+                      <tr>
+                          <th scope="row" class="text-center" [ngStyle]="getPositionStyle(position)">
+                          @if (position <= 3) {
+                            <img
+                              class="cIcon"
+                              [src]="'assets/medals/medal_' + getPositionName(position) + '.svg'"
+                              [alt]="getPositionName(position) + ' medal'"
+                            />
+                          } @else {
+                            {{position}}
+                          }
+                        </th>
+                        <td [ngStyle]="getPositionStyle(position)">{{getDriverByPosition(getActiveRaceSession(gp), position)}}</td>
+                        @if (gp.gran_prix_has_sprint == 1) {
+                          <td [ngStyle]="getPositionStyle(position)">{{getDriverByPosition(gp.sessions.sprint, position)}}</td>
+                        }
+                        <td [ngStyle]="getPositionStyle(position)">{{getDriverByPosition(gp.sessions.qualifying, position)}}</td>
+                        <td [ngStyle]="getPositionStyle(position)">{{getDriverByPosition(gp.sessions.free_practice, position)}}</td>
+                      </tr>
                     }
-                    <td [ngStyle]="getPositionStyle(position)">{{getDriverByPosition(gp.sessions.qualifying, position)}}</td>
-                    <td [ngStyle]="getPositionStyle(position)">{{getDriverByPosition(gp.sessions.free_practice, position)}}</td>
-                  </tr>
-                }
-                
-                <!-- Giro veloce Row -->
-                @if (getActiveFastLapDriver(gp) || (gp.gran_prix_has_sprint == 1 && gp.fastLapDrivers.sprint)) {
-                  <tr>
-                    <th scope="row" [ngStyle]="{'color':'purple'}">
-                      Giro veloce
-                      <svg [cIcon]="fireIcon"></svg>
-                    </th>
-                    <td [ngStyle]="{'color':'purple'}">{{getActiveFastLapDriver(gp)}}</td>
-                    @if (gp.gran_prix_has_sprint == 1) {
-                      <td [ngStyle]="{'color':'purple'}">{{gp.fastLapDrivers.sprint || ''}}</td>
+                    
+                    <!-- Giro veloce Row -->
+                    @if (getActiveFastLapDriver(gp) || (gp.gran_prix_has_sprint == 1 && gp.fastLapDrivers.sprint)) {
+                      <tr>
+                        <th scope="row" class="text-center" [ngStyle]="{'color':'purple'}">
+                          GV
+                          <svg [cIcon]="fireIcon"></svg>
+                        </th>
+                        <td [ngStyle]="{'color':'purple'}">{{getActiveFastLapDriver(gp)}}</td>
+                        @if (gp.gran_prix_has_sprint == 1) {
+                          <td [ngStyle]="{'color':'purple'}">{{gp.fastLapDrivers.sprint || ''}}</td>
+                        }
+                        <td></td>
+                        <td></td>
+                      </tr>
                     }
-                    <td></td>
-                    <td></td>
-                  </tr>
-                }
-                
-                <!-- DNF Row -->
-                @if (getDNFDrivers(getActiveRaceSession(gp)) || (gp.gran_prix_has_sprint == 1 && getDNFDrivers(gp.sessions.sprint))) {
-                  <tr>
-                    <th scope="row" [ngStyle]="{'color':'red'}">DNF</th>
-                    <td [ngStyle]="{'color':'red'}">{{getDNFDrivers(getActiveRaceSession(gp))}}</td>
-                    @if (gp.gran_prix_has_sprint == 1) {
-                      <td [ngStyle]="{'color':'red'}">{{getDNFDrivers(gp.sessions.sprint)}}</td>
+                    
+                    <!-- DNF Row -->
+                    @if (getDNFDrivers(getActiveRaceSession(gp)) || (gp.gran_prix_has_sprint == 1 && getDNFDrivers(gp.sessions.sprint))) {
+                      <tr>
+                        <th scope="row" class="text-center" [ngStyle]="{'color':'red'}">DNF</th>
+                        <td [ngStyle]="{'color':'red'}">{{getDNFDrivers(getActiveRaceSession(gp))}}</td>
+                        @if (gp.gran_prix_has_sprint == 1) {
+                          <td [ngStyle]="{'color':'red'}">{{getDNFDrivers(gp.sessions.sprint)}}</td>
+                        }
+                        <td></td>
+                        <td></td>
+                      </tr>
                     }
-                    <td></td>
-                    <td></td>
-                  </tr>
-                }
-            </tbody>
-            </table>
-          </div>
-        </c-card-body>
-      </c-card>
-    </c-col>
+                </tbody>
+                </table>
+              </div>
+            </c-card-body>
+          }
+        </c-card>
+      </c-col>
+    }
   </c-row>
   

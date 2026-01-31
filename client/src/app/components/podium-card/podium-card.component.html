@@ -6,9 +6,9 @@
 
   <!-- Podio -->
   <section class="podio">
-    <div
-      class="podio-card"
-      *ngFor="let pilota of podio"
+    @for (pilota of podio; track pilota.posizione) {
+      <div
+        class="podio-card"
       [class.first]="pilota.posizione === 1"
       [class.second]="pilota.posizione === 2"
       [class.third]="pilota.posizione === 3"
@@ -28,7 +28,8 @@
         <span class="nome">{{ pilota.nome }}</span>
         <span class="nome">{{ pilota.punti }} Pt</span>
       </div>
-    </div>
+      </div>
+    }
   </section>
 
   <!-- Classifica 4–6 -->
@@ -42,11 +43,13 @@
           class="mb-0 border"
         >
         <tbody>
-          <tr *ngFor="let p of classifica">
-            <td class="pos">{{ p.posizione }}</td>
-            <td class="nome-table">{{ p.nome }}</td>
-            <td class="punti-table">{{ p.punti }} Pt</td>
-          </tr>
+          @for (p of classifica; track p.posizione) {
+            <tr>
+              <td class="pos">{{ p.posizione }}</td>
+              <td class="nome-table">{{ p.nome }}</td>
+              <td class="punti-table">{{ p.punti }} Pt</td>
+            </tr>
+          }
         </tbody>
     </table>
   </section>

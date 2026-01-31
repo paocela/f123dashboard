@@ -38,7 +38,9 @@
               <c-col md="3" class="global-select-group">
                 <label cLabel for="track" class="global-select-label">Pista</label>
                 <select cFormControl formControlName="track_id" id="track" class="global-select">
-                  <option *ngFor="let track of tracks" [value]="track.id">{{ track.name }}</option>
+                  @for (track of tracks; track track.id) {
+                    <option [value]="track.id">{{ track.name }}</option>
+                  }
                 </select>
               </c-col>
               <c-col md="3">
@@ -75,70 +77,75 @@
             <strong>Prossime Gare</strong>
           </c-card-header>
           <c-card-body>
-            <div *ngIf="loading" class="text-center">
-              <c-spinner></c-spinner>
-            </div>
-            
-            <table [striped]="true" cTable hover *ngIf="!loading">
-              <thead>
-                <tr>
-                  <th>Pista</th>
-                  <th>Data (UTC)</th>
-                  <th>Sprint</th>
-                  <th>Punti Doppi</th>
-                  <th>Azioni</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let gp of gps">
-                  <td>
-                    <!-- Track Name (Read Only as implies changing track) -->
-                    {{ gp.track_name }}
-                  </td>
-                  <td>
-                    <input cFormControl type="datetime-local" [(ngModel)]="gp.date" class="global-datetime table-datetime">
-                  </td>
-                  <td>
-                    <div class="form-check">
-                        <input cFormCheckInput type="checkbox" [(ngModel)]="gp.has_sprint">
-                    </div>
-                  </td>
-                  <td>
-                    <div class="form-check">
-                        <input cFormCheckInput type="checkbox" [(ngModel)]="gp.has_x2">
-                    </div>
-                  </td>
-                  <td>
-                    <button cButton color="primary" size="sm" class="me-2" (click)="onSave(gp)">
-                      Salva
-                    </button>
-                    <button cButton color="danger" size="sm" (click)="onDelete(gp.id)">
-                      Elimina
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            @if (loading) {
+              <div class="text-center">
+                <c-spinner></c-spinner>
+              </div>
+            } @else {
+              <table [striped]="true" cTable hover>
+                <thead>
+                  <tr>
+                    <th>Pista</th>
+                    <th>Data (UTC)</th>
+                    <th>Sprint</th>
+                    <th>Punti Doppi</th>
+                    <th>Azioni</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (gp of gps; track gp.id) {
+                    <tr>
+                      <td>
+                        <!-- Track Name (Read Only as implies changing track) -->
+                        {{ gp.track_name }}
+                      </td>
+                      <td>
+                        <input cFormControl type="datetime-local" [(ngModel)]="gp.date" class="global-datetime table-datetime">
+                      </td>
+                      <td>
+                        <div class="form-check">
+                            <input cFormCheckInput type="checkbox" [(ngModel)]="gp.has_sprint">
+                        </div>
+                      </td>
+                      <td>
+                        <div class="form-check">
+                            <input cFormCheckInput type="checkbox" [(ngModel)]="gp.has_x2">
+                        </div>
+                      </td>
+                      <td>
+                        <button cButton color="primary" size="sm" class="me-2" (click)="onSave(gp)">
+                          Salva
+                        </button>
+                        <button cButton color="danger" size="sm" (click)="onDelete(gp.id)">
+                          Elimina
+                        </button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            }
           </c-card-body>
         </c-card>
       </c-col>
     </c-row>
 
   <c-toaster [placement]="'top-end'" class="p-3" position="fixed">
-    <c-toast 
-      *ngFor="let toast of toasts" 
-      [visible]="true" 
-      [autohide]="true"
-      [delay]="5000"
-      [color]="toast.color" 
-      (visibleChange)="onToastVisibleChange($event, toast)">
-      <c-toast-header>
-        <strong>{{ toast.title }}</strong>
-      </c-toast-header>
-      <c-toast-body>
-        {{ toast.message }}
-      </c-toast-body>
-    </c-toast>
+    @for (toast of toasts; track $index) {
+      <c-toast 
+        [visible]="true" 
+        [autohide]="true"
+        [delay]="5000"
+        [color]="toast.color" 
+        (visibleChange)="onToastVisibleChange($event, toast)">
+        <c-toast-header>
+          <strong>{{ toast.title }}</strong>
+        </c-toast-header>
+        <c-toast-body>
+          {{ toast.message }}
+        </c-toast-body>
+      </c-toast>
+    }
   </c-toaster>
 
   <c-modal [visible]="modalVisible" (visibleChange)="modalVisible = $event" alignment="center">

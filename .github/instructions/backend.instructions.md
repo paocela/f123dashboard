@@ -215,7 +215,7 @@ LOG_LEVEL=debug
 
 **Base Path**: All API routes mounted under `/api/*`
 
-**HTTP Method**: Use POST for all endpoints (including reads) - project convention for consistency with legacy Genezio API.
+**HTTP Method**: Use correct HTTP methods (GET, POST, PUT, DELETE) according to REST conventions.
 
 **Request Body**: Optional parameters handled with optional chaining
 ```typescript
@@ -228,7 +228,7 @@ const seasonId = req.body?.seasonId ? parseInt(req.body.seasonId) : undefined;
 { success: false, message: 'Error description' }
 ```
 ## Unit Testing
-when implementing a new feature or fixin/refacroring Create unit tests for all possible scenarios, including edge cases.
+When implementing a new feature or fixing/refactoring, create unit tests for all possible scenarios, including edge cases.
 tests must mock database interactions and external resources to ensure isolation and reliability.
 **Testing Framework**: vitest
 **Test Files**: server/tests/*.test.ts
@@ -307,7 +307,6 @@ const __dirname = dirname(__filename);
 - **Auth Flow**: `server/docs/authentication-flow.md` - Complete auth documentation
 - **Database Schema**: `.github/instructions/db.instructions.md` - Entry-based result tables
 - **Logging Guide**: `server/docs/winston-logging.md` - Winston usage and best practices
-- **Migration Plan**: `.github/prompts/plan-fullBackendMigration.prompt.md` - Genezio to Express migration
 
 ## Production Deployment
 
