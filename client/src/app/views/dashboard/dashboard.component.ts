@@ -3,6 +3,7 @@ import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import {DbDataService} from '../../service/db-data.service';  //aggiunto il servizio per dati db
+import { ConstructorService } from '../../service/constructor.service';
 import { ModalModule, ModalComponent } from '@coreui/angular';
 import {
   AvatarComponent,
@@ -95,6 +96,7 @@ export class DashboardComponent implements OnInit {
   private dbData = inject(DbDataService);
   private twitchApiService = inject(TwitchApiService);
   private sanitizer = inject(DomSanitizer);
+  private constructorService = inject(ConstructorService);
   loadingService = inject(LoadingService);
 
   @ViewChild('championshipResoult', { static: true }) championshipResoult!: ModalComponent; 
@@ -197,6 +199,10 @@ export class DashboardComponent implements OnInit {
     });
 
     this.constructors =  this.dbData.getConstructors();
+    
+    // Calculate full constructor points based on total driver points
+    this.constructors = this.constructorService.calculateConstructorPoints(this.constructors, this.championship_standings_users);
+    
     // filter next championship track
     let i = 0;
     const currentDate: Date = new Date();
@@ -226,14 +232,8 @@ export class DashboardComponent implements OnInit {
         {user.gainedPoints = 0;}
     }
     
-    for (const constructor of this.constructors) {
-      constructor.constructor_race_points = 0;
-      for (const user of this.championship_standings_users) {
-        if ( user.driver_username == constructor.driver_1_username || user.driver_username == constructor.driver_2_username ) {
-          constructor.constructor_race_points += user.gainedPoints;
-        }
-      }
-    }
+    // Calculate gained points for constructors
+    this.constructors = this.constructorService.calculateConstructorGainedPoints(this.constructors, this.championship_standings_users);
 
     //  delta points from the pilot above
     for (let i = 1; i < this.championship_standings_users.length; i++) 
