@@ -16,7 +16,6 @@ export interface ProcessedCalendarEvent extends CalendarEvent {
 
 @Component({
   selector: 'app-calendar',
-  standalone: true,
   imports: [CommonModule, ButtonModule, ButtonGroupModule, IconModule, ModalModule],
   providers: [DatePipe],
   templateUrl: './calendar.component.html',

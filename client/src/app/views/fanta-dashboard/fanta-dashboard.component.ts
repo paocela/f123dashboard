@@ -5,7 +5,6 @@ import { GridModule } from '@coreui/angular';
 
 @Component({
   selector: 'app-fanta-dashboard',
-  standalone: true,
   imports: [
     GridModule,
     LeaderboardComponent,

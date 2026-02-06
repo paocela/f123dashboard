@@ -11,7 +11,6 @@ import type { Constructor } from '@f123dashboard/shared';
 
 @Component({
   selector: 'app-constructor-card',
-  standalone: true,
   imports: [
     CommonModule,
     CardComponent,

@@ -10,7 +10,6 @@ import { AuthService } from 'src/app/service/auth.service';
 
 @Component({
   selector: 'app-playground',
-  standalone: true,
   imports: [
     GridModule,
     TableDirective,

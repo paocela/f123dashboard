@@ -28,8 +28,7 @@ import { AuthService } from '../../service/auth.service';
     ModalBodyComponent,
     SpinnerComponent,
     AlertComponent
-  ],
-  standalone: true
+  ]
 })
 export class PasswordChangeModalComponent implements OnDestroy {
   private authService = inject(AuthService);

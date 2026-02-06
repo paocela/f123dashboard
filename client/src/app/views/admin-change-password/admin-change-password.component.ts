@@ -25,7 +25,6 @@ import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-admin-change-password',
-  standalone: true,
   imports: [
     CommonModule,
     FormsModule,

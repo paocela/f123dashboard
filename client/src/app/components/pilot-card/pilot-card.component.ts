@@ -14,7 +14,6 @@ import type { DriverData } from '@f123dashboard/shared';
 
 @Component({
   selector: 'app-pilot-card',
-  standalone: true,
   imports: [
     CommonModule,
     CardComponent,

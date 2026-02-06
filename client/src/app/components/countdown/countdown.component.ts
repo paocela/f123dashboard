@@ -21,7 +21,6 @@ interface TimeInterface {
     ],
     templateUrl: './countdown.component.html',
     styleUrl: './countdown.component.scss',
-    standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CountdownComponent implements OnInit, OnDestroy {

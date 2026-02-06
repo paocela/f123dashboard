@@ -29,8 +29,7 @@ import type { User } from '@f123dashboard/shared';
     ModalBodyComponent,
     SpinnerComponent,
     AlertComponent
-  ],
-  standalone: true
+  ]
 })
 export class RegistrationModalComponent implements OnDestroy {
   private authService = inject(AuthService);

@@ -10,7 +10,6 @@ import { VoteStatus, VOTE_INDEX } from '../../model/fanta';
 
 @Component({
   selector: 'app-vote-history-table',
-  standalone: true,
   imports: [
     CommonModule,
     TableDirective,

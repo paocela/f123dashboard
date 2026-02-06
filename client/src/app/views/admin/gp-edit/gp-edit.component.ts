@@ -37,7 +37,6 @@ type GPEditViewModel = Omit<GPEditItem, 'date'> & { date: string };
 
 @Component({
   selector: 'app-gp-edit',
-  standalone: true,
   imports: [
     CommonModule,
     FormsModule,

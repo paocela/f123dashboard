@@ -41,8 +41,7 @@ import type { User } from '@f123dashboard/shared';
     PasswordChangeModalComponent
   ],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.scss',
-  standalone: true
+  styleUrl: './login.component.scss'
 })
 export class LoginComponent implements OnInit {
   private authService = inject(AuthService);
