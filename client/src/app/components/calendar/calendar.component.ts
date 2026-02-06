@@ -66,8 +66,6 @@ export class CalendarComponent implements OnInit, OnChanges {
   // Locale for formatting (Italian as requested in examples)
   private readonly locale = 'it-IT';
 
-  private readonly datePipe = inject(DatePipe);
-
   ngOnInit(): void {
     if (this.defaultView) {
       this.view.set(this.defaultView);
@@ -118,7 +116,9 @@ export class CalendarComponent implements OnInit, OnChanges {
     } else {
       // List View: Show range of events on current page
       const visibleDays = this.visibleListDays();
-      if (visibleDays.length === 0) return 'Nessun Evento';
+      if (visibleDays.length === 0) {
+        return 'Nessun Evento';
+      }
       
       const start = visibleDays[0].date;
       const end = visibleDays[visibleDays.length - 1].date;
@@ -216,7 +216,7 @@ export class CalendarComponent implements OnInit, OnChanges {
     // Map events to easy lookup structure
     return this.events.map(e => ({
       ...e,
-      parsedDate: new Date(e.date)
+      parsedDate: this.parseAsLocalTime(e.date)
     }));
   });
 
@@ -312,6 +312,33 @@ export class CalendarComponent implements OnInit, OnChanges {
   }
 
   // --- Helper Methods ---
+
+  /**
+   * Parse a date/string as local time, ignoring timezone indicators.
+   * This prevents ISO strings with 'Z' from being converted to local timezone.
+   */
+  private parseAsLocalTime(date: Date | string): Date {
+    if (date instanceof Date) {
+      return date;
+    }
+    
+    // Parse ISO string components and create local date
+    const match = date.match(/^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})?)?$/);
+    if (match) {
+      const [, year, month, day, hour = '0', minute = '0', second = '0'] = match;
+      return new Date(
+        parseInt(year),
+        parseInt(month) - 1,
+        parseInt(day),
+        parseInt(hour),
+        parseInt(minute),
+        parseInt(second)
+      );
+    }
+    
+    // Fallback to standard parsing
+    return new Date(date);
+  }
 
   private getStartOfWeek(date: Date): Date {
     const d = new Date(date);
