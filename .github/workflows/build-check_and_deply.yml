@@ -38,6 +38,9 @@ jobs:
       - name: Run Backend Tests
         run: npm run test --prefix server
 
+      - name: Run Angular Tests
+        run: npm run test --prefix client
+
       - name: Run build
         run: npm run build
 

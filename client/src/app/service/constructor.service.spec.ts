@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { ConstructorService } from './constructor.service';
 import type { Constructor, DriverData } from '@f123dashboard/shared';
 
@@ -6,7 +7,9 @@ describe('ConstructorService', () => {
   let service: ConstructorService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({
+      imports: [],
+      providers: [provideNoopAnimations(), ],});
     service = TestBed.inject(ConstructorService);
   });
 

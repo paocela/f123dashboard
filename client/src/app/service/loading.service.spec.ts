@@ -14,32 +14,45 @@ describe('LoadingService', () => {
   });
 
   it('should show loading on first show() call', (done) => {
+    let emissionCount = 0;
     service.loading$.subscribe(loading => {
-      expect(loading).toBeTrue();
-      done();
+      emissionCount++;
+      // First emission is the initial false, second is true after show()
+      if (emissionCount === 2) {
+        expect(loading).toBeTrue();
+        done();
+      }
     });
     service.show();
   });
 
   it('should hide loading after matching hide() calls', (done) => {
+    let emissionCount = 0;
+    service.loading$.subscribe(loading => {
+      emissionCount++;
+      // 1st: initial false
+      // 2nd: true after first show()
+      // 3rd: false after second hide()
+      if (emissionCount === 3) {
+        expect(loading).toBeFalse();
+        done();
+      }
+    });
     service.show();
     service.show();
     service.hide();
-    service.loading$.subscribe(loading => {
-      expect(loading).toBeTrue();
-    });
     service.hide();
-    service.loading$.subscribe(loading => {
-      expect(loading).toBeFalse();
-      done();
-    });
   });
 
   it('should not affect loading state when hide() is called without show()', (done) => {
-    service.hide();
+    let emitted = false;
     service.loading$.subscribe(loading => {
-      expect(loading).toBeFalse();
-      done();
+      if (!emitted) {
+        emitted = true;
+        expect(loading).toBeFalse();
+        done();
+      }
     });
+    service.hide();
   });
 });

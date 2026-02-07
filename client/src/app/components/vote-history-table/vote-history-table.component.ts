@@ -5,8 +5,8 @@ import { IconDirective } from '@coreui/icons-angular';
 import { cilPeople, cilCheckAlt, cilX, cilSwapVertical } from '@coreui/icons';
 import { FantaService } from '../../service/fanta.service';
 import { DbDataService } from '../../service/db-data.service';
-import type { FantaVote, RaceResult } from '@f123dashboard/shared';
-import { VoteStatus, VOTE_INDEX } from '../../model/fanta';
+import type { FantaVote, DriverData } from '@f123dashboard/shared';
+import { VoteStatus } from '../../model/fanta';
 
 @Component({
   selector: 'app-vote-history-table',
@@ -53,7 +53,7 @@ export class VoteHistoryTableComponent {
     ];
   }
 
-  getPilota(id: number): any | null {
+  getPilota(id: number): DriverData | null {
     return this.dbData.getAllDrivers().find(driver => +driver.driver_id === +id) || null;
   }
 
@@ -106,7 +106,7 @@ export class VoteHistoryTableComponent {
     const result = this.fantaService.getRaceResult(this.trackId);
     if (!result) {return 0;}
     
-    return this.fantaService.isDnfCorrect(result.list_dnf, this.fantaVote.id_dnf) && this.fantaVote.id_dnf !== 0
+    return this.fantaService.isDnfCorrect(result.list_dnf, +this.fantaVote.id_dnf) && +this.fantaVote.id_dnf !== 0
       ? this.fantaService.getCorrectResponsePointDnf()
       : 0;
   }
@@ -115,7 +115,7 @@ export class VoteHistoryTableComponent {
     const winningConstructorIds = this.fantaService.getWinningConstructorsForTrack(this.trackId);
     if (winningConstructorIds.length === 0) {return 0;}
     
-    return winningConstructorIds.includes(this.fantaVote.constructor_id) && this.fantaVote.constructor_id !== 0
+    return winningConstructorIds.includes(+this.fantaVote.constructor_id) && +this.fantaVote.constructor_id !== 0
       ? this.fantaService.getCorrectResponsePointTeam()
       : 0;
   }
@@ -150,7 +150,7 @@ export class VoteHistoryTableComponent {
     const result = this.fantaService.getRaceResult(this.trackId);
     if (!result) {return { icon: cilX, color: 'red' };}
     
-    const isCorrect = +result.id_fast_lap === +this.fantaVote.id_fast_lap && this.fantaVote.id_fast_lap !== 0;
+    const isCorrect = +result.id_fast_lap === +this.fantaVote.id_fast_lap && +this.fantaVote.id_fast_lap !== 0;
     return isCorrect 
       ? { icon: cilCheckAlt, color: 'green' }
       : { icon: cilX, color: 'red' };
@@ -160,7 +160,7 @@ export class VoteHistoryTableComponent {
     const result = this.fantaService.getRaceResult(this.trackId);
     if (!result) {return { icon: cilX, color: 'red' };}
     
-    const isCorrect = this.fantaService.isDnfCorrect(result.list_dnf, this.fantaVote.id_dnf);
+    const isCorrect = this.fantaService.isDnfCorrect(result.list_dnf, +this.fantaVote.id_dnf) && +this.fantaVote.id_dnf !== 0;
     return isCorrect 
       ? { icon: cilCheckAlt, color: 'green' }
       : { icon: cilX, color: 'red' };
@@ -170,7 +170,7 @@ export class VoteHistoryTableComponent {
     const winningConstructorIds = this.fantaService.getWinningConstructorsForTrack(this.trackId);
     if (winningConstructorIds.length === 0) {return { icon: cilX, color: 'red' };}
     
-    const isCorrect = winningConstructorIds.includes(this.fantaVote.constructor_id) && this.fantaVote.constructor_id !== 0;
+    const isCorrect = winningConstructorIds.includes(+this.fantaVote.constructor_id) && +this.fantaVote.constructor_id !== 0;
     return isCorrect 
       ? { icon: cilCheckAlt, color: 'green' }
       : { icon: cilX, color: 'red' };
