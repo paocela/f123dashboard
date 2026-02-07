@@ -129,11 +129,11 @@ export class FantaService implements OnDestroy {
     }
     
     // Find the maximum points for this track
-    const maxPoints = Math.max(...constructorsForTrack.map(c => c.constructor_points));
+    const maxPoints = Math.max(...constructorsForTrack.map(c => +c.constructor_points));
     
     // Return all constructors that have the maximum points (handles ties)
     return constructorsForTrack
-      .filter(c => c.constructor_points === maxPoints)
+      .filter(c => +c.constructor_points === maxPoints)
       .map(c => +c.constructor_id)
       .filter(id => id !== null && id !== undefined);
    }
