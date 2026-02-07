@@ -37,7 +37,7 @@
     <tbody>
       @for (voto of getVoteArray(); track i; let i = $index) {
         @let pilota = getPilota(voto);
-          @if (pilota !== null) {
+          @if (pilota !== null || i + 1 > 10) {
             <tr>
               <td class="col-voto">
                 <div class="text-center fw-semibold voto-label">
