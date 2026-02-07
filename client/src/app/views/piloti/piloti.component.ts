@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common'; 
 import { DbDataService } from '../../service/db-data.service';
 import { ConstructorService } from '../../service/constructor.service';
@@ -28,30 +28,29 @@ import { ConstructorCardComponent } from '../../components/constructor-card/cons
 
 export class PilotiComponent implements OnInit {
   private dbData = inject(DbDataService);
-  private cdr = inject(ChangeDetectorRef);
   private constructorService = inject(ConstructorService);
 
-
-  piloti: DriverData[] = [];
-  constructors: Constructor[] = [];
-  isLoading = true;
+  piloti = signal<DriverData[]>([]);
+  constructors = signal<Constructor[]>([]);
+  isLoading = signal(true);
 
   ngOnInit() {
     try {
-      this.isLoading = true;
-      this.cdr.detectChanges();
+      this.isLoading.set(true);
       
       // Fetch data from service
-      this.piloti = this.dbData.getAllDrivers();
-      this.constructors = this.dbData.getConstructors();
+      const drivers = this.dbData.getAllDrivers();
+      const constructorsData = this.dbData.getConstructors();
 
       // Calculate points for constructors based on drivers data
-      this.constructors = this.constructorService.calculateConstructorPoints(this.constructors, this.piloti);
+      const constructorsWithPoints = this.constructorService.calculateConstructorPoints(constructorsData, drivers);
+      
+      this.piloti.set(drivers);
+      this.constructors.set(constructorsWithPoints);
     } catch (error) {
       console.error('Error loading data:', error);
     } finally {
-      this.isLoading = false;
-      this.cdr.detectChanges();
+      this.isLoading.set(false);
     }
   }
 
