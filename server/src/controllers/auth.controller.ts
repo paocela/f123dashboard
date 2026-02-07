@@ -148,7 +148,16 @@ export class AuthController {
 
   async logout(req: Request, res: Response): Promise<void> {
     try {
-      const { jwtToken } = req.body;
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        res.status(401).json({
+          success: false,
+          message: 'No token provided'
+        });
+        return;
+      }
+      
+      const jwtToken = authHeader.substring(7); // Remove 'Bearer ' prefix
       const result = await authService.logout(jwtToken);
       res.json(result);
     } catch (error) {
@@ -162,7 +171,16 @@ export class AuthController {
 
   async logoutAllSessions(req: Request, res: Response): Promise<void> {
     try {
-      const { jwtToken } = req.body;
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        res.status(401).json({
+          success: false,
+          message: 'No token provided'
+        });
+        return;
+      }
+      
+      const jwtToken = authHeader.substring(7); // Remove 'Bearer ' prefix
       const result = await authService.logoutAllSessions(jwtToken);
       res.json(result);
     } catch (error) {
@@ -176,7 +194,16 @@ export class AuthController {
 
   async getUserSessions(req: Request, res: Response): Promise<void> {
     try {
-      const { jwtToken } = req.body;
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        res.status(401).json({
+          success: false,
+          message: 'No token provided'
+        });
+        return;
+      }
+      
+      const jwtToken = authHeader.substring(7); // Remove 'Bearer ' prefix
       const result = await authService.getUserSessions(jwtToken);
       
       if (result.success) {
