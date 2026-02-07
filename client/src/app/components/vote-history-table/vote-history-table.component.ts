@@ -112,10 +112,10 @@ export class VoteHistoryTableComponent {
   }
 
   getPuntiConstructor(): number {
-    const winningConstructorId = this.fantaService.getWinningConstructorForTrack(this.trackId);
-    if (!winningConstructorId) {return 0;}
+    const winningConstructorIds = this.fantaService.getWinningConstructorsForTrack(this.trackId);
+    if (winningConstructorIds.length === 0) {return 0;}
     
-    return +winningConstructorId === +this.fantaVote.constructor_id && this.fantaVote.constructor_id !== 0
+    return winningConstructorIds.includes(this.fantaVote.constructor_id) && this.fantaVote.constructor_id !== 0
       ? this.fantaService.getCorrectResponsePointTeam()
       : 0;
   }
@@ -167,10 +167,10 @@ export class VoteHistoryTableComponent {
   }
 
   isCorrectConstructor(): VoteStatus {
-    const winningConstructorId = this.fantaService.getWinningConstructorForTrack(this.trackId);
-    if (!winningConstructorId) {return { icon: cilX, color: 'red' };}
+    const winningConstructorIds = this.fantaService.getWinningConstructorsForTrack(this.trackId);
+    if (winningConstructorIds.length === 0) {return { icon: cilX, color: 'red' };}
     
-    const isCorrect = +winningConstructorId === +this.fantaVote.constructor_id && this.fantaVote.constructor_id !== 0;
+    const isCorrect = winningConstructorIds.includes(this.fantaVote.constructor_id) && this.fantaVote.constructor_id !== 0;
     return isCorrect 
       ? { icon: cilCheckAlt, color: 'green' }
       : { icon: cilX, color: 'red' };

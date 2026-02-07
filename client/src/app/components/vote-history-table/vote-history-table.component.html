@@ -99,7 +99,7 @@
               </div>
             } @else {
               <div class="fw-semibold text-center posizione-value">
-                @if (fantaService.getWinningConstructorForTrack(trackId) && +fantaService.getWinningConstructorForTrack(trackId)! === +voto) {
+                @if (fantaService.getWinningConstructorsForTrack(trackId).includes(+voto)) {
                   SI
                 } @else {
                   NO

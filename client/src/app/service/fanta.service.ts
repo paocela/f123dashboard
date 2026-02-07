@@ -117,15 +117,25 @@ export class FantaService implements OnDestroy {
    }
 
    /**
-    * Get the winning constructor for a specific track/race
+    * Get the winning constructor(s) for a specific track/race.
+    * Returns all constructors that tied for first place with the highest points.
     */
-   getWinningConstructorForTrack(trackId: number): number | undefined {
-    const winningConstructors = this.dbData.getWinningConstructorGrandPrixPointsData();
-    const winner = winningConstructors.find(constructor => +constructor.track_id === +trackId);
-    if (!winner || winner.constructor_id === null || winner.constructor_id === undefined) {
-      return undefined;
+   getWinningConstructorsForTrack(trackId: number): number[] {
+    const allConstructorGpPoints = this.dbData.getConstructorGrandPrixPointsData();
+    const constructorsForTrack = allConstructorGpPoints.filter(c => +c.track_id === +trackId);
+    
+    if (constructorsForTrack.length === 0) {
+      return [];
     }
-    return +winner.constructor_id;
+    
+    // Find the maximum points for this track
+    const maxPoints = Math.max(...constructorsForTrack.map(c => c.constructor_points));
+    
+    // Return all constructors that have the maximum points (handles ties)
+    return constructorsForTrack
+      .filter(c => c.constructor_points === maxPoints)
+      .map(c => +c.constructor_id)
+      .filter(id => id !== null && id !== undefined);
    }
 
    /**
@@ -160,9 +170,10 @@ export class FantaService implements OnDestroy {
     points = (raceResult.id_fast_lap == fantaVote.id_fast_lap && fantaVote.id_fast_lap != 0) ? points + FantaService.CORRECT_RESPONSE_FAST_LAP_POINTS : points;
     points = (this.isDnfCorrect(raceResult.list_dnf, fantaVote.id_dnf) && fantaVote.id_dnf != 0) ? points + FantaService.CORRECT_RESPONSE_DNF_POINTS : points;
     
-    // Calculate points for Constructor Team
-    const winningConstructorId = this.getWinningConstructorForTrack(+raceResult.track_id);
-    points = (winningConstructorId === fantaVote.constructor_id && fantaVote.constructor_id != 0) ? points + FantaService.CORRECT_RESPONSE_TEAM : points;
+    // Calculate points for Constructor Team (all tied constructors with highest points count as winners)
+    const winningConstructorIds = this.getWinningConstructorsForTrack(+raceResult.track_id);
+    const isConstructorWinner = winningConstructorIds.includes(fantaVote.constructor_id) && fantaVote.constructor_id != 0;
+    points = isConstructorWinner ? points + FantaService.CORRECT_RESPONSE_TEAM : points;
 
     return points;
   }
