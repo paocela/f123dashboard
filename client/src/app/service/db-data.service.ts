@@ -1,6 +1,6 @@
-import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, Observable, firstValueFrom } from 'rxjs';
-import type { FantaVote, DriverData, Driver, ChampionshipData, Season, CumulativePointsData, TrackData, User, RaceResult, ConstructorGrandPrixPoints, Constructor } from '@f123dashboard/shared';
+import { Injectable, inject, signal, computed } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
+import type { DriverData, Driver, ChampionshipData, Season, CumulativePointsData, TrackData, User, RaceResult, ConstructorGrandPrixPoints, Constructor } from '@f123dashboard/shared';
 import { GpResult } from '../model/championship';
 import { ApiService } from './api.service';
 import { AuthService } from './auth.service';
@@ -15,30 +15,87 @@ export class DbDataService {
 /****************************************************************/
 //variabili locali
 /****************************************************************/
-  private allDrivers: DriverData[] = [];
-  private championship: ChampionshipData[] = [];
-  private cumulative_points: CumulativePointsData[] = [];
-  private tracks: TrackData[] = [];
-  private fantaVoteSubject = new BehaviorSubject<FantaVote[]>([]);
-  public  fantaVote$ = this.fantaVoteSubject.asObservable();
-  private raceResult: RaceResult[] = [];
-  private users: User[] = [];
-  private drivers: Driver[] = [];
-  private constructorGrandPrixPoints: ConstructorGrandPrixPoints[] = [];
-  private constructors: Constructor[] = [];
+  private allDriversSignal = signal<DriverData[]>([]);
+  readonly allDrivers = this.allDriversSignal.asReadonly();
+
+  private championshipSignal = signal<ChampionshipData[]>([]);
+  readonly championship = this.championshipSignal.asReadonly();
+
+  private cumulativePointsSignal = signal<CumulativePointsData[]>([]);
+  readonly cumulativePoints = this.cumulativePointsSignal.asReadonly();
+
+  private tracksSignal = signal<TrackData[]>([]);
+  readonly tracks = this.tracksSignal.asReadonly();
+
+  private raceResultSignal = signal<RaceResult[]>([]);
+  readonly raceResult = this.raceResultSignal.asReadonly();
+
+  private usersSignal = signal<User[]>([]);
+  readonly users = this.usersSignal.asReadonly();
+
+  private driversSignal = signal<Driver[]>([]);
+  readonly drivers = this.driversSignal.asReadonly();
+
+  private constructorGrandPrixPointsSignal = signal<ConstructorGrandPrixPoints[]>([]);
+  readonly constructorGrandPrixPoints = this.constructorGrandPrixPointsSignal.asReadonly();
+
+  private constructorsSignal = signal<Constructor[]>([]);
+  readonly constructors = computed(() => {
+    const constructors = this.constructorsSignal();
+    // TODO fix hardcoded drivers in constructors
+    return constructors.map(constructor => {
+      const updated = { ...constructor };
+      if (constructor.constructor_id === 1) {
+        updated.driver_1_id = 10;
+        updated.driver_1_username = "Marcogang96";
+        updated.driver_2_id = 11;
+        updated.driver_2_username = "GiannisCorbe";
+      } else if (constructor.constructor_id === 4) {
+        updated.driver_1_id = 14;
+        updated.driver_1_username = "redmamba_99_";
+        updated.driver_2_id = 16;
+        updated.driver_2_username = "JJKudos";
+      } else if (constructor.constructor_id === 2) {
+        updated.driver_1_id = 12;
+        updated.driver_1_username = "Lil Mvrck";
+        updated.driver_2_id = 17;
+        updated.driver_2_username = "Octimus10";
+      } else if (constructor.constructor_id === 3) {
+        updated.driver_1_id = 13;
+        updated.driver_1_username = "FASTman";
+        updated.driver_2_id = 15;
+        updated.driver_2_username = "Dreandos";
+      }
+      return updated;
+    });
+  });
+
+  readonly winningConstructorGrandPrixPoints = computed(() => {
+    const allConstructorGpPoints = this.constructorGrandPrixPoints();
+    const winningConstructorsByRace = new Map<number, ConstructorGrandPrixPoints>();
+    
+    allConstructorGpPoints.forEach(entry => {
+      const existingWinner = winningConstructorsByRace.get(entry.grand_prix_id);
+      if (!existingWinner || entry.constructor_points > existingWinner.constructor_points) {
+        winningConstructorsByRace.set(entry.grand_prix_id, entry);
+      }
+    });
+    
+    return Array.from(winningConstructorsByRace.values())
+      .sort((a, b) => new Date(a.grand_prix_date).getTime() - new Date(b.grand_prix_date).getTime());
+  });
 
 
 /****************************************************************/
 //compilazione delle variabili pre caricamento del interfaccia web 
 /****************************************************************/
 
-  async AllData() {
+  async allData() {
     const [
       allDrivers,
       championship,
       cumulativePoints,
       tracks,
-      fantaVote,
       users,
       raceResult,
       constructors,
@@ -50,7 +107,6 @@ export class DbDataService {
       firstValueFrom(this.apiService.post<ChampionshipData[]>('/database/championship', {})),
       firstValueFrom(this.apiService.post<CumulativePointsData[]>('/database/cumulative-points', {})),
       firstValueFrom(this.apiService.post<TrackData[]>('/database/tracks', {})),
-      firstValueFrom(this.apiService.post<FantaVote[]>('/fanta/votes', {})),
       firstValueFrom(this.apiService.post<User[]>('/auth/users', {})),
       firstValueFrom(this.apiService.post<RaceResult[]>('/database/race-results', {})),
       firstValueFrom(this.apiService.post<Constructor[]>('/database/constructors', {})),
@@ -58,106 +114,58 @@ export class DbDataService {
       firstValueFrom(this.apiService.post<ConstructorGrandPrixPoints[]>('/database/constructor-grand-prix-points', {}))
     ]);
 
-    this.allDrivers = allDrivers;
-    this.championship = championship;
-    this.cumulative_points = cumulativePoints;
-    this.tracks = tracks;
-    this.fantaVoteSubject.next(fantaVote);
-    this.users = users;
-    this.raceResult = raceResult;
-    this.constructors = constructors;
-    this.drivers = drivers;
-    this.constructorGrandPrixPoints = constructorGrandPrixPoints;
+    this.allDriversSignal.set(allDrivers);
+    this.championshipSignal.set(championship);
+    this.cumulativePointsSignal.set(cumulativePoints);
+    this.tracksSignal.set(tracks);
+    this.usersSignal.set(users);
+    this.raceResultSignal.set(raceResult);
+    this.constructorsSignal.set(constructors);
+    this.driversSignal.set(drivers);
+    this.constructorGrandPrixPointsSignal.set(constructorGrandPrixPoints);
   }
 
 /****************************************************************/
 //chiamate che trasferiscono le variabili alle varie pagine 
 /****************************************************************/
   getAllDrivers(): DriverData[] {
-    return this.allDrivers;
+    return this.allDrivers();
   }
 
   getChampionship(): ChampionshipData[] {
-    return this.championship;
+    return this.championship();
   }
 
   getCumulativePoints(): CumulativePointsData[] {
-    return this.cumulative_points;
+    return this.cumulativePoints();
   }
 
   getAllTracks(): TrackData[] {
-    return this.tracks;
-  }
-
-  getFantaVote(): FantaVote[] {
-    return this.fantaVoteSubject.value;
-  }
-
-  getFantaVoteObservable(): Observable<FantaVote[]> {
-    return this.fantaVote$;
+    return this.tracks();
   }
 
   getRaceResoult(): RaceResult[] {
-    return this.raceResult;
+    return this.raceResult();
   }
   
   getUsers(): User[] {
-    return this.users;
+    return this.users();
   }
+
   getDrivers(): Driver[] {
-    return this.drivers;
+    return this.drivers();
   }
 
-
-  //TODO fix hardcoded drivers in constructors
   getConstructors(): Constructor[] {
-    for (const constructor of this.constructors) {
-      if (constructor.constructor_id == 1) {
-        constructor.driver_1_id = 10;
-        constructor.driver_1_username = "Marcogang96";
-        constructor.driver_2_id = 11;
-        constructor.driver_2_username = "GiannisCorbe";
-      } else if (constructor.constructor_id == 4) {
-        constructor.driver_1_id = 14;
-        constructor.driver_1_username = "redmamba_99_";
-        constructor.driver_2_id = 16;
-        constructor.driver_2_username = "JJKudos";
-      } else if (constructor.constructor_id == 2) {
-        constructor.driver_1_id = 12;
-        constructor.driver_1_username = "Lil Mvrck";
-        constructor.driver_2_id = 17;
-        constructor.driver_2_username = "Octimus10";
-      } else if (constructor.constructor_id == 3) {
-        constructor.driver_1_id = 13;
-        constructor.driver_1_username = "FASTman";
-        constructor.driver_2_id = 15;
-        constructor.driver_2_username = "Dreandos";
-      }
-    }
-    return this.constructors;
+    return this.constructors();
   }
 
   getConstructorGrandPrixPointsData(): ConstructorGrandPrixPoints[] {
-    return this.constructorGrandPrixPoints;
+    return this.constructorGrandPrixPoints();
   }
 
   getWinningConstructorGrandPrixPointsData(): ConstructorGrandPrixPoints[] {
-    const allConstructorGpPoints = this.constructorGrandPrixPoints
-    
-    // Group by grand_prix_id and find the constructor with the highest points for each race
-    const winningConstructorsByRace = new Map<number, ConstructorGrandPrixPoints>();
-    
-    allConstructorGpPoints.forEach(entry => {
-      const existingWinner = winningConstructorsByRace.get(entry.grand_prix_id);
-      
-      if (!existingWinner || entry.constructor_points > existingWinner.constructor_points) {
-        winningConstructorsByRace.set(entry.grand_prix_id, entry);
-      }
-    });
-    
-    // Convert map to array and sort by date
-    return Array.from(winningConstructorsByRace.values())
-      .sort((a, b) => new Date(a.grand_prix_date).getTime() - new Date(b.grand_prix_date).getTime());
+    return this.winningConstructorGrandPrixPoints();
   }
 /****************************************************************/
 //season-specific data methods
@@ -225,19 +233,6 @@ export class DbDataService {
     );
     return constructorGpPoints;
   }
-
-  async setFantaVoto(voto: FantaVote): Promise<void> {
-    await firstValueFrom(
-      this.apiService.post('/fanta/set-vote', voto)
-    );
-    
-    // Refresh the fanta votes and notify subscribers
-    const updatedFantaVote = await firstValueFrom(
-      this.apiService.post<FantaVote[]>('/fanta/votes', {})
-    );
-    this.fantaVoteSubject.next(updatedFantaVote);
-  }
-
 
   async setGpResult(trackId: number, gpResult: GpResult): Promise<string> {
     try {

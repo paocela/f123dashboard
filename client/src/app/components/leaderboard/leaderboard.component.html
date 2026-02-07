@@ -29,7 +29,7 @@
             </tr>
         </thead>
         <tbody>
-            @for (leaderBoard of leaderBoards.slice(0, maxDisplayable); track leaderBoard.id; let i = $index) {
+            @for (leaderBoard of leaderBoards().slice(0, maxDisplayable); track leaderBoard.id; let i = $index) {
                 <tr (click)="openVoteHistoryModal(leaderBoard.id)" style="cursor: pointer;">
                     <td>
                         <div class="text-center fw-semibold">
@@ -49,7 +49,7 @@
                     @if (showVotes) {
                       <td>
                         <div class="text-center">
-                          {{ leaderBoard.numberVotes }} / {{totNumberVotes}}
+                          {{ leaderBoard.numberVotes }} / {{totNumberVotes()}}
                         </div>
                       </td>
                     }
@@ -65,19 +65,19 @@
 </c-row>
 
 <!-- Vote History Modal -->
-<c-modal [visible]="modalVisible" (visibleChange)="modalVisible = $event" size="lg">
+<c-modal [visible]="modalVisible()" (visibleChange)="closeModal()" size="lg">
   <c-modal-header>
     <h5 cModalTitle class="w-100 text-center">
       <svg cIcon name="cilList" class="me-2" width="24" height="24"></svg>
-      Storico Votazioni di <strong>{{ selectedUser?.username }}</strong>
+      Storico Votazioni di <strong>{{ selectedUser()?.username }}</strong>
     </h5>
     <button (click)="closeModal()" cButtonClose></button>
   </c-modal-header>
   <c-modal-body>
-    @if (userVotes.length === 0) {
+    @if (userVotes().length === 0) {
       <p class="text-center text-muted">Nessuna votazione disponibile</p>
     } @else {
-      @for (voteData of userVotes; track voteData.trackId) {
+      @for (voteData of userVotes(); track voteData.trackId) {
         <div class="mb-4">
           <h6 class="text-center mb-3">
             <svg

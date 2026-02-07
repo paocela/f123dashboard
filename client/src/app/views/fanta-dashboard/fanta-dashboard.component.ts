@@ -10,8 +10,7 @@ import { GridModule } from '@coreui/angular';
     LeaderboardComponent,
     FantaRulesComponent
   ],
-  templateUrl: './fanta-dashboard.component.html',
-  styleUrl: './fanta-dashboard.component.scss'
+  templateUrl: './fanta-dashboard.component.html'
 })
 export class FantaDashboardComponent {
 

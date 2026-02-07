@@ -22,7 +22,7 @@
             <th>
               <div>
                 <h5 [ngStyle]="{ color: 'green' }">
-                  Punteggio: {{ this.userFantaPoints }}
+                  Punteggio: {{ userFantaPoints() }}
                 </h5>
               </div>
             </th>
@@ -83,7 +83,7 @@
                           @if (hasUnsavedData(track.track_id)) {
                               <c-badge color="danger">NON<br>Salvato</c-badge>
                           }
-                          @if (formStatus[track.track_id] == 1) {
+                          @if (formStatus()[track.track_id] == 1) {
                               <c-badge color="success">Salvato</c-badge>
                           }
                       </div>
@@ -173,22 +173,33 @@
                     }
                     <c-row class="submit-row">
                       <c-col class="text-center">
-                        <button cButton type="submit" class="confirm-button">Conferma</button>
+                        <button 
+                          cButton 
+                          type="submit" 
+                          class="confirm-button"
+                          [disabled]="isLoading(track.track_id)">
+                          @if (isLoading(track.track_id)) {
+                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            Salvataggio...
+                          } @else {
+                            Conferma
+                          }
+                        </button>
       	              </c-col>
                     </c-row>
                     <c-row class="status-row">
                       <c-col class="text-center">
-                          @if (formStatus[track.track_id] == 2) {
+                          @if (formStatus()[track.track_id] == 2) {
                             <p class="error">
                               <c-badge color="danger">Errore: piloti assenti, invalidi, o inseriti più volte :(</c-badge>
                             </p>
                           }
-                          @if (formStatus[track.track_id] == 3) {
+                          @if (formStatus()[track.track_id] == 3) {
                             <p class="error">
                               <c-badge color="danger">Errore nel salvataggio: contattare l'assistenza :(</c-badge>
                             </p>
                           }
-                          @if (formStatus[track.track_id] == 1) {
+                          @if (formStatus()[track.track_id] == 1) {
                             <p class="success">
                               <c-badge color="success">Preferenze salvate correttamente :)</c-badge>
                             </p>
@@ -226,7 +237,7 @@
               <strong>{{ track.name }}</strong>
               <ng-template cTemplateId="accordionHeaderTemplate">
                 <button
-                  (click)="votazioni.has(track.track_id) ? item0.toggleItem() : null"
+                  (click)="votazioni().has(track.track_id) ? item0.toggleItem() : null"
                   [collapsed]="!item0.visible"
                   cAccordionButton
                 >
@@ -247,7 +258,7 @@
                           ></svg>
                         </h5>
                       </c-col>
-                      @if(!votazioni.has(track.track_id)){
+                      @if(!votazioni().has(track.track_id)){
                         <c-col xs="auto">
                           <div class="small">
                             <c-badge color="danger">Votazione<br>non effettuata</c-badge>
@@ -263,7 +274,7 @@
                   </c-container>
                 </button>
               </ng-template>
-              @if (votazioni.has(track.track_id)) {
+              @if (votazioni().has(track.track_id)) {
                 <ng-template cTemplateId="accordionBodyTemplate">
                   <div class="accordion-body">
                     <c-container>

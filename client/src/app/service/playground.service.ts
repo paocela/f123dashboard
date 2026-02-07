@@ -19,7 +19,7 @@ export class PlaygroundService {
 //compilazione delle variabili pre caricamento del interfaccia web 
 /****************************************************************/
 
-  async AllData() {
+  async allData() {
     const [
       playgroundLeaderboard
     ] = await Promise.all([

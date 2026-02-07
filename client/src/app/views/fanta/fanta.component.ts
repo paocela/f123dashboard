@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';    
 import { FormsModule, NgForm } from '@angular/forms';
 import { AccordionComponent, 
@@ -35,6 +35,7 @@ import type { FantaVote, User, DriverData, TrackData } from '@f123dashboard/shar
 
 @Component({
     selector: 'app-fanta',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CommonModule,
         FormsModule,
@@ -64,12 +65,16 @@ export class FantaComponent implements OnInit {
   private dbData = inject(DbDataService);
   fantaService = inject(FantaService);
 
-  // Form submission status per track (uses FORM_STATUS constants)
-  formStatus: Record<number, number> = {};
+  // Signals for reactive state
+  private formStatusSignal = signal<Record<number, number>>({});
+  readonly formStatus = this.formStatusSignal.asReadonly();
+  
+  private loadingSignal = signal<Record<number, boolean>>({});
+  readonly loading = this.loadingSignal.asReadonly();
+  
   forms: Record<number, NgForm> = {};
   
   user!: User;
-  userFantaPoints = 0;
   piloti: DriverData[] = [];
   tracks: TrackData[] = [];
   constructors = new Map<number, string>();
@@ -77,9 +82,17 @@ export class FantaComponent implements OnInit {
   previusTracks: TrackData[] = [];
   
   // Maps track ID to vote array [place1-8, fastLap, dnf, constructor]
-  votazioni = new Map<number, number[]>();
+  private votazioniSignal = signal<Map<number, number[]>>(new Map());
+  readonly votazioni = this.votazioniSignal.asReadonly();
+  
   // Store original loaded data for change detection
-  originalVotazioni = new Map<number, number[]>();
+  private originalVotazioniSignal = signal<Map<number, number[]>>(new Map());
+  readonly originalVotazioni = this.originalVotazioniSignal.asReadonly();
+  
+  // Computed user fanta points
+  readonly userFantaPoints = computed(() => 
+    this.user?.id ? this.fantaService.getFantaPoints(this.user.id) : 0
+  );
   
   public modalRankingVisible = false;
   public modalRulesVisible = false;
@@ -92,51 +105,77 @@ export class FantaComponent implements OnInit {
   public allFlags = allFlags;
 
   ngOnInit(): void {
-    
+    this.loadUserFromSession();
+    this.loadDriversTracksAndConstructors();
+    this.filterTracks();
+    this.loadPreviousVotes();
+  }
+
+  /**
+   * Loads user data from session storage.
+   */
+  private loadUserFromSession(): void {
     const userString = sessionStorage.getItem('user');
     this.user = userString ? JSON.parse(userString) as User : {} as User;
+  }
 
-    this.piloti  = this.dbData.getAllDrivers();
+  /**
+   * Loads drivers, tracks, and constructors from database service.
+   */
+  private loadDriversTracksAndConstructors(): void {
+    this.piloti = this.dbData.getAllDrivers();
     this.tracks = this.dbData.getAllTracks();
-    this.userFantaPoints = this.fantaService.getFantaPoints(this.user.id);
     this.dbData.getConstructors().forEach(constructor => {
       this.constructors.set(constructor.constructor_id, constructor.constructor_name);
     });
+  }
+
+  /**
+   * Filters tracks into upcoming and previous races.
+   */
+  private filterTracks(): void {
+    const today = new Date();
+    
     this.nextTracks = this.tracks
-    .filter(item => {
-      const today = new Date();  
-      const itemDate = new Date(item.date);
-      return itemDate > today;
-    })
-      .slice(0,4);
+      .filter(item => new Date(item.date) > today)
+      .slice(0, 4);
 
     this.previusTracks = this.tracks
-        .filter(item => {
-      const today = new Date();
-      const itemDate = new Date(item.date);
-      return itemDate <= today;
-    })
+      .filter(item => new Date(item.date) <= today);
+  }
 
-    /**
-     * Applies previously saved vote data to a track.
-     */
-    const applyPreviousVote = (track: TrackData) => {
-      if (!this.user?.id) {return;}
-      
-      const previousVote = this.fantaService.getFantaVote(this.user.id, track.track_id);
-      if (!previousVote) {return;}
-      
-      // Convert Fanta object to array using helper
-      const previousVoteArray = Array.from(FantaVoteHelper.toArray(previousVote));
-      
-      this.votazioni.set(track.track_id, previousVoteArray);
-      // Store a copy of the original data for comparison
-      this.originalVotazioni.set(track.track_id, [...previousVoteArray]);
-    };
+  /**
+   * Loads previously saved votes for all tracks.
+   */
+  private loadPreviousVotes(): void {
+    this.previusTracks.forEach(track => this.applyPreviousVote(track));
+    this.nextTracks.forEach(track => this.applyPreviousVote(track));
+  }
 
-    this.previusTracks.forEach(applyPreviousVote);
-    this.nextTracks.forEach(applyPreviousVote);
-
+  /**
+   * Applies previously saved vote data to a track.
+   */
+  private applyPreviousVote(track: TrackData): void {
+    if (!this.user?.id) {return;}
+    
+    const previousVote = this.fantaService.getFantaVote(this.user.id, track.track_id);
+    if (!previousVote) {return;}
+    
+    // Convert Fanta object to array using helper
+    const previousVoteArray = Array.from(FantaVoteHelper.toArray(previousVote));
+    
+    // Update signals immutably
+    this.votazioniSignal.update(map => {
+      const newMap = new Map(map);
+      newMap.set(track.track_id, previousVoteArray);
+      return newMap;
+    });
+    
+    this.originalVotazioniSignal.update(map => {
+      const newMap = new Map(map);
+      newMap.set(track.track_id, [...previousVoteArray]);
+      return newMap;
+    });
   }
 
   /**
@@ -148,11 +187,14 @@ export class FantaComponent implements OnInit {
     this.forms[trackId] = form;
     
     if (!this.formIsValid(trackId) || !this.user?.id) {
-      this.formStatus[trackId] = FORM_STATUS.VALIDATION_ERROR;
+      this.formStatusSignal.update(status => ({ ...status, [trackId]: FORM_STATUS.VALIDATION_ERROR }));
       return;
     }
 
-    const votes = this.votazioni.get(trackId) || [];
+    // Set loading state
+    this.loadingSignal.update(loading => ({ ...loading, [trackId]: true }));
+
+    const votes = this.votazioni().get(trackId) || [];
     const fantaVoto: FantaVote = {
       fanta_player_id: this.user.id,
       username: this.user.username,
@@ -171,16 +213,24 @@ export class FantaComponent implements OnInit {
     };
     
     try {
-      await this.dbData.setFantaVoto(fantaVoto);
-      this.formStatus[trackId] = FORM_STATUS.SUCCESS;
-      // Update the original votazioni to reflect the saved state
-      const currentVotes = this.votazioni.get(trackId);
-      if (currentVotes) 
-        {this.originalVotazioni.set(trackId, [...currentVotes]);}
+      await this.fantaService.setFantaVote(fantaVoto);
+      this.formStatusSignal.update(status => ({ ...status, [trackId]: FORM_STATUS.SUCCESS }));
       
+      // Update the original votazioni to reflect the saved state
+      const currentVotes = this.votazioni().get(trackId);
+      if (currentVotes) {
+        this.originalVotazioniSignal.update(map => {
+          const newMap = new Map(map);
+          newMap.set(trackId, [...currentVotes]);
+          return newMap;
+        });
+      }
     } catch (error) {
       console.error('Error saving fantasy vote:', error);
-      this.formStatus[trackId] = FORM_STATUS.SAVE_ERROR;
+      this.formStatusSignal.update(status => ({ ...status, [trackId]: FORM_STATUS.SAVE_ERROR }));
+    } finally {
+      // Clear loading state
+      this.loadingSignal.update(loading => ({ ...loading, [trackId]: false }));
     }
   }
 
@@ -190,7 +240,7 @@ export class FantaComponent implements OnInit {
    * @returns true if form is valid, false otherwise
    */
   formIsValid(trackId: number): boolean {
-    const votoArray = this.votazioni.get(trackId) || [];
+    const votoArray = this.votazioni().get(trackId) || [];
     
     // Check if all required fields are present
     if (votoArray.length < TOTAL_VOTE_FIELDS) 
@@ -198,7 +248,7 @@ export class FantaComponent implements OnInit {
     
     
     // Check for empty votes in all required positions
-    const hasEmptyVotes = votoArray.some((v, i) => i <= VOTE_INDEX.CONSTRUCTOR && v == 0);
+    const hasEmptyVotes = votoArray.some((v, i) => i <= VOTE_INDEX.CONSTRUCTOR && v === 0);
     if (hasEmptyVotes) {return false;}
     
     // Check for duplicates only in driver positions (indices 0-7)
@@ -215,7 +265,7 @@ export class FantaComponent implements OnInit {
    * @returns The vote value or 0 if not found
    */
   getVoto(trackId: number, index: number): number {
-    const votoArray = this.votazioni.get(trackId) || [];
+    const votoArray = this.votazioni().get(trackId) || [];
     return votoArray[index - 1] || 0;
   }
 
@@ -226,7 +276,7 @@ export class FantaComponent implements OnInit {
    * @returns The position (1-8) or 0 if not found
    */
   getVotoPos(trackId: number, pilota: number): number {
-    const votoArray = this.votazioni.get(trackId) || [];
+    const votoArray = this.votazioni().get(trackId) || [];
     const posizione = votoArray.indexOf(pilota);
     return posizione >= 0 ? posizione + 1 : 0;
   }
@@ -237,7 +287,7 @@ export class FantaComponent implements OnInit {
    * @returns Array of votes or undefined
    */
   getVoti(trackId: number): number[] | undefined { 
-    return this.votazioni.get(trackId);
+    return this.votazioni().get(trackId);
   }
   
   /**
@@ -252,18 +302,30 @@ export class FantaComponent implements OnInit {
     
     if (!valore) {return;}
     
-    let votoArray = this.votazioni.get(trackId);
-    if (!votoArray) {
-      votoArray = [];
-      this.votazioni.set(trackId, votoArray);
+    // Update votazioni signal immutably
+    this.votazioniSignal.update(votazioniMap => {
+      const newMap = new Map(votazioniMap);
+      let votoArray = newMap.get(trackId);
+      
+      if (!votoArray) {
+        votoArray = [];
+      } else {
+        votoArray = [...votoArray]; // Create a copy
+      }
+      
+      votoArray[index - 1] = +valore;
+      newMap.set(trackId, votoArray);
+      return newMap;
+    });
+    
+    // Reset form status when data is changed
+    if (this.formStatus()[trackId] === FORM_STATUS.SUCCESS) {
+      this.formStatusSignal.update(status => {
+        const newStatus = { ...status };
+        delete newStatus[trackId];
+        return newStatus;
+      });
     }
-    
-    votoArray[index - 1] = +valore;
-    
-    // Reset form status when data is changed, so user knows they need to save
-    if (this.formStatus[trackId] === FORM_STATUS.SUCCESS) 
-      {delete this.formStatus[trackId];}
-    
   }
 
   toggleModalRanking() {
@@ -278,19 +340,19 @@ export class FantaComponent implements OnInit {
    * Checks if there are unsaved changes for a track.
    */
   hasUnsavedData(trackId: number): boolean {
-    const currentVotes = this.votazioni.get(trackId) || [];
-    const originalVotes = this.originalVotazioni.get(trackId) || [];
+    const currentVotes = this.votazioni().get(trackId) || [];
+    const originalVotes = this.originalVotazioni().get(trackId) || [];
     
     // If form was just saved successfully, no unsaved data
-    if (this.formStatus[trackId] === FORM_STATUS.SUCCESS) 
-      {return false;}
-    
+    if (this.formStatus()[trackId] === FORM_STATUS.SUCCESS) {
+      return false;
+    }
     
     // Check if there are any votes entered
     const hasVotes = currentVotes.some(vote => vote && vote > 0);
     
     // If no votes at all, no unsaved data
-    if (!hasVotes)  {return false;}
+    if (!hasVotes) {return false;}
     
     // If there are no original votes but current votes exist, it's unsaved
     if (originalVotes.length === 0) {return true;}
@@ -306,12 +368,12 @@ export class FantaComponent implements OnInit {
    * Checks if no vote data exists for a track.
    */
   hasNoData(trackId: number): boolean {
-    const currentVotes = this.votazioni.get(trackId) || [];
+    const currentVotes = this.votazioni().get(trackId) || [];
     
     // If form is already saved, don't show "Votazione Mancante"
-    if (this.formStatus[trackId] === FORM_STATUS.SUCCESS) 
-      {return false;}
-    
+    if (this.formStatus()[trackId] === FORM_STATUS.SUCCESS) {
+      return false;
+    }
     
     // Show "Votazione Mancante" if no votes are entered at all
     const hasAnyVotes = currentVotes.some(vote => vote && vote > 0);
@@ -323,10 +385,17 @@ export class FantaComponent implements OnInit {
   }
 
   /**
+   * Checks if a form is currently being submitted.
+   */
+  isLoading(trackId: number): boolean {
+    return this.loading()[trackId] || false;
+  }
+
+  /**
    * Convert vote array to FantaVote object for the reusable component
    */
   getFantaVoteObject(trackId: number): FantaVote {
-    const voteArray = this.votazioni.get(trackId) || [];
+    const voteArray = this.votazioni().get(trackId) || [];
     return {
       fanta_player_id: this.user.id,
       username: this.user.username,
