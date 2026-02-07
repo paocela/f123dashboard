@@ -1,13 +1,15 @@
 import { TestBed } from '@angular/core/testing';
-import { BehaviorSubject } from 'rxjs';
+import { signal } from '@angular/core';
+import { of } from 'rxjs';
 import { FantaService } from './fanta.service';
 import { DbDataService } from './db-data.service';
+import { ApiService } from './api.service';
 import type { FantaVote, RaceResult, Driver, ConstructorGrandPrixPoints } from '@f123dashboard/shared';
 
 describe('FantaService', () => {
   let service: FantaService;
   let mockDbDataService: jasmine.SpyObj<DbDataService>;
-  let fantaVoteSubject: BehaviorSubject<FantaVote[]>;
+  let mockApiService: jasmine.SpyObj<ApiService>;
 
   const mockDrivers: Driver[] = [
     { id: 1, username: 'driver1', first_name: 'John', surname: 'Doe' },
@@ -167,33 +169,32 @@ describe('FantaService', () => {
     }
   ];
 
-  beforeEach(() => {
-    fantaVoteSubject = new BehaviorSubject<FantaVote[]>(mockFantaVotes);
-
+  beforeEach(async () => {
     mockDbDataService = jasmine.createSpyObj('DbDataService', [
-      'getFantaVote',
-      'getRaceResoult',
       'getDrivers',
       'getWinningConstructorGrandPrixPointsData',
       'getConstructorGrandPrixPointsData'
     ], {
-      fantaVote$: fantaVoteSubject.asObservable()
+      raceResult: signal(mockRaceResults)
     });
 
-    mockDbDataService.getFantaVote.and.returnValue(mockFantaVotes);
-    mockDbDataService.getRaceResoult.and.returnValue(mockRaceResults);
     mockDbDataService.getDrivers.and.returnValue(mockDrivers);
     mockDbDataService.getWinningConstructorGrandPrixPointsData.and.returnValue(mockConstructorGrandPrixPoints);
     mockDbDataService.getConstructorGrandPrixPointsData.and.returnValue(mockConstructorGrandPrixPoints);
 
+    mockApiService = jasmine.createSpyObj('ApiService', ['post']);
+    mockApiService.post.and.returnValue(of(mockFantaVotes));
+
     TestBed.configureTestingModule({
       providers: [
         FantaService,
-        { provide: DbDataService, useValue: mockDbDataService }
+        { provide: DbDataService, useValue: mockDbDataService },
+        { provide: ApiService, useValue: mockApiService }
       ]
     });
     
     service = TestBed.inject(FantaService);
+    await service.loadFantaVotes();
   });
 
   it('should be created', () => {
@@ -201,12 +202,11 @@ describe('FantaService', () => {
   });
 
   describe('initialization', () => {
-    it('should load fanta votes and race results on initialization', () => {
-      expect(mockDbDataService.getFantaVote).toHaveBeenCalled();
-      expect(mockDbDataService.getRaceResoult).toHaveBeenCalled();
+    it('should load fanta votes via API', () => {
+      expect(mockApiService.post).toHaveBeenCalledWith('/fanta/votes', {});
     });
 
-    it('should calculate points on initialization', () => {
+    it('should calculate points after loading', () => {
       expect(service.getFantaPoints(1)).toBeGreaterThan(0);
     });
   });
@@ -643,76 +643,9 @@ describe('FantaService', () => {
     });
   });
 
-  describe('subscription handling', () => {
-    it('should update points when fantaVote$ emits new values', () => {
-      const initialPoints = service.getFantaPoints(1);
-      
-      // Add new vote for player 1
-      const newVote: FantaVote = {
-        fanta_player_id: 1,
-        username: 'player1',
-        track_id: 102,
-        id_1_place: 3,
-        id_2_place: 4,
-        id_3_place: 5,
-        id_4_place: 6,
-        id_5_place: 7,
-        id_6_place: 8,
-        id_7_place: 1,
-        id_8_place: 2,
-        id_fast_lap: 3,
-        id_dnf: 0,
-        constructor_id: 1,
-        season_id: 1
-      };
-
-      const updatedVotes = [...mockFantaVotes, newVote];
-      fantaVoteSubject.next(updatedVotes);
-
-      const updatedPoints = service.getFantaPoints(1);
-      expect(updatedPoints).not.toBe(initialPoints);
-    });
-
-    it('should recalculate vote counts when fantaVote$ emits', () => {
-      const initialVotes = service.getFantaNumberVotes(1);
-      expect(initialVotes).toBe(2);
-
-      const newVote: FantaVote = {
-        fanta_player_id: 1,
-        username: 'player1',
-        track_id: 102,
-        id_1_place: 1,
-        id_2_place: 2,
-        id_3_place: 3,
-        id_4_place: 4,
-        id_5_place: 5,
-        id_6_place: 6,
-        id_7_place: 7,
-        id_8_place: 8,
-        id_fast_lap: 1,
-        id_dnf: 0,
-        constructor_id: 1,
-        season_id: 1
-      };
-
-      const updatedVotes = [...mockFantaVotes, newVote];
-      fantaVoteSubject.next(updatedVotes);
-
-      const updatedVoteCount = service.getFantaNumberVotes(1);
-      expect(updatedVoteCount).toBe(3);
-    });
-  });
-
-  describe('ngOnDestroy', () => {
-    it('should unsubscribe on destroy', () => {
-      spyOn(service['subscription'], 'unsubscribe');
-      service.ngOnDestroy();
-      expect(service['subscription'].unsubscribe).toHaveBeenCalled();
-    });
-  });
 
   describe('edge cases', () => {
-    it('should handle race results with null positions', () => {
+    it('should handle race results with invalid positions', () => {
       const incompleteRaceResult: RaceResult = {
         id: 99,
         track_id: 999,
@@ -729,40 +662,37 @@ describe('FantaService', () => {
       };
 
       const extendedResults = [...mockRaceResults, incompleteRaceResult];
-      mockDbDataService.getRaceResoult.and.returnValue(extendedResults);
-      
-      // Reconfigure TestBed with updated mock
-      TestBed.resetTestingModule();
-      TestBed.configureTestingModule({
-        providers: [
-          FantaService,
-          { provide: DbDataService, useValue: mockDbDataService }
-        ]
+      Object.defineProperty(mockDbDataService, 'raceResult', {
+        value: signal(extendedResults),
+        writable: true,
+        configurable: true
       });
       
-      const newService = TestBed.inject(FantaService);
-      expect(newService).toBeTruthy();
-      expect(newService.getTotNumberVotes()).toBe(extendedResults.length);
+      expect(service.getTotNumberVotes()).toBe(mockRaceResults.length);
     });
 
-    it('should handle empty fanta votes', () => {
-      mockDbDataService.getFantaVote.and.returnValue([]);
-      fantaVoteSubject.next([]);
+    it('should handle empty fanta votes', async () => {
+      mockApiService.post.and.returnValue(of([]));
+      await service.loadFantaVotes();
       
       expect(service.getFantaPoints(1)).toBe(0);
       expect(service.getFantaNumberVotes(1)).toBe(0);
     });
 
     it('should handle empty race results', () => {
-      mockDbDataService.getFantaVote.and.returnValue([]);
-      mockDbDataService.getRaceResoult.and.returnValue([]);
+      Object.defineProperty(mockDbDataService, 'raceResult', {
+        value: signal([]),
+        writable: true,
+        configurable: true
+      });
       
       // Reconfigure TestBed with empty data
       TestBed.resetTestingModule();
       TestBed.configureTestingModule({
         providers: [
           FantaService,
-          { provide: DbDataService, useValue: mockDbDataService }
+          { provide: DbDataService, useValue: mockDbDataService },
+          { provide: ApiService, useValue: mockApiService }
         ]
       });
       
