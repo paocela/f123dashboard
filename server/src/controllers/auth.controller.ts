@@ -116,7 +116,7 @@ export class AuthController {
   async adminChangePassword(req: Request, res: Response): Promise<void> {
     try {
       const result = await authService.adminChangePassword(req.body);
-      res.json({ success: result });
+      res.json(result);
     } catch (error) {
       logger.error('Error in admin change password:', error);
       res.status(500).json({

@@ -6,6 +6,7 @@ import type {
   ChangePasswordRequest,
   ChangePasswordResponse,
   LoginRequest,
+  LogoutResponse,
   RefreshTokenResponse,
   RegisterRequest,
   SessionsResponse,
@@ -155,7 +156,7 @@ export class AuthService {
     }
   }
 
-  async changePassword(currentPassword: string, newPassword: string): Promise<{ success: boolean; message: string }> {
+  async changePassword(currentPassword: string, newPassword: string): Promise<ChangePasswordResponse> {
     try {
       const token = this.getToken();
       if (!token) 
@@ -375,7 +376,7 @@ export class AuthService {
     }
   }
 
-  async logoutAllSessions(): Promise<{ success: boolean; message: string }> {
+  async logoutAllSessions(): Promise<LogoutResponse> {
     try {
       const token = this.getToken();
       if (!token) 
@@ -383,7 +384,7 @@ export class AuthService {
       
 
       const response = await firstValueFrom(
-        this.apiService.post<{ success: boolean; message: string }>('/auth/logout-all-sessions', {})
+        this.apiService.post<LogoutResponse>('/auth/logout-all-sessions', {})
       );
       
       if (response.success) {
