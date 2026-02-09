@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
-import { of, throwError } from 'rxjs';
+import { of, throwError, delay } from 'rxjs';
 
 import { GpEditComponent } from './gp-edit.component';
 import { GpEditService } from '../../../service/gp-edit.service';
@@ -78,9 +78,15 @@ describe('GpEditComponent', () => {
   });
 
   it('should set loading state when loading data', () => {
+    // Setup async observable to simulate real API call
+    mockGpEditService.getUpcomingGps.and.returnValue(
+      of({ success: true, data: mockGpData }).pipe(delay(10))
+    );
+    
     component.loading.set(false);
     component.loadData();
     
+    // Check loading state immediately after calling loadData
     expect(component.loading()).toBe(true);
   });
 
