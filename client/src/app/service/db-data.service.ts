@@ -1,5 +1,5 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, forkJoin } from 'rxjs';
 import type { DriverData, Driver, ChampionshipData, Season, CumulativePointsData, TrackData, User, RaceResult, ConstructorGrandPrixPoints, Constructor } from '@f123dashboard/shared';
 import { GpResult } from '../model/championship';
 import { ApiService } from './api.service';
@@ -10,7 +10,6 @@ import { AuthService } from './auth.service';
 })
 export class DbDataService {
   private apiService = inject(ApiService);
-  private authService = inject(AuthService);
 
 /****************************************************************/
 //variabili locali
@@ -91,7 +90,7 @@ export class DbDataService {
 /****************************************************************/
 
   async allData() {
-    const [
+    const {
       allDrivers,
       championship,
       cumulativePoints,
@@ -101,18 +100,17 @@ export class DbDataService {
       constructors,
       drivers,
       constructorGrandPrixPoints
-
-    ] = await Promise.all([
-      firstValueFrom(this.apiService.post<DriverData[]>('/database/drivers', {})),
-      firstValueFrom(this.apiService.post<ChampionshipData[]>('/database/championship', {})),
-      firstValueFrom(this.apiService.post<CumulativePointsData[]>('/database/cumulative-points', {})),
-      firstValueFrom(this.apiService.post<TrackData[]>('/database/tracks', {})),
-      firstValueFrom(this.apiService.post<User[]>('/auth/users', {})),
-      firstValueFrom(this.apiService.post<RaceResult[]>('/database/race-results', {})),
-      firstValueFrom(this.apiService.post<Constructor[]>('/database/constructors', {})),
-      firstValueFrom(this.apiService.post<Driver[]>('/database/drivers-data', {})),
-      firstValueFrom(this.apiService.post<ConstructorGrandPrixPoints[]>('/database/constructor-grand-prix-points', {}))
-    ]);
+    } = await firstValueFrom(forkJoin({
+      allDrivers: this.apiService.post<DriverData[]>('/database/drivers', {}),
+      championship: this.apiService.post<ChampionshipData[]>('/database/championship', {}),
+      cumulativePoints: this.apiService.post<CumulativePointsData[]>('/database/cumulative-points', {}),
+      tracks: this.apiService.post<TrackData[]>('/database/tracks', {}),
+      users: this.apiService.post<User[]>('/auth/users', {}),
+      raceResult: this.apiService.post<RaceResult[]>('/database/race-results', {}),
+      constructors: this.apiService.post<Constructor[]>('/database/constructors', {}),
+      drivers: this.apiService.post<Driver[]>('/database/drivers-data', {}),
+      constructorGrandPrixPoints: this.apiService.post<ConstructorGrandPrixPoints[]>('/database/constructor-grand-prix-points', {})
+    }));
 
     this.allDriversSignal.set(allDrivers);
     this.championshipSignal.set(championship);
