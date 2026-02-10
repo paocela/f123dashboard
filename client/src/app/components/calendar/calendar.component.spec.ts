@@ -34,8 +34,8 @@ describe('CalendarComponent', () => {
   });
 
   it('should take input for default view', () => {
-    component.defaultView = 'month';
-    component.ngOnInit();
+    fixture.componentRef.setInput('defaultView', 'month');
+    fixture.detectChanges();
     expect(component.view()).toBe('month');
   });
 
@@ -80,9 +80,9 @@ describe('CalendarComponent', () => {
     const newComponent = newFixture.componentInstance;
     
     // Set events before change detection runs
-    newComponent.events = [
+    newFixture.componentRef.setInput('events', [
       { name: 'Test Event', date: testDate, description: 'Desc' }
-    ];
+    ]);
     
     // Now run change detection
     newFixture.detectChanges();

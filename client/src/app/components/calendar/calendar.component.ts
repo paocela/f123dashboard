@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges, computed, signal, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, input, computed, signal, ChangeDetectionStrategy, effect } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { ButtonModule, ButtonGroupModule, ModalModule } from '@coreui/angular';
 import { IconModule } from '@coreui/icons-angular';
@@ -26,32 +26,32 @@ export interface ProcessedCalendarEvent extends CalendarEvent {
  * A calendar component that displays events in week or month view.
  * Supports navigation, event selection, and modal display.
  */
-export class CalendarComponent implements OnInit, OnChanges {
+export class CalendarComponent {
   /**
    * The title displayed at the top of the calendar.
    * @default 'Calendar'
    */
-  @Input() title = 'Calendar'; 
+  title = input<string>('Calendar'); 
  
   /**
    * The default view mode for the calendar.
    * Can be either 'week', 'month', or 'list'.
    * @default 'week'
    */
-  @Input() defaultView: 'week' | 'month' | 'list' = 'week'; 
+  defaultView = input<'week' | 'month' | 'list'>('week'); 
  
   /**
    * An array of calendar events to be displayed.
    * Each event should conform to the CalendarEvent interface.
    * @default []
    */
-  @Input() events: CalendarEvent[] = [];
+  events = input<CalendarEvent[]>([]);
 
   /**
    * If true, forces the mobile list view on all screen sizes for the week view.
    * @default false
    */
-  @Input() compactView = false;
+  compactView = input<boolean>(false);
 
 
 
@@ -66,33 +66,25 @@ export class CalendarComponent implements OnInit, OnChanges {
   // Locale for formatting (Italian as requested in examples)
   private readonly locale = 'it-IT';
 
-  ngOnInit(): void {
-    if (this.defaultView) {
-      this.view.set(this.defaultView);
-      if (this.defaultView === 'list') {
-        // Defer to allow computed signals to stabilize if needed, 
-        // essentially ensuring we calculate based on initial events
+  constructor() {
+    // Sync view with defaultView input using effect
+    effect(() => {
+      const newDefaultView = this.defaultView();
+      this.view.set(newDefaultView);
+      
+      // If switching to list view, calculate the appropriate page
+      if (newDefaultView === 'list') {
         this.calculateListPageForDate(this.currentDate());
       }
-    }
-  }
+    });
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['defaultView'] && !changes['defaultView'].firstChange) {
-      this.view.set(this.defaultView);
-      if (this.defaultView === 'list') {
+    // Watch events changes - if events are loaded and in list view, sync to today
+    effect(() => {
+      const currentEvents = this.events();
+      if (this.view() === 'list' && currentEvents.length > 0) {
         this.calculateListPageForDate(this.currentDate());
       }
-    }
-
-    if (changes['events'] && this.view() === 'list') {
-       // If we loaded events for the first time or from empty, try to sync to today
-       const prev = changes['events'].previousValue;
-       const curr = changes['events'].currentValue;
-       if ((!prev || prev.length === 0) && curr && curr.length > 0) {
-          this.calculateListPageForDate(this.currentDate());
-       }
-    }
+    });
   }
 
 
@@ -214,7 +206,7 @@ export class CalendarComponent implements OnInit, OnChanges {
 
   readonly processedEvents = computed(() => {
     // Map events to easy lookup structure
-    return this.events.map(e => ({
+    return this.events().map(e => ({
       ...e,
       parsedDate: this.parseAsLocalTime(e.date)
     }));
