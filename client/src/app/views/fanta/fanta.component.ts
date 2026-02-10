@@ -147,10 +147,10 @@ export class FantaComponent implements OnInit {
    * Loads drivers, tracks, and constructors from database service.
    */
   private loadDriversTracksAndConstructors(): void {
-    this.pilotiSignal.set(this.dbData.getAllDrivers());
-    this.tracksSignal.set(this.dbData.getAllTracks());
+    this.pilotiSignal.set(this.dbData.allDrivers());
+    this.tracksSignal.set(this.dbData.tracks());
     const constructorsMap = new Map<number, string>();
-    this.dbData.getConstructors().forEach(constructor => {
+    this.dbData.constructors().forEach(constructor => {
       constructorsMap.set(constructor.constructor_id, constructor.constructor_name);
     });
     this.constructorsSignal.set(constructorsMap);

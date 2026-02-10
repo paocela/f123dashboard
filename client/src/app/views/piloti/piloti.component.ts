@@ -39,8 +39,8 @@ export class PilotiComponent implements OnInit {
       this.isLoading.set(true);
       
       // Fetch data from service
-      const drivers = this.dbData.getAllDrivers();
-      const constructorsData = this.dbData.getConstructors();
+      const drivers = this.dbData.allDrivers();
+      const constructorsData = this.dbData.constructors();
 
       // Calculate points for constructors based on drivers data
       const constructorsWithPoints = this.constructorService.calculateConstructorPoints(constructorsData, drivers);

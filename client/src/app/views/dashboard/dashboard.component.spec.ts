@@ -183,6 +183,9 @@ describe('DashboardComponent', () => {
   ];
 
   beforeEach(async () => {
+    // Create a writable signal for testing that can be updated
+    const mockIsLiveSignal = signal(false);
+    
     mockDbDataService = jasmine.createSpyObj('DbDataService', [
       'getAllDrivers',
       'getAllTracks',
@@ -190,9 +193,13 @@ describe('DashboardComponent', () => {
       'getCumulativePoints'
     ]);
     mockTwitchApiService = jasmine.createSpyObj('TwitchApiService', [
-      'isLive',
-      'getChannel'
+      'getChannel',
+      'checkStreamStatus'
     ]);
+    // Assign the writable signal to the mock (casting as any to allow assignment in tests)
+    (mockTwitchApiService as any).isLive = mockIsLiveSignal.asReadonly();
+    (mockTwitchApiService as any)._isLiveSignal = mockIsLiveSignal;
+    
     mockDomSanitizer = jasmine.createSpyObj('DomSanitizer', [
       'bypassSecurityTrustResourceUrl'
     ]);
@@ -210,7 +217,6 @@ describe('DashboardComponent', () => {
     mockDbDataService.getAllTracks.and.returnValue(mockTrackData);
     mockDbDataService.getConstructors.and.returnValue(mockConstructorData);
     mockDbDataService.getCumulativePoints.and.returnValue(mockCumulativePointsData);
-    mockTwitchApiService.isLive.and.returnValue(false);
     mockTwitchApiService.getChannel.and.returnValue('testchannel');
     mockDomSanitizer.bypassSecurityTrustResourceUrl.and.returnValue('safe-url' as any);
     mockConstructorService.calculateConstructorPoints.and.returnValue(mockConstructorData);
@@ -247,7 +253,7 @@ describe('DashboardComponent', () => {
     });
 
     it('should initialize Twitch embed when stream is live', () => {
-      mockTwitchApiService.isLive.and.returnValue(true);
+      (mockTwitchApiService as any)._isLiveSignal.set(true);
 
       component.ngOnInit();
 
@@ -256,7 +262,7 @@ describe('DashboardComponent', () => {
     });
 
     it('should not initialize Twitch embed when stream is not live', () => {
-      mockTwitchApiService.isLive.and.returnValue(false);
+      (mockTwitchApiService as any)._isLiveSignal.set(false);
 
       component.ngOnInit();
 

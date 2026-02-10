@@ -168,7 +168,7 @@ export class DashboardComponent implements OnInit {
    * Initializes drivers data with gained points initialized to 0
    */
   private initializeDriversData(): void {
-    this.championship_standings_users.set(this.dbData.getAllDrivers().map(driver => ({
+    this.championship_standings_users.set(this.dbData.allDrivers().map(driver => ({
       ...driver,
       gainedPoints: 0
     })));
@@ -178,7 +178,7 @@ export class DashboardComponent implements OnInit {
    * Gets championship trend data sorted by date
    */
   private getChampionshipTrend(): CumulativePointsData[] {
-    return this.dbData.getCumulativePoints()
+    return this.dbData.cumulativePoints()
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }
 
@@ -186,7 +186,7 @@ export class DashboardComponent implements OnInit {
    * Initializes tracks data and maps them to calendar events
    */
   private initializeTracksAndCalendar(): void {
-    this.championshipTracks.set(this.dbData.getAllTracks());
+    this.championshipTracks.set(this.dbData.tracks());
     this.calendarEvents.set(this.mapTracksToCalendarEvents(this.championshipTracks()));
   }
 
@@ -215,7 +215,7 @@ export class DashboardComponent implements OnInit {
    * Initializes constructors data and calculates their points
    */
   private initializeConstructorsData(): void {
-    const allConstructors = this.dbData.getConstructors();
+    const allConstructors = this.dbData.constructors();
     const updatedConstructors = this.constructorService.calculateConstructorPoints(
       allConstructors, 
       this.championship_standings_users()
