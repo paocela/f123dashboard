@@ -69,17 +69,31 @@ export class FantaComponent implements OnInit {
   private formStatusSignal = signal<Record<number, number>>({});
   readonly formStatus = this.formStatusSignal.asReadonly();
   
+  private validationDetailsSignal = signal<Record<number, { hasEmptyVotes: boolean; hasDuplicates: boolean }>>({});
+  readonly validationDetails = this.validationDetailsSignal.asReadonly();
+  
   private loadingSignal = signal<Record<number, boolean>>({});
   readonly loading = this.loadingSignal.asReadonly();
   
   forms: Record<number, NgForm> = {};
   
-  user!: User;
-  piloti: DriverData[] = [];
-  tracks: TrackData[] = [];
-  constructors = new Map<number, string>();
-  nextTracks: TrackData[] = [];
-  previusTracks: TrackData[] = [];
+  private userSignal = signal<User>(null!);
+  readonly user = this.userSignal.asReadonly();
+  
+  private pilotiSignal = signal<DriverData[]>([]);
+  readonly piloti = this.pilotiSignal.asReadonly();
+  
+  private tracksSignal = signal<TrackData[]>([]);
+  readonly tracks = this.tracksSignal.asReadonly();
+  
+  private constructorsSignal = signal<Map<number, string>>(new Map());
+  readonly constructors = this.constructorsSignal.asReadonly();
+  
+  private nextTracksSignal = signal<TrackData[]>([]);
+  readonly nextTracks = this.nextTracksSignal.asReadonly();
+  
+  private previusTracksSignal = signal<TrackData[]>([]);
+  readonly previusTracks = this.previusTracksSignal.asReadonly();
   
   // Maps track ID to vote array [place1-8, fastLap, dnf, constructor]
   private votazioniSignal = signal<Map<number, number[]>>(new Map());
@@ -91,11 +105,14 @@ export class FantaComponent implements OnInit {
   
   // Computed user fanta points
   readonly userFantaPoints = computed(() => 
-    this.user?.id ? this.fantaService.getFantaPoints(this.user.id) : 0
+    this.fantaService.getFantaPoints(this.user().id)
   );
   
-  public modalRankingVisible = false;
-  public modalRulesVisible = false;
+  private modalRankingVisibleSignal = signal<boolean>(false);
+  readonly modalRankingVisible = this.modalRankingVisibleSignal.asReadonly();
+  
+  private modalRulesVisibleSignal = signal<boolean>(false);
+  readonly modalRulesVisible = this.modalRulesVisibleSignal.asReadonly();
 
   public fireIcon: string[] = cilFire;
   public powerIcon: string[] = cilPowerStandby;
@@ -116,18 +133,27 @@ export class FantaComponent implements OnInit {
    */
   private loadUserFromSession(): void {
     const userString = sessionStorage.getItem('user');
-    this.user = userString ? JSON.parse(userString) as User : {} as User;
+    if (!userString) {
+      throw new Error('User not found in session storage. User must be logged in to access this component.');
+    }
+    const user = JSON.parse(userString) as User;
+    if (!user.id) {
+      throw new Error('Invalid user data: missing user ID. User must be logged in to access this component.');
+    }
+    this.userSignal.set(user);
   }
 
   /**
    * Loads drivers, tracks, and constructors from database service.
    */
   private loadDriversTracksAndConstructors(): void {
-    this.piloti = this.dbData.getAllDrivers();
-    this.tracks = this.dbData.getAllTracks();
+    this.pilotiSignal.set(this.dbData.getAllDrivers());
+    this.tracksSignal.set(this.dbData.getAllTracks());
+    const constructorsMap = new Map<number, string>();
     this.dbData.getConstructors().forEach(constructor => {
-      this.constructors.set(constructor.constructor_id, constructor.constructor_name);
+      constructorsMap.set(constructor.constructor_id, constructor.constructor_name);
     });
+    this.constructorsSignal.set(constructorsMap);
   }
 
   /**
@@ -136,29 +162,31 @@ export class FantaComponent implements OnInit {
   private filterTracks(): void {
     const today = new Date();
     
-    this.nextTracks = this.tracks
-      .filter(item => new Date(item.date) > today)
-      .slice(0, 4);
+    this.nextTracksSignal.set(
+      this.tracks()
+        .filter(item => new Date(item.date) > today)
+        .slice(0, 4)
+    );
 
-    this.previusTracks = this.tracks
-      .filter(item => new Date(item.date) <= today);
+    this.previusTracksSignal.set(
+      this.tracks()
+        .filter(item => new Date(item.date) <= today)
+    );
   }
 
   /**
    * Loads previously saved votes for all tracks.
    */
   private loadPreviousVotes(): void {
-    this.previusTracks.forEach(track => this.applyPreviousVote(track));
-    this.nextTracks.forEach(track => this.applyPreviousVote(track));
+    this.previusTracks().forEach(track => this.applyPreviousVote(track));
+    this.nextTracks().forEach(track => this.applyPreviousVote(track));
   }
 
   /**
    * Applies previously saved vote data to a track.
    */
   private applyPreviousVote(track: TrackData): void {
-    if (!this.user?.id) {return;}
-    
-    const previousVote = this.fantaService.getFantaVote(this.user.id, track.track_id);
+    const previousVote = this.fantaService.getFantaVote(this.user().id, track.track_id);
     if (!previousVote) {return;}
     
     // Convert Fanta object to array using helper
@@ -186,8 +214,13 @@ export class FantaComponent implements OnInit {
   async publishVoto(trackId: number, form: NgForm): Promise<void> {
     this.forms[trackId] = form;
     
-    if (!this.formIsValid(trackId) || !this.user?.id) {
+    const validation = this.validateForm(trackId);
+    if (!validation.isValid) {
       this.formStatusSignal.update(status => ({ ...status, [trackId]: FORM_STATUS.VALIDATION_ERROR }));
+      this.validationDetailsSignal.update(details => ({ 
+        ...details, 
+        [trackId]: { hasEmptyVotes: validation.hasEmptyVotes, hasDuplicates: validation.hasDuplicates } 
+      }));
       return;
     }
 
@@ -196,8 +229,8 @@ export class FantaComponent implements OnInit {
 
     const votes = this.votazioni().get(trackId) || [];
     const fantaVoto: FantaVote = {
-      fanta_player_id: this.user.id,
-      username: this.user.username,
+      fanta_player_id: this.user().id,
+      username: this.user().username,
       track_id: trackId,
       id_1_place: votes[VOTE_INDEX.PLACE_1],
       id_2_place: votes[VOTE_INDEX.PLACE_2],
@@ -237,25 +270,37 @@ export class FantaComponent implements OnInit {
   /**
    * Validates if a vote form is complete and valid.
    * @param trackId The track identifier
-   * @returns true if form is valid, false otherwise
+   * @returns Validation result with specific error details
    */
-  formIsValid(trackId: number): boolean {
+  private validateForm(trackId: number): { isValid: boolean; hasEmptyVotes: boolean; hasDuplicates: boolean } {
     const votoArray = this.votazioni().get(trackId) || [];
     
     // Check if all required fields are present
-    if (votoArray.length < TOTAL_VOTE_FIELDS) 
-      {return false;}
-    
+    if (votoArray.length < TOTAL_VOTE_FIELDS) {
+      return { isValid: false, hasEmptyVotes: true, hasDuplicates: false };
+    }
     
     // Check for empty votes in all required positions
     const hasEmptyVotes = votoArray.some((v, i) => i <= VOTE_INDEX.CONSTRUCTOR && v === 0);
-    if (hasEmptyVotes) {return false;}
     
     // Check for duplicates only in driver positions (indices 0-7)
     const driverVotes = votoArray.slice(0, DRIVER_POSITIONS_COUNT);
     const hasDuplicates = driverVotes.some((v, i) => driverVotes.indexOf(v) !== i);
     
-    return !hasDuplicates;
+    return { 
+      isValid: !hasEmptyVotes && !hasDuplicates, 
+      hasEmptyVotes, 
+      hasDuplicates 
+    };
+  }
+
+  /**
+   * Checks if a vote form is complete and valid.
+   * @param trackId The track identifier
+   * @returns true if form is valid, false otherwise
+   */
+  formIsValid(trackId: number): boolean {
+    return this.validateForm(trackId).isValid;
   }
 
   /**
@@ -318,7 +363,7 @@ export class FantaComponent implements OnInit {
       return newMap;
     });
     
-    // Reset form status when data is changed
+    // Reset form status and validation details when data is changed
     if (this.formStatus()[trackId] === FORM_STATUS.SUCCESS) {
       this.formStatusSignal.update(status => {
         const newStatus = { ...status };
@@ -326,14 +371,23 @@ export class FantaComponent implements OnInit {
         return newStatus;
       });
     }
+    
+    // Clear validation details when user makes changes
+    if (this.validationDetails()[trackId]) {
+      this.validationDetailsSignal.update(details => {
+        const newDetails = { ...details };
+        delete newDetails[trackId];
+        return newDetails;
+      });
+    }
   }
 
   toggleModalRanking() {
-    this.modalRankingVisible = !this.modalRankingVisible;
+    this.modalRankingVisibleSignal.update(value => !value);
   }
 
   toggleModalRules() {
-    this.modalRulesVisible = !this.modalRulesVisible;
+    this.modalRulesVisibleSignal.update(value => !value);
   }
 
   /**
@@ -381,7 +435,7 @@ export class FantaComponent implements OnInit {
   }
   
   get avatarSrc(): string {
-    return this.dbData.getAvatarSrc(this.user);
+    return this.dbData.getAvatarSrc(this.user());
   }
 
   /**
@@ -397,8 +451,8 @@ export class FantaComponent implements OnInit {
   getFantaVoteObject(trackId: number): FantaVote {
     const voteArray = this.votazioni().get(trackId) || [];
     return {
-      fanta_player_id: this.user.id,
-      username: this.user.username,
+      fanta_player_id: this.user().id,
+      username: this.user().username,
       track_id: trackId,
       id_1_place: voteArray[VOTE_INDEX.PLACE_1] || 0,
       id_2_place: voteArray[VOTE_INDEX.PLACE_2] || 0,
