@@ -101,7 +101,7 @@
                 </div>
               } @else {
                 <div class="fw-semibold text-center posizione-value">
-                  @if (fantaService.getWinningConstructorsForTrack(trackId).includes(+voto)) {
+                  @if (fantaService.getWinningConstructorsForTrack(trackId()).includes(+voto)) {
                     SI
                   } @else {
                     NO
@@ -158,7 +158,7 @@
   </table>
 </div>
 
-@if (showTotalPoints) {
+@if (showTotalPoints()) {
   <div class="m-3">
     <h4 class="text-center text-success">
       Totale Punti: {{ getTotalPoints() }}
