@@ -18,7 +18,7 @@ describe('ConstructorCardComponent', () => {
     component = fixture.componentInstance;
     
     // Set required inputs
-    component.constructorData = {
+    fixture.componentRef.setInput('constructorData', {
       constructor_id: 1,
       constructor_name: 'Test Constructor',
       constructor_color: '#FF0000',
@@ -29,8 +29,8 @@ describe('ConstructorCardComponent', () => {
       driver_2_username: 'driver2',
       driver_2_tot_points: 90,
       constructor_tot_points: 190
-    };
-    component.position = 1;
+    });
+    fixture.componentRef.setInput('position', 1);
     fixture.detectChanges();
   });
 

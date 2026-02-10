@@ -18,7 +18,7 @@ describe('PilotCardComponent', () => {
     component = fixture.componentInstance;
     
     // Set required inputs
-    component.pilota = {
+    fixture.componentRef.setInput('pilota', {
       driver_id: 1,
       driver_username: 'testdriver',
       driver_name: 'Test',
@@ -39,8 +39,8 @@ describe('PilotCardComponent', () => {
       total_full_race_points: 25,
       total_race_points: 30,
       total_points: 100
-    };
-    component.position = 1;
+    });
+    fixture.componentRef.setInput('position', 1);
     fixture.detectChanges();
   });
 
