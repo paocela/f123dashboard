@@ -1,6 +1,6 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, firstValueFrom } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import type { 
   AuthResponse,
   ChangePasswordRequest,
@@ -27,12 +27,12 @@ export class AuthService {
   private configService = inject(ConfigService);
   private cookieService = inject(CookieService);
 
-  private currentUserSubject = new BehaviorSubject<User | null>(null);
-  private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
+  private currentUserSignal = signal<User | null>(null);
+  private isAuthenticatedSignal = signal<boolean>(false);
   private tokenRefreshTimer: ReturnType<typeof setTimeout> | undefined;
 
-  public currentUser$ = this.currentUserSubject.asObservable();
-  public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
+  public currentUser = this.currentUserSignal.asReadonly();
+  public isAuthenticated = this.isAuthenticatedSignal.asReadonly();
 
   constructor() {
     this.initializeAuth();
@@ -48,14 +48,18 @@ export class AuthService {
     const token = this.getToken();
     const storedUser = sessionStorage.getItem(AUTH_CONSTANTS.STORAGE_KEYS.USER);
     
-    if (storedUser) {
-      try {
-        const user = JSON.parse(storedUser);
-        this.setAuthenticatedUser(user);
-      } catch (error) {
-        console.error('Error parsing stored user data:', error);
-      }
+    if (storedUser === null) {
+      return;
     }
+    try {
+      const user = JSON.parse(storedUser) as User;
+      this.currentUserSignal.set(user);
+      const hasEmail = !!(user.mail && user.mail.trim() !== '');
+      this.isAuthenticatedSignal.set(hasEmail);
+    } catch (error) {
+      console.error('Error parsing stored user data:', error);
+    }
+    
     
     if (token) {
       this.validateTokenAndSetUser();
@@ -187,16 +191,7 @@ export class AuthService {
 
   async updateUserInfo(updateData: UpdateUserInfoRequest): Promise<AuthResponse> {
     try {
-      const token = this.getToken();
-      if (!token) {
-        return {
-          success: false,
-          message: 'Token di autenticazione non trovato'
-        };
-      }
-      
-      updateData.jwt = token;
-    
+
       const response = await firstValueFrom(
         this.apiService.post<AuthResponse>('/auth/update-user-info', updateData)
       );
@@ -270,16 +265,19 @@ export class AuthService {
     } finally {
       // Always clear local auth state
       this.clearAuth();
-      this.router.navigate(['/login']);
+      // Use setTimeout to avoid ExpressionChangedAfterItHasBeenCheckedError
+      setTimeout(() => {
+        this.router.navigate(['/login']);
+      }, 0);
     }
   }
 
   private setAuthenticatedUser(user: User): void {
-    this.currentUserSubject.next(user);
+    this.currentUserSignal.set(user);
     
     // Only set as authenticated if user has email
     const hasEmail = !!(user.mail && user.mail.trim() !== '');
-    this.isAuthenticatedSubject.next(hasEmail);
+    this.isAuthenticatedSignal.set(hasEmail);
     
     // Store user data in session storage for persistence
     sessionStorage.setItem(AUTH_CONSTANTS.STORAGE_KEYS.USER, JSON.stringify(user));
@@ -288,16 +286,16 @@ export class AuthService {
 
   // Method to mark user as fully authenticated after email completion
   public markUserAsAuthenticated(): void {
-    const currentUser = this.currentUserSubject.value;
+    const currentUser = this.currentUserSignal();
     if (currentUser && currentUser.mail && currentUser.mail.trim() !== '') {
-      this.isAuthenticatedSubject.next(true);
+      this.isAuthenticatedSignal.set(true);
       sessionStorage.setItem(AUTH_CONSTANTS.STORAGE_KEYS.IS_LOGGED_IN, 'true');
     }
   }
 
   private clearAuth(): void {
-    this.currentUserSubject.next(null);
-    this.isAuthenticatedSubject.next(false);
+    this.currentUserSignal.set(null);
+    this.isAuthenticatedSignal.set(false);
     
     // Clear stored data
     this.cookieService.deleteCookie(AUTH_CONSTANTS.COOKIE_NAME, AUTH_CONSTANTS.COOKIE_PATH);
@@ -339,29 +337,6 @@ export class AuthService {
     }, this.configService.tokenRefreshTimeBeforeExpiry);
   }
 
-  // Getters for backwards compatibility
-  getLoggedUser(): string | null {
-    const user = this.currentUserSubject.value;
-    return user ? user.username : null;
-  }
-
-  getCurrentUser(): User | null {
-    return this.currentUserSubject.value;
-  }
-
-  getCurrentUserId(): number | null {
-    const user = this.currentUserSubject.value;
-    return user ? user.id : null;
-  }
-
-  isLoggedIn(): boolean {
-    return this.isAuthenticatedSubject.value;
-  }
-
-  getAuthToken(): string | null {
-    return this.getToken();
-  }
-
   // Session management methods
   async getUserSessions(): Promise<SessionsResponse> {
     try {
@@ -394,7 +369,10 @@ export class AuthService {
       if (response.success) {
         // Clear local auth state since all sessions are logged out
         this.clearAuth();
-        this.router.navigate(['/login']);
+        // Use setTimeout to avoid ExpressionChangedAfterItHasBeenCheckedError
+        setTimeout(() => {
+          this.router.navigate(['/login']);
+        }, 0);
       }
       
       return response;
