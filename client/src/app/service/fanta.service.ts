@@ -47,16 +47,14 @@ export class FantaService {
       this.apiService.post<FantaVote[]>('/fanta/votes', {})
     );
     this.fantaVotesSignal.set(fantaVotes);
-    // Defer calculation to next tick to avoid change detection errors
-    queueMicrotask(() => this.calculatePoints());
+    this.calculatePoints();
   }
 
   async setFantaVote(voto: FantaVote): Promise<void> {
     await firstValueFrom(
       this.apiService.post('/fanta/set-vote', voto)
     );
-    
-    // Refresh the fanta votes (loadFantaVotes will call calculatePoints)
+  
     await this.loadFantaVotes();
   }
 
@@ -73,7 +71,7 @@ export class FantaService {
       if (raceVotes.length === 0) {return;}
 
       raceVotes.forEach(raceVote => {
-        const racePoints: number =  this.calculateFantaPoints(raceResult, raceVote);
+        const racePoints =  this.calculateFantaPoints(raceResult, raceVote);
         const playerId = Number(raceVote.fanta_player_id);
         const raceId = Number(raceResult.track_id);
         
