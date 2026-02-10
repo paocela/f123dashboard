@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
+import { signal } from '@angular/core';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../service/auth.service';
@@ -11,8 +12,7 @@ describe('PasswordChangeModalComponent', () => {
   let mockAuthService: jasmine.SpyObj<AuthService>;
 
   beforeEach(async () => {
-    const authSpy = jasmine.createSpyObj('AuthService', ['changePassword', 'getCurrentUser', 'isPasswordStrong']);
-    authSpy.getCurrentUser.and.returnValue(null);
+    const authSpy = jasmine.createSpyObj('AuthService', ['changePassword', 'isPasswordStrong'], { currentUser: signal(null) });
 
     await TestBed.configureTestingModule({
       imports: [PasswordChangeModalComponent,

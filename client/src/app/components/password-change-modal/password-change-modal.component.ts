@@ -50,7 +50,7 @@ export class PasswordChangeModalComponent implements OnDestroy {
   successMessage = '';
 
   get currentUser() {
-    return this.authService.getCurrentUser();
+    return this.authService.currentUser();
   }
 
   ngOnDestroy(): void {
