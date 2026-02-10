@@ -7,7 +7,7 @@ import { DbDataService } from '../../../app/service/db-data.service';
 import { cilPeople, cilInfo, cilBell } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
 import { AvatarComponent, TextColorDirective } from '@coreui/angular';
-import type { User, FantaVote } from '@f123dashboard/shared';
+import type { User, FantaVote, TrackData } from '@f123dashboard/shared';
 import { VoteHistoryTableComponent } from '../vote-history-table/vote-history-table.component';
 import { allFlags } from '../../model/constants';
 
@@ -132,7 +132,8 @@ export class LeaderboardComponent implements OnInit {
    * Open modal with last 2 votes for the selected user
    */
   openVoteHistoryModal(userId: number): void {
-    const user = this.users().find(u => u.id === userId);
+    const users = this.dbData.users();
+    const user = users.find(u => u.id === userId);
     if (!user) {return;}
 
     this.selectedUserSignal.set(user);
@@ -165,7 +166,7 @@ export class LeaderboardComponent implements OnInit {
   /**
    * Gets the last 2 tracks sorted by date descending.
    */
-  private getLastTwoTracks(tracks: any[]) {
+  private getLastTwoTracks(tracks: TrackData[]): TrackData[] {
     const sorted = [...tracks].sort((a, b) => 
       new Date(b.date).getTime() - new Date(a.date).getTime()
     );
@@ -175,7 +176,7 @@ export class LeaderboardComponent implements OnInit {
   /**
    * Gets user votes for specific tracks.
    */
-  private getUserVotesForTracks(userId: number, tracks: any[]) {
+  private getUserVotesForTracks(userId: number, tracks: TrackData[]): { vote: FantaVote, trackId: number, trackName: string, trackCountry: string }[] {
     return tracks
       .map(track => {
         const vote = this.fantaService.getFantaVote(userId, track.track_id);

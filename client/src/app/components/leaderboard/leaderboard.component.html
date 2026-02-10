@@ -9,14 +9,14 @@
       </c-alert>
     </div>
 
-    <table
-        [hover]="true"
-        [responsive]="true"
-        [striped]="true"
-        align="middle"
-        cTable
-        class="mb-0 border rounded custom-table"
-    >
+      <table
+          [hover]="true"
+          [responsive]="true"
+          [striped]="true"
+          align="middle"
+          cTable
+          class="mb-0 border rounded custom-table"
+      >
         <thead class="text-nowrap text-truncate">
             <tr>
                 <th class="bg-body-tertiary text-center">Pos.</th>
@@ -61,7 +61,7 @@
                 </tr>
             }
         </tbody>
-    </table>
+      </table>
 </c-row>
 
 <!-- Vote History Modal -->
@@ -71,7 +71,9 @@
       <svg cIcon name="cilList" class="me-2" width="24" height="24"></svg>
       Storico Votazioni di <strong>{{ selectedUser()?.username }}</strong>
     </h5>
-    <button (click)="closeModal()" cButtonClose></button>
+    <button (click)="closeModal()" cButtonClose aria-label="Chiudi modale">
+      <span aria-hidden="true">&times;</span>
+    </button>
   </c-modal-header>
   <c-modal-body>
     @if (userVotes().length === 0) {
