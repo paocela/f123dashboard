@@ -74,7 +74,7 @@ export class AdminChangePasswordComponent implements OnInit {
 
   ngOnInit(): void {
     // Check if user is admin
-    const currentUser = this.authService.getCurrentUser();
+    const currentUser = this.authService.currentUser();
     if (!currentUser?.isAdmin) 
       {this.router.navigate(['/dashboard']);}
     
@@ -107,7 +107,7 @@ export class AdminChangePasswordComponent implements OnInit {
     this.generatedPassword.set('');
 
     try {
-      const token = this.authService.getAuthToken();
+      const token = this.authService.getToken();
       if (!token) {
         this.showError.set(true);
         this.errorMessage.set('Sessione scaduta. Effettua nuovamente il login.');

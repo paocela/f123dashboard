@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
+import { signal } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AdminChangePasswordComponent } from './admin-change-password.component';
@@ -12,7 +13,7 @@ describe('AdminChangePasswordComponent', () => {
   let mockRouter: jasmine.SpyObj<Router>;
 
   beforeEach(async () => {
-    mockAuthService = jasmine.createSpyObj('AuthService', ['getCurrentUser', 'getAuthToken']);
+    mockAuthService = jasmine.createSpyObj('AuthService', ['getToken'], { currentUser: signal({ id: 1, username: 'test', name: 'Test', surname: 'User', isAdmin: false }) });
     mockRouter = jasmine.createSpyObj('Router', ['navigate']);
 
     await TestBed.configureTestingModule({
@@ -31,9 +32,11 @@ describe('AdminChangePasswordComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should redirect non-admin users', () => {
-    mockAuthService.getCurrentUser.and.returnValue({ id: 1, username: 'test', name: 'Test', surname: 'User', isAdmin: false });
+  it('should redirect non-admin users', async () => {
+    mockAuthService = jasmine.createSpyObj('AuthService', ['getToken'], { currentUser: signal({ id: 1, username: 'test', name: 'Test', surname: 'User', isAdmin: false }) });
+    TestBed.overrideProvider(AuthService, { useValue: mockAuthService });
     fixture.detectChanges();
+    await fixture.whenStable();
     expect(mockRouter.navigate).toHaveBeenCalledWith(['/dashboard']);
   });
 
