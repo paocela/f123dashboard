@@ -22,14 +22,14 @@
                 <th class="bg-body-tertiary text-center">Pos.</th>
                 <th class="bg-body-tertiary text-center"><svg cIcon name="cilPeople"></svg></th>
                 <th class="bg-body-tertiary">Username</th>
-                @if (showVotes) {
+                @if (showVotes()) {
                   <th class="bg-body-tertiary text-center">Voti</th>
                 }
                 <th class="bg-body-tertiary text-center">Punti</th>
             </tr>
         </thead>
         <tbody>
-            @for (leaderBoard of leaderBoards().slice(0, maxDisplayable); track leaderBoard.id; let i = $index) {
+            @for (leaderBoard of leaderBoards().slice(0, maxDisplayable()); track leaderBoard.id; let i = $index) {
                 <tr (click)="openVoteHistoryModal(leaderBoard.id)" style="cursor: pointer;">
                     <td>
                         <div class="text-center fw-semibold">
@@ -46,7 +46,7 @@
                         <div>{{ leaderBoard.username }}</div>
                         <div class="small text-body-secondary text-nowrap"></div>
                     </td>
-                    @if (showVotes) {
+                    @if (showVotes()) {
                       <td>
                         <div class="text-center">
                           {{ leaderBoard.numberVotes }} / {{totNumberVotes()}}

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, input, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { GridModule, TableDirective, ModalComponent, ModalHeaderComponent, ModalTitleDirective, ModalBodyComponent, ButtonCloseDirective, ThemeDirective, AlertModule } from '@coreui/angular';
 import { LeaderBoard } from '../../../app/model/leaderboard'
 import { FantaService } from '../../../app/service/fanta.service';
@@ -39,8 +39,8 @@ export class LeaderboardComponent implements OnInit {
   private fantaService = inject(FantaService);
   private dbData = inject(DbDataService);
 
-  @Input() maxDisplayable: number | undefined = undefined;
-  @Input() showVotes = true;
+  maxDisplayable = input<number | undefined>(undefined);
+  showVotes = input<boolean>(true);
   
   public cilPeople: string[] = cilPeople;
   public cilInfo: string[] = cilInfo;
@@ -77,7 +77,7 @@ export class LeaderboardComponent implements OnInit {
    * Loads users from database service.
    */
   private loadUsers(): void {
-    const allUsers = this.dbData.getUsers();
+    const allUsers = this.dbData.users();
     this.usersSignal.set(allUsers);
   }
 
@@ -156,7 +156,7 @@ export class LeaderboardComponent implements OnInit {
    * Gets all tracks that have race results.
    */
   private getTracksWithResults() {
-    const allTracks = this.dbData.getAllTracks();
+    const allTracks = this.dbData.tracks();
     return allTracks.filter(track => {
       const result = this.fantaService.getRaceResult(track.track_id);
       return result && result.id_1_place !== null && result.id_1_place !== undefined;

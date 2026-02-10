@@ -33,13 +33,13 @@ describe('PasswordChangeModalComponent', () => {
   });
 
   it('should open and close modal', () => {
-    expect(component.visible).toBeFalsy();
+    expect(component.visible()).toBeFalsy();
     
     component.open();
-    expect(component.visible).toBeTruthy();
+    expect(component.visible()).toBeTruthy();
     
     component.close();
-    expect(component.visible).toBeFalsy();
+    expect(component.visible()).toBeFalsy();
   });
 
   it('should check password strength via authService', () => {
@@ -59,18 +59,18 @@ describe('PasswordChangeModalComponent', () => {
   });
 
   it('should reset form on close', () => {
-    component.currentPassword = 'test';
-    component.newPassword = 'test123';
-    component.confirmPassword = 'test123';
-    component.errorMessage = 'Error';
-    component.visible = true;
+    component.currentPassword.set('test');
+    component.newPassword.set('test123');
+    component.confirmPassword.set('test123');
+    component.errorMessage.set('Error');
+    component.visible.set(true);
 
     component.close();
 
-    expect(component.currentPassword).toBe('');
-    expect(component.newPassword).toBe('');
-    expect(component.confirmPassword).toBe('');
-    expect(component.errorMessage).toBe('');
-    expect(component.visible).toBeFalsy();
+    expect(component.currentPassword()).toBe('');
+    expect(component.newPassword()).toBe('');
+    expect(component.confirmPassword()).toBe('');
+    expect(component.errorMessage()).toBe('');
+    expect(component.visible()).toBeFalsy();
   });
 });
