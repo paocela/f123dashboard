@@ -85,5 +85,4 @@ export type UpdateUserInfoRequest = {
   surname?: string;
   mail?: string;
   image?: string;
-  jwt: string;
 }

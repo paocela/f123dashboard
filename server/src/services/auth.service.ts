@@ -535,9 +535,9 @@ export class AuthService {
     }
   }
 
-  async updateUserInfo(request: UpdateUserInfoRequest): Promise<AuthResponse> {
+  async updateUserInfo(request: UpdateUserInfoRequest, jwt: string): Promise<AuthResponse> {
     try {
-      const { jwt, name, surname, mail, image } = request;
+      const { name, surname, mail, image } = request;
 
       if (!jwt) {
         return {
