@@ -63,7 +63,7 @@ applyTo: '**'
 - Use `ApiService` for all API calls to the Express backend (never use `HttpClient` directly)
 - Use RxJS for asynchronous operations and state management
 - Name services with the `Service` suffix (e.g., `UserService`)
-- Import all types from `@f123dashboard/shared` package
+- Import shared types for API from `@f123dashboard/shared` package
 
 ## Routing
 - Add new routes in `src/app/app.routes.ts` and/or feature-specific `routes.ts` files
@@ -102,6 +102,7 @@ applyTo: '**'
 - Use constants and do not repeat yourself
 - Make the code simple to read with clear variable and method names
 - Comments should be avoided and used only to explain public class/method/variable with TSDoc standard
+- Use Guard Clause to reduce nesting and improve readability
 
 ## Naming Conventions
 - Use English for all code, comments, and documentation
