@@ -124,48 +124,6 @@ export class DbDataService {
   }
 
 /****************************************************************/
-//chiamate che trasferiscono le variabili alle varie pagine 
-/****************************************************************/
-  getAllDrivers(): DriverData[] {
-    return this.allDrivers();
-  }
-
-  getChampionship(): ChampionshipData[] {
-    return this.championship();
-  }
-
-  getCumulativePoints(): CumulativePointsData[] {
-    return this.cumulativePoints();
-  }
-
-  getAllTracks(): TrackData[] {
-    return this.tracks();
-  }
-
-  getRaceResoult(): RaceResult[] {
-    return this.raceResult();
-  }
-  
-  getUsers(): User[] {
-    return this.users();
-  }
-
-  getDrivers(): Driver[] {
-    return this.drivers();
-  }
-
-  getConstructors(): Constructor[] {
-    return this.constructors();
-  }
-
-  getConstructorGrandPrixPointsData(): ConstructorGrandPrixPoints[] {
-    return this.constructorGrandPrixPoints();
-  }
-
-  getWinningConstructorGrandPrixPointsData(): ConstructorGrandPrixPoints[] {
-    return this.winningConstructorGrandPrixPoints();
-  }
-/****************************************************************/
 //season-specific data methods
 /****************************************************************/
 

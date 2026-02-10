@@ -139,7 +139,7 @@ export class FantaService {
    * Returns all constructors that tied for first place with the highest points.
    */
   getWinningConstructorsForTrack(trackId: number): number[] {
-    const allConstructorGpPoints = this.dbData.getConstructorGrandPrixPointsData();
+    const allConstructorGpPoints = this.dbData.constructorGrandPrixPoints();
     const constructorsForTrack = allConstructorGpPoints.filter(c => +c.track_id === +trackId);
     
     if (constructorsForTrack.length === 0) {
@@ -169,7 +169,7 @@ export class FantaService {
       Number(fantaVote.id_5_place), Number(fantaVote.id_6_place), Number(fantaVote.id_7_place), Number(fantaVote.id_8_place)
     ];
     // Calculate points for each driver (1-8)
-    this.dbData.getDrivers().forEach(driver =>  {
+    this.dbData.drivers().forEach(driver =>  {
       const realPosition = resultPositions.indexOf(Number(driver.id));
       const votedPosition = votePositions.indexOf(Number(driver.id));
       if (votedPosition === -1 || realPosition === -1) {return;}

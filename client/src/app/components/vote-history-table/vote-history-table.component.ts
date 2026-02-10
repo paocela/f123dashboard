@@ -89,11 +89,11 @@ export class VoteHistoryTableComponent {
   }
 
   getPilota(id: number): DriverData | null {
-    return this.dbData.getAllDrivers().find(driver => +driver.driver_id === +id) || null;
+    return this.dbData.allDrivers().find(driver => +driver.driver_id === +id) || null;
   }
 
   getConstructor(id: number): string | null {
-    const constructor = this.dbData.getConstructors().find(c => c.constructor_id === id);
+    const constructor = this.dbData.constructors().find(c => c.constructor_id === id);
     return constructor?.constructor_name || null;
   }
 
