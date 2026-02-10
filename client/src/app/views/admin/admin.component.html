@@ -26,7 +26,7 @@
                     </select>
                     @if (isSeasonLoading()) {
                         <div class="loading-overlay">
-                            <c-spinner color="primary" size="sm"></c-spinner>
+                            <span class="spinner-border spinner-border-sm text-primary" role="status" aria-hidden="true"></span>
                             <span class="loading-text">Caricamento stagione...</span>
                         </div>
                     }
@@ -39,7 +39,7 @@
             <c-row class="justify-content-center">
                 <c-col xs="auto" class="text-center">
                     <div class="initial-loading">
-                        <c-spinner color="primary"></c-spinner>
+                        <span class="spinner-border text-primary" role="status" aria-hidden="true"></span>
                         <h4 class="mt-3">Caricamento dati amministrazione...</h4>
                         <p class="text-muted">Attendere il caricamento dei dati</p>
                     </div>
@@ -288,7 +288,7 @@
                                             [disabled]="isSubmitting()[track.track_id] || isSeasonLoading()"
                                             class="submit-button">
                                       @if (isSubmitting()[track.track_id]) {
-                                        <c-spinner size="sm" class="me-2"></c-spinner>
+                                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                                         Invio...
                                       } @else {
                                         Conferma

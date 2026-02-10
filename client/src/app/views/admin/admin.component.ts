@@ -15,8 +15,7 @@ import {
   TableDirective,
   BadgeComponent,
   GridModule,
-  ButtonDirective,
-  SpinnerComponent
+  ButtonDirective
 } from '@coreui/angular';
 import { cilFire, cilPowerStandby } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
@@ -46,7 +45,6 @@ import type { ChampionshipData, Driver, Season, TrackData } from '@f123dashboard
     ReactiveFormsModule,
     GridModule,
     ButtonDirective,
-    SpinnerComponent,
     MatFormFieldModule, 
     MatSelectModule
   ],
@@ -91,7 +89,7 @@ export class AdminComponent implements OnInit {
     this.isInitialLoading.set(true);
     try {
       // Additional security check
-      const currentUser = this.authService.getCurrentUser();
+      const currentUser = this.authService.currentUser();
       if (!currentUser?.isAdmin) {
         this.router.navigate(['/dashboard']);
         return;
