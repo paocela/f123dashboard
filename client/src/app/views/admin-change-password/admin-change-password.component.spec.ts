@@ -33,11 +33,23 @@ describe('AdminChangePasswordComponent', () => {
   });
 
   it('should redirect non-admin users', async () => {
-    mockAuthService = jasmine.createSpyObj('AuthService', ['getToken'], { currentUser: signal({ id: 1, username: 'test', name: 'Test', surname: 'User', isAdmin: false }) });
-    TestBed.overrideProvider(AuthService, { useValue: mockAuthService });
-    fixture.detectChanges();
-    await fixture.whenStable();
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['/dashboard']);
+    TestBed.resetTestingModule();
+    const nonAdminAuthService = jasmine.createSpyObj('AuthService', ['getToken'], { currentUser: signal({ id: 1, username: 'test', name: 'Test', surname: 'User', isAdmin: false }) });
+    const testRouter = jasmine.createSpyObj('Router', ['navigate']);
+    
+    await TestBed.configureTestingModule({
+      imports: [AdminChangePasswordComponent, ReactiveFormsModule],
+      providers: [
+        provideNoopAnimations(),
+        { provide: AuthService, useValue: nonAdminAuthService },
+        { provide: Router, useValue: testRouter }
+      ]
+    }).compileComponents();
+    
+    const testFixture = TestBed.createComponent(AdminChangePasswordComponent);
+    testFixture.detectChanges();
+    await testFixture.whenStable();
+    expect(testRouter.navigate).toHaveBeenCalledWith(['/dashboard']);
   });
 
   it('should initialize form with empty values', () => {

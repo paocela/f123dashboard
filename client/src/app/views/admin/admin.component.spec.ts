@@ -66,13 +66,33 @@ describe('AdminComponent', () => {
   });
 
   it('should redirect non-admin users to dashboard', async () => {
-    mockAuthService = jasmine.createSpyObj('AuthService', [], { currentUser: signal({ isAdmin: false, id: 2, username: 'user', name: 'Regular', surname: 'User' }) });
-    TestBed.overrideProvider(AuthService, { useValue: mockAuthService });
-    component = TestBed.createComponent(AdminComponent).componentInstance;
+    TestBed.resetTestingModule();
+    const nonAdminAuthService = jasmine.createSpyObj('AuthService', [], { currentUser: signal({ isAdmin: false, id: 2, username: 'user', name: 'Regular', surname: 'User' }) });
+    const testRouter = jasmine.createSpyObj('Router', ['navigate']);
+    const testDbDataService = jasmine.createSpyObj('DbDataService', [
+      'getAllSeasons',
+      'getDriversData',
+      'getAllTracksBySeason',
+      'getChampionshipBySeason',
+      'setGpResult'
+    ]);
     
-    await component.ngOnInit();
+    await TestBed.configureTestingModule({
+      providers: [
+        provideNoopAnimations(),
+        { provide: DbDataService, useValue: testDbDataService },
+        { provide: AuthService, useValue: nonAdminAuthService },
+        { provide: Router, useValue: testRouter }
+      ],
+      imports: [AdminComponent]
+    }).compileComponents();
     
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['/dashboard']);
+    const testFixture = TestBed.createComponent(AdminComponent);
+    const testComponent = testFixture.componentInstance;
+    
+    await testComponent.ngOnInit();
+    
+    expect(testRouter.navigate).toHaveBeenCalledWith(['/dashboard']);
   });
 
   it('should load seasons on initialization', async () => {
