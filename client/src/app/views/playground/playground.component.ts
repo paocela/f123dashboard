@@ -4,7 +4,6 @@ import { GridModule, TableDirective, AvatarComponent, AlertComponent, ColorModeS
 import { cilPeople, cilWarning } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
 import { PlaygroundService, PlaygroundBestScore } from '../../service/playground.service';
-import type { User } from '@f123dashboard/shared';
 import { AuthService } from 'src/app/service/auth.service';
 
 
@@ -31,9 +30,10 @@ export class PlaygroundComponent implements OnInit, AfterViewInit {
 
   public screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 
-  playgroundLeaderboard = signal<PlaygroundBestScore[]>([]);
-  currentUser = signal<User | null>(null);
-  isLoggedIn = signal(false);
+  // Use the service's signal directly
+  playgroundLeaderboard = this.playgroundService.playgroundLeaderboard;
+  currentUser = this.authService.currentUser;
+  isLoggedIn = computed(() => this.authService.isAuthenticated());
 
   public cilPeople: string[] = cilPeople;
   public cilWarning: string[] = cilWarning;
@@ -47,32 +47,14 @@ export class PlaygroundComponent implements OnInit, AfterViewInit {
   playerStatus = signal("");
   playerStatusColor = signal("");  
   playerScore = signal<number | null>(null);
-  playerBestScore = signal(9999);
+  playerBestScore = signal<number>(9999);
   hasJumpStart = signal(false);
 
   ngOnInit(): void {
-    this.playgroundLeaderboard.set(this.playgroundService.getPlaygroundLeaderboard());
-
-    // Check if user is already logged in
-    this.authService.isAuthenticated$.subscribe(isAuth => {
-      if (isAuth) {
-        const user = this.authService.getCurrentUser();
-        this.currentUser.set(user);
-        this.isLoggedIn.set(true);
-      }
-    });
-
-    // Subscribe to current user changes
-    this.authService.currentUser$.subscribe(user => {
-      this.currentUser.set(user);
-      this.isLoggedIn.set(!!user);
-    });
-
-    // set best score for current user
-    if ( this.isLoggedIn() ) {
-      this.playerBestScore.set(this.playgroundService.getUserBestScore(this.currentUser()?.id ?? 0));
+    // Initialize best score for logged-in users
+    if (this.isLoggedIn() && this.currentUser()?.id) {
+      this.playerBestScore.set(this.playgroundService.getUserBestScore(this.currentUser()!.id));
     }
-
     this.resetGameText();
   }
 
@@ -87,61 +69,58 @@ export class PlaygroundComponent implements OnInit, AfterViewInit {
   }
 
   gameTrigger(): void {
-    if ( this.isTimerStarted() ) {
-      // Record reaction time and game over
-      const elapsedTime = Date.now() - (this.timerStartTime ?? 0);
-      this.playerScore.set(elapsedTime);
-      this.playerStatus.set(`Tempo di reazione: ${this.playerScore()} ms`);
-      this.playerStatusColor.set("#0E8F5F");
-
-      this.isTimerStarted.set(false);
-      this.timerStartTime = null;
-      this.isLightsTriggered.set(false);
-      
-      if ( this.playerScore()! < this.playerBestScore() ) {
-        this.playerBestScore.set(this.playerScore()!);
-        const currentUserValue = this.currentUser();
-        if ( this.isLoggedIn() && currentUserValue?.id ) {
-          // update DB with new best score
-          const newBestScore: PlaygroundBestScore = {
-            user_id: currentUserValue.id,
-            username: currentUserValue.username,
-            image: currentUserValue.image ?? "",
-            best_score: this.playerBestScore(),
-            best_date: new Date(),
-          };
-          this.playgroundService.setUserBestScore(newBestScore);
-
-          // update local leaderboard
-          this.playgroundLeaderboard.update(leaderboard => {
-            const tmp = [...leaderboard];
-            const foundIndex = tmp.findIndex(bestScore => bestScore.user_id === currentUserValue.id);
-            if ( foundIndex === -1 ) {
-              // New entry
-              tmp.push(newBestScore);
-            } else {
-              tmp[foundIndex].best_score = this.playerBestScore();
-            }
-            return tmp;
-          });
-        }
+    if (!this.isTimerStarted()) {
+      if (this.hasLightsError()) {
+        return;
       }
-    } else {
-      if ( !this.hasLightsError() ) {
-        if ( this.isLightsTriggered() ) {
-          // Jump start condition
-          this.playerStatus.set(`FALSA PARTENZA`);
-          this.playerStatusColor.set("#FF0000");
-          this.isLightsTriggered.set(false); 
-          this.hasJumpStart.set(true);
-          this.lightsError();
-        } else {
-          // Start light up sequence
-          this.resetGameText();
 
-          this.isLightsTriggered.set(true);
-          this.lightsUp();
-        }
+      if (this.isLightsTriggered()) {
+        // Jump start condition
+        this.playerStatus.set(`FALSA PARTENZA`);
+        this.playerStatusColor.set("#FF0000");
+        this.isLightsTriggered.set(false);
+        this.hasJumpStart.set(true);
+        this.lightsError();
+        return;
+      }
+
+      // Start light up sequence
+      this.resetGameText();
+      this.isLightsTriggered.set(true);
+      this.lightsUp();
+      return;
+    }
+
+    // Record reaction time and game over
+    const elapsedTime = Date.now() - (this.timerStartTime ?? 0);
+    this.playerScore.set(elapsedTime);
+    this.playerStatus.set(`Tempo di reazione: ${this.playerScore()} ms`);
+    this.playerStatusColor.set("#0E8F5F");
+
+    this.isTimerStarted.set(false);
+    this.timerStartTime = null;
+    this.isLightsTriggered.set(false);
+
+    const playerScoreValue = this.playerScore();
+    if (playerScoreValue === null) {
+      return;
+    }
+
+    // Update best score if current score is better
+    if (playerScoreValue < this.playerBestScore()) {
+      this.playerBestScore.set(playerScoreValue);
+
+      // Save to backend if user is logged in
+      const currentUserValue = this.currentUser();
+      if (this.isLoggedIn() && currentUserValue?.id) {
+        const newBestScore: PlaygroundBestScore = {
+          user_id: currentUserValue.id,
+          username: currentUserValue.username,
+          image: currentUserValue.image ?? "",
+          best_score: playerScoreValue,
+          best_date: new Date(),
+        };
+        this.playgroundService.setUserBestScore(newBestScore);
       }
     }
   }
@@ -150,7 +129,9 @@ export class PlaygroundComponent implements OnInit, AfterViewInit {
     const bulbs = this.bulbs ?? document.querySelectorAll<HTMLElement>('.bulb');
 
     for (const bulb of Array.from(bulbs)) {
-      if (this.hasJumpStart()) break;
+      if (this.hasJumpStart()) {
+        break;
+      }
       bulb.classList.add('red_light');
       await sleep(1000);
     }
@@ -214,7 +195,7 @@ export class PlaygroundComponent implements OnInit, AfterViewInit {
 
   resetGameText(): void {
     this.playerStatus.set(`SEI PRONTO?`);
-    if ( this.#colorModeService.colorMode.name == 'dark' ) {
+    if ( this.#colorModeService.colorMode.name === 'dark' ) {
       this.playerStatusColor.set("#FFFFFF");
     } else {
       this.playerStatusColor.set("#000000"); 
