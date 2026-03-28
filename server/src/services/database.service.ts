@@ -338,16 +338,11 @@ export class DatabaseService {
       SELECT
         gp.id AS id,
         gp.track_id AS track_id,
-        MAX(CASE WHEN rre.position = 1 THEN rre.pilot_id END) AS id_1_place,
-        MAX(CASE WHEN rre.position = 2 THEN rre.pilot_id END) AS id_2_place,
-        MAX(CASE WHEN rre.position = 3 THEN rre.pilot_id END) AS id_3_place,
-        MAX(CASE WHEN rre.position = 4 THEN rre.pilot_id END) AS id_4_place,
-        MAX(CASE WHEN rre.position = 5 THEN rre.pilot_id END) AS id_5_place,
-        MAX(CASE WHEN rre.position = 6 THEN rre.pilot_id END) AS id_6_place,
-        MAX(CASE WHEN rre.position = 7 THEN rre.pilot_id END) AS id_7_place,
-        MAX(CASE WHEN rre.position = 8 THEN rre.pilot_id END) AS id_8_place,
-        MAX(CASE WHEN rre.fast_lap THEN rre.pilot_id END) AS id_fast_lap,
-        ARRAY_AGG(rre.pilot_id) FILTER (WHERE rre.position = 0) AS list_dnf
+        JSON_AGG(
+          JSON_BUILD_OBJECT('position', rre.position, 'pilot_id', rre.pilot_id, 'fast_lap', rre.fast_lap)
+          ORDER BY rre.position
+        ) FILTER (WHERE rre.position > 0) AS positions,
+        COALESCE(ARRAY_AGG(rre.pilot_id) FILTER (WHERE rre.position = 0), '{}') AS list_dnf
       FROM gran_prix gp
       CROSS JOIN latest_season ls
       LEFT JOIN race_result_entries rre ON gp.race_results_id = rre.race_results_id
@@ -358,18 +353,13 @@ export class DatabaseService {
       UNION ALL
 
       SELECT
-        gp.id AS track_id,
+        gp.id AS id,
         gp.track_id AS track_id,
-        MAX(CASE WHEN frre.position = 1 THEN frre.pilot_id END) AS id_1_place,
-        MAX(CASE WHEN frre.position = 2 THEN frre.pilot_id END) AS id_2_place,
-        MAX(CASE WHEN frre.position = 3 THEN frre.pilot_id END) AS id_3_place,
-        MAX(CASE WHEN frre.position = 4 THEN frre.pilot_id END) AS id_4_place,
-        MAX(CASE WHEN frre.position = 5 THEN frre.pilot_id END) AS id_5_place,
-        MAX(CASE WHEN frre.position = 6 THEN frre.pilot_id END) AS id_6_place,
-        MAX(CASE WHEN frre.position = 7 then frre.pilot_id END) AS id_7_place,
-        MAX(CASE WHEN frre.position = 8 THEN frre.pilot_id END) AS id_8_place,
-        MAX(CASE WHEN frre.fast_lap THEN frre.pilot_id END) AS id_fast_lap,
-        ARRAY_AGG(frre.pilot_id) FILTER (WHERE frre.position = 0) AS list_dnf
+        JSON_AGG(
+          JSON_BUILD_OBJECT('position', frre.position, 'pilot_id', frre.pilot_id, 'fast_lap', frre.fast_lap)
+          ORDER BY frre.position
+        ) FILTER (WHERE frre.position > 0) AS positions,
+        COALESCE(ARRAY_AGG(frre.pilot_id) FILTER (WHERE frre.position = 0), '{}') AS list_dnf
       FROM gran_prix gp
       CROSS JOIN latest_season ls
       LEFT JOIN full_race_result_entries frre ON gp.full_race_results_id = frre.race_results_id

@@ -66,12 +66,14 @@ export class VoteHistoryTableComponent {
   );
 
   fastLap = computed(() => 
-    this.raceResult()?.id_fast_lap || 0
+    this.raceResult()?.positions.find(p => p.fast_lap)?.pilot_id ?? 0
   );
 
   dnfList = computed(() => 
-    this.raceResult()?.list_dnf || ''
+    this.raceResult()?.list_dnf ?? []
   );
+
+  driverPositionsCount = computed(() => this.raceResult()?.positions?.length ?? 8);
 
   winningConstructors = computed(() => 
     this.fantaService.getWinningConstructorsForTrack(this.trackId())
@@ -102,19 +104,14 @@ export class VoteHistoryTableComponent {
     if (!result) {
       return 0;
     }
-    
-    const positions = [
-      result.id_1_place, result.id_2_place, result.id_3_place, result.id_4_place,
-      result.id_5_place, result.id_6_place, result.id_7_place, result.id_8_place
-    ];
-    
-    const position = positions.findIndex(id => +id === +pilotaId);
-    return position >= 0 ? position + 1 : 0;
+
+    return result.positions.find(p => +p.pilot_id === +pilotaId)?.position ?? 0;
   }
 
   getVotoPos(pilotaId: number): number {
-    const voteArray = this.voteArray();
-    const position = voteArray.slice(0, 8).findIndex(id => +id === +pilotaId);
+    const position = this.voteArray()
+      .slice(0, this.driverPositionsCount())
+      .findIndex(id => +id === +pilotaId);
     return position >= 0 ? position + 1 : 0;
   }
 
@@ -135,9 +132,10 @@ export class VoteHistoryTableComponent {
     if (!result) {
       return 0;
     }
-    
+
+    const fastLapPilotId = result.positions.find(p => p.fast_lap)?.pilot_id ?? 0;
     const vote = this.fantaVote();
-    return +result.id_fast_lap === +vote.id_fast_lap && vote.id_fast_lap !== 0
+    return fastLapPilotId === vote.id_fast_lap && vote.id_fast_lap !== 0
       ? FantaService.CORRECT_RESPONSE_FAST_LAP_POINTS
       : 0;
   }
@@ -147,7 +145,7 @@ export class VoteHistoryTableComponent {
     if (!result) {
       return 0;
     }
-    
+
     const vote = this.fantaVote();
     return this.fantaService.isDnfCorrect(result.list_dnf, +vote.id_dnf) && +vote.id_dnf !== 0
       ? FantaService.CORRECT_RESPONSE_DNF_POINTS
@@ -197,10 +195,11 @@ export class VoteHistoryTableComponent {
     if (!result) {
       return this.VOTE_STATUS_INCORRECT;
     }
-    
+
+    const fastLapPilotId = result.positions.find(p => p.fast_lap)?.pilot_id ?? 0;
     const vote = this.fantaVote();
-    const isCorrect = +result.id_fast_lap === +vote.id_fast_lap && +vote.id_fast_lap !== 0;
-    return isCorrect 
+    const isCorrect = fastLapPilotId === vote.id_fast_lap && +vote.id_fast_lap !== 0;
+    return isCorrect
       ? this.VOTE_STATUS_CORRECT
       : this.VOTE_STATUS_INCORRECT;
   }
@@ -210,10 +209,10 @@ export class VoteHistoryTableComponent {
     if (!result) {
       return this.VOTE_STATUS_INCORRECT;
     }
-    
+
     const vote = this.fantaVote();
     const isCorrect = this.fantaService.isDnfCorrect(result.list_dnf, +vote.id_dnf) && +vote.id_dnf !== 0;
-    return isCorrect 
+    return isCorrect
       ? this.VOTE_STATUS_CORRECT
       : this.VOTE_STATUS_INCORRECT;
   }
@@ -235,7 +234,7 @@ export class VoteHistoryTableComponent {
     return this.fastLap();
   }
 
-  getDnf(): string {
+  getDnf(): number[] {
     return this.dnfList();
   }
 }

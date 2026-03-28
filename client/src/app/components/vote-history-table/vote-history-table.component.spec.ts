@@ -98,16 +98,17 @@ describe('VoteHistoryTableComponent', () => {
   const mockRaceResult: RaceResult = {
     id: 1,
     track_id: 1,
-    id_1_place: 1,
-    id_2_place: 2,
-    id_3_place: 3,
-    id_4_place: 4,
-    id_5_place: 5,
-    id_6_place: 6,
-    id_7_place: 7,
-    id_8_place: 8,
-    id_fast_lap: 1,
-    list_dnf: '2,3'
+    positions: [
+      { position: 1, pilot_id: 1, fast_lap: true },
+      { position: 2, pilot_id: 2, fast_lap: false },
+      { position: 3, pilot_id: 3, fast_lap: false },
+      { position: 4, pilot_id: 4, fast_lap: false },
+      { position: 5, pilot_id: 5, fast_lap: false },
+      { position: 6, pilot_id: 6, fast_lap: false },
+      { position: 7, pilot_id: 7, fast_lap: false },
+      { position: 8, pilot_id: 8, fast_lap: false }
+    ],
+    list_dnf: [2, 3]
   };
 
   beforeEach(async () => {
@@ -507,12 +508,12 @@ describe('VoteHistoryTableComponent', () => {
   });
 
   describe('getDnf', () => {
-    it('should return DNF list', () => {
+    it('should return DNF list as number array', () => {
       const result = component.getDnf();
-      expect(result).toBe('2,3');
+      expect(result).toEqual([2, 3]);
     });
 
-    it('should return empty string if no race result', () => {
+    it('should return empty array if no race result', () => {
       // Create new fixture with trackId that returns no result
       const noResultFixture = TestBed.createComponent(VoteHistoryTableComponent);
       noResultFixture.componentRef.setInput('fantaVote', { ...mockFantaVote });
@@ -520,7 +521,94 @@ describe('VoteHistoryTableComponent', () => {
       noResultFixture.detectChanges();
       
       const result = noResultFixture.componentInstance.getDnf();
-      expect(result).toBe('');
+      expect(result).toEqual([]);
+    });
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Phase 2 — dynamic driver count via driverPositionsCount
+  // ─────────────────────────────────────────────────────────────────────────
+
+  describe('Phase 2 – driverPositionsCount', () => {
+    it('returns positions count from race result', () => {
+      // mockRaceResult has 8 positions
+      expect(component.driverPositionsCount()).toBe(8);
+    });
+
+    it('returns 8 as fallback when race result is not found', () => {
+      const noResultFixture = TestBed.createComponent(VoteHistoryTableComponent);
+      noResultFixture.componentRef.setInput('fantaVote', { ...mockFantaVote });
+      noResultFixture.componentRef.setInput('trackId', 999);
+      noResultFixture.detectChanges();
+
+      expect(noResultFixture.componentInstance.driverPositionsCount()).toBe(8);
+    });
+
+    it('returns correct count when race has fewer drivers', () => {
+      const fiveDriverResult: RaceResult = {
+        id: 5,
+        track_id: 5,
+        positions: [
+          { position: 1, pilot_id: 1, fast_lap: false },
+          { position: 2, pilot_id: 2, fast_lap: false },
+          { position: 3, pilot_id: 3, fast_lap: false },
+          { position: 4, pilot_id: 4, fast_lap: false },
+          { position: 5, pilot_id: 5, fast_lap: true },
+        ],
+        list_dnf: []
+      };
+
+      mockFantaService.getRaceResult.and.callFake((trackId: number) =>
+        trackId === 5 ? fiveDriverResult : undefined
+      );
+
+      const fiveDriverFixture = TestBed.createComponent(VoteHistoryTableComponent);
+      fiveDriverFixture.componentRef.setInput('fantaVote', { ...mockFantaVote });
+      fiveDriverFixture.componentRef.setInput('trackId', 5);
+      fiveDriverFixture.detectChanges();
+
+      expect(fiveDriverFixture.componentInstance.driverPositionsCount()).toBe(5);
+    });
+  });
+
+  describe('Phase 2 – fastLap from positions[].fast_lap', () => {
+    it('getFastLap returns pilot_id of driver with fast_lap=true', () => {
+      // mockRaceResult has pilot_id:1 with fast_lap:true at position 1
+      expect(component.getFastLap()).toBe(1);
+    });
+
+    it('getFastLap returns 0 when no driver has fast_lap=true', () => {
+      const noFastLapResult: RaceResult = {
+        id: 6, track_id: 6,
+        positions: [
+          { position: 1, pilot_id: 1, fast_lap: false },
+          { position: 2, pilot_id: 2, fast_lap: false },
+        ],
+        list_dnf: []
+      };
+
+      mockFantaService.getRaceResult.and.callFake((trackId: number) =>
+        trackId === 6 ? noFastLapResult : undefined
+      );
+
+      const fixture2 = TestBed.createComponent(VoteHistoryTableComponent);
+      fixture2.componentRef.setInput('fantaVote', { ...mockFantaVote });
+      fixture2.componentRef.setInput('trackId', 6);
+      fixture2.detectChanges();
+
+      expect(fixture2.componentInstance.getFastLap()).toBe(0);
+    });
+  });
+
+  describe('Phase 2 – getPosizioneArrivo from positions[]', () => {
+    it('returns position from positions array', () => {
+      expect(component.getPosizioneArrivo(1)).toBe(1);
+      expect(component.getPosizioneArrivo(2)).toBe(2);
+    });
+
+    it('returns 0 when driver not in positions', () => {
+      expect(component.getPosizioneArrivo(999)).toBe(0);
     });
   });
 });
+

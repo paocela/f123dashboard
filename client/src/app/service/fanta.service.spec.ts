@@ -29,44 +29,47 @@ describe('FantaService', () => {
     {
       id: 1,
       track_id: 100,
-      id_1_place: 1,
-      id_2_place: 2,
-      id_3_place: 3,
-      id_4_place: 4,
-      id_5_place: 5,
-      id_6_place: 6,
-      id_7_place: 7,
-      id_8_place: 8,
-      id_fast_lap: 1,
-      list_dnf: '{7,8}'
+      positions: [
+        { position: 1, pilot_id: 1, fast_lap: true },
+        { position: 2, pilot_id: 2, fast_lap: false },
+        { position: 3, pilot_id: 3, fast_lap: false },
+        { position: 4, pilot_id: 4, fast_lap: false },
+        { position: 5, pilot_id: 5, fast_lap: false },
+        { position: 6, pilot_id: 6, fast_lap: false },
+        { position: 7, pilot_id: 7, fast_lap: false },
+        { position: 8, pilot_id: 8, fast_lap: false }
+      ],
+      list_dnf: [7, 8]
     },
     {
       id: 2,
       track_id: 101,
-      id_1_place: 2,
-      id_2_place: 1,
-      id_3_place: 4,
-      id_4_place: 3,
-      id_5_place: 6,
-      id_6_place: 5,
-      id_7_place: 8,
-      id_8_place: 7,
-      id_fast_lap: 2,
-      list_dnf: '{5}'
+      positions: [
+        { position: 1, pilot_id: 2, fast_lap: true },
+        { position: 2, pilot_id: 1, fast_lap: false },
+        { position: 3, pilot_id: 4, fast_lap: false },
+        { position: 4, pilot_id: 3, fast_lap: false },
+        { position: 5, pilot_id: 6, fast_lap: false },
+        { position: 6, pilot_id: 5, fast_lap: false },
+        { position: 7, pilot_id: 8, fast_lap: false },
+        { position: 8, pilot_id: 7, fast_lap: false }
+      ],
+      list_dnf: [5]
     },
     {
       id: 3,
       track_id: 102,
-      id_1_place: 3,
-      id_2_place: 4,
-      id_3_place: 5,
-      id_4_place: 6,
-      id_5_place: 7,
-      id_6_place: 8,
-      id_7_place: 1,
-      id_8_place: 2,
-      id_fast_lap: 3,
-      list_dnf: ''
+      positions: [
+        { position: 1, pilot_id: 3, fast_lap: true },
+        { position: 2, pilot_id: 4, fast_lap: false },
+        { position: 3, pilot_id: 5, fast_lap: false },
+        { position: 4, pilot_id: 6, fast_lap: false },
+        { position: 5, pilot_id: 7, fast_lap: false },
+        { position: 6, pilot_id: 8, fast_lap: false },
+        { position: 7, pilot_id: 1, fast_lap: false },
+        { position: 8, pilot_id: 2, fast_lap: false }
+      ],
+      list_dnf: []
     }
   ];
 
@@ -275,7 +278,7 @@ describe('FantaService', () => {
   });
 
   describe('totNumberVotes', () => {
-    it('should return total number of races', () => {
+    it('should return total number of races with results', () => {
       expect(service.totNumberVotes()).toBe(mockRaceResults.length);
     });
   });
@@ -390,16 +393,17 @@ describe('FantaService', () => {
       const raceResult: RaceResult = {
         id: 1,
         track_id: 100,
-        id_1_place: 1,
-        id_2_place: 2,
-        id_3_place: 3,
-        id_4_place: 4,
-        id_5_place: 5,
-        id_6_place: 6,
-        id_7_place: 7,
-        id_8_place: 8,
-        id_fast_lap: 1,
-        list_dnf: ''
+        positions: [
+          { position: 1, pilot_id: 1, fast_lap: true },
+          { position: 2, pilot_id: 2, fast_lap: false },
+          { position: 3, pilot_id: 3, fast_lap: false },
+          { position: 4, pilot_id: 4, fast_lap: false },
+          { position: 5, pilot_id: 5, fast_lap: false },
+          { position: 6, pilot_id: 6, fast_lap: false },
+          { position: 7, pilot_id: 7, fast_lap: false },
+          { position: 8, pilot_id: 8, fast_lap: false }
+        ],
+        list_dnf: []
       };
 
       const fantaVote: FantaVote = {
@@ -427,16 +431,17 @@ describe('FantaService', () => {
       const raceResult: RaceResult = {
         id: 1,
         track_id: 100,
-        id_1_place: 1,
-        id_2_place: 2,
-        id_3_place: 3,
-        id_4_place: 4,
-        id_5_place: 5,
-        id_6_place: 6,
-        id_7_place: 7,
-        id_8_place: 8,
-        id_fast_lap: 0,
-        list_dnf: '{7}'
+        positions: [
+          { position: 1, pilot_id: 1, fast_lap: false },
+          { position: 2, pilot_id: 2, fast_lap: false },
+          { position: 3, pilot_id: 3, fast_lap: false },
+          { position: 4, pilot_id: 4, fast_lap: false },
+          { position: 5, pilot_id: 5, fast_lap: false },
+          { position: 6, pilot_id: 6, fast_lap: false },
+          { position: 7, pilot_id: 7, fast_lap: false },
+          { position: 8, pilot_id: 8, fast_lap: false }
+        ],
+        list_dnf: [7]
       };
 
       const fantaVote: FantaVote = {
@@ -464,16 +469,17 @@ describe('FantaService', () => {
       const raceResult: RaceResult = {
         id: 1,
         track_id: 100,
-        id_1_place: 1,
-        id_2_place: 2,
-        id_3_place: 3,
-        id_4_place: 4,
-        id_5_place: 5,
-        id_6_place: 6,
-        id_7_place: 7,
-        id_8_place: 8,
-        id_fast_lap: 1,
-        list_dnf: ''
+        positions: [
+          { position: 1, pilot_id: 1, fast_lap: true },
+          { position: 2, pilot_id: 2, fast_lap: false },
+          { position: 3, pilot_id: 3, fast_lap: false },
+          { position: 4, pilot_id: 4, fast_lap: false },
+          { position: 5, pilot_id: 5, fast_lap: false },
+          { position: 6, pilot_id: 6, fast_lap: false },
+          { position: 7, pilot_id: 7, fast_lap: false },
+          { position: 8, pilot_id: 8, fast_lap: false }
+        ],
+        list_dnf: []
       };
 
       const fantaVote: FantaVote = {
@@ -541,16 +547,17 @@ describe('FantaService', () => {
       const raceResult: RaceResult = {
         id: 3,
         track_id: 103,
-        id_1_place: 1,
-        id_2_place: 2,
-        id_3_place: 3,
-        id_4_place: 4,
-        id_5_place: 5,
-        id_6_place: 6,
-        id_7_place: 7,
-        id_8_place: 8,
-        id_fast_lap: 0,
-        list_dnf: ''
+        positions: [
+          { position: 1, pilot_id: 1, fast_lap: false },
+          { position: 2, pilot_id: 2, fast_lap: false },
+          { position: 3, pilot_id: 3, fast_lap: false },
+          { position: 4, pilot_id: 4, fast_lap: false },
+          { position: 5, pilot_id: 5, fast_lap: false },
+          { position: 6, pilot_id: 6, fast_lap: false },
+          { position: 7, pilot_id: 7, fast_lap: false },
+          { position: 8, pilot_id: 8, fast_lap: false }
+        ],
+        list_dnf: []
       };
 
       // Test voting for constructor 1 (tied winner)
@@ -587,25 +594,25 @@ describe('FantaService', () => {
   });
 
   describe('isDnfCorrect', () => {
-    it('should return true when DNF prediction is correct', () => {
-      expect(service.isDnfCorrect('{7,8}', 7)).toBe(true);
-      expect(service.isDnfCorrect('{7,8}', 8)).toBe(true);
+    it('should return true when driver is in DNF list', () => {
+      expect(service.isDnfCorrect([7, 8], 7)).toBe(true);
+      expect(service.isDnfCorrect([7, 8], 8)).toBe(true);
     });
 
-    it('should return false when DNF prediction is wrong', () => {
-      expect(service.isDnfCorrect('{7,8}', 1)).toBe(false);
+    it('should return false when driver is not in DNF list', () => {
+      expect(service.isDnfCorrect([7, 8], 1)).toBe(false);
     });
 
     it('should return false for empty DNF list', () => {
-      expect(service.isDnfCorrect('', 7)).toBe(false);
+      expect(service.isDnfCorrect([], 7)).toBe(false);
     });
 
-    it('should return false for null/undefined values', () => {
-      expect(service.isDnfCorrect('', 0)).toBe(false);
+    it('should return false when fantaVoteDnfId is 0', () => {
+      expect(service.isDnfCorrect([7, 8], 0)).toBe(false);
     });
 
-    it('should handle DNF list with spaces', () => {
-      expect(service.isDnfCorrect('{7, 8}', 7)).toBe(true);
+    it('should return false for single-item list when wrong driver', () => {
+      expect(service.isDnfCorrect([5], 7)).toBe(false);
     });
   });
 
@@ -631,26 +638,19 @@ describe('FantaService', () => {
   });
 
   describe('edge cases', () => {
-    it('should handle race results with invalid positions', () => {
+    it('should ignore race results with no positions', () => {
       const incompleteRaceResult: RaceResult = {
         id: 99,
         track_id: 999,
-        id_1_place: 0,
-        id_2_place: 0,
-        id_3_place: 0,
-        id_4_place: 0,
-        id_5_place: 0,
-        id_6_place: 0,
-        id_7_place: 0,
-        id_8_place: 0,
-        id_fast_lap: 0,
-        list_dnf: ''
+        positions: [],
+        list_dnf: []
       };
 
       const extendedResults = [...mockRaceResults, incompleteRaceResult];
       raceResultSignal.set(extendedResults);
-      
-      expect(service.totNumberVotes()).toBe(mockRaceResults.length + 1);
+
+      // empty-positions results are filtered from raceResults, so count stays the same
+      expect(service.totNumberVotes()).toBe(mockRaceResults.length);
     });
 
     it('should handle empty fanta votes', async () => {
@@ -678,6 +678,97 @@ describe('FantaService', () => {
       expect(newService.totNumberVotes()).toBe(0);
     });
   });
+
+  describe('Phase 2 – dynamic driver count via positions[]', () => {
+    it('raceResults filters out entries with no positions', () => {
+      const noPositionsResult: RaceResult = { id: 99, track_id: 999, positions: [], list_dnf: [] };
+      raceResultSignal.set([...mockRaceResults, noPositionsResult]);
+      expect(service.raceResults().length).toBe(mockRaceResults.length);
+    });
+
+    it('calculates correct points for a 5-driver season race', () => {
+      const fiveDriverResult: RaceResult = {
+        id: 50,
+        track_id: 500,
+        positions: [
+          { position: 1, pilot_id: 1, fast_lap: false },
+          { position: 2, pilot_id: 2, fast_lap: false },
+          { position: 3, pilot_id: 3, fast_lap: false },
+          { position: 4, pilot_id: 4, fast_lap: true },
+          { position: 5, pilot_id: 5, fast_lap: false },
+        ],
+        list_dnf: []
+      };
+
+      const vote: FantaVote = {
+        fanta_player_id: 1, username: 'p1', track_id: 500,
+        id_1_place: 1, id_2_place: 2, id_3_place: 3, id_4_place: 4, id_5_place: 5,
+        id_6_place: 0, id_7_place: 0, id_8_place: 0,
+        id_fast_lap: 4, id_dnf: 0, constructor_id: 0
+      };
+
+      const points = service.calculateFantaPoints(fiveDriverResult, vote);
+      // 5 drivers each at position 0 diff = 5×7 + fast lap = 35 + 5 = 40
+      expect(points).toBe(40);
+    });
+
+    it('calculates correct points for a 10-driver season race', () => {
+      const tenDriverResult: RaceResult = {
+        id: 100,
+        track_id: 1000,
+        positions: Array.from({ length: 10 }, (_, i) => ({
+          position: i + 1,
+          pilot_id: i + 1,
+          fast_lap: i === 0
+        })),
+        list_dnf: []
+      };
+
+      // Use 10-driver signal
+      const tenDrivers = Array.from({ length: 10 }, (_, i) => ({
+        id: i + 1, username: `d${i + 1}`, first_name: `F${i + 1}`, surname: `S${i + 1}`
+      }));
+      driversSignal.set(tenDrivers);
+
+      const vote: FantaVote = {
+        fanta_player_id: 1, username: 'p1', track_id: 1000,
+        id_1_place: 1, id_2_place: 2, id_3_place: 3, id_4_place: 4,
+        id_5_place: 5, id_6_place: 6, id_7_place: 7, id_8_place: 8,
+        id_fast_lap: 1, id_dnf: 0, constructor_id: 0
+      };
+
+      const points = service.calculateFantaPoints(tenDriverResult, vote);
+      // 8 perfect predictions (ids 1-8 map to vote positions 0-7) + fast lap = 8×7 + 5 = 61
+      expect(points).toBe(61);
+    });
+
+    it('isDnfCorrect works with number[] list_dnf', () => {
+      expect(service.isDnfCorrect([1, 2, 3], 2)).toBe(true);
+      expect(service.isDnfCorrect([1, 2, 3], 5)).toBe(false);
+      expect(service.isDnfCorrect([], 1)).toBe(false);
+    });
+
+    it('fast lap pilot is identified via positions.find(p => p.fast_lap)', () => {
+      const result: RaceResult = {
+        id: 11, track_id: 110,
+        positions: [
+          { position: 1, pilot_id: 10, fast_lap: false },
+          { position: 2, pilot_id: 11, fast_lap: true },
+        ],
+        list_dnf: []
+      };
+
+      const voteCorrect: FantaVote = {
+        fanta_player_id: 1, username: 'p1', track_id: 110,
+        id_1_place: 10, id_2_place: 11, id_3_place: 0, id_4_place: 0,
+        id_5_place: 0, id_6_place: 0, id_7_place: 0, id_8_place: 0,
+        id_fast_lap: 11, id_dnf: 0, constructor_id: 0
+      };
+      const voteWrong: FantaVote = { ...voteCorrect, id_fast_lap: 10 };
+
+      const ptCorrect = service.calculateFantaPoints(result, voteCorrect);
+      const ptWrong = service.calculateFantaPoints(result, voteWrong);
+      expect(ptCorrect - ptWrong).toBe(FantaService.CORRECT_RESPONSE_FAST_LAP_POINTS);
+    });
+  });
 });
-
-
