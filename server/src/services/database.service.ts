@@ -452,13 +452,13 @@ export class DatabaseService {
       if (gpRes.rowCount === 0) throw new Error('Gran Prix not found');
       const gp = gpRes.rows[0];
       const hasX2Enabled = Number(gp.has_x2) === 1;
-      const raceFastLapPilotId = raceResult[8];
-      const sprintFastLapPilotId = sprintResult[8];
+      const raceFastLapPilotId = raceResult.at(-1)!;
+      const sprintFastLapPilotId = sprintResult.at(-1);
 
       // Handle Race or Full Race Results
       if (hasX2Enabled && gp.full_race_results_id) {
         await client.query('DELETE FROM full_race_result_entries WHERE race_results_id = $1', [gp.full_race_results_id]);
-        for (let i = 0; i < 8; i++) {
+        for (let i = 0; i < raceResult.length - 1; i++) {
           if (raceResult[i] && raceResult[i] !== 0) {
             await client.query(
               'INSERT INTO full_race_result_entries (race_results_id, pilot_id, position, fast_lap) VALUES ($1, $2, $3, $4)',
@@ -476,7 +476,7 @@ export class DatabaseService {
         }
       } else if (gp.race_results_id) {
         await client.query('DELETE FROM race_result_entries WHERE race_results_id = $1', [gp.race_results_id]);
-        for (let i = 0; i < 8; i++) {
+        for (let i = 0; i < raceResult.length - 1; i++) {
           if (raceResult[i] && raceResult[i] !== 0) {
             await client.query(
               'INSERT INTO race_result_entries (race_results_id, pilot_id, position, fast_lap) VALUES ($1, $2, $3, $4)',
@@ -497,7 +497,7 @@ export class DatabaseService {
       // Handle Sprint Results
       if (hasSprint && gp.sprint_results_id) {
         await client.query('DELETE FROM sprint_result_entries WHERE sprint_results_id = $1', [gp.sprint_results_id]);
-        for (let i = 0; i < 8; i++) {
+        for (let i = 0; i < sprintResult.length - 1; i++) {
           if (sprintResult[i] && sprintResult[i] !== 0) {
             await client.query(
               'INSERT INTO sprint_result_entries (sprint_results_id, pilot_id, position, fast_lap) VALUES ($1, $2, $3, $4)',
@@ -518,7 +518,7 @@ export class DatabaseService {
       // Handle Qualifying Results
       if (gp.qualifying_results_id) {
         await client.query('DELETE FROM qualifying_result_entries WHERE qualifying_results_id = $1', [gp.qualifying_results_id]);
-        for (let i = 0; i < 8; i++) {
+        for (let i = 0; i < qualiResult.length; i++) {
           if (qualiResult[i] && qualiResult[i] !== 0) {
             await client.query(
               'INSERT INTO qualifying_result_entries (qualifying_results_id, pilot_id, position) VALUES ($1, $2, $3)',
@@ -531,7 +531,7 @@ export class DatabaseService {
       // Handle Free Practice Results
       if (gp.free_practice_results_id) {
         await client.query('DELETE FROM free_practice_result_entries WHERE free_practice_results_id = $1', [gp.free_practice_results_id]);
-        for (let i = 0; i < 8; i++) {
+        for (let i = 0; i < fpResult.length; i++) {
           if (fpResult[i] && fpResult[i] !== 0) {
             await client.query(
               'INSERT INTO free_practice_result_entries (free_practice_results_id, pilot_id, position) VALUES ($1, $2, $3)',

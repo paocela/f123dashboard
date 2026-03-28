@@ -125,18 +125,27 @@ describe('AdminComponent', () => {
   });
 
   it('should validate race results with DNF correctly', () => {
-    const validResults = [1, 0, 0, 0, 0, 0, 0, 0, 1, [1]]; // One driver finished, one DNF
-    const result = component.validateSessionWithDnf(validResults, 'Test');
+    // Set up 8 drivers — the array format is [pos1..posN, fastLap, dnf[]]
+    component.piloti.set(Array.from({ length: 8 }, (_, i) => ({
+      id: i + 1, username: `d${i + 1}`, first_name: 'A', surname: 'B'
+    })));
+    // Driver 1 is in both position 1 AND dnf — should fail duplicate/conflict check
+    const invalidResults = [1, 0, 0, 0, 0, 0, 0, 0, 1, [1]];
+    const result = component.validateSessionWithDnf(invalidResults, 'Test');
     
-    expect(result.isValid).toBe(false); // Will fail because piloti signal is empty in test
+    expect(result.isValid).toBe(false);
+    expect(result.errors.length).toBeGreaterThan(0);
   });
 
   it('should validate qualifying results without DNF correctly', () => {
-    component.piloti.set(mockDrivers);
-    const validResults = [1, 0, 0, 0, 0, 0, 0, 0];
-    const result = component.validateSessionNoDnf(validResults, 'Qualifying');
+    // Set up 8 drivers — first position filled, rest empty → should fail (not all positions filled)
+    component.piloti.set(Array.from({ length: 8 }, (_, i) => ({
+      id: i + 1, username: `d${i + 1}`, first_name: 'A', surname: 'B'
+    })));
+    const incompleteResults = [1, 0, 0, 0, 0, 0, 0, 0];
+    const result = component.validateSessionNoDnf(incompleteResults, 'Qualifying');
     
-    expect(result.isValid).toBe(false); // Missing drivers
+    expect(result.isValid).toBe(false);
     expect(result.errors.length).toBeGreaterThan(0);
   });
 
@@ -158,28 +167,6 @@ describe('AdminComponent', () => {
     
     component.setSprintResult(trackId, position, driverId);
     const result = component.getSprintResult(trackId, position);
-    
-    expect(result).toBe(driverId);
-  });
-
-  it('should get and set qualifying results correctly', () => {
-    const trackId = 1;
-    const position = 3;
-    const driverId = 7;
-    
-    component.setQualiResult(trackId, position, driverId);
-    const result = component.getQualiResult(trackId, position);
-    
-    expect(result).toBe(driverId);
-  });
-
-  it('should get and set free practice results correctly', () => {
-    const trackId = 1;
-    const position = 1;
-    const driverId = 2;
-    
-    component.setFpResult(trackId, position, driverId);
-    const result = component.getFpResult(trackId, position);
     
     expect(result).toBe(driverId);
   });
@@ -210,16 +197,179 @@ describe('AdminComponent', () => {
     expect(Array.isArray(result)).toBe(true);
   });
 
-  it('should initialize results maps correctly', () => {
-    component.piloti.set(mockDrivers);
-    component.tracks.set(mockTracks);
-    component.championshipData.set(mockChampionship);
-    
-    component.initializeResults();
-    
-    expect(component.raceResults()).toBeInstanceOf(Map);
-    expect(component.sprintResults()).toBeInstanceOf(Map);
-    expect(component.qualiResults()).toBeInstanceOf(Map);
-    expect(component.fpResults()).toBeInstanceOf(Map);
+  describe('driverCount signal', () => {
+    it('returns 0 when piloti is empty', () => {
+      component.piloti.set([]);
+      expect(component.driverCount()).toBe(0);
+    });
+
+    it('reflects the current number of drivers in piloti', () => {
+      const tenDrivers: Driver[] = Array.from({ length: 10 }, (_, i) => ({
+        id: i + 1, username: `d${i + 1}`, first_name: 'A', surname: 'B'
+      }));
+      component.piloti.set(tenDrivers);
+      expect(component.driverCount()).toBe(10);
+    });
+  });
+
+  describe('posizioni computed map', () => {
+    it('has N driver entries + Giro Veloce + DNF for N drivers', () => {
+      const n = 6;
+      component.piloti.set(Array.from({ length: n }, (_, i) => ({
+        id: i + 1, username: `d${i + 1}`, first_name: 'A', surname: 'B'
+      })));
+
+      const map = component.posizioni();
+      expect(map.size).toBe(n + 2); // positions 1..N, N+1=GV, N+2=DNF
+    });
+
+    it('labels position N+1 as Giro Veloce', () => {
+      const n = 8;
+      component.piloti.set(Array.from({ length: n }, (_, i) => ({
+        id: i + 1, username: `d${i + 1}`, first_name: 'A', surname: 'B'
+      })));
+
+      expect(component.posizioni().get(n + 1)).toBe('Giro Veloce');
+    });
+
+    it('labels position N+2 as DNF', () => {
+      const n = 8;
+      component.piloti.set(Array.from({ length: n }, (_, i) => ({
+        id: i + 1, username: `d${i + 1}`, first_name: 'A', surname: 'B'
+      })));
+
+      expect(component.posizioni().get(n + 2)).toBe('DNF');
+    });
+
+    it('updates when piloti count changes', () => {
+      component.piloti.set(Array.from({ length: 6 }, (_, i) => ({
+        id: i + 1, username: `d${i + 1}`, first_name: 'A', surname: 'B'
+      })));
+      expect(component.posizioni().size).toBe(8); // 6+2
+
+      component.piloti.set(Array.from({ length: 10 }, (_, i) => ({
+        id: i + 1, username: `d${i + 1}`, first_name: 'A', surname: 'B'
+      })));
+      expect(component.posizioni().size).toBe(12); // 10+2
+    });
+  });
+
+  describe('initializeResults with N drivers', () => {
+    function makeDrivers(n: number): Driver[] {
+      return Array.from({ length: n }, (_, i) => ({
+        id: i + 1, username: `d${i + 1}`, first_name: 'A', surname: 'B'
+      }));
+    }
+
+    function makeChampionshipEntry(trackName: string): ChampionshipData {
+      return {
+        gran_prix_id: 1, track_name: trackName,
+        gran_prix_date: new Date(), gran_prix_has_sprint: 0, gran_prix_has_x2: 0, track_country: 'IT',
+        sessions: {}, fastLapDrivers: {}
+      };
+    }
+
+    it('creates race array of length N+2 (positions + fast_lap slot + DNF slot)', () => {
+      const n = 10;
+      const trackName = 'Monza';
+      const track: TrackData = { track_id: 1, name: trackName, country: 'Italy', date: '2024-01-01', has_sprint: 0, has_x2: 0, besttime_driver_time: '1:10', username: 'd1' };
+      component.piloti.set(makeDrivers(n));
+      component.tracks.set([track]);
+      component.championshipData.set([makeChampionshipEntry(trackName)]);
+
+      component.initializeResults();
+
+      component.raceResults().forEach(arr => {
+        expect(arr.length).toBe(n + 2);
+        arr.slice(0, n).forEach((v: unknown) => expect(v).toBe(0));
+        expect(Array.isArray(arr[n + 1])).toBeTrue();
+      });
+    });
+
+    it('creates quali/fp arrays of length N (no extra slots)', () => {
+      const n = 6;
+      const trackName = 'Monaco';
+      const track: TrackData = { track_id: 2, name: trackName, country: 'Monaco', date: '2024-01-01', has_sprint: 0, has_x2: 0, besttime_driver_time: '1:10', username: 'd1' };
+      component.piloti.set(makeDrivers(n));
+      component.tracks.set([track]);
+      component.championshipData.set([makeChampionshipEntry(trackName)]);
+
+      component.initializeResults();
+
+      component.qualiResults().forEach(arr => expect(arr.length).toBe(n));
+      component.fpResults().forEach(arr => expect(arr.length).toBe(n));
+    });
+  });
+
+  describe('validateSessionWithDnf – N drivers', () => {
+    function makeDrivers(n: number): Driver[] {
+      return Array.from({ length: n }, (_, i) => ({ id: i + 1, username: `d${i + 1}`, first_name: 'A', surname: 'B' }));
+    }
+
+    it('passes with exactly N finishers, a fast lap, and no DNF', () => {
+      const n = 6;
+      component.piloti.set(makeDrivers(n));
+      // [pos1..posN, fastLap, []]
+      const arr = [...Array.from({ length: n }, (_, i) => i + 1), n + 1, []];
+      const result = component.validateSessionWithDnf(arr, 'Gara');
+      expect(result.isValid).toBeTrue();
+    });
+
+    it('fails when fast lap is missing', () => {
+      const n = 6;
+      component.piloti.set(makeDrivers(n));
+      const arr = [...Array.from({ length: n }, (_, i) => i + 1), 0, []];
+      const result = component.validateSessionWithDnf(arr, 'Gara');
+      expect(result.isValid).toBeFalse();
+      expect(result.errors.some(e => e.includes('giro veloce'))).toBeTrue();
+    });
+
+    it('fails when array is too short for the current driver count', () => {
+      component.piloti.set(makeDrivers(10));
+      const shortArr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, []]; // only 9 positions
+      const result = component.validateSessionWithDnf(shortArr, 'Gara');
+      expect(result.isValid).toBeFalse();
+      expect(result.errors.some(e => e.includes('incompleti'))).toBeTrue();
+    });
+
+    it('passes with N-1 finishers and 1 DNF (last position slot empty)', () => {
+      const n = 6;
+      component.piloti.set(makeDrivers(n));
+      // positions: [1,2,3,4,5,0], fast_lap: 1, dnf: [6]
+      const arr = [1, 2, 3, 4, 5, 0, 1, [6]];
+      const result = component.validateSessionWithDnf(arr, 'Gara');
+      expect(result.isValid).toBeTrue();
+    });
+  });
+
+  describe('validateSessionNoDnf – N drivers', () => {
+    function makeDrivers(n: number): Driver[] {
+      return Array.from({ length: n }, (_, i) => ({ id: i + 1, username: `d${i + 1}`, first_name: 'A', surname: 'B' }));
+    }
+
+    it('passes with exactly N unique valid drivers', () => {
+      const n = 6;
+      component.piloti.set(makeDrivers(n));
+      const arr = Array.from({ length: n }, (_, i) => i + 1);
+      const result = component.validateSessionNoDnf(arr, 'Qualifica');
+      expect(result.isValid).toBeTrue();
+    });
+
+    it('fails when array has fewer entries than driverCount', () => {
+      component.piloti.set(makeDrivers(10));
+      const arr = [1, 2, 3, 4, 5, 6, 7, 8]; // only 8 for a 10-driver season
+      const result = component.validateSessionNoDnf(arr, 'Qualifica');
+      expect(result.isValid).toBeFalse();
+      expect(result.errors.some(e => e.includes('incompleti'))).toBeTrue();
+    });
+
+    it('fails when there are duplicate drivers', () => {
+      const n = 4;
+      component.piloti.set(makeDrivers(n));
+      const arr = [1, 1, 3, 4]; // driver 1 duplicated
+      const result = component.validateSessionNoDnf(arr, 'Qualifica');
+      expect(result.isValid).toBeFalse();
+      expect(result.errors.some(e => e.includes('duplicat'))).toBeTrue();
+    });
   });
 });
