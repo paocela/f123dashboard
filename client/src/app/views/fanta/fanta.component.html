@@ -101,14 +101,14 @@
               <div class="accordion-body">
                 <form #form="ngForm" cForm (ngSubmit)="publishVoto(track.track_id, form)">
                  <c-container>
-                    @for (posizione of posizioni | keyvalue; track posizione.key) {
+                    @for (posizione of posizioniDinamiche() | keyvalue; track posizione.key) {
                       <c-row
                         class="my-2 position-row"
                         [gutter]="{g: 2, sm: {g: 3}}"
                       >
                         <c-col xs="5" sm="3" md="auto" class="position-label">
                           <strong class="text-nowrap">
-                            @if (posizione.key <= 8) {
+                            @if (posizione.key <= driverCount()) {
                               {{ posizione?.value }} posto
                             } @else {
                               {{posizione?.value}}
@@ -121,18 +121,18 @@
                               attr.alt="Medal for position {{ posizione.key }}"
                             />
                           }
-                          @if (posizione.key == 9) {
+                          @if (posizione.key === driverCount() + 1) {
                             <svg [cIcon]="fireIcon" class="position-icon" style="color: purple"></svg>
                           }
-                          @if (posizione.key == 10) {
+                          @if (posizione.key === driverCount() + 2) {
                             <svg [cIcon]="powerIcon" class="position-icon" style="color: red"></svg>
                           }
-                          @if (posizione.key == 11) {
+                          @if (posizione.key === driverCount() + 3) {
                             <svg [cIcon]="teamIcon" class="position-icon" style="color: blue"></svg>
                           }
                         </c-col>
                         <c-col xs="7" sm="9" md="auto" class="ms-auto select-col">
-                          @if (posizione.key <= 10) {
+                          @if (posizione.key <= driverCount() + 2) {
                             <select
                               attr.aria-label="seleziona il pilota che arrivera {{posizione?.value}}"
                               attr.id="{{ track.track_id + posizione.key }}"

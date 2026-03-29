@@ -194,11 +194,24 @@ The `fanta` table stores fantasy team selections, while the result entry tables 
 - **id**: Primary key (int4, auto-increment)
 - **fanta_player_id**: Reference to `users` (int8, NOT NULL)
 - **race_id**: Reference to a race event (int8, NOT NULL)
-- **1_place_id** to **8_place_id**: Fantasy team positions (drivers, int8, NOT NULL)
-- **fast_lap_id**: Fastest lap (driver id, int8, NOT NULL)
-- **dnf_id**: Driver who did not finish (driver id, int8, NOT NULL)
+- **fast_lap_id**: Fastest lap prediction (driver id, int8, NOT NULL)
+- **dnf_id**: DNF prediction (driver id, int8, NOT NULL)
 - **season_id**: Reference to `seasons` (int4, NOT NULL)
 - **team_id**: Reference to `teams` (int8, NOT NULL)
+- **Unique Constraint**: (fanta_player_id, race_id, season_id)
+
+> **Note**: Driver position predictions are no longer stored as fixed columns (`1_place_id` … `8_place_id`) on this table. They are stored in the `fanta_entries` table (see below), which supports a dynamic number of driver positions per season.
+
+---
+
+## 13a. Fanta Entries
+
+- **fanta_id**: Reference to `fanta(id)` (int4, NOT NULL, CASCADE DELETE)
+- **pilot_id**: Reference to `drivers(id)` (int4, NOT NULL)
+- **position**: Predicted finishing position (int4, NOT NULL) — 1-based, where 1 = predicted 1st place
+- **Primary Key**: Composite (fanta_id, position)
+
+**Purpose**: Stores the ordered list of driver position predictions for each fantasy vote. One row per predicted position.
 
 ---
 

@@ -18,8 +18,8 @@ import { DbDataService } from './../../service/db-data.service';
 import { FantaService } from './../../service/fanta.service';
 import { cilFire, cilPowerStandby, cilPeople } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
-import { VOTE_INDEX, FORM_STATUS, DRIVER_POSITIONS_COUNT, TOTAL_VOTE_FIELDS, FantaVoteHelper } from '../../model/fanta';
-import { medals, allFlags, posizioni } from '../../model/constants';
+import { FORM_STATUS, FantaVoteHelper } from '../../model/fanta';
+import { medals, allFlags } from '../../model/constants';
 import { LeaderboardComponent } from "../../components/leaderboard/leaderboard.component";
 import { VoteHistoryTableComponent } from '../../components/vote-history-table/vote-history-table.component';
 import { FantaRulesComponent } from '../../components/fanta-rules/fanta-rules.component';
@@ -117,9 +117,22 @@ export class FantaComponent implements OnInit {
   public fireIcon: string[] = cilFire;
   public powerIcon: string[] = cilPowerStandby;
   public teamIcon: string[] = cilPeople;
-  public posizioni = posizioni;
   public medals = medals;
   public allFlags = allFlags;
+
+  readonly driverCount = computed(() => this.piloti().length);
+
+  readonly posizioniDinamiche = computed(() => {
+    const n = this.driverCount();
+    const map = new Map<number, string>();
+    for (let i = 1; i <= n; i++) {
+      map.set(i, String(i));
+    }
+    map.set(n + 1, 'Giro Veloce');
+    map.set(n + 2, 'DNF');
+    map.set(n + 3, 'Team Vincente');
+    return map;
+  });
 
   ngOnInit(): void {
     this.loadUserFromSession();
@@ -228,21 +241,15 @@ export class FantaComponent implements OnInit {
     this.loadingSignal.update(loading => ({ ...loading, [trackId]: true }));
 
     const votes = this.votazioni().get(trackId) || [];
+    const dCount = this.driverCount();
     const fantaVoto: FantaVote = {
       fanta_player_id: this.user().id,
       username: this.user().username,
       track_id: trackId,
-      id_1_place: votes[VOTE_INDEX.PLACE_1],
-      id_2_place: votes[VOTE_INDEX.PLACE_2],
-      id_3_place: votes[VOTE_INDEX.PLACE_3],
-      id_4_place: votes[VOTE_INDEX.PLACE_4],
-      id_5_place: votes[VOTE_INDEX.PLACE_5],
-      id_6_place: votes[VOTE_INDEX.PLACE_6],
-      id_7_place: votes[VOTE_INDEX.PLACE_7],
-      id_8_place: votes[VOTE_INDEX.PLACE_8],
-      id_fast_lap: votes[VOTE_INDEX.FAST_LAP],
-      id_dnf: votes[VOTE_INDEX.DNF],
-      constructor_id: votes[VOTE_INDEX.CONSTRUCTOR]
+      positions: votes.slice(0, dCount),
+      id_fast_lap: votes[dCount] || 0,
+      id_dnf: votes[dCount + 1] || 0,
+      constructor_id: votes[dCount + 2] || 0
     };
     
     try {
@@ -274,23 +281,22 @@ export class FantaComponent implements OnInit {
    */
   private validateForm(trackId: number): { isValid: boolean; hasEmptyVotes: boolean; hasDuplicates: boolean } {
     const votoArray = this.votazioni().get(trackId) || [];
-    
-    // Check if all required fields are present
-    if (votoArray.length < TOTAL_VOTE_FIELDS) {
+    const dCount = this.driverCount();
+    const totalFields = dCount + 3;
+
+    if (votoArray.length < totalFields) {
       return { isValid: false, hasEmptyVotes: true, hasDuplicates: false };
     }
-    
-    // Check for empty votes in all required positions
-    const hasEmptyVotes = votoArray.some((v, i) => i <= VOTE_INDEX.CONSTRUCTOR && v === 0);
-    
-    // Check for duplicates only in driver positions (indices 0-7)
-    const driverVotes = votoArray.slice(0, DRIVER_POSITIONS_COUNT);
+
+    const hasEmptyVotes = votoArray.some((v, i) => i < totalFields && v === 0);
+
+    const driverVotes = votoArray.slice(0, dCount);
     const hasDuplicates = driverVotes.some((v, i) => driverVotes.indexOf(v) !== i);
-    
-    return { 
-      isValid: !hasEmptyVotes && !hasDuplicates, 
-      hasEmptyVotes, 
-      hasDuplicates 
+
+    return {
+      isValid: !hasEmptyVotes && !hasDuplicates,
+      hasEmptyVotes,
+      hasDuplicates
     };
   }
 
@@ -322,7 +328,7 @@ export class FantaComponent implements OnInit {
    */
   getVotoPos(trackId: number, pilota: number): number {
     const votoArray = this.votazioni().get(trackId) || [];
-    const posizione = votoArray.indexOf(pilota);
+    const posizione = votoArray.slice(0, this.driverCount()).indexOf(pilota);
     return posizione >= 0 ? posizione + 1 : 0;
   }
 
@@ -450,21 +456,15 @@ export class FantaComponent implements OnInit {
    */
   getFantaVoteObject(trackId: number): FantaVote {
     const voteArray = this.votazioni().get(trackId) || [];
+    const dCount = this.driverCount();
     return {
       fanta_player_id: this.user().id,
       username: this.user().username,
       track_id: trackId,
-      id_1_place: voteArray[VOTE_INDEX.PLACE_1] || 0,
-      id_2_place: voteArray[VOTE_INDEX.PLACE_2] || 0,
-      id_3_place: voteArray[VOTE_INDEX.PLACE_3] || 0,
-      id_4_place: voteArray[VOTE_INDEX.PLACE_4] || 0,
-      id_5_place: voteArray[VOTE_INDEX.PLACE_5] || 0,
-      id_6_place: voteArray[VOTE_INDEX.PLACE_6] || 0,
-      id_7_place: voteArray[VOTE_INDEX.PLACE_7] || 0,
-      id_8_place: voteArray[VOTE_INDEX.PLACE_8] || 0,
-      id_fast_lap: voteArray[VOTE_INDEX.FAST_LAP] || 0,
-      id_dnf: voteArray[VOTE_INDEX.DNF] || 0,
-      constructor_id: voteArray[VOTE_INDEX.CONSTRUCTOR] || 0
+      positions: voteArray.slice(0, dCount),
+      id_fast_lap: voteArray[dCount] || 0,
+      id_dnf: voteArray[dCount + 1] || 0,
+      constructor_id: voteArray[dCount + 2] || 0
     };
   }
 

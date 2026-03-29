@@ -78,14 +78,7 @@ describe('FantaService', () => {
       fanta_player_id: 1,
       username: 'player1',
       track_id: 100,
-      id_1_place: 1,
-      id_2_place: 2,
-      id_3_place: 3,
-      id_4_place: 4,
-      id_5_place: 5,
-      id_6_place: 6,
-      id_7_place: 7,
-      id_8_place: 8,
+      positions: [1, 2, 3, 4, 5, 6, 7, 8],
       id_fast_lap: 1,
       id_dnf: 7,
       constructor_id: 1,
@@ -95,14 +88,7 @@ describe('FantaService', () => {
       fanta_player_id: 2,
       username: 'player2',
       track_id: 100,
-      id_1_place: 2,
-      id_2_place: 1,
-      id_3_place: 4,
-      id_4_place: 3,
-      id_5_place: 6,
-      id_6_place: 5,
-      id_7_place: 8,
-      id_8_place: 7,
+      positions: [2, 1, 4, 3, 6, 5, 8, 7],
       id_fast_lap: 2,
       id_dnf: 8,
       constructor_id: 2,
@@ -112,14 +98,7 @@ describe('FantaService', () => {
       fanta_player_id: 1,
       username: 'player1',
       track_id: 101,
-      id_1_place: 2,
-      id_2_place: 1,
-      id_3_place: 3,
-      id_4_place: 4,
-      id_5_place: 5,
-      id_6_place: 6,
-      id_7_place: 7,
-      id_8_place: 8,
+      positions: [2, 1, 3, 4, 5, 6, 7, 8],
       id_fast_lap: 2,
       id_dnf: 5,
       constructor_id: 1,
@@ -410,14 +389,7 @@ describe('FantaService', () => {
         fanta_player_id: 1,
         username: 'player1',
         track_id: 100,
-        id_1_place: 2,
-        id_2_place: 1,
-        id_3_place: 3,
-        id_4_place: 4,
-        id_5_place: 5,
-        id_6_place: 6,
-        id_7_place: 7,
-        id_8_place: 8,
+        positions: [2, 1, 3, 4, 5, 6, 7, 8],
         id_fast_lap: 1,
         id_dnf: 0,
         constructor_id: 0
@@ -448,14 +420,7 @@ describe('FantaService', () => {
         fanta_player_id: 1,
         username: 'player1',
         track_id: 100,
-        id_1_place: 1,
-        id_2_place: 2,
-        id_3_place: 3,
-        id_4_place: 4,
-        id_5_place: 5,
-        id_6_place: 6,
-        id_7_place: 7,
-        id_8_place: 8,
+        positions: [1, 2, 3, 4, 5, 6, 7, 8],
         id_fast_lap: 0,
         id_dnf: 7,
         constructor_id: 0
@@ -486,14 +451,7 @@ describe('FantaService', () => {
         fanta_player_id: 1,
         username: 'player1',
         track_id: 100,
-        id_1_place: 1,
-        id_2_place: 2,
-        id_3_place: 3,
-        id_4_place: 4,
-        id_5_place: 5,
-        id_6_place: 6,
-        id_7_place: 7,
-        id_8_place: 8,
+        positions: [1, 2, 3, 4, 5, 6, 7, 8],
         id_fast_lap: 2,
         id_dnf: 0,
         constructor_id: 0
@@ -565,14 +523,7 @@ describe('FantaService', () => {
         fanta_player_id: 1,
         username: 'player1',
         track_id: 103,
-        id_1_place: 1,
-        id_2_place: 2,
-        id_3_place: 3,
-        id_4_place: 4,
-        id_5_place: 5,
-        id_6_place: 6,
-        id_7_place: 7,
-        id_8_place: 8,
+        positions: [1, 2, 3, 4, 5, 6, 7, 8],
         id_fast_lap: 0,
         id_dnf: 0,
         constructor_id: 1
@@ -702,8 +653,7 @@ describe('FantaService', () => {
 
       const vote: FantaVote = {
         fanta_player_id: 1, username: 'p1', track_id: 500,
-        id_1_place: 1, id_2_place: 2, id_3_place: 3, id_4_place: 4, id_5_place: 5,
-        id_6_place: 0, id_7_place: 0, id_8_place: 0,
+        positions: [1, 2, 3, 4, 5],
         id_fast_lap: 4, id_dnf: 0, constructor_id: 0
       };
 
@@ -732,8 +682,7 @@ describe('FantaService', () => {
 
       const vote: FantaVote = {
         fanta_player_id: 1, username: 'p1', track_id: 1000,
-        id_1_place: 1, id_2_place: 2, id_3_place: 3, id_4_place: 4,
-        id_5_place: 5, id_6_place: 6, id_7_place: 7, id_8_place: 8,
+        positions: [1, 2, 3, 4, 5, 6, 7, 8],
         id_fast_lap: 1, id_dnf: 0, constructor_id: 0
       };
 
@@ -760,8 +709,7 @@ describe('FantaService', () => {
 
       const voteCorrect: FantaVote = {
         fanta_player_id: 1, username: 'p1', track_id: 110,
-        id_1_place: 10, id_2_place: 11, id_3_place: 0, id_4_place: 0,
-        id_5_place: 0, id_6_place: 0, id_7_place: 0, id_8_place: 0,
+        positions: [10, 11],
         id_fast_lap: 11, id_dnf: 0, constructor_id: 0
       };
       const voteWrong: FantaVote = { ...voteCorrect, id_fast_lap: 10 };

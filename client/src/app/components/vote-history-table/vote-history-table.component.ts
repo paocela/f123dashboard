@@ -45,20 +45,8 @@ export class VoteHistoryTableComponent {
     if (!vote) {
       return [];
     }
-    
-    return [
-      vote.id_1_place,
-      vote.id_2_place,
-      vote.id_3_place,
-      vote.id_4_place,
-      vote.id_5_place,
-      vote.id_6_place,
-      vote.id_7_place,
-      vote.id_8_place,
-      vote.id_fast_lap,
-      vote.id_dnf,
-      vote.constructor_id
-    ];
+
+    return [...vote.positions, vote.id_fast_lap, vote.id_dnf, vote.constructor_id];
   });
 
   raceResult = computed(() => 
@@ -73,7 +61,7 @@ export class VoteHistoryTableComponent {
     this.raceResult()?.list_dnf ?? []
   );
 
-  driverPositionsCount = computed(() => this.raceResult()?.positions?.length ?? 8);
+  driverPositionsCount = computed(() => this.fantaVote().positions?.length ?? 0);
 
   winningConstructors = computed(() => 
     this.fantaService.getWinningConstructorsForTrack(this.trackId())

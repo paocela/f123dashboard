@@ -36,7 +36,7 @@ export class FantaService {
     const results = this.raceResults();
 
     results.forEach(raceResult => {
-      const raceVotes = votes.filter(item => item.track_id === raceResult.track_id && item.id_1_place !== null);
+      const raceVotes = votes.filter(item => item.track_id === raceResult.track_id && item.positions?.length > 0);
       if (raceVotes.length === 0) { return; }
 
       raceVotes.forEach(raceVote => {
@@ -147,10 +147,7 @@ export class FantaService {
       raceResult.positions.map(p => [p.pilot_id, p.position - 1])
     );
 
-    const votePositions = [
-      Number(fantaVote.id_1_place), Number(fantaVote.id_2_place), Number(fantaVote.id_3_place), Number(fantaVote.id_4_place),
-      Number(fantaVote.id_5_place), Number(fantaVote.id_6_place), Number(fantaVote.id_7_place), Number(fantaVote.id_8_place)
-    ];
+    const votePositions = fantaVote.positions.map(Number);
     // Calculate points for each driver
     this.dbData.drivers().forEach(driver => {
       const realPosition = resultPilotToPos.get(Number(driver.id));

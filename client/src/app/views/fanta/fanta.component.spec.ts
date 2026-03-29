@@ -6,7 +6,7 @@ import { FantaComponent } from './fanta.component';
 import { AuthService } from './../../service/auth.service';
 import { DbDataService } from './../../service/db-data.service';
 import { FantaService } from './../../service/fanta.service';
-import { VOTE_INDEX, FORM_STATUS } from '../../model/fanta';
+import { FORM_STATUS } from '../../model/fanta';
 import type { FantaVote, User, DriverData, TrackData, Constructor } from '@f123dashboard/shared';
 
 describe('FantaComponent', () => {
@@ -139,14 +139,7 @@ describe('FantaComponent', () => {
     fanta_player_id: 1,
     username: 'testuser',
     track_id: 1,
-    id_1_place: 1,
-    id_2_place: 2,
-    id_3_place: 3,
-    id_4_place: 4,
-    id_5_place: 5,
-    id_6_place: 6,
-    id_7_place: 7,
-    id_8_place: 8,
+    positions: [1, 2],
     id_fast_lap: 1,
     id_dnf: 2,
     constructor_id: 1
@@ -318,35 +311,23 @@ describe('FantaComponent', () => {
 
     it('should return false for duplicate driver votes', () => {
       const mockForm = { valid: true } as NgForm;
-      // Set all required fields
-      component.setVoto(1, 1, 1, mockForm);
+      // 2 mock drivers → driverCount = 2 → total fields = 5
+      component.setVoto(1, 1, 1, mockForm); // driver 1 at pos 1
       component.setVoto(1, 2, 1, mockForm); // Duplicate driver ID
-      component.setVoto(1, 3, 3, mockForm);
-      component.setVoto(1, 4, 4, mockForm);
-      component.setVoto(1, 5, 5, mockForm);
-      component.setVoto(1, 6, 6, mockForm);
-      component.setVoto(1, 7, 7, mockForm);
-      component.setVoto(1, 8, 8, mockForm);
-      component.setVoto(1, 9, 1, mockForm); // Fast lap
-      component.setVoto(1, 10, 2, mockForm); // DNF
-      component.setVoto(1, 11, 1, mockForm); // Constructor
+      component.setVoto(1, 3, 1, mockForm); // Fast lap
+      component.setVoto(1, 4, 2, mockForm); // DNF
+      component.setVoto(1, 5, 1, mockForm); // Constructor
       expect(component.formIsValid(1)).toBe(false);
     });
 
     it('should return true for complete and valid form', () => {
       const mockForm = { valid: true } as NgForm;
-      // Set all required fields with unique driver IDs
-      component.setVoto(1, 1, 1, mockForm);
-      component.setVoto(1, 2, 2, mockForm);
-      component.setVoto(1, 3, 3, mockForm);
-      component.setVoto(1, 4, 4, mockForm);
-      component.setVoto(1, 5, 5, mockForm);
-      component.setVoto(1, 6, 6, mockForm);
-      component.setVoto(1, 7, 7, mockForm);
-      component.setVoto(1, 8, 8, mockForm);
-      component.setVoto(1, 9, 1, mockForm); // Fast lap (can be duplicate)
-      component.setVoto(1, 10, 2, mockForm); // DNF (can be duplicate)
-      component.setVoto(1, 11, 1, mockForm); // Constructor
+      // 2 mock drivers → driverCount = 2 → total fields = 5
+      component.setVoto(1, 1, 1, mockForm); // driver 1 unique
+      component.setVoto(1, 2, 2, mockForm); // driver 2 unique
+      component.setVoto(1, 3, 1, mockForm); // Fast lap (can repeat)
+      component.setVoto(1, 4, 2, mockForm); // DNF (can repeat)
+      component.setVoto(1, 5, 1, mockForm); // Constructor
       expect(component.formIsValid(1)).toBe(true);
     });
   });
@@ -365,18 +346,12 @@ describe('FantaComponent', () => {
 
     it('should publish valid vote successfully', async () => {
       const mockForm = { valid: true } as NgForm;
-      // Set up a complete valid vote
+      // 2 mock drivers → total fields = 5
       component.setVoto(1, 1, 1, mockForm);
       component.setVoto(1, 2, 2, mockForm);
-      component.setVoto(1, 3, 3, mockForm);
-      component.setVoto(1, 4, 4, mockForm);
-      component.setVoto(1, 5, 5, mockForm);
-      component.setVoto(1, 6, 6, mockForm);
-      component.setVoto(1, 7, 7, mockForm);
-      component.setVoto(1, 8, 8, mockForm);
-      component.setVoto(1, 9, 1, mockForm);
-      component.setVoto(1, 10, 2, mockForm);
-      component.setVoto(1, 11, 1, mockForm);
+      component.setVoto(1, 3, 1, mockForm);
+      component.setVoto(1, 4, 2, mockForm);
+      component.setVoto(1, 5, 1, mockForm);
 
       await component.publishVoto(1, mockForm);
       expect(mockFantaService.setFantaVote).toHaveBeenCalled();
@@ -387,15 +362,9 @@ describe('FantaComponent', () => {
       const mockForm = { valid: true } as NgForm;
       component.setVoto(1, 1, 1, mockForm);
       component.setVoto(1, 2, 2, mockForm);
-      component.setVoto(1, 3, 3, mockForm);
-      component.setVoto(1, 4, 4, mockForm);
-      component.setVoto(1, 5, 5, mockForm);
-      component.setVoto(1, 6, 6, mockForm);
-      component.setVoto(1, 7, 7, mockForm);
-      component.setVoto(1, 8, 8, mockForm);
-      component.setVoto(1, 9, 1, mockForm);
-      component.setVoto(1, 10, 2, mockForm);
-      component.setVoto(1, 11, 1, mockForm);
+      component.setVoto(1, 3, 1, mockForm);
+      component.setVoto(1, 4, 2, mockForm);
+      component.setVoto(1, 5, 1, mockForm);
 
       let loadingDuringCall = false;
       mockFantaService.setFantaVote.and.callFake(async () => {
@@ -412,15 +381,9 @@ describe('FantaComponent', () => {
       const mockForm = { valid: true } as NgForm;
       component.setVoto(1, 1, 1, mockForm);
       component.setVoto(1, 2, 2, mockForm);
-      component.setVoto(1, 3, 3, mockForm);
-      component.setVoto(1, 4, 4, mockForm);
-      component.setVoto(1, 5, 5, mockForm);
-      component.setVoto(1, 6, 6, mockForm);
-      component.setVoto(1, 7, 7, mockForm);
-      component.setVoto(1, 8, 8, mockForm);
-      component.setVoto(1, 9, 1, mockForm);
-      component.setVoto(1, 10, 2, mockForm);
-      component.setVoto(1, 11, 1, mockForm);
+      component.setVoto(1, 3, 1, mockForm);
+      component.setVoto(1, 4, 2, mockForm);
+      component.setVoto(1, 5, 1, mockForm);
 
       mockFantaService.setFantaVote.and.returnValue(Promise.reject('Error'));
       await component.publishVoto(1, mockForm);
@@ -432,15 +395,9 @@ describe('FantaComponent', () => {
       const mockForm = { valid: true } as NgForm;
       component.setVoto(1, 1, 1, mockForm);
       component.setVoto(1, 2, 2, mockForm);
-      component.setVoto(1, 3, 3, mockForm);
-      component.setVoto(1, 4, 4, mockForm);
-      component.setVoto(1, 5, 5, mockForm);
-      component.setVoto(1, 6, 6, mockForm);
-      component.setVoto(1, 7, 7, mockForm);
-      component.setVoto(1, 8, 8, mockForm);
-      component.setVoto(1, 9, 1, mockForm);
-      component.setVoto(1, 10, 2, mockForm);
-      component.setVoto(1, 11, 1, mockForm);
+      component.setVoto(1, 3, 1, mockForm);
+      component.setVoto(1, 4, 2, mockForm);
+      component.setVoto(1, 5, 1, mockForm);
 
       await component.publishVoto(1, mockForm);
       const originalVotes = component.originalVotazioni().get(1);
@@ -565,31 +522,25 @@ describe('FantaComponent', () => {
 
     it('should convert vote array to FantaVote object', () => {
       const mockForm = { valid: true } as NgForm;
+      // 2 mock drivers → driverCount = 2 → fields at indices 1-5
       component.setVoto(1, 1, 1, mockForm);
       component.setVoto(1, 2, 2, mockForm);
       component.setVoto(1, 3, 3, mockForm);
       component.setVoto(1, 4, 4, mockForm);
-      component.setVoto(1, 5, 5, mockForm);
-      component.setVoto(1, 6, 6, mockForm);
-      component.setVoto(1, 7, 7, mockForm);
-      component.setVoto(1, 8, 8, mockForm);
-      component.setVoto(1, 9, 1, mockForm);
-      component.setVoto(1, 10, 2, mockForm);
-      component.setVoto(1, 11, 1, mockForm);
+      component.setVoto(1, 5, 1, mockForm);
 
       const fantaVote = component.getFantaVoteObject(1);
       expect(fantaVote.fanta_player_id).toBe(mockUser.id);
       expect(fantaVote.username).toBe(mockUser.username);
       expect(fantaVote.track_id).toBe(1);
-      expect(fantaVote.id_1_place).toBe(1);
-      expect(fantaVote.id_2_place).toBe(2);
+      expect(fantaVote.positions[0]).toBe(1);
+      expect(fantaVote.positions[1]).toBe(2);
       expect(fantaVote.constructor_id).toBe(1);
     });
 
     it('should return empty vote object for non-existent track', () => {
       const fantaVote = component.getFantaVoteObject(999);
-      expect(fantaVote.id_1_place).toBe(0);
-      expect(fantaVote.id_2_place).toBe(0);
+      expect(fantaVote.positions.length).toBe(0);
       expect(fantaVote.constructor_id).toBe(0);
     });
   });
