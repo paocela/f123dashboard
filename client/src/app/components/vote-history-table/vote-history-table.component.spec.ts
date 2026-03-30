@@ -79,7 +79,6 @@ describe('VoteHistoryTableComponent', () => {
 
   const mockFantaVote: FantaVote = {
     fanta_player_id: 1,
-    username: 'testuser',
     track_id: 1,
     positions: [1, 2, 3, 4, 5, 6, 7, 8],
     id_fast_lap: 1,

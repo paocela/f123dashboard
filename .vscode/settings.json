@@ -3,6 +3,7 @@
     "chat.tools.terminal.autoApprove": {
         "npm outdated": true,
         "npx ng": true,
-        "npx tsc": true
+        "npx tsc": true,
+        "npx vitest": true
     }
 }

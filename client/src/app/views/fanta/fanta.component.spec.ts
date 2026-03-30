@@ -137,7 +137,6 @@ describe('FantaComponent', () => {
 
   const mockFantaVote: FantaVote = {
     fanta_player_id: 1,
-    username: 'testuser',
     track_id: 1,
     positions: [1, 2],
     id_fast_lap: 1,
@@ -531,7 +530,6 @@ describe('FantaComponent', () => {
 
       const fantaVote = component.getFantaVoteObject(1);
       expect(fantaVote.fanta_player_id).toBe(mockUser.id);
-      expect(fantaVote.username).toBe(mockUser.username);
       expect(fantaVote.track_id).toBe(1);
       expect(fantaVote.positions[0]).toBe(1);
       expect(fantaVote.positions[1]).toBe(2);

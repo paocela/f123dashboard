@@ -3,7 +3,7 @@ import { DbDataService } from './db-data.service';
 import { ApiService } from './api.service';
 import { size } from 'lodash-es';
 import { firstValueFrom } from 'rxjs';
-import type { FantaVote, RaceResult } from '@f123dashboard/shared';
+import type { FantaVote, FantaVoteSubmission, RaceResult } from '@f123dashboard/shared';
 
 @Injectable({
   providedIn: 'root'
@@ -72,7 +72,7 @@ export class FantaService {
 
   }
 
-  async setFantaVote(voto: FantaVote): Promise<void> {
+  async setFantaVote(voto: FantaVoteSubmission): Promise<void> {
     await firstValueFrom(
       this.apiService.post('/fanta/set-vote', voto)
     );

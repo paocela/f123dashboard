@@ -66,8 +66,8 @@ describe('DatabaseService.setGpResult – dynamic driver count', () => {
 
   // Extracts the driver INSERT calls for a given table name
   function getInsertCalls(client: ReturnType<typeof createMockPool>['client'], table: string) {
-    return client.query.mock.calls.filter(
-      ([sql]: [string]) => typeof sql === 'string' && sql.includes(`INSERT INTO ${table}`)
+    return (client.query.mock.calls as [string, unknown[]][]).filter(
+      ([sql, v]) => typeof sql === 'string' && sql.includes(`INSERT INTO ${table}`)
     );
   }
 
@@ -128,12 +128,12 @@ describe('DatabaseService.setGpResult – dynamic driver count', () => {
 
       const inserts = getInsertCalls(client, 'race_result_entries');
       // Each call: [race_results_id, pilot_id, position, fast_lap]
-      const fastLapEntry = inserts.find(([, values]: [string, unknown[]]) => values[1] === fastLapDriver);
+      const fastLapEntry = inserts.find(([, values]) => values[1] === fastLapDriver);
       expect(fastLapEntry).toBeDefined();
       expect(fastLapEntry![1][3]).toBe(true);  // fast_lap = true
 
-      const nonFastLapEntries = inserts.filter(([, values]: [string, unknown[]]) => values[1] !== fastLapDriver);
-      nonFastLapEntries.forEach(([, values]: [string, unknown[]]) => {
+      const nonFastLapEntries = inserts.filter(([, values]) => values[1] !== fastLapDriver);
+      nonFastLapEntries.forEach(([, values]) => {
         expect(values[3]).toBe(false);
       });
     });
@@ -155,8 +155,8 @@ describe('DatabaseService.setGpResult – dynamic driver count', () => {
       );
 
       const inserts = getInsertCalls(client, 'race_result_entries');
-      const positionInserts = inserts.filter(([, v]: [string, unknown[]]) => v[2] !== 0);
-      const dnfInserts = inserts.filter(([, v]: [string, unknown[]]) => v[2] === 0);
+      const positionInserts = inserts.filter(([, v]) => v[2] !== 0);
+      const dnfInserts = inserts.filter(([, v]) => v[2] === 0);
 
       expect(positionInserts.length).toBe(finishers.length);
       expect(dnfInserts.length).toBe(dnfDrivers.length);
@@ -266,7 +266,7 @@ describe('DatabaseService.setGpResult – dynamic driver count', () => {
 
     expect(result.success).toBe(false);
     expect(result.message).toContain('Failed to save');
-    const rollbackCall = client.query.mock.calls.find(([sql]: [string]) => sql === 'ROLLBACK');
+    const rollbackCall = (client.query.mock.calls as [string][]).find(([sql]) => sql === 'ROLLBACK');
     expect(rollbackCall).toBeDefined();
   });
 });

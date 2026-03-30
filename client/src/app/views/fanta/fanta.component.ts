@@ -31,7 +31,7 @@ import {
   ModalTitleDirective,
   ThemeDirective
 } from '@coreui/angular';
-import type { FantaVote, User, DriverData, TrackData } from '@f123dashboard/shared';
+import type { FantaVoteSubmission, FantaVote, User, DriverData, TrackData } from '@f123dashboard/shared';
 
 @Component({
     selector: 'app-fanta',
@@ -242,9 +242,7 @@ export class FantaComponent implements OnInit {
 
     const votes = this.votazioni().get(trackId) || [];
     const dCount = this.driverCount();
-    const fantaVoto: FantaVote = {
-      fanta_player_id: this.user().id,
-      username: this.user().username,
+    const fantaVoto: FantaVoteSubmission = {
       track_id: trackId,
       positions: votes.slice(0, dCount),
       id_fast_lap: votes[dCount] || 0,
@@ -459,7 +457,6 @@ export class FantaComponent implements OnInit {
     const dCount = this.driverCount();
     return {
       fanta_player_id: this.user().id,
-      username: this.user().username,
       track_id: trackId,
       positions: voteArray.slice(0, dCount),
       id_fast_lap: voteArray[dCount] || 0,

@@ -76,7 +76,6 @@ describe('FantaService', () => {
   const mockFantaVotes: FantaVote[] = [
     {
       fanta_player_id: 1,
-      username: 'player1',
       track_id: 100,
       positions: [1, 2, 3, 4, 5, 6, 7, 8],
       id_fast_lap: 1,
@@ -86,7 +85,6 @@ describe('FantaService', () => {
     },
     {
       fanta_player_id: 2,
-      username: 'player2',
       track_id: 100,
       positions: [2, 1, 4, 3, 6, 5, 8, 7],
       id_fast_lap: 2,
@@ -96,7 +94,6 @@ describe('FantaService', () => {
     },
     {
       fanta_player_id: 1,
-      username: 'player1',
       track_id: 101,
       positions: [2, 1, 3, 4, 5, 6, 7, 8],
       id_fast_lap: 2,
@@ -387,7 +384,6 @@ describe('FantaService', () => {
 
       const fantaVote: FantaVote = {
         fanta_player_id: 1,
-        username: 'player1',
         track_id: 100,
         positions: [2, 1, 3, 4, 5, 6, 7, 8],
         id_fast_lap: 1,
@@ -418,7 +414,6 @@ describe('FantaService', () => {
 
       const fantaVote: FantaVote = {
         fanta_player_id: 1,
-        username: 'player1',
         track_id: 100,
         positions: [1, 2, 3, 4, 5, 6, 7, 8],
         id_fast_lap: 0,
@@ -449,7 +444,6 @@ describe('FantaService', () => {
 
       const fantaVote: FantaVote = {
         fanta_player_id: 1,
-        username: 'player1',
         track_id: 100,
         positions: [1, 2, 3, 4, 5, 6, 7, 8],
         id_fast_lap: 2,
@@ -521,7 +515,6 @@ describe('FantaService', () => {
       // Test voting for constructor 1 (tied winner)
       const fantaVote1: FantaVote = {
         fanta_player_id: 1,
-        username: 'player1',
         track_id: 103,
         positions: [1, 2, 3, 4, 5, 6, 7, 8],
         id_fast_lap: 0,
@@ -652,7 +645,7 @@ describe('FantaService', () => {
       };
 
       const vote: FantaVote = {
-        fanta_player_id: 1, username: 'p1', track_id: 500,
+        fanta_player_id: 1, track_id: 500,
         positions: [1, 2, 3, 4, 5],
         id_fast_lap: 4, id_dnf: 0, constructor_id: 0
       };
@@ -681,7 +674,7 @@ describe('FantaService', () => {
       driversSignal.set(tenDrivers);
 
       const vote: FantaVote = {
-        fanta_player_id: 1, username: 'p1', track_id: 1000,
+        fanta_player_id: 1, track_id: 1000,
         positions: [1, 2, 3, 4, 5, 6, 7, 8],
         id_fast_lap: 1, id_dnf: 0, constructor_id: 0
       };
@@ -708,7 +701,7 @@ describe('FantaService', () => {
       };
 
       const voteCorrect: FantaVote = {
-        fanta_player_id: 1, username: 'p1', track_id: 110,
+        fanta_player_id: 1, track_id: 110,
         positions: [10, 11],
         id_fast_lap: 11, id_dnf: 0, constructor_id: 0
       };
