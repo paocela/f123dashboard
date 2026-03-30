@@ -173,23 +173,6 @@ describe('VoteHistoryTableComponent', () => {
     });
   });
 
-  describe('getVoteArray', () => {
-    it('should return array of vote positions', () => {
-      const result = component.getVoteArray();
-      expect(result).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 1]);
-    });
-
-    it('should return empty array when fantaVote is null', () => {
-      // Create a new fixture where the signal starts with a different value
-      const emptyFixture = TestBed.createComponent(VoteHistoryTableComponent);
-      emptyFixture.componentRef.setInput('fantaVote', { ...mockFantaVote });
-      emptyFixture.componentRef.setInput('trackId', 1);
-      // Don't call detectChanges() to avoid triggering template evaluation
-      const result = emptyFixture.componentInstance.getVoteArray();
-      expect(result).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 1]);
-    });
-  });
-
   describe('getPilota', () => {
     it('should return driver data for valid id', () => {
       const result = component.getPilota(1);
@@ -523,44 +506,23 @@ describe('VoteHistoryTableComponent', () => {
   // ─────────────────────────────────────────────────────────────────────────
 
   describe('Phase 2 – driverPositionsCount', () => {
-    it('returns positions count from race result', () => {
-      // mockRaceResult has 8 positions
-      expect(component.driverPositionsCount()).toBe(8);
+    it('returns allDrivers count from current season', () => {
+      expect(component.driverPositionsCount()).toBe(mockDrivers.length);
     });
 
-    it('returns 8 as fallback when race result is not found', () => {
+    it('returns allDrivers count as fallback when race result is not found', () => {
       const noResultFixture = TestBed.createComponent(VoteHistoryTableComponent);
       noResultFixture.componentRef.setInput('fantaVote', { ...mockFantaVote });
       noResultFixture.componentRef.setInput('trackId', 999);
       noResultFixture.detectChanges();
 
-      expect(noResultFixture.componentInstance.driverPositionsCount()).toBe(8);
+      expect(noResultFixture.componentInstance.driverPositionsCount()).toBe(mockDrivers.length);
     });
 
-    it('returns correct count when race has fewer drivers', () => {
-      const fiveDriverResult: RaceResult = {
-        id: 5,
-        track_id: 5,
-        positions: [
-          { position: 1, pilot_id: 1, fast_lap: false },
-          { position: 2, pilot_id: 2, fast_lap: false },
-          { position: 3, pilot_id: 3, fast_lap: false },
-          { position: 4, pilot_id: 4, fast_lap: false },
-          { position: 5, pilot_id: 5, fast_lap: true },
-        ],
-        list_dnf: []
-      };
-
-      mockFantaService.getRaceResult.and.callFake((trackId: number) =>
-        trackId === 5 ? fiveDriverResult : undefined
-      );
-
-      const fiveDriverFixture = TestBed.createComponent(VoteHistoryTableComponent);
-      fiveDriverFixture.componentRef.setInput('fantaVote', { ...mockFantaVote });
-      fiveDriverFixture.componentRef.setInput('trackId', 5);
-      fiveDriverFixture.detectChanges();
-
-      expect(fiveDriverFixture.componentInstance.driverPositionsCount()).toBe(5);
+    it('returns updated count when allDrivers signal changes', () => {
+      expect(component.driverPositionsCount()).toBe(2);
+      allDriversSignal.set([...mockDrivers, { ...mockDrivers[0], driver_id: 3, driver_username: 'driver3' }]);
+      expect(component.driverPositionsCount()).toBe(3);
     });
   });
 

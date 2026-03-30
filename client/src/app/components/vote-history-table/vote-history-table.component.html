@@ -35,7 +35,7 @@
     </thead>
 
     <tbody>
-      @for (voto of getVoteArray(); track i; let i = $index) {
+      @for (voto of voteArray(); track i; let i = $index) {
         @let pilota = getPilota(voto);
         @if (pilota !== null || i > driverPositionsCount() + 1) {
           <tr>

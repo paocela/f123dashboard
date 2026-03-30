@@ -61,7 +61,7 @@ export class VoteHistoryTableComponent {
     this.raceResult()?.list_dnf ?? []
   );
 
-  driverPositionsCount = computed(() => this.fantaVote().positions?.length ?? 0);
+  driverPositionsCount = computed(() => this.dbData.allDrivers().length);
 
   winningConstructors = computed(() => 
     this.fantaService.getWinningConstructorsForTrack(this.trackId())
@@ -71,12 +71,6 @@ export class VoteHistoryTableComponent {
     this.fantaService.getFantaRacePoints(this.fantaVote().fanta_player_id, this.trackId())
   );
 
-  /**
-   * Get vote array from FantaVote object
-   */
-  getVoteArray(): number[] {
-    return this.voteArray();
-  }
 
   getPilota(id: number): DriverData | null {
     return this.dbData.allDrivers().find(driver => +driver.driver_id === +id) || null;
