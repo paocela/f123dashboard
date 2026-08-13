@@ -34,9 +34,9 @@
     </c-sidebar-brand>
   </c-sidebar-header>
 
-  <ng-scrollbar pointerEventsMethod="scrollbar" visibility="hover">
+  <div class="sidebar-scrollable">
     <c-sidebar-nav [navItems]="navItems()" dropdownMode="close" compact />
-  </ng-scrollbar>
+  </div>
 
   @if (!sidebar1.narrow) {
     <c-sidebar-footer

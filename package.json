@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@coreui/coreui": "~5.5.0",
+    "@coreui/coreui": "^5.9.0",
     "g": "^2.0.1",
-    "nodemailer": "^8.0.0"
+    "nodemailer": "^9.0.5"
   },
   "devDependencies": {
     "@playwright/test": "^1.54.2",

@@ -1,7 +1,6 @@
 import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterOutlet } from '@angular/router';
-import { NgScrollbar } from 'ngx-scrollbar';
 
 import {
   ContainerComponent,
@@ -30,7 +29,6 @@ import { AuthService } from './../../service/auth.service';
         SidebarHeaderComponent,
         SidebarBrandComponent,
         RouterLink,
-        NgScrollbar,
         SidebarNavComponent,
         SidebarFooterComponent,
         SidebarToggleDirective,
