@@ -22,7 +22,8 @@ export class FantaController {
 
   async setFantaVoto(req: Request, res: Response): Promise<void> {
     try {
-      const result = await fantaService.setFantaVoto(req.body);
+      const vote = { ...req.body, fanta_player_id: req.user!.userId };
+      const result = await fantaService.setFantaVoto(vote);
       res.json(result);
     } catch (error) {
       logger.error('Error setting fanta vote:', error);

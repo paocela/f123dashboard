@@ -20,16 +20,18 @@
   "scripts": {
     "start:client": "npm start --prefix client",
     "build:client": "npm run build --prefix client",
-    "test:client": "npm test --prefix client",
+    "test:client": "npm run test --prefix client -- --watch=false --browsers=ChromeHeadless",
     "start:server": "npm run dev --prefix server",
     "build:server": "npm run build --prefix server",
+    "test:server": "npm run test --prefix server -- --run",
     "build:shared": "npm run build --prefix shared",
     "build": "npm run clean && npm run build:all && npm run copy:all",
     "build:all": "npm run build:shared && npm run build:server && npm run build:client",
     "clean": "node scripts/clean.js",
     "copy:all": "node scripts/copy-to-dist.js",
     "start:prod": "node dist/server/server.js",
-    "dev": "concurrently \"npm run build:shared -- --watch\" \"npm run start:server\" \"npm run start:client\""
+    "dev": "concurrently \"npm run build:shared -- --watch\" \"npm run start:server\" \"npm run start:client\"",
+    "test": "npm run test:client && npm run test:server"
   },
   "workspaces": [
     "client",

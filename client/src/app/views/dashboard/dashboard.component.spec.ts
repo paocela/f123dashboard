@@ -187,6 +187,9 @@ describe('DashboardComponent', () => {
   ];
 
   beforeEach(async () => {
+    jasmine.clock().install();
+    jasmine.clock().mockDate(new Date(2026, 2, 1));
+
     // Create a writable signal for testing that can be updated
     const mockIsLiveSignal = signal(false);
 
@@ -239,6 +242,10 @@ describe('DashboardComponent', () => {
 
     fixture = TestBed.createComponent(DashboardComponent);
     component = fixture.componentInstance;
+  });
+
+  afterEach(() => {
+    jasmine.clock().uninstall();
   });
 
   it('should create', () => {

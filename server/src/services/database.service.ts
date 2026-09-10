@@ -378,16 +378,11 @@ export class DatabaseService {
       SELECT
         gp.id AS id,
         gp.track_id AS track_id,
-        MAX(CASE WHEN rre.position = 1 THEN rre.pilot_id END) AS id_1_place,
-        MAX(CASE WHEN rre.position = 2 THEN rre.pilot_id END) AS id_2_place,
-        MAX(CASE WHEN rre.position = 3 THEN rre.pilot_id END) AS id_3_place,
-        MAX(CASE WHEN rre.position = 4 THEN rre.pilot_id END) AS id_4_place,
-        MAX(CASE WHEN rre.position = 5 THEN rre.pilot_id END) AS id_5_place,
-        MAX(CASE WHEN rre.position = 6 THEN rre.pilot_id END) AS id_6_place,
-        MAX(CASE WHEN rre.position = 7 THEN rre.pilot_id END) AS id_7_place,
-        MAX(CASE WHEN rre.position = 8 THEN rre.pilot_id END) AS id_8_place,
-        MAX(CASE WHEN rre.fast_lap THEN rre.pilot_id END) AS id_fast_lap,
-        ARRAY_AGG(rre.pilot_id) FILTER (WHERE rre.position = 0) AS list_dnf
+        JSON_AGG(
+          JSON_BUILD_OBJECT('position', rre.position, 'pilot_id', rre.pilot_id, 'fast_lap', rre.fast_lap)
+          ORDER BY rre.position
+        ) FILTER (WHERE rre.position > 0) AS positions,
+        COALESCE(ARRAY_AGG(rre.pilot_id) FILTER (WHERE rre.position = 0), '{}') AS list_dnf
       FROM gran_prix gp
       CROSS JOIN latest_season ls
       LEFT JOIN race_result_entries rre ON gp.race_results_id = rre.race_results_id
@@ -398,18 +393,13 @@ export class DatabaseService {
       UNION ALL
 
       SELECT
-        gp.id AS track_id,
+        gp.id AS id,
         gp.track_id AS track_id,
-        MAX(CASE WHEN frre.position = 1 THEN frre.pilot_id END) AS id_1_place,
-        MAX(CASE WHEN frre.position = 2 THEN frre.pilot_id END) AS id_2_place,
-        MAX(CASE WHEN frre.position = 3 THEN frre.pilot_id END) AS id_3_place,
-        MAX(CASE WHEN frre.position = 4 THEN frre.pilot_id END) AS id_4_place,
-        MAX(CASE WHEN frre.position = 5 THEN frre.pilot_id END) AS id_5_place,
-        MAX(CASE WHEN frre.position = 6 THEN frre.pilot_id END) AS id_6_place,
-        MAX(CASE WHEN frre.position = 7 then frre.pilot_id END) AS id_7_place,
-        MAX(CASE WHEN frre.position = 8 THEN frre.pilot_id END) AS id_8_place,
-        MAX(CASE WHEN frre.fast_lap THEN frre.pilot_id END) AS id_fast_lap,
-        ARRAY_AGG(frre.pilot_id) FILTER (WHERE frre.position = 0) AS list_dnf
+        JSON_AGG(
+          JSON_BUILD_OBJECT('position', frre.position, 'pilot_id', frre.pilot_id, 'fast_lap', frre.fast_lap)
+          ORDER BY frre.position
+        ) FILTER (WHERE frre.position > 0) AS positions,
+        COALESCE(ARRAY_AGG(frre.pilot_id) FILTER (WHERE frre.position = 0), '{}') AS list_dnf
       FROM gran_prix gp
       CROSS JOIN latest_season ls
       LEFT JOIN full_race_result_entries frre ON gp.full_race_results_id = frre.race_results_id
@@ -492,13 +482,13 @@ export class DatabaseService {
       if (gpRes.rowCount === 0) throw new Error('Gran Prix not found');
       const gp = gpRes.rows[0];
       const hasX2Enabled = Number(gp.has_x2) === 1;
-      const raceFastLapPilotId = raceResult[8];
-      const sprintFastLapPilotId = sprintResult[8];
+      const raceFastLapPilotId = raceResult.at(-1)!;
+      const sprintFastLapPilotId = sprintResult.at(-1);
 
       // Handle Race or Full Race Results
       if (hasX2Enabled && gp.full_race_results_id) {
         await client.query('DELETE FROM full_race_result_entries WHERE race_results_id = $1', [gp.full_race_results_id]);
-        for (let i = 0; i < 8; i++) {
+        for (let i = 0; i < raceResult.length - 1; i++) {
           if (raceResult[i] && raceResult[i] !== 0) {
             await client.query(
               'INSERT INTO full_race_result_entries (race_results_id, pilot_id, position, fast_lap) VALUES ($1, $2, $3, $4)',
@@ -516,7 +506,7 @@ export class DatabaseService {
         }
       } else if (gp.race_results_id) {
         await client.query('DELETE FROM race_result_entries WHERE race_results_id = $1', [gp.race_results_id]);
-        for (let i = 0; i < 8; i++) {
+        for (let i = 0; i < raceResult.length - 1; i++) {
           if (raceResult[i] && raceResult[i] !== 0) {
             await client.query(
               'INSERT INTO race_result_entries (race_results_id, pilot_id, position, fast_lap) VALUES ($1, $2, $3, $4)',
@@ -537,7 +527,7 @@ export class DatabaseService {
       // Handle Sprint Results
       if (hasSprint && gp.sprint_results_id) {
         await client.query('DELETE FROM sprint_result_entries WHERE sprint_results_id = $1', [gp.sprint_results_id]);
-        for (let i = 0; i < 8; i++) {
+        for (let i = 0; i < sprintResult.length - 1; i++) {
           if (sprintResult[i] && sprintResult[i] !== 0) {
             await client.query(
               'INSERT INTO sprint_result_entries (sprint_results_id, pilot_id, position, fast_lap) VALUES ($1, $2, $3, $4)',
@@ -558,7 +548,7 @@ export class DatabaseService {
       // Handle Qualifying Results
       if (gp.qualifying_results_id) {
         await client.query('DELETE FROM qualifying_result_entries WHERE qualifying_results_id = $1', [gp.qualifying_results_id]);
-        for (let i = 0; i < 8; i++) {
+        for (let i = 0; i < qualiResult.length; i++) {
           if (qualiResult[i] && qualiResult[i] !== 0) {
             await client.query(
               'INSERT INTO qualifying_result_entries (qualifying_results_id, pilot_id, position) VALUES ($1, $2, $3)',
@@ -571,7 +561,7 @@ export class DatabaseService {
       // Handle Free Practice Results
       if (gp.free_practice_results_id) {
         await client.query('DELETE FROM free_practice_result_entries WHERE free_practice_results_id = $1', [gp.free_practice_results_id]);
-        for (let i = 0; i < 8; i++) {
+        for (let i = 0; i < fpResult.length; i++) {
           if (fpResult[i] && fpResult[i] !== 0) {
             await client.query(
               'INSERT INTO free_practice_result_entries (free_practice_results_id, pilot_id, position) VALUES ($1, $2, $3)',
