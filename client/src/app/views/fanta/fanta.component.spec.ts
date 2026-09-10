@@ -145,6 +145,9 @@ describe('FantaComponent', () => {
   };
 
   beforeEach(async () => {
+    jasmine.clock().install();
+    jasmine.clock().mockDate(new Date(2026, 2, 1));
+
     // Mock services
     mockAuthService = jasmine.createSpyObj('AuthService', [], { currentUser: signal(mockUser) });
 
@@ -202,6 +205,7 @@ describe('FantaComponent', () => {
   });
 
   afterEach(() => {
+    jasmine.clock().uninstall();
     sessionStorage.clear();
   });
 
