@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { signal } from '@angular/core';
+import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 
 import { AdminComponent } from './admin.component';
@@ -371,5 +372,40 @@ describe('AdminComponent', () => {
       expect(result.isValid).toBeFalse();
       expect(result.errors.some(e => e.includes('duplicat'))).toBeTrue();
     });
+  });
+
+  it('submits correctly sized result payloads for different driver counts', async () => {
+    component.selectedSeason.set(1);
+    mockDbDataService.setGpResult.and.resolveTo(JSON.stringify({ success: true, message: 'saved' }));
+
+    for (const driverCount of [5, 10]) {
+      const drivers = Array.from({ length: driverCount }, (_, index) => ({
+        id: index + 1,
+        username: `d${index + 1}`,
+        first_name: 'A',
+        surname: 'B'
+      }));
+      const finishingOrder = drivers.map(driver => driver.id);
+      const raceResults = [...finishingOrder, finishingOrder[0], []];
+
+      component.piloti.set(drivers);
+      component.raceResults.set(new Map([[1, raceResults]]));
+      component.sprintResults.set(new Map([[1, []]]));
+      component.qualiResults.set(new Map([[1, [...finishingOrder]]]));
+      component.fpResults.set(new Map([[1, [...finishingOrder]]]));
+      mockDbDataService.setGpResult.calls.reset();
+
+      await component.publishResult(1, '0', {} as NgForm);
+
+      expect(mockDbDataService.setGpResult).toHaveBeenCalledOnceWith(1, jasmine.objectContaining({
+        raceResult: [...finishingOrder, finishingOrder[0]],
+        raceDnfResult: [],
+        sprintResult: [],
+        sprintDnfResult: [],
+        qualiResult: finishingOrder,
+        fpResult: finishingOrder,
+        seasonId: 1
+      }));
+    }
   });
 });
