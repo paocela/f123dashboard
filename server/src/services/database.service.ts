@@ -40,8 +40,7 @@ export class DatabaseService {
       CROSS JOIN latest_season ls
       WHERE arp.season_id = COALESCE($1, ls.id);
     `, [seasonId]);
-    const carList: CarData[] = await this.getCarList();
-    console.log('Car List:', carList); // Debugging line to check the car list
+    const carList: CarData[] = await this.getCarList(); 
     
     // Create lookup map
     const carMap = new Map(carList.map(car => [Number(car.car_id), car]));

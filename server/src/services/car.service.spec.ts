@@ -32,7 +32,23 @@ describe('CarService', () => {
             expect(assignment.has(4)).toBe(true);
         });
 
-        it('should assign cars with best match for each driver', () => {
+        it('should assign a higher-scoring car to the lower-point driver', () => {
+            const driverPoints = new Map([
+                [1, 100],
+                [2, 20]
+            ]);
+            const carsScore = new Map([
+                [1, 100],
+                [2, 20]
+            ]);
+
+            const assignment = carService.assignCars(driverPoints, carsScore, 1);
+
+            expect(assignment.get(1)).toBe(2);
+            expect(assignment.get(2)).toBe(1);
+        });
+
+        it('should assign every driver while respecting car capacity', () => {
             const driverPoints = new Map([
                 [1, 100],
                 [2, 100], // same score as driver 1
@@ -65,19 +81,14 @@ describe('CarService', () => {
             expect(assignment.has(7)).toBe(true);
             expect(assignment.has(8)).toBe(true);
 
-            // Drivers with similar scores should prefer the same car when possible
-            const car1 = assignment.get(1);
-            const car2 = assignment.get(2);
-            const car3 = assignment.get(3);
-            const car4 = assignment.get(4);
+            const carCounts = new Map<number, number>();
+            assignment.forEach(carId => {
+                carCounts.set(carId, (carCounts.get(carId) || 0) + 1);
+            });
 
-            // High performers (1,2) should get high-performing cars (1,2)
-            expect([1, 2]).toContain(car1);
-            expect([1, 2]).toContain(car2);
-
-            // Mid performers (3,4) should get mid cars
-            expect([3, 4, 5]).toContain(car3);
-            expect([3, 4, 5]).toContain(car4);
+            carCounts.forEach(count => {
+                expect(count).toBeLessThanOrEqual(2);
+            });
         });
 
         it('should not assign same car to more than 2 drivers', () => {
@@ -260,6 +271,35 @@ describe('CarService', () => {
             
             const assignment = carService.assignCars(driverPoints, carsScore);
             
+            const carCounts = new Map<number, number>();
+            assignment.forEach(carId => {
+                carCounts.set(carId, (carCounts.get(carId) || 0) + 1);
+            });
+
+            carCounts.forEach(count => {
+                expect(count).toBeLessThanOrEqual(2);
+            });
+        });
+
+        it('should assign all drivers when capacity requires pairs outside the tolerance', () => {
+            const driverPoints = new Map([
+                [1, 100],
+                [2, 80],
+                [3, 60],
+                [4, 40],
+                [5, 20],
+                [6, 0]
+            ]);
+            const carsScore = new Map([
+                [1, 90],
+                [2, 60],
+                [3, 30]
+            ]);
+
+            const assignment = carService.assignCars(driverPoints, carsScore, 1, 0.01);
+
+            expect(assignment.size).toBe(driverPoints.size);
+
             const carCounts = new Map<number, number>();
             assignment.forEach(carId => {
                 carCounts.set(carId, (carCounts.get(carId) || 0) + 1);
