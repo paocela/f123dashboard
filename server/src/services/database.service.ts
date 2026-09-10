@@ -9,11 +9,25 @@ import type {
   TrackData,
   RaceResult,
   Constructor,
-  ConstructorGrandPrixPoints
+  ConstructorGrandPrixPoints,
+  CarData
 } from '@f123dashboard/shared';
+import { CarService } from './car.service';
 
 export class DatabaseService {
-  constructor(private pool: pg.Pool) {}
+  constructor(private pool: pg.Pool, private carService: CarService) {}
+
+  private async getCarList(): Promise<CarData[]> {
+    const result = await this.pool.query(`
+      SELECT 
+        id as car_id,
+        name as car_name,
+        overall_score as car_score
+      FROM cars
+      ORDER BY overall_score DESC
+    `);
+    return result.rows as CarData[];
+  }
 
   async getAllDrivers(seasonId?: number): Promise<DriverData[]> {
     const result = await this.pool.query(`
@@ -26,7 +40,33 @@ export class DatabaseService {
       CROSS JOIN latest_season ls
       WHERE arp.season_id = COALESCE($1, ls.id);
     `, [seasonId]);
-    return result.rows as DriverData[];
+    const carList: CarData[] = await this.getCarList();
+    console.log('Car List:', carList); // Debugging line to check the car list
+    
+    // Create lookup map
+    const carMap = new Map(carList.map(car => [Number(car.car_id), car]));
+
+    const driverPoints = new Map<number, number>(
+      result.rows.map(row => [Number(row.driver_id), Number(row.total_points)])
+    );
+    const carScores = new Map<number, number>(
+      carList.map((car) => [Number(car.car_id), Number(car.car_score)])
+    );
+    const carAssignments = this.carService.assignCars(driverPoints, carScores);
+
+    const driverData: DriverData[] = result.rows.map(row => {
+      const assignedCarId = carAssignments.get(Number(row.driver_id));
+      const assignedCar = assignedCarId ? carMap.get(assignedCarId) : null;
+      
+      return {
+        ...row,
+        assigned_car_id: assignedCarId || null,
+        assigned_car_name: assignedCar?.car_name || null,
+        assigned_car_color: assignedCar?.car_color || null
+      };
+    });
+
+    return driverData;
   }
 
   async getDriversData(seasonId?: number): Promise<Driver[]> {

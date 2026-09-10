@@ -14,6 +14,9 @@ export type DriverData = {
   driver_color: string;
   car_name: string;
   car_overall_score: number;
+  assigned_car_id?: number | null;
+  assigned_car_name?: string | null;
+  assigned_car_color?: string | null;
   total_sprint_points: number;
   total_free_practice_points: number;
   total_qualifying_points: number;
@@ -82,6 +85,13 @@ export type TrackData = {
   besttime_driver_time: string;
   username: string;
 }
+
+export type CarData = {
+  car_id: number;
+  car_name: string;
+  car_score: number;
+  car_color?: string;
+};
 
 export type RaceResult = {
   id: number;

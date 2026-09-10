@@ -1,9 +1,11 @@
 import { Request, Response } from 'express';
 import { DatabaseService } from '../services/database.service.js';
+import { CarService } from '../services/car.service.js';
 import pool from '../config/db.js';
 import logger from '../config/logger.js';
 
-const databaseService = new DatabaseService(pool);
+const carService = new CarService();
+const databaseService = new DatabaseService(pool, carService);
 
 export class DatabaseController {
   async getAllDrivers(req: Request, res: Response): Promise<void> {
