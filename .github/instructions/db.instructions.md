@@ -125,6 +125,16 @@ The `fanta` table stores fantasy team selections, while the result entry tables 
 
 ---
 
+## 6a. Track Seasons
+
+- **track_id**: Reference to `tracks(id)` (int8, NOT NULL, CASCADE DELETE)
+- **season_id**: Reference to `seasons(id)` (int4, NOT NULL, CASCADE DELETE)
+- **Primary Key**: Composite (`track_id`, `season_id`)
+
+**Purpose**: Defines the seasons in which each track may be selected. An eligible next-GP track must belong to the active season and must not already be referenced by a Grand Prix in that season.
+
+---
+
 ## 7. Gran Prix
 
 - **id**: Primary key (int8)
@@ -340,6 +350,7 @@ Simplified view showing race points by result type and driver.
 - The design enables tracking performance and statistics for both real drivers and fantasy teams.
 - **Constructor Teams**: The `constructors` table manages F1 team structures, linking two drivers per constructor with team branding (name and color).
 - **Result Structure**: Instead of storing positions as separate columns, the new structure uses entry tables with position fields for better normalization.
+- **Track Eligibility**: The `track_seasons` relation determines which tracks can run in a season; `gran_prix` records which eligible tracks are already assigned.
 - **Session Management**: Sessions are managed through the `user_sessions` table with automatic cleanup capabilities.
 - **Configuration Management**: The `property` table provides a flexible key-value store for application configuration and feature flags, allowing dynamic control of features like cron jobs without code deployment.
 - **Data Integrity**: Foreign key constraints ensure data consistency across related tables.

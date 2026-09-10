@@ -81,6 +81,11 @@ export const getNavItems = (isAdmin: boolean): INavData[] => {
           iconComponent: { name: 'cil-calendar' }
         },
         {
+          name: 'Estrazione Pista',
+          url: '/admin/track-extraction',
+          iconComponent: { name: 'cil-loop-circular' }
+        },
+        {
           name: 'Gestione Utenti',
           url: '/admin/change-password',
           iconComponent: { name: 'cil-user' }

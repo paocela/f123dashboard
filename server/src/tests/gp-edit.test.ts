@@ -52,6 +52,50 @@ describe('GP Edit API', () => {
       expect(res.body.success).toBe(false);
     });
   });
+
+  describe('POST /api/gp-edit/eligible-tracks', () => {
+    it('should return tracks enabled for the latest season and not assigned to a GP', async () => {
+      (pool.query as any).mockResolvedValueOnce({ rows: [{ id: 2026 }] });
+      (pool.query as any).mockResolvedValueOnce({
+        rows: [{ id: '7', name: 'Monza', country: 'Italy' }]
+      });
+
+      const res = await request(app).post('/api/gp-edit/eligible-tracks');
+
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual({
+        success: true,
+        data: [{ id: 7, name: 'Monza', country: 'Italy' }]
+      });
+      expect(pool.query).toHaveBeenLastCalledWith(
+        expect.stringContaining('INNER JOIN track_seasons'),
+        [2026]
+      );
+      expect(pool.query).toHaveBeenLastCalledWith(
+        expect.stringContaining('NOT EXISTS'),
+        [2026]
+      );
+    });
+
+    it('should return no eligible tracks when no season exists', async () => {
+      (pool.query as any).mockResolvedValueOnce({ rows: [] });
+
+      const res = await request(app).post('/api/gp-edit/eligible-tracks');
+
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual({ success: true, data: [] });
+      expect(pool.query).toHaveBeenCalledTimes(1);
+    });
+
+    it('should handle eligible-track lookup errors', async () => {
+      (pool.query as any).mockRejectedValueOnce(new Error('DB Error'));
+
+      const res = await request(app).post('/api/gp-edit/eligible-tracks');
+
+      expect(res.status).toBe(500);
+      expect(res.body.success).toBe(false);
+    });
+  });
   
   describe('POST /api/gp-edit/create', () => {
      it('should create a GP', async () => {

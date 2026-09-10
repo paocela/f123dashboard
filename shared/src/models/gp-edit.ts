@@ -19,3 +19,9 @@ export interface GPEditItem {
     has_sprint?: boolean;
     has_x2?: boolean;
   }
+
+  export interface EligibleTrack {
+    id: number;
+    name: string;
+    country: string;
+  }

@@ -1,0 +1,63 @@
+:host {
+  display: block;
+}
+
+.wheel-layout {
+  display: grid;
+  gap: 1.5rem;
+  justify-items: center;
+}
+
+.wheel-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(100%, 46rem);
+  aspect-ratio: 1;
+  padding: 1.25rem;
+}
+
+.wheel {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  border: 0.5rem solid var(--cui-body-bg);
+  border-radius: 50%;
+  box-shadow: var(--cui-box-shadow);
+  transition: transform 3s cubic-bezier(0.16, 0.78, 0.26, 1);
+}
+
+.wheel-pointer {
+  position: absolute;
+  z-index: 1;
+  top: 0.4rem;
+  width: 0;
+  height: 0;
+  border-right: 1rem solid transparent;
+  border-left: 1rem solid transparent;
+  border-top: 1.75rem solid var(--cui-emphasis-color);
+}
+
+.wheel-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 32%;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.1;
+  text-align: center;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 60%);
+  transform-origin: center;
+}
+
+.selection {
+  min-height: 1.5rem;
+}
+
+@media (max-width: 575.98px) {
+  .wheel-label {
+    font-size: 0.625rem;
+  }
+}

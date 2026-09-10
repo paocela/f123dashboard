@@ -1,0 +1,59 @@
+<c-container fluid>
+  <c-row>
+    <c-col xs="12">
+      <h2 class="mt-4 mb-4 text-center" i18n>Estrazione Pista</h2>
+    </c-col>
+  </c-row>
+
+  <c-row>
+    <c-col xs="12">
+          @if (isLoading()) {
+            <div class="text-center py-5">
+              <c-spinner aria-label="Caricamento piste disponibili" i18n-aria-label></c-spinner>
+            </div>
+          } @else if (hasError()) {
+            <div class="text-center py-4">
+              <p class="mb-3" i18n>Non e stato possibile caricare le piste disponibili.</p>
+              <button cButton color="primary" type="button" (click)="loadEligibleTracks()" i18n>Riprova</button>
+            </div>
+          } @else if (tracks().length === 0) {
+            <p class="text-center mb-0 py-4" i18n>Non ci sono piste disponibili per questa stagione.</p>
+          } @else {
+            <div class="wheel-layout">
+              <div class="wheel-stage">
+                <div class="wheel-pointer" aria-hidden="true"></div>
+                <div
+                  class="wheel"
+                  [class.is-spinning]="isSpinning()"
+                  [style.background]="wheelBackground()"
+                  [style.transform]="'rotate(' + rotation() + 'deg)'"
+                  (transitionend)="onWheelTransitionEnd($event)"
+                  aria-hidden="true">
+                  @for (track of tracks(); track track.id; let index = $index) {
+                    <span class="wheel-label" [style.transform]="getLabelTransform(index)">{{ track.name }}</span>
+                  }
+                </div>
+              </div>
+
+              <div class="text-center">
+                <button cButton color="primary" type="button" (click)="spinWheel()" [disabled]="isSpinning()">
+                  @if (isSpinning()) {
+                    <span i18n>Estrazione in corso...</span>
+                  } @else {
+                    <span i18n>Estrai pista</span>
+                  }
+                </button>
+                <p class="mt-3 mb-0 selection" aria-live="polite">
+                  @if (selectedTrack() && !isSpinning()) {
+                    <strong i18n>Pista estratta:</strong> {{ selectedTrack()?.name }}
+                    @if (selectedTrack()?.country) {
+                      <span>({{ selectedTrack()?.country }})</span>
+                    }
+                  }
+                </p>
+              </div>
+            </div>
+          }
+    </c-col>
+  </c-row>
+</c-container>

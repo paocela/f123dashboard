@@ -5,6 +5,7 @@ import {
   cibCcPaypal,
   cibCcStripe,
   cibCcVisa,
+  cilLoopCircular,
   cibFacebook,
   cibGoogle,
   cibInstagram,
@@ -210,7 +211,8 @@ export const iconSubset = {
   cilUserUnfollow,
   cilWarning,
   logo,
-  signet
+  signet,
+  cilLoopCircular,
 };
 
 export enum IconSubset {
@@ -317,6 +319,7 @@ export enum IconSubset {
   cilUserUnfollow = 'cilUserUnfollow',
   cilWarning = 'cilWarning',
   logo = 'logo',
-  signet = 'signet'
+  signet = 'signet',
+  cilLoopCircular = 'cilLoopCircular'
 }
 

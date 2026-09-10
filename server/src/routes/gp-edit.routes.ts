@@ -7,6 +7,7 @@ export const gpEditRouter = Router();
 // Retrieve current data
 gpEditRouter.post('/list', authMiddleware, adminMiddleware, (req, res) => gpEditController.getUpcomingGps(req, res));
 gpEditRouter.post('/tracks', authMiddleware, adminMiddleware, (req, res) => gpEditController.getAllTracks(req, res));
+gpEditRouter.post('/eligible-tracks', authMiddleware, adminMiddleware, (req, res) => gpEditController.getEligibleTracks(req, res));
 
 // Actions
 gpEditRouter.post('/create', authMiddleware, adminMiddleware, (req, res) => gpEditController.createGp(req, res));

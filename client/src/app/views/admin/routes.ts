@@ -21,6 +21,13 @@ export const routes: Routes = [
     }
   },
   {
+    path: 'track-extraction',
+    loadComponent: () => import('./track-extraction/track-extraction.component').then(m => m.TrackExtractionComponent),
+    data: {
+      title: $localize`Estrazione pista`
+    }
+  },
+  {
     path: 'change-password',
     loadComponent: () => import('../admin-change-password/admin-change-password.component').then(m => m.AdminChangePasswordComponent),
     data: {

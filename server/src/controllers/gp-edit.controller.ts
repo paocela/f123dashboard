@@ -32,6 +32,19 @@ export class GpEditController {
     }
   }
 
+  async getEligibleTracks(req: Request, res: Response): Promise<void> {
+    try {
+      const data = await gpEditService.getEligibleTracksForLatestSeason();
+      res.json({ success: true, data });
+    } catch (error) {
+      logger.error('Error getting eligible tracks:', error);
+      res.status(500).json({
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to get eligible tracks'
+      });
+    }
+  }
+
   async createGp(req: Request, res: Response): Promise<void> {
     try {
       const data = await gpEditService.createGp(req.body);
