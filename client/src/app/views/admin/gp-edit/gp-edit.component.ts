@@ -91,7 +91,7 @@ export class GpEditComponent implements OnInit {
 
   // Create GP Form
   createForm = this.fb.group({
-    track_id: [null as number | null, [Validators.required]],
+    track_id: [null as number | null],
     date: ['', [Validators.required]],
     has_sprint: [false],
     has_x2: [false]
@@ -108,9 +108,7 @@ export class GpEditComponent implements OnInit {
       next: (res) => {
         this.gps.set(res.data.map((gp: GPEditItem) => ({
             ...gp,
-            // Format for datetime-local input: "YYYY-MM-DDTHH:mm"
-            // Using toISOString() and slicing to get the correct format
-            date: new Date(gp.date).toISOString().slice(0, 16)
+          date: this.formatDateTimeLocal(gp.date)
         })));
         this.loading.set(false);
       },
@@ -200,11 +198,12 @@ export class GpEditComponent implements OnInit {
   onCreate(): void {
     if (this.createForm.invalid) { return; }
     const val = this.createForm.value;
+    if (!val.date) { return; }
     
     this.loading.set(true);
     this.gpEditService.createGp({
-      track_id: val.track_id!,
-      date: new Date(val.date!).toISOString(), // Ensure ISO string
+      track_id: val.track_id ?? null,
+      date: val.date,
       has_sprint: val.has_sprint || false,
       has_x2: val.has_x2 || false
     }).subscribe({
@@ -249,7 +248,8 @@ export class GpEditComponent implements OnInit {
   onSave(gp: GPEditViewModel): void { 
     
     this.gpEditService.updateGp(gp.id, {
-        date: new Date(gp.date).toISOString(), // Ensure ISO format
+      track_id: gp.track_id,
+        date: gp.date,
         has_sprint: gp.has_sprint,
         has_x2: gp.has_x2
     }).subscribe({
@@ -263,5 +263,12 @@ export class GpEditComponent implements OnInit {
           this.addToast('Errore', 'Errore durante il salvataggio.', 'danger');
         }
     });
+  }
+
+  private formatDateTimeLocal(date: Date): string {
+    const localDate = new Date(date);
+    const pad = (value: number) => value.toString().padStart(2, '0');
+
+    return `${localDate.getFullYear()}-${pad(localDate.getMonth() + 1)}-${pad(localDate.getDate())}T${pad(localDate.getHours())}:${pad(localDate.getMinutes())}`;
   }
 }

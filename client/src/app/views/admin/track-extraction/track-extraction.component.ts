@@ -27,7 +27,7 @@ const WHEEL_COLORS = [
   '#795548',
   '#607d8b'
 ];
-const SPIN_TURNS = 6;
+const SPIN_TURNS = 8;
 
 @Component({
   selector: 'app-track-extraction',

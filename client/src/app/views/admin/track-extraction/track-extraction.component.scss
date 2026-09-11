@@ -24,7 +24,18 @@
   border: 0.5rem solid var(--cui-body-bg);
   border-radius: 50%;
   box-shadow: var(--cui-box-shadow);
-  transition: transform 3s cubic-bezier(0.16, 0.78, 0.26, 1);
+  transition: transform 10s linear(
+    0,
+    0.3 15%,
+    0.55 30%,
+    0.72 43%,
+    0.82 53%,
+    0.89 62%,
+    0.94 72%,
+    0.97 82%,
+    0.99 92%,
+    1
+  );
 }
 
 .wheel-pointer {
@@ -36,6 +47,25 @@
   border-right: 1rem solid transparent;
   border-left: 1rem solid transparent;
   border-top: 1.75rem solid var(--cui-emphasis-color);
+}
+
+.wheel-center-button {
+  position: absolute;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: clamp(5.75rem, 19%, 9rem);
+  aspect-ratio: 1;
+  padding: 0.5rem;
+  color: var(--cui-emphasis-color);
+  background-color: var(--cui-body-bg);
+  border-color: var(--cui-border-color);
+  border-radius: 50%;
+  box-shadow: var(--cui-box-shadow-sm);
+  font-size: clamp(0.625rem, 1.5vw, 0.875rem);
+  font-weight: 700;
+  line-height: 1.1;
+  text-align: center;
 }
 
 .wheel-label {

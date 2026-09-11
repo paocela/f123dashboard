@@ -23,7 +23,7 @@ async getUpcomingGps(): Promise<GPEditItem[]> {
             gp.has_sprint,
             gp.has_x2
         FROM gran_prix gp
-        JOIN tracks t ON gp.track_id = t.id
+        LEFT JOIN tracks t ON gp.track_id = t.id
         WHERE gp.season_id = $1
             AND gp.date > NOW()
         ORDER BY gp.date ASC
@@ -70,8 +70,9 @@ async getUpcomingGps(): Promise<GPEditItem[]> {
     const result = await this.pool.query(query, values);
     const row = result.rows[0];
     
-    const trackRes = await this.pool.query('SELECT name FROM tracks WHERE id = $1', [row.track_id]);
-    const trackName = trackRes.rows[0]?.name || 'Unknown';
+    const trackName = row.track_id === null
+      ? 'Da assegnare'
+      : (await this.pool.query('SELECT name FROM tracks WHERE id = $1', [row.track_id])).rows[0]?.name || 'Unknown';
 
     return {
       ...row,
@@ -85,6 +86,11 @@ async getUpcomingGps(): Promise<GPEditItem[]> {
     const fields: string[] = [];
     const values: any[] = [];
     let idx = 1;
+
+    if (data.track_id !== undefined) {
+      fields.push(`track_id = $${idx++}`);
+      values.push(data.track_id);
+    }
 
     if (data.date !== undefined) {
       fields.push(`date = $${idx++}`);

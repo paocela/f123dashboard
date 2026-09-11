@@ -198,7 +198,7 @@ describe('GpEditComponent', () => {
     }, 100);
   });
 
-  it('should not create GP if form is invalid', () => {
+  it('should not create GP if the date is missing', () => {
     component.createForm.patchValue({ track_id: null, date: '' });
     
     component.onCreate();
@@ -219,9 +219,26 @@ describe('GpEditComponent', () => {
     setTimeout(() => {
       expect(mockGpEditService.createGp).toHaveBeenCalledWith(jasmine.objectContaining({
         track_id: 1,
+        date: '2024-06-01T14:00',
         has_sprint: true,
         has_x2: false
       }));
+      done();
+    }, 100);
+  });
+
+  it('should create a GP without an assigned track', (done) => {
+    component.createForm.patchValue({
+      track_id: null,
+      date: '2024-06-01T14:00',
+      has_sprint: false,
+      has_x2: false
+    });
+
+    component.onCreate();
+
+    setTimeout(() => {
+      expect(mockGpEditService.createGp).toHaveBeenCalledWith(jasmine.objectContaining({ track_id: null }));
       done();
     }, 100);
   });
@@ -277,6 +294,8 @@ describe('GpEditComponent', () => {
     
     setTimeout(() => {
       expect(mockGpEditService.updateGp).toHaveBeenCalledWith(1, jasmine.objectContaining({
+        track_id: 1,
+        date: '2024-05-26T14:00',
         has_sprint: false,
         has_x2: true
       }));

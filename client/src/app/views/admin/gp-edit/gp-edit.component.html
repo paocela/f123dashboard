@@ -38,8 +38,9 @@
               <c-col md="3" class="global-select-group">
                 <label cLabel for="track" class="global-select-label">Pista</label>
                 <select cFormControl formControlName="track_id" id="track" class="global-select">
+                  <option [ngValue]="null">Da assegnare</option>
                   @for (track of tracks(); track track.id) {
-                    <option [value]="track.id">{{ track.name }}</option>
+                    <option [ngValue]="track.id">{{ track.name }}</option>
                   }
                 </select>
               </c-col>
@@ -95,9 +96,13 @@
                 <tbody>
                   @for (gp of gps(); track gp.id) {
                     <tr>
-                      <td>
-                        <!-- Track Name (Read Only as implies changing track) -->
-                        {{ gp.track_name }}
+                      <td class="global-select-group">
+                        <select cFormControl [(ngModel)]="gp.track_id" class="global-select" [attr.aria-label]="'Pista per il GP ' + gp.id">
+                          <option [ngValue]="null">Da assegnare</option>
+                          @for (track of tracks(); track track.id) {
+                            <option [ngValue]="track.id">{{ track.name }}</option>
+                          }
+                        </select>
                       </td>
                       <td>
                         <input cFormControl type="datetime-local" [(ngModel)]="gp.date" class="global-datetime table-datetime">
