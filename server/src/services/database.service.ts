@@ -416,6 +416,9 @@ export class DatabaseService {
 
   async getConstructors(seasonId?: number): Promise<Constructor[]> {
     const result = await this.pool.query(`
+      WITH latest_season AS (
+        SELECT id FROM seasons ORDER BY start_date DESC LIMIT 1
+      )
       SELECT constructor_id,
         constructor_name,
         constructor_color,
@@ -426,8 +429,11 @@ export class DatabaseService {
         driver_2_username,
         driver_2_tot_points,
         constructor_tot_points
-      FROM season_constructor_leaderboard
-    `);
+      FROM season_constructor_leaderboard scl
+      CROSS JOIN latest_season ls
+      WHERE scl.season_id = COALESCE($1, ls.id)
+      ORDER BY constructor_tot_points DESC;
+    `, [seasonId]);
     return result.rows as Constructor[];
   }
 

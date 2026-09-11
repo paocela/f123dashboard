@@ -254,6 +254,7 @@ The `fanta` table stores fantasy team selections, while the result entry tables 
 - **driver_id_1**: Reference to first driver in the constructor references `drivers(id)` (int8, nullable)
 - **driver_id_2**: Reference to second driver in the constructor references `drivers(id)` (int8, nullable)
 - **color**: Constructor team color (text, nullable)
+- **season**: Reference to `seasons(id)` (int4, NOT NULL)
 
 ---
 
@@ -348,7 +349,7 @@ Simplified view showing race points by result type and driver.
 - Fantasy game logic is supported through `fanta` and `users` tables.
 - Points logic is centralized in `session_type`, supporting flexible point assignment per session (1st through 6th place plus fast lap points).
 - The design enables tracking performance and statistics for both real drivers and fantasy teams.
-- **Constructor Teams**: The `constructors` table manages F1 team structures, linking two drivers per constructor with team branding (name and color).
+- **Constructor Teams**: The `constructors` table manages season-specific F1 team structures, linking two drivers per constructor with team branding (name and color).
 - **Result Structure**: Instead of storing positions as separate columns, the new structure uses entry tables with position fields for better normalization.
 - **Track Eligibility**: The `track_seasons` relation determines which tracks can run in a season; `gran_prix` records which eligible tracks are already assigned.
 - **Session Management**: Sessions are managed through the `user_sessions` table with automatic cleanup capabilities.

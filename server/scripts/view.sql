@@ -391,7 +391,9 @@ AS SELECT c.id AS constructor_id,
            FROM driver_grand_prix_points) dgp
      LEFT JOIN driver_grand_prix_points d1_points ON c.driver_id_1 = d1_points.pilot_id AND dgp.grand_prix_id = d1_points.grand_prix_id
      LEFT JOIN driver_grand_prix_points d2_points ON c.driver_id_2 = d2_points.pilot_id AND dgp.grand_prix_id = d2_points.grand_prix_id
-  WHERE c.driver_id_1 IS NOT NULL AND c.driver_id_2 IS NOT NULL
+  WHERE c.season = dgp.season_id
+    AND c.driver_id_1 IS NOT NULL
+    AND c.driver_id_2 IS NOT NULL
   ORDER BY dgp.grand_prix_date DESC, (COALESCE(d1_points.total_points, 0::bigint) + COALESCE(d2_points.total_points, 0::bigint)) DESC;
 
 -- public.season_constructor_leaderboard source
@@ -399,14 +401,17 @@ CREATE OR REPLACE VIEW public.season_constructor_leaderboard
 AS SELECT c.id AS constructor_id,
     c.name AS constructor_name,
     c.color AS constructor_color,
-    d1.pilot_id AS driver_1_id,
-    d1.pilot_username AS driver_1_username,
-    d1.total_points AS driver_1_tot_points,
-    d2.pilot_id AS driver_2_id,
-    d2.pilot_username AS driver_2_username,
-    d2.total_points AS driver_2_tot_points,
-    d1.total_points + d2.total_points AS constructor_tot_points
+    driver_1.id AS driver_1_id,
+    driver_1.username AS driver_1_username,
+    COALESCE(d1_points.total_points, 0::bigint) AS driver_1_tot_points,
+    driver_2.id AS driver_2_id,
+    driver_2.username AS driver_2_username,
+    COALESCE(d2_points.total_points, 0::bigint) AS driver_2_tot_points,
+    COALESCE(d1_points.total_points, 0::bigint) + COALESCE(d2_points.total_points, 0::bigint) AS constructor_tot_points,
+    c.season AS season_id
    FROM constructors c
-     LEFT JOIN season_driver_leaderboard d1 ON c.driver_id_1 = d1.pilot_id
-     LEFT JOIN season_driver_leaderboard d2 ON c.driver_id_2 = d2.pilot_id
-  ORDER BY (d1.total_points + d2.total_points) DESC;
+     LEFT JOIN drivers driver_1 ON c.driver_id_1 = driver_1.id AND c.season = driver_1.season
+     LEFT JOIN drivers driver_2 ON c.driver_id_2 = driver_2.id AND c.season = driver_2.season
+     LEFT JOIN season_driver_leaderboard d1_points ON driver_1.id = d1_points.pilot_id AND c.season = d1_points.season_id
+     LEFT JOIN season_driver_leaderboard d2_points ON driver_2.id = d2_points.pilot_id AND c.season = d2_points.season_id
+  ORDER BY (COALESCE(d1_points.total_points, 0::bigint) + COALESCE(d2_points.total_points, 0::bigint)) DESC;
