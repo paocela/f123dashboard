@@ -1,7 +1,4 @@
 import { INavData } from '@coreui/angular';
-import { cilCoffee } from '@coreui/icons';
-import { AuthService } from './../../service/auth.service';
-
 
 export const getNavItems = (isAdmin: boolean, fantaEnabled: boolean): INavData[] => {
   const items: INavData[] = [
@@ -33,29 +30,17 @@ export const getNavItems = (isAdmin: boolean, fantaEnabled: boolean): INavData[]
     {
       name: 'Albo D\'oro',
       url: '/albo-d-oro',
-      iconComponent: { name: 'cil-star' },
-      badge: {
-        color: 'success',
-        text: 'NEW'
-      }
+      iconComponent: { name: 'cil-star' }
     },
     {
       name: 'Crediti',
       url: '/credits',
-      iconComponent: { name: 'cil-coffee' },
-      badge: {
-        color: 'success',
-        text: 'NEW'
-      }
+      iconComponent: { name: 'cil-coffee' }
     },
     {
       name: 'Minigiochi',
       url: '/playground',
-      iconComponent: { name: 'cil-happy' },
-      badge: {
-        color: 'success',
-        text: 'NEW'
-      }
+      iconComponent: { name: 'cil-happy' }
     }
   ];
 
@@ -65,10 +50,6 @@ export const getNavItems = (isAdmin: boolean, fantaEnabled: boolean): INavData[]
       name: 'Admin',
       url: '/admin',
       iconComponent: { name: 'cil-settings' },
-      badge: {
-        color: 'success',
-        text: 'NEW'
-      },
       children: [
         {
           name: 'Gestione Risultati',
@@ -83,7 +64,11 @@ export const getNavItems = (isAdmin: boolean, fantaEnabled: boolean): INavData[]
         {
           name: 'Estrazione Pista',
           url: '/admin/track-extraction',
-          iconComponent: { name: 'cil-loop-circular' }
+          iconComponent: { name: 'cil-loop-circular' },
+          badge: {
+            color: 'success',
+            text: 'NEW'
+          },
         },
         {
           name: 'Gestione Utenti',
