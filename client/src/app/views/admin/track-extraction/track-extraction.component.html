@@ -62,3 +62,107 @@
     </c-col>
   </c-row>
 </c-container>
+
+<c-modal
+  [visible]="assignmentModalVisible()"
+  (visibleChange)="onAssignmentModalVisibleChange($event)"
+  alignment="center"
+  size="lg">
+  <c-modal-header>
+    <h5 cModalTitle i18n>Risultato estrazione pista</h5>
+    <button cButtonClose type="button" [disabled]="isAssigningTrack()" (click)="closeAssignmentModal()" aria-label="Chiudi" i18n-aria-label></button>
+  </c-modal-header>
+  <c-modal-body>
+    @if (selectedTrack(); as track) {
+      <c-row class="track-result justify-content-center">
+        <c-col lg="10" class="text-center">
+          <h6 class="track-result-title">{{ track.name }}</h6>
+          @if (track.country) {
+            <p class="text-body-secondary mb-3">{{ track.country }}</p>
+          }
+          <img
+            class="track-result-image"
+            [src]="getTrackImagePath(track.id)"
+            alt="Mappa del circuito estratto"
+            i18n-alt>
+        </c-col>
+      </c-row>
+    }
+
+    @if (hasAssignmentError()) {
+      <p class="alert alert-danger mb-0" role="alert" i18n>
+        Non e stato possibile caricare o assegnare la pista. Riprova.
+      </p>
+    } @else if (pendingTrackAssignment(); as assignment) {
+      <section class="assignment-details" aria-labelledby="assignment-question">
+        <h6 id="assignment-question" i18n>Assegnare questa pista al prossimo Gran Premio?</h6>
+        <c-row class="assignment-details-list g-3">
+          <c-col md="6">
+            <dl class="mb-0">
+              <dt i18n>Data e ora</dt>
+              <dd>{{ formatGpDate(assignment.gp.date) }}</dd>
+            </dl>
+          </c-col>
+          <c-col md="3">
+            <dl class="mb-0">
+              <dt i18n>Sprint</dt>
+              <dd>
+                @if (assignment.gp.has_sprint) {
+                  <span i18n>Si</span>
+                } @else {
+                  <span i18n>No</span>
+                }
+              </dd>
+            </dl>
+          </c-col>
+          <c-col md="3">
+            <dl class="mb-0">
+              <dt i18n>Punti doppi</dt>
+              <dd>
+                @if (assignment.gp.has_x2) {
+                  <span i18n>Si</span>
+                } @else {
+                  <span i18n>No</span>
+                }
+              </dd>
+            </dl>
+          </c-col>
+        </c-row>
+      </section>
+    } @else if (isLoadingPendingGp()) {
+      <div class="text-center py-3">
+        <c-spinner aria-label="Ricerca del prossimo Gran Premio" i18n-aria-label></c-spinner>
+      </div>
+    } @else {
+      <p class="alert alert-info mb-0" role="status" i18n>
+        Non ci sono Gran Premi programmati senza una pista assegnata.
+      </p>
+    }
+  </c-modal-body>
+  <c-modal-footer>
+    <button cButton color="secondary" type="button" (click)="closeAssignmentModal()" [disabled]="isAssigningTrack()" i18n>Annulla</button>
+    <button cButton color="primary" type="button" (click)="confirmTrackAssignment()" [disabled]="!pendingTrackAssignment() || isAssigningTrack()">
+      @if (isAssigningTrack()) {
+        <span i18n>Assegnazione in corso...</span>
+      } @else {
+        <span i18n>Conferma assegnazione</span>
+      }
+    </button>
+  </c-modal-footer>
+</c-modal>
+
+<c-toaster [placement]="'top-end'" class="p-3" position="fixed">
+  @for (toast of toasts(); track $index) {
+    <c-toast
+      [visible]="true"
+      [autohide]="true"
+      [delay]="5000"
+      [color]="toast.color"
+      (visibleChange)="onToastVisibleChange($event, toast)">
+      <c-toast-header>
+        <strong>{{ toast.title }}</strong>
+      </c-toast-header>
+      <c-toast-body>{{ toast.message }}</c-toast-body>
+    </c-toast>
+  }
+</c-toaster>

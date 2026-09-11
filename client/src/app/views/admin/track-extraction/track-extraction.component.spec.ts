@@ -1,7 +1,7 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { of, throwError } from 'rxjs';
-import type { EligibleTrack } from '@f123dashboard/shared';
+import type { EligibleTrack, GPEditItem } from '@f123dashboard/shared';
 import { GpEditService } from '../../../service/gp-edit.service';
 import { TrackExtractionComponent } from './track-extraction.component';
 
@@ -14,10 +14,24 @@ describe('TrackExtractionComponent', () => {
     { id: 1, name: 'Monza', country: 'Italy' },
     { id: 2, name: 'Silverstone', country: 'United Kingdom' }
   ];
+  const unassignedGp: GPEditItem = {
+    id: 10,
+    date: new Date('2026-05-24T14:00'),
+    track_id: null,
+    track_name: 'Da assegnare',
+    has_sprint: false,
+    has_x2: false
+  };
 
   beforeEach(async () => {
-    mockGpEditService = jasmine.createSpyObj('GpEditService', ['getEligibleTracks']);
+    mockGpEditService = jasmine.createSpyObj('GpEditService', [
+      'getEligibleTracks',
+      'getUpcomingGps',
+      'updateGp'
+    ]);
     mockGpEditService.getEligibleTracks.and.returnValue(of({ success: true, data: tracks }));
+    mockGpEditService.getUpcomingGps.and.returnValue(of({ success: true, data: [unassignedGp] }));
+    mockGpEditService.updateGp.and.returnValue(of({ success: true }));
 
     await TestBed.configureTestingModule({
       providers: [
@@ -48,16 +62,45 @@ describe('TrackExtractionComponent', () => {
     expect(component.isLoading()).toBeFalse();
   });
 
-  it('should lock the wheel until its rotation transition ends', () => {
+  it('should lock the wheel until its rotation transition ends', fakeAsync(() => {
     component.spinWheel();
 
     expect(component.isSpinning()).toBeTrue();
     expect(tracks).toContain(component.selectedTrack()!);
 
     component.onWheelTransitionEnd(new TransitionEvent('transitionend', { propertyName: 'transform' }));
+    tick(500);
 
     expect(component.isSpinning()).toBeFalse();
-  });
+    expect(component.assignmentModalVisible()).toBeTrue();
+    expect(component.pendingTrackAssignment()?.gp).toEqual(unassignedGp);
+  }));
+
+  it('should assign the selected track only after confirmation', fakeAsync(() => {
+    component.spinWheel();
+    component.onWheelTransitionEnd(new TransitionEvent('transitionend', { propertyName: 'transform' }));
+    tick(500);
+
+    const selectedTrack = component.selectedTrack();
+    component.confirmTrackAssignment();
+
+    expect(mockGpEditService.updateGp).toHaveBeenCalledWith(unassignedGp.id, { track_id: selectedTrack?.id });
+    expect(component.assignmentModalVisible()).toBeFalse();
+    expect(component.selectedTrack()).toBeNull();
+    expect(component.toasts()).toContain(jasmine.objectContaining({ color: 'success' }));
+  }));
+
+  it('should show an error toast when track assignment fails', fakeAsync(() => {
+    mockGpEditService.updateGp.and.returnValue(throwError(() => new Error('Assignment error')));
+    component.spinWheel();
+    component.onWheelTransitionEnd(new TransitionEvent('transitionend', { propertyName: 'transform' }));
+    tick(500);
+
+    component.confirmTrackAssignment();
+
+    expect(component.hasAssignmentError()).toBeTrue();
+    expect(component.toasts()).toContain(jasmine.objectContaining({ color: 'danger' }));
+  }));
 
   it('should not spin without eligible tracks', () => {
     component.tracks.set([]);

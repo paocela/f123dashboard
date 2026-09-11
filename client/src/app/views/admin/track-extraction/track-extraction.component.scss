@@ -86,6 +86,44 @@
   min-height: 1.5rem;
 }
 
+.track-result {
+  margin-bottom: 1.5rem;
+}
+
+.track-result-title {
+  margin-bottom: 0.25rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.track-result-image {
+  display: block;
+  width: 100%;
+  max-height: 20rem;
+  margin-inline: auto;
+  object-fit: contain;
+}
+
+.assignment-details {
+  border-top: 1px solid var(--cui-border-color);
+  padding-top: 1.25rem;
+}
+
+.assignment-details-list {
+  margin: 1rem 0 0;
+}
+
+.assignment-details-list dt {
+  color: var(--cui-secondary-color);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.assignment-details-list dd {
+  margin: 0.25rem 0 0;
+  font-weight: 600;
+}
+
 @media (max-width: 575.98px) {
   .wheel-label {
     font-size: 0.625rem;
