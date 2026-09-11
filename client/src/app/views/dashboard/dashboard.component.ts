@@ -30,6 +30,7 @@ import { cilCalendar, cilMap, cilFire } from '@coreui/icons';
 import { LeaderboardComponent } from "../../components/leaderboard/leaderboard.component";
 import { TwitchApiService } from '../../service/twitch-api.service';
 import { LoadingService } from '../../service/loading.service';
+import { FantaService } from '../../service/fanta.service';
 import { ChampionshipTrendComponent } from '../../components/championship-trend/championship-trend.component';
 import type { Constructor, CumulativePointsData, DriverData, TrackData } from '@f123dashboard/shared';
 import { PilotCardComponent } from '../../components/pilot-card/pilot-card.component';
@@ -83,10 +84,12 @@ export class DashboardComponent implements OnInit {
   private twitchApiService = inject(TwitchApiService);
   private sanitizer = inject(DomSanitizer);
   private constructorService = inject(ConstructorService);
+  private fantaService = inject(FantaService);
   loadingService = inject(LoadingService);
 
   private screenWidth = signal<number>(0);
   showColumn = computed(() => this.screenWidth() > 1600);
+  readonly hasFantaLeaderboard = computed(() => this.fantaService.fantaNumberVotes().size > 0);
 
   twitchEmbedUrl = signal<SafeResourceUrl>('' as SafeResourceUrl);
   calendarEvents = signal<CalendarEvent[]>([]);
@@ -97,6 +100,10 @@ export class DashboardComponent implements OnInit {
   isLive = signal<boolean>(true);
   constructors = signal<Constructor[]>([]);
   showGainedPointsColumn = signal<boolean>(false);
+  readonly hasDashboardSidebar = computed(() =>
+    this.championshipNextTracks().length > 0 || this.hasFantaLeaderboard()
+  );
+  showWeeklyBestPerformers = signal<boolean>(false);
   driverOfWeek = signal<DriverOfWeek>({ driver_username: '', driver_id: 0, points: 0 });
   constructorOfWeek = signal<ConstructorOfWeek>({ 
     constructor_name: '', 
@@ -297,42 +304,58 @@ export class DashboardComponent implements OnInit {
   }
 
   /**
-   * Calculates the best performing driver and constructor of the week
+   * Calculates the best performing driver and constructor for the latest GP
    */
   private calculateWeeklyBestPerformers(championshipTrend: CumulativePointsData[]): void {
-    const driversCount = this.championship_standings_users().length;
-    
-    if (championshipTrend.length <= 3 * driversCount) {
+    const latestGrandPrixDate = championshipTrend[0]?.date;
+    if (!latestGrandPrixDate) {
       return;
     }
 
-    const lastRacePoints = championshipTrend.slice(0, driversCount);
-    const thirdLastRacePoints = championshipTrend.slice(2 * driversCount, 3 * driversCount);
+    const latestGrandPrixPoints = championshipTrend.filter(
+      point => point.date === latestGrandPrixDate
+    );
+    const previousGrandPrixDate = championshipTrend.find(
+      point => point.date < latestGrandPrixDate
+    )?.date;
+    const previousGrandPrixPoints = championshipTrend.filter(
+      point => point.date === previousGrandPrixDate
+    );
+    const hasGrandPrixPoints = latestGrandPrixPoints.some(point =>
+      Number(point.cumulative_points) > 0
+    );
 
-    this.calculateDriverOfWeek(lastRacePoints, thirdLastRacePoints);
-    this.calculateConstructorOfWeek(lastRacePoints, thirdLastRacePoints);
+    if (!hasGrandPrixPoints) {
+      return;
+    }
+
+    const previousPointsByDriver = new Map<number, number>(
+      previousGrandPrixPoints.map(point => [point.driver_id, Number(point.cumulative_points)])
+    );
+    const latestPoints = latestGrandPrixPoints.map(point => ({
+      ...point,
+      points: Number(point.cumulative_points) - (previousPointsByDriver.get(point.driver_id) ?? 0)
+    }));
+
+    this.calculateDriverOfWeek(latestPoints);
+    this.calculateConstructorOfWeek(latestPoints);
+    this.showWeeklyBestPerformers.set(true);
   }
 
   /**
-   * Finds the driver with the most points gained in the last 2 races
+   * Finds the driver with the most points gained in the latest GP
    */
-  private calculateDriverOfWeek(
-    lastRacePoints: CumulativePointsData[],
-    thirdLastRacePoints: CumulativePointsData[]
-  ): void {
+  private calculateDriverOfWeek(latestGrandPrixPoints: Array<CumulativePointsData & { points: number }>): void {
     let bestPoints = 0;
     let bestDriver: DriverOfWeek = { driver_username: '', driver_id: 0, points: 0 };
 
-    for (let i = 0; i < lastRacePoints.length; i++) {
-      const currentPoints = Number(lastRacePoints[i].cumulative_points) - 
-                           Number(thirdLastRacePoints[i].cumulative_points);
-      
-      if (currentPoints > bestPoints) {
-        bestPoints = currentPoints;
+    for (const point of latestGrandPrixPoints) {
+      if (point.points > bestPoints) {
+        bestPoints = point.points;
         bestDriver = {
-          driver_username: lastRacePoints[i].driver_username,
-          driver_id: Number(lastRacePoints[i].driver_id),
-          points: currentPoints
+          driver_username: point.driver_username,
+          driver_id: Number(point.driver_id),
+          points: point.points
         };
       }
     }
@@ -341,12 +364,9 @@ export class DashboardComponent implements OnInit {
   }
 
   /**
-   * Finds the constructor with the most combined driver points in the last 2 races
+   * Finds the constructor with the most combined driver points in the latest GP
    */
-  private calculateConstructorOfWeek(
-    lastRacePoints: CumulativePointsData[],
-    thirdLastRacePoints: CumulativePointsData[]
-  ): void {
+  private calculateConstructorOfWeek(latestGrandPrixPoints: Array<CumulativePointsData & { points: number }>): void {
     const constructorsOfWeek: ConstructorOfWeek[] = this.constructors().map(constructor => ({
       constructor_name: constructor.constructor_name,
       constructor_id: constructor.constructor_id,
@@ -355,15 +375,12 @@ export class DashboardComponent implements OnInit {
       points: 0
     }));
 
-    for (let i = 0; i < lastRacePoints.length; i++) {
-      const currentPoints = Number(lastRacePoints[i].cumulative_points) - 
-                           Number(thirdLastRacePoints[i].cumulative_points);
-      
+    for (const point of latestGrandPrixPoints) {
       constructorsOfWeek.forEach(constructor => {
-        const driverId = Number(lastRacePoints[i].driver_id);
+        const driverId = Number(point.driver_id);
         if (constructor.constructor_driver_1_id === driverId || 
             constructor.constructor_driver_2_id === driverId) {
-          constructor.points += currentPoints;
+          constructor.points += point.points;
         }
       });
     }
