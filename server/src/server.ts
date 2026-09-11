@@ -42,6 +42,7 @@ app.get('/api/health', (req: Request, res: Response) => {
 import { databaseRouter } from './routes/database.routes.js';
 import { authRouter } from './routes/auth.routes.js';
 import { fantaRouter } from './routes/fanta.routes.js';
+import { featureFlagsRouter } from './routes/feature-flags.routes.js';
 import { twitchRouter } from './routes/twitch.routes.js';
 import { playgroundRouter } from './routes/playground.routes.js';
 import { deployRouter } from './routes/deploy.routes.js';
@@ -51,6 +52,7 @@ import { existsSync } from 'fs';
 app.use('/api/database', databaseRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/fanta', fantaRouter);
+app.use('/api/feature-flags', featureFlagsRouter);
 app.use('/api/twitch', twitchRouter);
 app.use('/api/playground', playgroundRouter);
 app.use('/api/deploy', deployRouter);

@@ -9,6 +9,7 @@ import { provideRouter } from '@angular/router';
 import { ConstructorService } from '../../service/constructor.service';
 import { LoadingService } from '../../service/loading.service';
 import { FantaService } from '../../service/fanta.service';
+import { FeatureFlagsService } from '../../service/feature-flags.service';
 import { signal, WritableSignal, computed } from '@angular/core';
 import type { Constructor, CumulativePointsData, DriverData, TrackData } from '@f123dashboard/shared';
 
@@ -25,7 +26,9 @@ describe('DashboardComponent', () => {
   let mockConstructorService: jasmine.SpyObj<ConstructorService>;
   let mockLoadingService: LoadingService;
   let fantaNumberVotesSignal: WritableSignal<Map<number, number>>;
+  let fantaEnabledSignal: WritableSignal<boolean>;
   let mockFantaService: Pick<FantaService, 'fantaNumberVotes'>;
+  let mockFeatureFlagsService: Pick<FeatureFlagsService, 'fantaEnabled'>;
 
   const mockDriverData: DriverData[] = [
     {
@@ -202,8 +205,12 @@ describe('DashboardComponent', () => {
     constructorsSignal = signal(mockConstructorData);
     cumulativePointsSignal = signal(mockCumulativePointsData);
     fantaNumberVotesSignal = signal(new Map([[1, 1]]));
+    fantaEnabledSignal = signal(true);
     mockFantaService = {
       fantaNumberVotes: fantaNumberVotesSignal.asReadonly()
+    };
+    mockFeatureFlagsService = {
+      fantaEnabled: fantaEnabledSignal.asReadonly()
     };
     mockDbDataService = {
       allDrivers: allDriversSignal.asReadonly(),
@@ -247,7 +254,8 @@ describe('DashboardComponent', () => {
         { provide: DomSanitizer, useValue: mockDomSanitizer },
         { provide: ConstructorService, useValue: mockConstructorService },
         { provide: LoadingService, useValue: mockLoadingService },
-        { provide: FantaService, useValue: mockFantaService }
+        { provide: FantaService, useValue: mockFantaService },
+        { provide: FeatureFlagsService, useValue: mockFeatureFlagsService }
       ]
     }).compileComponents();
 
@@ -506,7 +514,20 @@ describe('DashboardComponent', () => {
 
     it('should not show the fantasy leaderboard without scored votes', () => {
       tracksSignal.set([]);
+      fantaEnabledSignal.set(true);
       fantaNumberVotesSignal.set(new Map());
+
+      component.ngOnInit();
+      fixture.detectChanges();
+
+      expect(component.hasFantaLeaderboard()).toBe(false);
+      expect(fixture.nativeElement.textContent).not.toContain('Classifica Fanta');
+    });
+
+    it('should not show the fantasy leaderboard when Fanta is disabled', () => {
+      tracksSignal.set([]);
+      fantaEnabledSignal.set(false);
+      fantaNumberVotesSignal.set(new Map([[1, 1]]));
 
       component.ngOnInit();
       fixture.detectChanges();
@@ -517,6 +538,7 @@ describe('DashboardComponent', () => {
 
     it('should expand the championship standings when the dashboard sidebar is empty', () => {
       tracksSignal.set([]);
+      fantaEnabledSignal.set(true);
       fantaNumberVotesSignal.set(new Map());
 
       component.ngOnInit();

@@ -31,6 +31,7 @@ import { LeaderboardComponent } from "../../components/leaderboard/leaderboard.c
 import { TwitchApiService } from '../../service/twitch-api.service';
 import { LoadingService } from '../../service/loading.service';
 import { FantaService } from '../../service/fanta.service';
+import { FeatureFlagsService } from '../../service/feature-flags.service';
 import { ChampionshipTrendComponent } from '../../components/championship-trend/championship-trend.component';
 import type { Constructor, CumulativePointsData, DriverData, TrackData } from '@f123dashboard/shared';
 import { PilotCardComponent } from '../../components/pilot-card/pilot-card.component';
@@ -85,11 +86,14 @@ export class DashboardComponent implements OnInit {
   private sanitizer = inject(DomSanitizer);
   private constructorService = inject(ConstructorService);
   private fantaService = inject(FantaService);
+  private featureFlagsService = inject(FeatureFlagsService);
   loadingService = inject(LoadingService);
 
   private screenWidth = signal<number>(0);
   showColumn = computed(() => this.screenWidth() > 1600);
-  readonly hasFantaLeaderboard = computed(() => this.fantaService.fantaNumberVotes().size > 0);
+  readonly hasFantaLeaderboard = computed(() =>
+    this.featureFlagsService.fantaEnabled() && this.fantaService.fantaNumberVotes().size > 0
+  );
 
   twitchEmbedUrl = signal<SafeResourceUrl>('' as SafeResourceUrl);
   calendarEvents = signal<CalendarEvent[]>([]);

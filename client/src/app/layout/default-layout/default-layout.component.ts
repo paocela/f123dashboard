@@ -18,6 +18,7 @@ import { DefaultFooterComponent, DefaultHeaderComponent } from './';
 import { getNavItems } from './_nav';
 import { LoadingSpinnerComponent } from '../../../components/loading-spinner/loading-spinner.component';
 import { AuthService } from './../../service/auth.service';
+import { FeatureFlagsService } from '../../service/feature-flags.service';
 
 @Component({
     selector: 'app-dashboard',
@@ -43,9 +44,10 @@ import { AuthService } from './../../service/auth.service';
 })
 export class DefaultLayoutComponent {
   private authService = inject(AuthService);
+  private featureFlagsService = inject(FeatureFlagsService);
 
   // Use computed to reactively update navigation based on user
   public navItems = computed(() => 
-    getNavItems(this.authService.currentUser()?.isAdmin ?? false)
+    getNavItems(this.authService.currentUser()?.isAdmin ?? false, this.featureFlagsService.fantaEnabled())
   );
 }

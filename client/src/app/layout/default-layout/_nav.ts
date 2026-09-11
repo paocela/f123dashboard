@@ -3,7 +3,7 @@ import { cilCoffee } from '@coreui/icons';
 import { AuthService } from './../../service/auth.service';
 
 
-export const getNavItems = (isAdmin: boolean): INavData[] => {
+export const getNavItems = (isAdmin: boolean, fantaEnabled: boolean): INavData[] => {
   const items: INavData[] = [
     {
       name: 'Dashboard',
@@ -25,11 +25,11 @@ export const getNavItems = (isAdmin: boolean): INavData[] => {
       url: '/championship',
       iconComponent: { name: 'cil-calendar' },
     },
-    {
+    ...(fantaEnabled ? [{
       name: 'Fanta',
       url: '/fanta',
       iconComponent: { name: 'cil-gamepad' }
-    },
+    }] : []),
     {
       name: 'Albo D\'oro',
       url: '/albo-d-oro',
