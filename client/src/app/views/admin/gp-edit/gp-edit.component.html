@@ -26,6 +26,25 @@
         </c-card>
       </c-col>
     </c-row>
+
+    <c-row class="mb-4">
+      <c-col xs="12">
+        <c-card>
+          <c-card-header><strong>Stagione corrente</strong></c-card-header>
+          <c-card-body>
+            <div class="form-check">
+              <input
+                cFormCheckInput
+                id="freePracticeEnabled"
+                type="checkbox"
+                [checked]="freePracticeEnabled()"
+                (change)="updateFreePracticeEnabled($event)">
+              <label cFormCheckLabel for="freePracticeEnabled">Abilita prove libere e relativi punti</label>
+            </div>
+          </c-card-body>
+        </c-card>
+      </c-col>
+    </c-row>
   
     <c-row class="mb-4">
       <c-col xs="12">

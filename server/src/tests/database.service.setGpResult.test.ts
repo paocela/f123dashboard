@@ -228,6 +228,18 @@ describe('DatabaseService.setGpResult – dynamic driver count', () => {
       const inserts = getInsertCalls(client, 'free_practice_result_entries');
       expect(inserts.length).toBe(drivers.length);
     });
+
+    it('casts the season ID when looking up the free practice flag', async () => {
+      const { pool, client } = createMockPool(BASE_GP);
+      const service = new DatabaseService(pool);
+
+      await service.setGpResult(1, false, [1, 1], [], [], [], [1], [1], 2024);
+
+      expect(client.query).toHaveBeenCalledWith(
+        expect.stringContaining("$1::text"),
+        [2024]
+      );
+    });
   });
 
   describe('sprint (when hasSprint = true)', () => {

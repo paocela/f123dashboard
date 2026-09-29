@@ -1,7 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { signal } from '@angular/core';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 import { PilotCardComponent } from './pilot-card.component';
+import { FeatureFlagsService } from '../../service/feature-flags.service';
 
 describe('PilotCardComponent', () => {
   let component: PilotCardComponent;
@@ -9,7 +11,10 @@ describe('PilotCardComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      providers: [provideNoopAnimations(), ],
+      providers: [
+        provideNoopAnimations(),
+        { provide: FeatureFlagsService, useValue: { freePracticeEnabled: signal(true).asReadonly() } }
+      ],
       imports: [PilotCardComponent]
     })
     .compileComponents();

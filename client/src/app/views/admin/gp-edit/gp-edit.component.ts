@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, ChangeDetectionStrategy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import {
   ContainerComponent,
   RowComponent,
@@ -25,6 +25,7 @@ import {
   ModalFooterComponent
 } from '@coreui/angular';
 import { GpEditService } from '../../../service/gp-edit.service';
+import { FeatureFlagsService } from '../../../service/feature-flags.service';
 import type { GPEditItem } from '@f123dashboard/shared';
 
 interface Toast {
@@ -69,11 +70,13 @@ type GPEditViewModel = Omit<GPEditItem, 'date'> & { date: string };
 })
 export class GpEditComponent implements OnInit {
   private gpEditService = inject(GpEditService);
+  private featureFlagsService = inject(FeatureFlagsService);
   private fb = inject(FormBuilder);
 
   gps = signal<GPEditViewModel[]>([]);
   tracks = signal<{ id: number; name: string }[]>([]);
   loading = signal(false);
+  readonly freePracticeEnabled = this.featureFlagsService.freePracticeEnabled;
   
   // Toaster state
   toasts = signal<Toast[]>([]);
@@ -128,6 +131,17 @@ export class GpEditComponent implements OnInit {
     });
   }
 
+  async updateFreePracticeEnabled(event: Event): Promise<void> {
+    const enabled = (event.target as HTMLInputElement).checked;
+    try {
+      await this.featureFlagsService.setFreePracticeEnabled(enabled);
+      this.addToast('Salvato', 'Impostazione delle prove libere aggiornata.', 'success');
+    } catch (error) {
+      console.error('Error updating free practice setting', error);
+      this.addToast('Errore', 'Non e stato possibile aggiornare le prove libere.', 'danger');
+    }
+  }
+
   addToast(title: string, message: string, color = 'success') {
     this.toasts.update(toasts => [...toasts, { title, message, color }]);
   }
@@ -167,9 +181,13 @@ export class GpEditComponent implements OnInit {
   }
 
   onBulkUpdate(): void {
-    if (this.bulkForm.invalid) return;
+    if (this.bulkForm.invalid) {
+      return;
+    }
     const daysOffset = this.bulkForm.value.daysOffset || 0;
-    if (daysOffset === 0) return;
+    if (daysOffset === 0) {
+      return;
+    }
 
     this.showConfirmation(
         'Conferma Spostamento',

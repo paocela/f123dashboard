@@ -33,12 +33,15 @@ export class DatabaseService {
     const result = await this.pool.query(`
       WITH latest_season AS (
         SELECT id FROM seasons ORDER BY start_date DESC LIMIT 1
+      ),
+      selected_season AS (
+        SELECT COALESCE($1, (SELECT id FROM latest_season)) AS id
       )
       SELECT 
         driver_id, driver_username, driver_name, driver_surname, driver_description, driver_license_pt, driver_consistency_pt, driver_fast_lap_pt, drivers_dangerous_pt, driver_ingenuity_pt, driver_strategy_pt, driver_color, car_name, car_overall_score, total_sprint_points, total_free_practice_points, total_qualifying_points, total_full_race_points, total_race_points, total_points
       FROM public.all_race_points arp
-      CROSS JOIN latest_season ls
-      WHERE arp.season_id = COALESCE($1, ls.id);
+      CROSS JOIN selected_season ss
+      WHERE arp.season_id = ss.id;
     `, [seasonId]);
     const carList: CarData[] = await this.getCarList(); 
     
@@ -114,6 +117,11 @@ export class DatabaseService {
         WHERE gp.season_id = COALESCE($1, ls.id)
           AND gp.free_practice_results_id IS NOT NULL
           AND fpre.position IS NOT NULL
+          AND COALESCE((
+            SELECT value FROM property
+            WHERE name = CONCAT('free_practice_enabled_season_', COALESCE($1, ls.id))
+            LIMIT 1
+          ), '1') <> '0'
         
         UNION ALL
         
@@ -489,6 +497,11 @@ export class DatabaseService {
       const hasX2Enabled = Number(gp.has_x2) === 1;
       const raceFastLapPilotId = raceResult.at(-1)!;
       const sprintFastLapPilotId = sprintResult.at(-1);
+      const freePracticeEnabledResult = await client.query<{ value: string }>(
+        `SELECT value FROM property WHERE name = 'free_practice_enabled_season_' || $1::text LIMIT 1`,
+        [seasonId]
+      );
+      const freePracticeEnabled = freePracticeEnabledResult.rows[0]?.value !== '0';
 
       // Handle Race or Full Race Results
       if (hasX2Enabled && gp.full_race_results_id) {
@@ -564,7 +577,7 @@ export class DatabaseService {
       }
 
       // Handle Free Practice Results
-      if (gp.free_practice_results_id) {
+      if (freePracticeEnabled && gp.free_practice_results_id) {
         await client.query('DELETE FROM free_practice_result_entries WHERE free_practice_results_id = $1', [gp.free_practice_results_id]);
         for (let i = 0; i < fpResult.length; i++) {
           if (fpResult[i] && fpResult[i] !== 0) {

@@ -40,7 +40,9 @@
                         <th scope="col">Sprint</th>
                       }
                       <th scope="col">Qualifica</th>
-                      <th scope="col">Prove Libere</th>
+                      @if (freePracticeEnabled()) {
+                        <th scope="col">Prove Libere</th>
+                      }
                     </tr>
                   </thead>
                   <tbody>
@@ -63,7 +65,9 @@
                           <td [ngStyle]="getPositionStyle(position)">{{getDriverByPosition(gp.sessions.sprint, position)}}</td>
                         }
                         <td [ngStyle]="getPositionStyle(position)">{{getDriverByPosition(gp.sessions.qualifying, position)}}</td>
-                        <td [ngStyle]="getPositionStyle(position)">{{getDriverByPosition(gp.sessions.free_practice, position)}}</td>
+                        @if (freePracticeEnabled()) {
+                          <td [ngStyle]="getPositionStyle(position)">{{getDriverByPosition(gp.sessions.free_practice, position)}}</td>
+                        }
                       </tr>
                     }
                     
@@ -79,7 +83,9 @@
                           <td [ngStyle]="{'color':'purple'}">{{gp.fastLapDrivers.sprint || ''}}</td>
                         }
                         <td></td>
-                        <td></td>
+                        @if (freePracticeEnabled()) {
+                          <td></td>
+                        }
                       </tr>
                     }
                     
@@ -92,7 +98,9 @@
                           <td [ngStyle]="{'color':'red'}">{{getDNFDrivers(gp.sessions.sprint)}}</td>
                         }
                         <td></td>
-                        <td></td>
+                        @if (freePracticeEnabled()) {
+                          <td></td>
+                        }
                       </tr>
                     }
                 </tbody>

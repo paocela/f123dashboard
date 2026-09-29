@@ -1,15 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { signal } from '@angular/core';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { of, throwError, delay } from 'rxjs';
 
 import { GpEditComponent } from './gp-edit.component';
 import { GpEditService } from '../../../service/gp-edit.service';
+import { FeatureFlagsService } from '../../../service/feature-flags.service';
 import type { GPEditItem } from '@f123dashboard/shared';
 
 describe('GpEditComponent', () => {
   let component: GpEditComponent;
   let fixture: ComponentFixture<GpEditComponent>;
   let mockGpEditService: jasmine.SpyObj<GpEditService>;
+  let freePracticeEnabled = signal(true);
 
   const mockGpData: GPEditItem[] = [
     {
@@ -47,7 +50,14 @@ describe('GpEditComponent', () => {
     await TestBed.configureTestingModule({
       providers: [
         provideNoopAnimations(),
-        { provide: GpEditService, useValue: mockGpEditService }
+        { provide: GpEditService, useValue: mockGpEditService },
+        {
+          provide: FeatureFlagsService,
+          useValue: {
+            freePracticeEnabled: freePracticeEnabled.asReadonly(),
+            setFreePracticeEnabled: jasmine.createSpy('setFreePracticeEnabled').and.resolveTo()
+          }
+        }
       ],
       imports: [GpEditComponent]
     })
@@ -60,6 +70,10 @@ describe('GpEditComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should show the free practice setting', () => {
+    expect(fixture.nativeElement.querySelector('#freePracticeEnabled')).toBeTruthy();
   });
 
   it('should load GPs on initialization', () => {

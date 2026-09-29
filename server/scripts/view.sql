@@ -269,6 +269,12 @@ AS WITH session_points AS (
              LEFT JOIN tracks t ON gp.track_id = t.id
              JOIN seasons s ON gp.season_id = s.id
           WHERE gp.free_practice_results_id IS NOT NULL
+            AND COALESCE((
+              SELECT value
+              FROM property
+              WHERE name = 'free_practice_enabled_season_' || gp.season_id::text
+              LIMIT 1
+            ), '1') <> '0'
         UNION ALL
          SELECT gp.id AS grand_prix_id,
             gp.date AS grand_prix_date,

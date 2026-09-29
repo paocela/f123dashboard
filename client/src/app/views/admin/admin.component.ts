@@ -22,6 +22,7 @@ import { IconDirective } from '@coreui/icons-angular';
 
 import { DbDataService } from 'src/app/service/db-data.service';
 import { AuthService } from 'src/app/service/auth.service';
+import { FeatureFlagsService } from '../../service/feature-flags.service';
 import { GpResult } from '../../model/championship';
 import { medals, allFlags } from '../../model/constants';
 import type { ChampionshipData, Driver, Season, SessionResult, TrackData } from '@f123dashboard/shared';
@@ -55,6 +56,7 @@ import type { ChampionshipData, Driver, Season, SessionResult, TrackData } from 
 export class AdminComponent implements OnInit {
   private dbData = inject(DbDataService);
   private authService = inject(AuthService);
+  private featureFlagsService = inject(FeatureFlagsService);
   private router = inject(Router);
 
   
@@ -70,6 +72,7 @@ export class AdminComponent implements OnInit {
   sprintResults = signal<Map<number, any[]>>(new Map<number, any[]>());
   qualiResults = signal<Map<number, any[]>>(new Map<number, any[]>());
   fpResults = signal<Map<number, any[]>>(new Map<number, any[]>());
+  freePracticeEnabled = signal(true);
 
   // Loading states
   isInitialLoading = signal(true);
@@ -131,26 +134,30 @@ export class AdminComponent implements OnInit {
       let piloti: Driver[];
       let tracks: TrackData[];
       let championshipData: ChampionshipData[];
+      let flags;
       
       if (seasonId) {
         // Load data for specific season concurrently
-        [piloti, tracks, championshipData] = await Promise.all([
+        [piloti, tracks, championshipData, flags] = await Promise.all([
           this.dbData.getDriversData(seasonId),
           this.dbData.getAllTracksBySeason(seasonId),
-          this.dbData.getChampionshipBySeason(seasonId)
+          this.dbData.getChampionshipBySeason(seasonId),
+          this.featureFlagsService.loadFlags(seasonId)
         ]);
       } else {
         // Load data for latest season (default) concurrently
-        [piloti, tracks, championshipData] = await Promise.all([
+        [piloti, tracks, championshipData, flags] = await Promise.all([
           this.dbData.getDriversData(),
           this.dbData.getAllTracksBySeason(),
-          this.dbData.getChampionshipBySeason()
+          this.dbData.getChampionshipBySeason(),
+          this.featureFlagsService.loadFlags()
         ]);
       }
       
       this.piloti.set(piloti);
       this.tracks.set(tracks);
       this.championshipData.set(championshipData);
+      this.freePracticeEnabled.set(flags.freePracticeEnabled);
       
       this.initializeResults();
     } catch (error) {
@@ -190,7 +197,7 @@ export class AdminComponent implements OnInit {
           : []
       );
       qualiMap.set(trackId, this.buildSimpleArray(gp.sessions.qualifying, piloti, pilotiMap));
-      fpMap.set(trackId, this.buildSimpleArray(gp.sessions.free_practice, piloti, pilotiMap));
+      fpMap.set(trackId, this.freePracticeEnabled() ? this.buildSimpleArray(gp.sessions.free_practice, piloti, pilotiMap) : []);
     }
 
     this.raceResults.set(raceMap);
@@ -259,7 +266,7 @@ export class AdminComponent implements OnInit {
         sprintResult: hasSprintBool ? sprintData.slice(0, driverCount + 1).map(Number) : [],
         sprintDnfResult: hasSprintBool ? (sprintData[driverCount + 1] ?? []).map(Number) : [],
         qualiResult: this.qualiResults().get(trackId)!.map(Number),
-        fpResult: this.fpResults().get(trackId)!.map(Number),
+        fpResult: this.freePracticeEnabled() ? this.fpResults().get(trackId)!.map(Number) : [],
         seasonId: +seasonId,
       };
 
@@ -302,7 +309,7 @@ export class AdminComponent implements OnInit {
     const results = [
       check(this.validateSessionWithDnf(this.raceResults().get(trackId) ?? [], 'Gara'), 'Gara'),
       check(this.validateSessionNoDnf(this.qualiResults().get(trackId) ?? [], 'Qualifica'), 'Qualifica'),
-      check(this.validateSessionNoDnf(this.fpResults().get(trackId) ?? [], 'Prove Libere'), 'Prove Libere'),
+      ...(this.freePracticeEnabled() ? [check(this.validateSessionNoDnf(this.fpResults().get(trackId) ?? [], 'Prove Libere'), 'Prove Libere')] : []),
       ...(hasSprint ? [check(this.validateSessionWithDnf(this.sprintResults().get(trackId) ?? [], 'Sprint'), 'Sprint')] : []),
     ];
 

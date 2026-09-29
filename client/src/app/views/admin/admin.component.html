@@ -111,7 +111,9 @@
                                                       <th class="bg-body-tertiary text-center">Sprint</th>
                                                     }
                                                     <th class="bg-body-tertiary text-center">Qualifica</th>
-                                                    <th class="bg-body-tertiary text-center">Prove Libere</th>
+                                                    @if (freePracticeEnabled()) {
+                                                      <th class="bg-body-tertiary text-center">Prove Libere</th>
+                                                    }
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -252,27 +254,29 @@
                                                   </td>
 
                                                   <!-- FREE PRACTICE RESULTS -->
-                                                  <td class="text-center">
-                                                    @if (posizione.key < driverCount() + 1) {
-                                                      <select
-                                                              [attr.aria-label]="'seleziona il pilota che arrivera ' + posizione?.value"
-                                                              [id]="track.track_id + '_fp_' + posizione.key"
-                                                              [name]="'fp_posizione_' + posizione.key"
-                                                              [ngModel]="getFpResult(track.track_id, posizione.key)"
-                                                              (ngModelChange)="setFpResult(track.track_id, posizione.key, $event)"
-                                                              cSelect
-                                                              cFormControl
-                                                              class="admin-select"
-                                                              required>
-                                                        <option value="0">-- Seleziona un pilota --</option>
-                                                        @for (pilota of piloti(); track pilota.id + '_fp_' + $index) {
-                                                          <option [value]="pilota.id">
-                                                            {{ pilota.username }}
-                                                          </option>
-                                                        }
-                                                      </select>
-                                                    }
-                                                  </td>
+                                                  @if (freePracticeEnabled()) {
+                                                    <td class="text-center">
+                                                      @if (posizione.key < driverCount() + 1) {
+                                                        <select
+                                                                [attr.aria-label]="'seleziona il pilota che arrivera ' + posizione?.value"
+                                                                [id]="track.track_id + '_fp_' + posizione.key"
+                                                                [name]="'fp_posizione_' + posizione.key"
+                                                                [ngModel]="getFpResult(track.track_id, posizione.key)"
+                                                                (ngModelChange)="setFpResult(track.track_id, posizione.key, $event)"
+                                                                cSelect
+                                                                cFormControl
+                                                                class="admin-select"
+                                                                required>
+                                                          <option value="0">-- Seleziona un pilota --</option>
+                                                          @for (pilota of piloti(); track pilota.id + '_fp_' + $index) {
+                                                            <option [value]="pilota.id">
+                                                              {{ pilota.username }}
+                                                            </option>
+                                                          }
+                                                        </select>
+                                                      }
+                                                    </td>
+                                                  }
                                                 </tr>
                                                 }
                                             </tbody>

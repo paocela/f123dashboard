@@ -48,12 +48,14 @@
             <div class="col-5">{{ pilota().total_qualifying_points }} Pt.</div>
           </div>
         </li>
-        <li cListGroupItem>
-          <div class="row">
-            <div class="col-7 border-end"><strong>Practice:</strong></div>
-            <div class="col-5">{{ pilota().total_free_practice_points }} Pt.</div>
-          </div>
-        </li>
+        @if (freePracticeEnabled()) {
+          <li cListGroupItem>
+            <div class="row">
+              <div class="col-7 border-end"><strong>Practice:</strong></div>
+              <div class="col-5">{{ pilota().total_free_practice_points }} Pt.</div>
+            </div>
+          </li>
+        }
         <li cListGroupItem>
           <div class="row">
             <div class="col-7 border-end"><strong>License:</strong></div>
