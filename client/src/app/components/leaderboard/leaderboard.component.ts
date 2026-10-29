@@ -102,7 +102,7 @@ export class LeaderboardComponent {
     const allTracks = this.dbData.tracks();
     return allTracks.filter(track => {
       const result = this.fantaService.getRaceResult(track.track_id);
-      return result && result.id_1_place !== null && result.id_1_place !== undefined;
+      return result && result.positions?.length > 0;
     });
   }
 

@@ -17,8 +17,8 @@ AS WITH all_race_points AS (
                     WHEN rre.fast_lap THEN st.fast_lap_points
                     ELSE 0
                 END AS fast_lap_point
-           FROM race_result_entries rre
-             JOIN session_type st ON st.id = 1
+                     FROM race_result_entries rre
+                         JOIN session_type st ON st.id = 1
         ), all_full_race_points AS (
          SELECT frre.race_results_id AS result_id,
             frre.pilot_id AS driver_id,
@@ -35,8 +35,8 @@ AS WITH all_race_points AS (
                     WHEN frre.fast_lap THEN st.fast_lap_points
                     ELSE 0
                 END AS fast_lap_point
-           FROM full_race_result_entries frre
-             JOIN session_type st ON st.id = 5
+                     FROM full_race_result_entries frre
+                         JOIN session_type st ON st.id = 5
         ), all_sprint_points AS (
          SELECT sre.sprint_results_id AS result_id,
             sre.pilot_id AS driver_id,
@@ -53,8 +53,8 @@ AS WITH all_race_points AS (
                     WHEN sre.fast_lap THEN st.fast_lap_points
                     ELSE 0
                 END AS fast_lap_point
-           FROM sprint_result_entries sre
-             JOIN session_type st ON st.id = 4
+                     FROM sprint_result_entries sre
+                         JOIN session_type st ON st.id = 4
         ), all_qualifying_points AS (
          SELECT qre.qualifying_results_id AS result_id,
             qre.pilot_id AS driver_id,
@@ -68,8 +68,8 @@ AS WITH all_race_points AS (
                     ELSE 0
                 END AS qualifying_point,
             0 AS fast_lap_point
-           FROM qualifying_result_entries qre
-             JOIN session_type st ON st.id = 2
+                     FROM qualifying_result_entries qre
+                         JOIN session_type st ON st.id = 2
         ), all_free_practice_points AS (
          SELECT fpre.free_practice_results_id AS result_id,
             fpre.pilot_id AS driver_id,
@@ -83,8 +83,15 @@ AS WITH all_race_points AS (
                     ELSE 0
                 END AS free_practice_point,
             0 AS fast_lap_point
-           FROM free_practice_result_entries fpre
-             JOIN session_type st ON st.id = 3
+                     FROM free_practice_result_entries fpre
+                         JOIN gran_prix gp ON gp.free_practice_results_id = fpre.free_practice_results_id
+                         JOIN session_type st ON st.id = 3
+                    WHERE COALESCE((
+                        SELECT value
+                        FROM property
+                        WHERE name = 'free_practice_enabled_season_' || gp.season_id::text
+                        LIMIT 1
+                    ), '1') <> '0'
         ), all_drivers AS (
          SELECT drivers.id AS driver_id,
             drivers.username AS driver_username,

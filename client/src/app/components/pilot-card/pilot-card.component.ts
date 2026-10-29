@@ -1,4 +1,4 @@
-import { Component, input, computed, ChangeDetectionStrategy } from '@angular/core';
+import { Component, input, computed, ChangeDetectionStrategy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   CardBodyComponent,
@@ -10,6 +10,7 @@ import {
   ListGroupItemDirective
 } from '@coreui/angular';
 import { ChartjsComponent } from '@coreui/angular-chartjs';
+import { FeatureFlagsService } from '../../service/feature-flags.service';
 import type { DriverData } from '@f123dashboard/shared';
 
 @Component({
@@ -30,8 +31,10 @@ import type { DriverData } from '@f123dashboard/shared';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PilotCardComponent {
+  private featureFlagsService = inject(FeatureFlagsService);
   pilota = input.required<DriverData>();
   position = input.required<number>();
+  readonly freePracticeEnabled = this.featureFlagsService.freePracticeEnabled;
 
   // Variabili per la personalizzazione del radar chart
   private readonly CHART_TEXT_COLOR = 'rgba(130, 130, 130, 1)';

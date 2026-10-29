@@ -3,6 +3,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { provideHttpClient } from '@angular/common/http';
 import { DbDataService } from './service/db-data.service';
 import { FantaService } from './service/fanta.service';
+import { FeatureFlagsService } from './service/feature-flags.service';
 import {
   provideRouter,
   withEnabledBlockingInitialNavigation,
@@ -22,12 +23,14 @@ import localeIt from '@angular/common/locales/it';
 
 registerLocaleData(localeIt, 'it-IT');
 
-export function initializeApp(dbDataService: DbDataService, twitchApiService: TwitchApiService, playgroundService: PlaygroundService, fantaService: FantaService) {
+export function initializeApp(dbDataService: DbDataService, twitchApiService: TwitchApiService, playgroundService: PlaygroundService, fantaService: FantaService, featureFlagsService: FeatureFlagsService) {
   return async () => {
+    await featureFlagsService.loadFlags();
+
     await Promise.all([
       dbDataService.allData(),
       playgroundService.allData(),
-      fantaService.loadFantaVotes(),
+      ...(featureFlagsService.fantaEnabled() ? [fantaService.loadFantaVotes()] : []),
       twitchApiService.checkStreamStatus().catch(err => {
         console.error('Error during Twitch stream status check:', err);
       })
@@ -57,7 +60,7 @@ export const appConfig: ApplicationConfig = {
     DbDataService,
     TwitchApiService,
     provideAppInitializer(() => {
-        const initializerFn = (initializeApp)(inject(DbDataService), inject(TwitchApiService), inject(PlaygroundService), inject(FantaService));
+      const initializerFn = (initializeApp)(inject(DbDataService), inject(TwitchApiService), inject(PlaygroundService), inject(FantaService), inject(FeatureFlagsService));
         return initializerFn();
       })
   ]

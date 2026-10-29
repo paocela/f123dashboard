@@ -80,12 +80,14 @@
           <div class="col-4">{{ constructorData().constructor_qualifying_points }}</div>
         </div>
       </li>
-      <li cListGroupItem>
-        <div class="row g-0">
-          <div class="col-8 border-end"><strong>Practice:</strong></div>
-          <div class="col-4">{{ constructorData().constructor_free_practice_points }}</div>
-        </div>
-      </li>
+      @if (freePracticeEnabled()) {
+        <li cListGroupItem>
+          <div class="row g-0">
+            <div class="col-8 border-end"><strong>Practice:</strong></div>
+            <div class="col-4">{{ constructorData().constructor_free_practice_points }}</div>
+          </div>
+        </li>
+      }
     </ul>
   </c-card-body>
 </c-card>

@@ -5,6 +5,7 @@ AS WITH session_points AS (
          SELECT gp.id AS grand_prix_id,
             gp.date AS grand_prix_date,
             t.name AS track_name,
+          gp.track_id,
             s.description AS season_description,
             s.id AS season_id,
             p.id AS pilot_id,
@@ -68,13 +69,14 @@ AS WITH session_points AS (
            FROM gran_prix gp
              JOIN race_result_entries rre ON gp.race_results_id = rre.race_results_id
              JOIN drivers p ON rre.pilot_id = p.id
-             JOIN tracks t ON gp.track_id = t.id
+             LEFT JOIN tracks t ON gp.track_id = t.id
              JOIN seasons s ON gp.season_id = s.id
           WHERE gp.race_results_id IS NOT NULL
         UNION ALL
          SELECT gp.id AS grand_prix_id,
             gp.date AS grand_prix_date,
             t.name AS track_name,
+          gp.track_id,
             s.description AS season_description,
             s.id AS season_id,
             p.id AS pilot_id,
@@ -138,13 +140,14 @@ AS WITH session_points AS (
            FROM gran_prix gp
              JOIN sprint_result_entries sre ON gp.sprint_results_id = sre.sprint_results_id
              JOIN drivers p ON sre.pilot_id = p.id
-             JOIN tracks t ON gp.track_id = t.id
+             LEFT JOIN tracks t ON gp.track_id = t.id
              JOIN seasons s ON gp.season_id = s.id
           WHERE gp.sprint_results_id IS NOT NULL AND gp.has_sprint = 1
         UNION ALL
          SELECT gp.id AS grand_prix_id,
             gp.date AS grand_prix_date,
             t.name AS track_name,
+          gp.track_id,
             s.description AS season_description,
             s.id AS season_id,
             p.id AS pilot_id,
@@ -200,13 +203,14 @@ AS WITH session_points AS (
            FROM gran_prix gp
              JOIN qualifying_result_entries qre ON gp.qualifying_results_id = qre.qualifying_results_id
              JOIN drivers p ON qre.pilot_id = p.id
-             JOIN tracks t ON gp.track_id = t.id
+             LEFT JOIN tracks t ON gp.track_id = t.id
              JOIN seasons s ON gp.season_id = s.id
           WHERE gp.qualifying_results_id IS NOT NULL
         UNION ALL
          SELECT gp.id AS grand_prix_id,
             gp.date AS grand_prix_date,
             t.name AS track_name,
+          gp.track_id,
             s.description AS season_description,
             s.id AS season_id,
             p.id AS pilot_id,
@@ -262,13 +266,20 @@ AS WITH session_points AS (
            FROM gran_prix gp
              JOIN free_practice_result_entries fpre ON gp.free_practice_results_id = fpre.free_practice_results_id
              JOIN drivers p ON fpre.pilot_id = p.id
-             JOIN tracks t ON gp.track_id = t.id
+             LEFT JOIN tracks t ON gp.track_id = t.id
              JOIN seasons s ON gp.season_id = s.id
           WHERE gp.free_practice_results_id IS NOT NULL
+            AND COALESCE((
+              SELECT value
+              FROM property
+              WHERE name = 'free_practice_enabled_season_' || gp.season_id::text
+              LIMIT 1
+            ), '1') <> '0'
         UNION ALL
          SELECT gp.id AS grand_prix_id,
             gp.date AS grand_prix_date,
             t.name AS track_name,
+          gp.track_id,
             s.description AS season_description,
             s.id AS season_id,
             p.id AS pilot_id,
@@ -332,13 +343,14 @@ AS WITH session_points AS (
            FROM gran_prix gp
              JOIN full_race_result_entries rre ON gp.full_race_results_id = rre.race_results_id
              JOIN drivers p ON rre.pilot_id = p.id
-             JOIN tracks t ON gp.track_id = t.id
+             LEFT JOIN tracks t ON gp.track_id = t.id
              JOIN seasons s ON gp.season_id = s.id
           WHERE gp.full_race_results_id IS NOT NULL AND gp.has_x2 = 1
         )
  SELECT grand_prix_id,
     grand_prix_date,
     track_name,
+   track_id,
     season_description,
     season_id,
     pilot_id,
@@ -349,7 +361,7 @@ AS WITH session_points AS (
     sum(position_points + fast_lap_points) AS total_points,
     string_agg((session_type || ': '::text) || ((position_points + fast_lap_points)::text), ', '::text ORDER BY session_type) AS points_breakdown
    FROM session_points
-  GROUP BY grand_prix_id, grand_prix_date, track_name, season_description, season_id, pilot_id, pilot_name, pilot_username
+    GROUP BY grand_prix_id, grand_prix_date, track_name, track_id, season_description, season_id, pilot_id, pilot_name, pilot_username
   ORDER BY grand_prix_date DESC, (sum(position_points + fast_lap_points)) DESC;
 -- public.season_driver_leaderboard source
 
@@ -391,7 +403,9 @@ AS SELECT c.id AS constructor_id,
            FROM driver_grand_prix_points) dgp
      LEFT JOIN driver_grand_prix_points d1_points ON c.driver_id_1 = d1_points.pilot_id AND dgp.grand_prix_id = d1_points.grand_prix_id
      LEFT JOIN driver_grand_prix_points d2_points ON c.driver_id_2 = d2_points.pilot_id AND dgp.grand_prix_id = d2_points.grand_prix_id
-  WHERE c.driver_id_1 IS NOT NULL AND c.driver_id_2 IS NOT NULL
+  WHERE c.season = dgp.season_id
+    AND c.driver_id_1 IS NOT NULL
+    AND c.driver_id_2 IS NOT NULL
   ORDER BY dgp.grand_prix_date DESC, (COALESCE(d1_points.total_points, 0::bigint) + COALESCE(d2_points.total_points, 0::bigint)) DESC;
 
 -- public.season_constructor_leaderboard source
@@ -399,14 +413,17 @@ CREATE OR REPLACE VIEW public.season_constructor_leaderboard
 AS SELECT c.id AS constructor_id,
     c.name AS constructor_name,
     c.color AS constructor_color,
-    d1.pilot_id AS driver_1_id,
-    d1.pilot_username AS driver_1_username,
-    d1.total_points AS driver_1_tot_points,
-    d2.pilot_id AS driver_2_id,
-    d2.pilot_username AS driver_2_username,
-    d2.total_points AS driver_2_tot_points,
-    d1.total_points + d2.total_points AS constructor_tot_points
+    driver_1.id AS driver_1_id,
+    driver_1.username AS driver_1_username,
+    COALESCE(d1_points.total_points, 0::bigint) AS driver_1_tot_points,
+    driver_2.id AS driver_2_id,
+    driver_2.username AS driver_2_username,
+    COALESCE(d2_points.total_points, 0::bigint) AS driver_2_tot_points,
+    COALESCE(d1_points.total_points, 0::bigint) + COALESCE(d2_points.total_points, 0::bigint) AS constructor_tot_points,
+    c.season AS season_id
    FROM constructors c
-     LEFT JOIN season_driver_leaderboard d1 ON c.driver_id_1 = d1.pilot_id
-     LEFT JOIN season_driver_leaderboard d2 ON c.driver_id_2 = d2.pilot_id
-  ORDER BY (d1.total_points + d2.total_points) DESC;
+     LEFT JOIN drivers driver_1 ON c.driver_id_1 = driver_1.id AND c.season = driver_1.season
+     LEFT JOIN drivers driver_2 ON c.driver_id_2 = driver_2.id AND c.season = driver_2.season
+     LEFT JOIN season_driver_leaderboard d1_points ON driver_1.id = d1_points.pilot_id AND c.season = d1_points.season_id
+     LEFT JOIN season_driver_leaderboard d2_points ON driver_2.id = d2_points.pilot_id AND c.season = d2_points.season_id
+  ORDER BY (COALESCE(d1_points.total_points, 0::bigint) + COALESCE(d2_points.total_points, 0::bigint)) DESC;

@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, ChangeDetectionStrategy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import {
   ContainerComponent,
   RowComponent,
@@ -25,6 +25,7 @@ import {
   ModalFooterComponent
 } from '@coreui/angular';
 import { GpEditService } from '../../../service/gp-edit.service';
+import { FeatureFlagsService } from '../../../service/feature-flags.service';
 import type { GPEditItem } from '@f123dashboard/shared';
 
 interface Toast {
@@ -69,11 +70,13 @@ type GPEditViewModel = Omit<GPEditItem, 'date'> & { date: string };
 })
 export class GpEditComponent implements OnInit {
   private gpEditService = inject(GpEditService);
+  private featureFlagsService = inject(FeatureFlagsService);
   private fb = inject(FormBuilder);
 
   gps = signal<GPEditViewModel[]>([]);
   tracks = signal<{ id: number; name: string }[]>([]);
   loading = signal(false);
+  readonly freePracticeEnabled = this.featureFlagsService.freePracticeEnabled;
   
   // Toaster state
   toasts = signal<Toast[]>([]);
@@ -91,7 +94,7 @@ export class GpEditComponent implements OnInit {
 
   // Create GP Form
   createForm = this.fb.group({
-    track_id: [null as number | null, [Validators.required]],
+    track_id: [null as number | null],
     date: ['', [Validators.required]],
     has_sprint: [false],
     has_x2: [false]
@@ -108,9 +111,7 @@ export class GpEditComponent implements OnInit {
       next: (res) => {
         this.gps.set(res.data.map((gp: GPEditItem) => ({
             ...gp,
-            // Format for datetime-local input: "YYYY-MM-DDTHH:mm"
-            // Using toISOString() and slicing to get the correct format
-            date: new Date(gp.date).toISOString().slice(0, 16)
+          date: this.formatDateTimeLocal(gp.date)
         })));
         this.loading.set(false);
       },
@@ -128,6 +129,17 @@ export class GpEditComponent implements OnInit {
       },
       error: (err) => console.error('Error loading tracks', err)
     });
+  }
+
+  async updateFreePracticeEnabled(event: Event): Promise<void> {
+    const enabled = (event.target as HTMLInputElement).checked;
+    try {
+      await this.featureFlagsService.setFreePracticeEnabled(enabled);
+      this.addToast('Salvato', 'Impostazione delle prove libere aggiornata.', 'success');
+    } catch (error) {
+      console.error('Error updating free practice setting', error);
+      this.addToast('Errore', 'Non e stato possibile aggiornare le prove libere.', 'danger');
+    }
   }
 
   addToast(title: string, message: string, color = 'success') {
@@ -169,9 +181,13 @@ export class GpEditComponent implements OnInit {
   }
 
   onBulkUpdate(): void {
-    if (this.bulkForm.invalid) return;
+    if (this.bulkForm.invalid) {
+      return;
+    }
     const daysOffset = this.bulkForm.value.daysOffset || 0;
-    if (daysOffset === 0) return;
+    if (daysOffset === 0) {
+      return;
+    }
 
     this.showConfirmation(
         'Conferma Spostamento',
@@ -200,11 +216,12 @@ export class GpEditComponent implements OnInit {
   onCreate(): void {
     if (this.createForm.invalid) { return; }
     const val = this.createForm.value;
+    if (!val.date) { return; }
     
     this.loading.set(true);
     this.gpEditService.createGp({
-      track_id: val.track_id!,
-      date: new Date(val.date!).toISOString(), // Ensure ISO string
+      track_id: val.track_id ?? null,
+      date: val.date,
       has_sprint: val.has_sprint || false,
       has_x2: val.has_x2 || false
     }).subscribe({
@@ -249,7 +266,8 @@ export class GpEditComponent implements OnInit {
   onSave(gp: GPEditViewModel): void { 
     
     this.gpEditService.updateGp(gp.id, {
-        date: new Date(gp.date).toISOString(), // Ensure ISO format
+      track_id: gp.track_id,
+        date: gp.date,
         has_sprint: gp.has_sprint,
         has_x2: gp.has_x2
     }).subscribe({
@@ -263,5 +281,12 @@ export class GpEditComponent implements OnInit {
           this.addToast('Errore', 'Errore durante il salvataggio.', 'danger');
         }
     });
+  }
+
+  private formatDateTimeLocal(date: Date): string {
+    const localDate = new Date(date);
+    const pad = (value: number) => value.toString().padStart(2, '0');
+
+    return `${localDate.getFullYear()}-${pad(localDate.getMonth() + 1)}-${pad(localDate.getDate())}T${pad(localDate.getHours())}:${pad(localDate.getMinutes())}`;
   }
 }

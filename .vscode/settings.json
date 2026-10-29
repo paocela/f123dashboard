@@ -1,6 +1,9 @@
 {
     "todo-tree.tree.showBadges": false,
     "chat.tools.terminal.autoApprove": {
-        "npm outdated": true
+        "npm outdated": true,
+        "npx ng": true,
+        "npx tsc": true,
+        "npx vitest": true
     }
 }

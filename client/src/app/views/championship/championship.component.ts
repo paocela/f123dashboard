@@ -1,10 +1,11 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common'; 
 import { BadgeComponent, RowComponent, ColComponent, TextColorDirective, CardComponent, CardHeaderComponent, CardBodyComponent, TableDirective, TableColorDirective, TableActiveDirective, BorderDirective, AlignDirective, ContainerComponent } from '@coreui/angular';
 import { cifBh, cifAt, cifMc, cifJp, cifHu, cifCn, cifCa, cifEs, cifGb, cifBe, cifNl, cifAz, cifSg, cifIt, cifUs, cifAu, cifMx, cifBr, cifQa, cifAe, cifSa } from '@coreui/icons';
 import { cilFire } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
 import { DbDataService } from '../../service/db-data.service';
+import { FeatureFlagsService } from '../../service/feature-flags.service';
 import { allFlags } from '../../model/constants';
 import type { ChampionshipData, SessionResult } from '@f123dashboard/shared';
 
@@ -12,10 +13,12 @@ import type { ChampionshipData, SessionResult } from '@f123dashboard/shared';
     selector: 'app-championship',
     imports: [BadgeComponent, ContainerComponent, IconDirective, CommonModule, IconDirective, RowComponent, ColComponent, TextColorDirective, CardComponent, CardHeaderComponent, CardBodyComponent, TableDirective],
     templateUrl: './championship.component.html',
-    styleUrl: './championship.component.scss'
+    styleUrl: './championship.component.scss',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ChampionshipComponent implements OnInit{
   private dbData = inject(DbDataService);
+  private featureFlagsService = inject(FeatureFlagsService);
 
 
   public championship_data: ChampionshipData[] = [];
@@ -23,6 +26,7 @@ export class ChampionshipComponent implements OnInit{
 
 
   public fireIcon: string[] = cilFire;
+  readonly freePracticeEnabled = this.featureFlagsService.freePracticeEnabled;
 
   ngOnInit(): void {
     this.championship_data = this.dbData.championship();
@@ -76,7 +80,7 @@ export class ChampionshipComponent implements OnInit{
       gp.sessions.full_race,
       gp.sessions.sprint,
       gp.sessions.qualifying,
-      gp.sessions.free_practice
+      ...(this.freePracticeEnabled() ? [gp.sessions.free_practice] : [])
     ];
 
     sessions.forEach(session => {

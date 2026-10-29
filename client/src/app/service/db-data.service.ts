@@ -39,35 +39,7 @@ export class DbDataService {
   readonly constructorGrandPrixPoints = this.constructorGrandPrixPointsSignal.asReadonly();
 
   private constructorsSignal = signal<Constructor[]>([]);
-  readonly constructors = computed(() => {
-    const constructors = this.constructorsSignal();
-    // TODO fix hardcoded drivers in constructors
-    return constructors.map(constructor => {
-      const updated = { ...constructor };
-      if (constructor.constructor_id === 1) {
-        updated.driver_1_id = 10;
-        updated.driver_1_username = "Marcogang96";
-        updated.driver_2_id = 11;
-        updated.driver_2_username = "GiannisCorbe";
-      } else if (constructor.constructor_id === 4) {
-        updated.driver_1_id = 14;
-        updated.driver_1_username = "redmamba_99_";
-        updated.driver_2_id = 16;
-        updated.driver_2_username = "JJKudos";
-      } else if (constructor.constructor_id === 2) {
-        updated.driver_1_id = 12;
-        updated.driver_1_username = "Lil Mvrck";
-        updated.driver_2_id = 17;
-        updated.driver_2_username = "Octimus10";
-      } else if (constructor.constructor_id === 3) {
-        updated.driver_1_id = 13;
-        updated.driver_1_username = "FASTman";
-        updated.driver_2_id = 15;
-        updated.driver_2_username = "Dreandos";
-      }
-      return updated;
-    });
-  });
+  readonly constructors = this.constructorsSignal.asReadonly();
 
   readonly winningConstructorGrandPrixPoints = computed(() => {
     const allConstructorGpPoints = this.constructorGrandPrixPoints();

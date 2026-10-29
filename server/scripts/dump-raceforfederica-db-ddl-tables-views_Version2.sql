@@ -109,6 +109,11 @@ CREATE TABLE public.tracks (
     besttime_driver_id bigint
 );
 
+CREATE TABLE public.track_seasons (
+    track_id bigint NOT NULL,
+    season_id integer NOT NULL
+);
+
 CREATE TABLE public.fanta (
     id integer NOT NULL,
     fanta_player_id bigint NOT NULL,

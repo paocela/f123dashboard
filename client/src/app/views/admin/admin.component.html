@@ -111,7 +111,9 @@
                                                       <th class="bg-body-tertiary text-center">Sprint</th>
                                                     }
                                                     <th class="bg-body-tertiary text-center">Qualifica</th>
-                                                    <th class="bg-body-tertiary text-center">Prove Libere</th>
+                                                    @if (freePracticeEnabled()) {
+                                                      <th class="bg-body-tertiary text-center">Prove Libere</th>
+                                                    }
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -120,7 +122,7 @@
                                                   <!-- INDEX -->
                                                   <td class="text-center">
                                                     <strong>
-                                                      @if (posizione.key <= 8) {
+                                                      @if (posizione.key <= driverCount()) {
                                                         {{ posizione?.value }} posto
                                                       } @else {
                                                         {{posizione?.value}}
@@ -134,17 +136,17 @@
                                                         [attr.alt]="'Medaglia per la posizione ' + posizione?.value"
                                                       />
                                                     }
-                                                    @if (posizione.key == 9) {
+                                                    @if (posizione.key === driverCount() + 1) {
                                                       <svg [cIcon]="fireIcon" style="color: purple"></svg>
                                                     }
-                                                    @if (posizione.key == 10) {
+                                                    @if (posizione.key === driverCount() + 2) {
                                                       <svg [cIcon]="powerIcon" style="color: red"></svg>
                                                     }
                                                   </td>
 
                                                   <!-- RACE RESULTS -->
                                                   <td class="text-center">
-                                                    @if (posizione.key < 10) {
+                                                    @if (posizione.key < driverCount() + 2) {
                                                       <select
                                                         [attr.aria-label]="'seleziona il pilota che arrivera ' + posizione?.value"
                                                         [id]="track.track_id + posizione.key"
@@ -163,7 +165,7 @@
                                                         }
                                                       </select>
                                                     }
-                                                    @if (posizione.key == 10) {
+                                                    @if (posizione.key === driverCount() + 2) {
                                                       <div class="multi-select-container">
                                                         <label class="multi-select-label" [attr.for]="'race-multi-select-' + track.track_id + '-' + posizione.key">-- Seleziona piloti --</label>
                                                         <select [id]="'race-multi-select-' + track.track_id + '-' + posizione.key"
@@ -187,7 +189,7 @@
                                                   <!-- SPRINT RESULTS -->
                                                   @if (track.has_sprint == 1) {
                                                     <td class="text-center">
-                                                      @if (posizione.key < 10) {
+                                                      @if (posizione.key < driverCount() + 2) {
                                                         <select
                                                                 [attr.aria-label]="'seleziona il pilota che arrivera ' + posizione?.value"
                                                                 [id]="track.track_id + '_race_' + posizione.key"
@@ -206,7 +208,7 @@
                                                           }
                                                         </select>
                                                       }
-                                                      @if (posizione.key == 10) {
+                                                      @if (posizione.key === driverCount() + 2) {
                                                         <div class="multi-select-container">
                                                           <label class="multi-select-label" [attr.for]="'sprint-multi-select-' + track.track_id + '-' + posizione.key">-- Seleziona piloti --</label>
                                                           <select [id]="'sprint-multi-select-' + track.track_id + '-' + posizione.key"
@@ -230,7 +232,7 @@
 
                                                   <!-- QUALI RESULTS -->
                                                   <td class="text-center">
-                                                    @if (posizione.key < 9) {
+                                                    @if (posizione.key < driverCount() + 1) {
                                                       <select
                                                               [attr.aria-label]="'seleziona il pilota che arrivera ' + posizione?.value"
                                                               [id]="track.track_id + '_quali_' + posizione.key"
@@ -252,27 +254,29 @@
                                                   </td>
 
                                                   <!-- FREE PRACTICE RESULTS -->
-                                                  <td class="text-center">
-                                                    @if (posizione.key < 9) {
-                                                      <select
-                                                              [attr.aria-label]="'seleziona il pilota che arrivera ' + posizione?.value"
-                                                              [id]="track.track_id + '_fp_' + posizione.key"
-                                                              [name]="'fp_posizione_' + posizione.key"
-                                                              [ngModel]="getFpResult(track.track_id, posizione.key)"
-                                                              (ngModelChange)="setFpResult(track.track_id, posizione.key, $event)"
-                                                              cSelect
-                                                              cFormControl
-                                                              class="admin-select"
-                                                              required>
-                                                        <option value="0">-- Seleziona un pilota --</option>
-                                                        @for (pilota of piloti(); track pilota.id + '_fp_' + $index) {
-                                                          <option [value]="pilota.id">
-                                                            {{ pilota.username }}
-                                                          </option>
-                                                        }
-                                                      </select>
-                                                    }
-                                                  </td>
+                                                  @if (freePracticeEnabled()) {
+                                                    <td class="text-center">
+                                                      @if (posizione.key < driverCount() + 1) {
+                                                        <select
+                                                                [attr.aria-label]="'seleziona il pilota che arrivera ' + posizione?.value"
+                                                                [id]="track.track_id + '_fp_' + posizione.key"
+                                                                [name]="'fp_posizione_' + posizione.key"
+                                                                [ngModel]="getFpResult(track.track_id, posizione.key)"
+                                                                (ngModelChange)="setFpResult(track.track_id, posizione.key, $event)"
+                                                                cSelect
+                                                                cFormControl
+                                                                class="admin-select"
+                                                                required>
+                                                          <option value="0">-- Seleziona un pilota --</option>
+                                                          @for (pilota of piloti(); track pilota.id + '_fp_' + $index) {
+                                                            <option [value]="pilota.id">
+                                                              {{ pilota.username }}
+                                                            </option>
+                                                          }
+                                                        </select>
+                                                      }
+                                                    </td>
+                                                  }
                                                 </tr>
                                                 }
                                             </tbody>

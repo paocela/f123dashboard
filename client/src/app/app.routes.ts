@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { DefaultLayoutComponent } from './layout';
 import { authGuard } from './guard/auth.guard';
 import { adminGuard } from './guard/admin.guard';
+import { fantaEnabledGuard } from './guard/fanta-enabled.guard';
 
 export const routes: Routes = [
   {
@@ -40,12 +41,13 @@ export const routes: Routes = [
       {
         path: 'fanta-dashboard',
         loadChildren: () => import('./views/fanta-dashboard/routes').then((m) => m.routes),
+        canActivate: [fantaEnabledGuard]
       },
       /* routing fanta */
       {
         path: 'fanta',
         loadChildren: () => import('./views/fanta/routes').then((m) => m.routes),
-        canActivate: [authGuard]
+        canActivate: [fantaEnabledGuard, authGuard]
       },
       /* routing admin */
       {

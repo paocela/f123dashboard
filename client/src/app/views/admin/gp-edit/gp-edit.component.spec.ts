@@ -1,15 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { signal } from '@angular/core';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { of, throwError, delay } from 'rxjs';
 
 import { GpEditComponent } from './gp-edit.component';
 import { GpEditService } from '../../../service/gp-edit.service';
+import { FeatureFlagsService } from '../../../service/feature-flags.service';
 import type { GPEditItem } from '@f123dashboard/shared';
 
 describe('GpEditComponent', () => {
   let component: GpEditComponent;
   let fixture: ComponentFixture<GpEditComponent>;
   let mockGpEditService: jasmine.SpyObj<GpEditService>;
+  let freePracticeEnabled = signal(true);
 
   const mockGpData: GPEditItem[] = [
     {
@@ -47,7 +50,14 @@ describe('GpEditComponent', () => {
     await TestBed.configureTestingModule({
       providers: [
         provideNoopAnimations(),
-        { provide: GpEditService, useValue: mockGpEditService }
+        { provide: GpEditService, useValue: mockGpEditService },
+        {
+          provide: FeatureFlagsService,
+          useValue: {
+            freePracticeEnabled: freePracticeEnabled.asReadonly(),
+            setFreePracticeEnabled: jasmine.createSpy('setFreePracticeEnabled').and.resolveTo()
+          }
+        }
       ],
       imports: [GpEditComponent]
     })
@@ -60,6 +70,10 @@ describe('GpEditComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should show the free practice setting', () => {
+    expect(fixture.nativeElement.querySelector('#freePracticeEnabled')).toBeTruthy();
   });
 
   it('should load GPs on initialization', () => {
@@ -198,7 +212,7 @@ describe('GpEditComponent', () => {
     }, 100);
   });
 
-  it('should not create GP if form is invalid', () => {
+  it('should not create GP if the date is missing', () => {
     component.createForm.patchValue({ track_id: null, date: '' });
     
     component.onCreate();
@@ -219,9 +233,26 @@ describe('GpEditComponent', () => {
     setTimeout(() => {
       expect(mockGpEditService.createGp).toHaveBeenCalledWith(jasmine.objectContaining({
         track_id: 1,
+        date: '2024-06-01T14:00',
         has_sprint: true,
         has_x2: false
       }));
+      done();
+    }, 100);
+  });
+
+  it('should create a GP without an assigned track', (done) => {
+    component.createForm.patchValue({
+      track_id: null,
+      date: '2024-06-01T14:00',
+      has_sprint: false,
+      has_x2: false
+    });
+
+    component.onCreate();
+
+    setTimeout(() => {
+      expect(mockGpEditService.createGp).toHaveBeenCalledWith(jasmine.objectContaining({ track_id: null }));
       done();
     }, 100);
   });
@@ -277,6 +308,8 @@ describe('GpEditComponent', () => {
     
     setTimeout(() => {
       expect(mockGpEditService.updateGp).toHaveBeenCalledWith(1, jasmine.objectContaining({
+        track_id: 1,
+        date: '2024-05-26T14:00',
         has_sprint: false,
         has_x2: true
       }));

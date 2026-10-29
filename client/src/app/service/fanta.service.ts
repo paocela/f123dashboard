@@ -3,7 +3,7 @@ import { DbDataService } from './db-data.service';
 import { ApiService } from './api.service';
 import { size } from 'lodash-es';
 import { firstValueFrom } from 'rxjs';
-import type { FantaVote, RaceResult } from '@f123dashboard/shared';
+import type { FantaVote, FantaVoteSubmission, RaceResult } from '@f123dashboard/shared';
 
 @Injectable({
   providedIn: 'root'
@@ -24,7 +24,7 @@ export class FantaService {
   readonly fantaVotes = this.fantaVotesSignal.asReadonly();
 
   readonly raceResults = computed(() => 
-    this.dbData.raceResult().filter(result => result.id_1_place !== null)
+    this.dbData.raceResult().filter(result => result.positions?.length > 0)
   );
 
   private readonly _pointsCache = computed(() => {
@@ -36,7 +36,7 @@ export class FantaService {
     const results = this.raceResults();
 
     results.forEach(raceResult => {
-      const raceVotes = votes.filter(item => item.track_id === raceResult.track_id && item.id_1_place !== null);
+      const raceVotes = votes.filter(item => item.track_id === raceResult.track_id && item.positions?.length > 0);
       if (raceVotes.length === 0) { return; }
 
       raceVotes.forEach(raceVote => {
@@ -72,7 +72,7 @@ export class FantaService {
 
   }
 
-  async setFantaVote(voto: FantaVote): Promise<void> {
+  async setFantaVote(voto: FantaVoteSubmission): Promise<void> {
     await firstValueFrom(
       this.apiService.post('/fanta/set-vote', voto)
     );
@@ -142,27 +142,24 @@ export class FantaService {
 
   calculateFantaPoints(raceResult: RaceResult, fantaVote: FantaVote): number {
     let points = 0;
-    // Create arrays of positions for both result and vote
-    const resultPositions = [
-      Number(raceResult.id_1_place), Number(raceResult.id_2_place), Number(raceResult.id_3_place), Number(raceResult.id_4_place),
-      Number(raceResult.id_5_place), Number(raceResult.id_6_place), Number(raceResult.id_7_place), Number(raceResult.id_8_place)
-    ];
-    
-    const votePositions = [
-      Number(fantaVote.id_1_place), Number(fantaVote.id_2_place), Number(fantaVote.id_3_place), Number(fantaVote.id_4_place),
-      Number(fantaVote.id_5_place), Number(fantaVote.id_6_place), Number(fantaVote.id_7_place), Number(fantaVote.id_8_place)
-    ];
-    // Calculate points for each driver (1-8)
-    this.dbData.drivers().forEach(driver =>  {
-      const realPosition = resultPositions.indexOf(Number(driver.id));
+    // Build 0-based position map from race result (matches votePositions.indexOf behavior)
+    const resultPilotToPos = new Map<number, number>(
+      raceResult.positions.map(p => [p.pilot_id, p.position - 1])
+    );
+
+    const votePositions = fantaVote.positions.map(Number);
+    // Calculate points for each driver
+    this.dbData.drivers().forEach(driver => {
+      const realPosition = resultPilotToPos.get(Number(driver.id));
       const votedPosition = votePositions.indexOf(Number(driver.id));
-      if (votedPosition === -1 || realPosition === -1) {return;}
+      if (votedPosition === -1 || realPosition === undefined) { return; }
 
       points += this.pointsWithAbsoluteDifference(realPosition, votedPosition);
     });
 
     // Calculate points for Fast Lap and DNF
-    points = (raceResult.id_fast_lap === fantaVote.id_fast_lap && fantaVote.id_fast_lap !== 0) ? points + FantaService.CORRECT_RESPONSE_FAST_LAP_POINTS : points;
+    const fastLapPilotId = raceResult.positions.find(p => p.fast_lap)?.pilot_id ?? 0;
+    points = (fastLapPilotId === fantaVote.id_fast_lap && fantaVote.id_fast_lap !== 0) ? points + FantaService.CORRECT_RESPONSE_FAST_LAP_POINTS : points;
     points = (this.isDnfCorrect(raceResult.list_dnf, fantaVote.id_dnf) && fantaVote.id_dnf !== 0) ? points + FantaService.CORRECT_RESPONSE_DNF_POINTS : points;
     
     // Calculate points for Constructor Team (all tied constructors with highest points count as winners)
@@ -173,16 +170,9 @@ export class FantaService {
     return points;
   }
 
-  isDnfCorrect(raceResultDnf: string, fantaVoteDnfId: number) {
-    //let fantaVoteDnfUsername: string = this.allDrivers.find(driver => driver.driver_id == fantaVoteDnfId)?.driver_username;
-    //return raceResultDnf.includes(fantaVoteDnfUsername) ;
-    // now list_dnf contains the driver_id, so we can check directly
-    if (!raceResultDnf || !fantaVoteDnfId) {return false;}
-    // raceResultDnf is a string like "{1,4}", so extract numbers
-    const dnfStr = typeof raceResultDnf === 'string' ? raceResultDnf : String(raceResultDnf ?? '');
-    const ids = dnfStr.replace(/[{}]/g, '').split(',').map(id => Number(id.trim())).filter(id => !isNaN(id));
-    return ids.includes(+fantaVoteDnfId);
-    
+  isDnfCorrect(raceResultDnf: number[], fantaVoteDnfId: number): boolean {
+    if (!raceResultDnf?.length || !fantaVoteDnfId) { return false; }
+    return raceResultDnf.includes(+fantaVoteDnfId);
   }
 
   pointsWithAbsoluteDifference(raceResult: number, fantaVote: number) : number{

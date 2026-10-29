@@ -5,8 +5,11 @@ import { DashboardComponent, DriverDataWithGainedPoints } from './dashboard.comp
 import { DbDataService } from '../../service/db-data.service';
 import { TwitchApiService } from '../../service/twitch-api.service';
 import { DomSanitizer } from '@angular/platform-browser';
+import { provideRouter } from '@angular/router';
 import { ConstructorService } from '../../service/constructor.service';
 import { LoadingService } from '../../service/loading.service';
+import { FantaService } from '../../service/fanta.service';
+import { FeatureFlagsService } from '../../service/feature-flags.service';
 import { signal, WritableSignal, computed } from '@angular/core';
 import type { Constructor, CumulativePointsData, DriverData, TrackData } from '@f123dashboard/shared';
 
@@ -22,6 +25,10 @@ describe('DashboardComponent', () => {
   let mockDomSanitizer: jasmine.SpyObj<DomSanitizer>;
   let mockConstructorService: jasmine.SpyObj<ConstructorService>;
   let mockLoadingService: LoadingService;
+  let fantaNumberVotesSignal: WritableSignal<Map<number, number>>;
+  let fantaEnabledSignal: WritableSignal<boolean>;
+  let mockFantaService: Pick<FantaService, 'fantaNumberVotes'>;
+  let mockFeatureFlagsService: Pick<FeatureFlagsService, 'fantaEnabled'>;
 
   const mockDriverData: DriverData[] = [
     {
@@ -187,6 +194,9 @@ describe('DashboardComponent', () => {
   ];
 
   beforeEach(async () => {
+    jasmine.clock().install();
+    jasmine.clock().mockDate(new Date(2026, 2, 1));
+
     // Create a writable signal for testing that can be updated
     const mockIsLiveSignal = signal(false);
 
@@ -194,6 +204,14 @@ describe('DashboardComponent', () => {
     tracksSignal = signal(mockTrackData);
     constructorsSignal = signal(mockConstructorData);
     cumulativePointsSignal = signal(mockCumulativePointsData);
+    fantaNumberVotesSignal = signal(new Map([[1, 1]]));
+    fantaEnabledSignal = signal(true);
+    mockFantaService = {
+      fantaNumberVotes: fantaNumberVotesSignal.asReadonly()
+    };
+    mockFeatureFlagsService = {
+      fantaEnabled: fantaEnabledSignal.asReadonly()
+    };
     mockDbDataService = {
       allDrivers: allDriversSignal.asReadonly(),
       tracks: tracksSignal.asReadonly(),
@@ -210,7 +228,8 @@ describe('DashboardComponent', () => {
     (mockTwitchApiService as any)._isLiveSignal = mockIsLiveSignal;
     
     mockDomSanitizer = jasmine.createSpyObj('DomSanitizer', [
-      'bypassSecurityTrustResourceUrl'
+      'bypassSecurityTrustResourceUrl',
+      'bypassSecurityTrustHtml'
     ]);
     mockConstructorService = jasmine.createSpyObj('ConstructorService', [
       'calculateConstructorPoints',
@@ -224,21 +243,28 @@ describe('DashboardComponent', () => {
 
     mockTwitchApiService.getChannel.and.returnValue('testchannel');
     mockDomSanitizer.bypassSecurityTrustResourceUrl.and.returnValue('safe-url' as any);
+    mockDomSanitizer.bypassSecurityTrustHtml.and.callFake(value => value as any);
     mockConstructorService.calculateConstructorPoints.and.returnValue(mockConstructorData);
     mockConstructorService.calculateConstructorGainedPoints.and.returnValue(mockConstructorData);
 
     await TestBed.configureTestingModule({
       imports: [DashboardComponent],
-      providers: [provideNoopAnimations(), { provide: DbDataService, useValue: mockDbDataService as DbDataService },
+      providers: [provideNoopAnimations(), provideRouter([]), { provide: DbDataService, useValue: mockDbDataService as DbDataService },
         { provide: TwitchApiService, useValue: mockTwitchApiService },
         { provide: DomSanitizer, useValue: mockDomSanitizer },
         { provide: ConstructorService, useValue: mockConstructorService },
-        { provide: LoadingService, useValue: mockLoadingService }
+        { provide: LoadingService, useValue: mockLoadingService },
+        { provide: FantaService, useValue: mockFantaService },
+        { provide: FeatureFlagsService, useValue: mockFeatureFlagsService }
       ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(DashboardComponent);
     component = fixture.componentInstance;
+  });
+
+  afterEach(() => {
+    jasmine.clock().uninstall();
   });
 
   it('should create', () => {
@@ -343,19 +369,17 @@ describe('DashboardComponent', () => {
       component.ngOnInit();
 
       const driverOfWeek = component.driverOfWeek();
-      // Calculates from last race (Track 4) to 3rd last race (Track 2)
-      // driver1: 75 - 45 = 30 points gained in last 2 races
       expect(driverOfWeek.driver_username).toBe('driver1');
-      expect(driverOfWeek.points).toBe(30);
+      expect(driverOfWeek.points).toBe(15);
+      expect(component.showWeeklyBestPerformers()).toBe(true);
     });
 
     it('should calculate constructor of the week', () => {
       component.ngOnInit();
 
       const constructorOfWeek = component.constructorOfWeek();
-      // Team Red has driver1 (30 points) + driver2 (25 points) = 55 points in last 2 races
       expect(constructorOfWeek.constructor_name).toBe('Team Red');
-      expect(constructorOfWeek.points).toBe(55);
+      expect(constructorOfWeek.points).toBe(27);
     });
   });
 
@@ -472,6 +496,10 @@ describe('DashboardComponent', () => {
 
       expect(component.championship_standings_users().length).toBe(0);
       expect(component.showGainedPointsColumn()).toBe(false);
+      expect(component.showWeeklyBestPerformers()).toBe(false);
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelector('.driver-card')).toBeNull();
+      expect(fixture.nativeElement.querySelector('.team-card')).toBeNull();
     });
 
     it('should handle empty track data', () => {
@@ -482,6 +510,42 @@ describe('DashboardComponent', () => {
       expect(component.championshipTracks().length).toBe(0);
       expect(component.championshipNextTracks().length).toBe(0);
       expect(component.calendarEvents().length).toBe(0);
+    });
+
+    it('should not show the fantasy leaderboard without scored votes', () => {
+      tracksSignal.set([]);
+      fantaEnabledSignal.set(true);
+      fantaNumberVotesSignal.set(new Map());
+
+      component.ngOnInit();
+      fixture.detectChanges();
+
+      expect(component.hasFantaLeaderboard()).toBe(false);
+      expect(fixture.nativeElement.textContent).not.toContain('Classifica Fanta');
+    });
+
+    it('should not show the fantasy leaderboard when Fanta is disabled', () => {
+      tracksSignal.set([]);
+      fantaEnabledSignal.set(false);
+      fantaNumberVotesSignal.set(new Map([[1, 1]]));
+
+      component.ngOnInit();
+      fixture.detectChanges();
+
+      expect(component.hasFantaLeaderboard()).toBe(false);
+      expect(fixture.nativeElement.textContent).not.toContain('Classifica Fanta');
+    });
+
+    it('should expand the championship standings when the dashboard sidebar is empty', () => {
+      tracksSignal.set([]);
+      fantaEnabledSignal.set(true);
+      fantaNumberVotesSignal.set(new Map());
+
+      component.ngOnInit();
+      fixture.detectChanges();
+
+      expect(component.hasDashboardSidebar()).toBe(false);
+      expect(fixture.nativeElement.querySelector('c-col').classList).toContain('col-md-12');
     });
 
     it('should handle insufficient cumulative data for gained points calculation', () => {
@@ -519,9 +583,8 @@ describe('DashboardComponent', () => {
       component.ngOnInit();
 
       const constructorOfWeek = component.constructorOfWeek();
-      // driver1 gained 30pts (75-45) + driver2 gained 25pts (60-35) = 55 total
       expect(constructorOfWeek.constructor_name).toBe('Team Red');
-      expect(constructorOfWeek.points).toBe(55);
+      expect(constructorOfWeek.points).toBe(27);
     });
 
     it('should handle constructor with no drivers', () => {

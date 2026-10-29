@@ -26,7 +26,7 @@
 }
 
 <c-row>
-  <c-col xs="12" md="6">
+  <c-col xs="12" [md]="hasDashboardSidebar() ? 6 : 12">
     <c-card class="mb-4">
       <c-card-header>
         <h4 class="card-title mb-0" id="traffic">Classifica Campionato 🏅</h4>
@@ -61,8 +61,8 @@
                     </th>
                     }
                     @if (showColumn()) {
-                    <th class="bg-body-tertiary pilot">
-                      Pilota
+                    <th class="bg-body-tertiary text-center">
+                      Monoposto
                     </th>
                     }
                     <th class="bg-body-tertiary text-center">Punti</th>
@@ -100,9 +100,9 @@
                     </td>
                     }
                     @if (showColumn()) {
-                    <td class="pilot">
+                    <td class="text-center">
                       <div class="text-nowrap">
-                        {{ user.driver_name }} {{ user.driver_surname }}
+                        {{ user.assigned_car_name }}
                       </div>
                     </td>
                     }
@@ -282,7 +282,7 @@
       ></c-carousel-control>
     </c-carousel>
     }
-    @else if (championshipNextTracks().length === 0) {
+    @else if (championshipNextTracks().length === 0 && hasFantaLeaderboard()) {
     <c-card class="mb-4 p-0">
       <c-card-header>
         <h4 class="card-title mb-0" id="traffic">Classifica Fanta</h4>
@@ -296,6 +296,7 @@
     </c-card>
     }
     </c-row>
+    @if (showWeeklyBestPerformers()) {
     <c-row class="g-4 align-items-stretch">
       <c-col>
         <c-card class="text-center shadow-sm h-100 driver-card">
@@ -344,6 +345,7 @@
         </c-card>
       </c-col>
     </c-row>
+    }
    
   </c-col>
 </c-row>
