@@ -1,6 +1,9 @@
 # Quick Build & Deploy Reference
 
 ## Development
+Use Node.js 24.15.0 or newer in the Node.js 24 release line for Angular 22.
+The client uses TypeScript 6.0.3 (`~6.0.3`), within Angular 22's supported `>=6.0 <6.1` range.
+
 ```bash
 npm run dev                    # Start dev servers (client + server + shared watch)
 npm run start:client           # Start Angular dev server only
@@ -86,6 +89,10 @@ curl http://localhost:3000/api/health
 ```
 
 ## Common Issues
+
+**TypeScript reports that `baseUrl` is deprecated**
+- The client uses explicit `paths` mappings instead of `baseUrl` for TypeScript 6 compatibility.
+- Keep the `src/*` mapping in both `client/tsconfig.app.json` and `client/tsconfig.spec.json`; their `paths` settings do not merge.
 
 **Server can't find client files**
 - Ensure `NODE_ENV=production` is set

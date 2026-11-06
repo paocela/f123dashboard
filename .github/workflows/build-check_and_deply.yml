@@ -8,9 +8,9 @@ on:
     types: [closed]
     branches:
       - main
-      - v5.*
+      - develop
   schedule:
-    - cron: '15 4 * * *'
+    - cron: '15 4 * * 0'
 
 env:
   FORCE_COLOR: 2
