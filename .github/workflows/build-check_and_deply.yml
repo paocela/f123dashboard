@@ -5,7 +5,7 @@ on:
     branches-ignore:
       - "dependabot/**"
   pull_request:
-    types: [closed]
+    types: [opened, synchronize, reopened, closed]
     branches:
       - main
       - develop
