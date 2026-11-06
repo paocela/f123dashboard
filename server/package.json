@@ -17,16 +17,15 @@
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.5",
     "@types/morgan": "^1.9.10",
-    "@types/node": "^22.19.9",
+    "@types/node": "^22.20.5",
     "@types/node-cron": "^3.0.11",
-    "@types/nodemailer": "^7.0.4",
     "@types/pg": "^8.15.6",
-    "@types/supertest": "^6.0.3",
+    "@types/supertest": "^7.2.1",
     "supertest": "^7.2.2",
     "ts-node": "^10.9.2",
     "tsx": "^4.20.6",
     "typescript": "^5.6.3",
-    "vitest": "^4.0.17"
+    "vitest": "^5.1.0"
   },
   "dependencies": {
     "@f123dashboard/shared": "file:../shared",
@@ -34,12 +33,12 @@
     "@types/jsonwebtoken": "^9.0.10",
     "axios": "^1.8.4",
     "cors": "^2.8.5",
-    "dotenv": "^17.2.3",
+    "dotenv": "^18.0.9",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.1",
     "node-cron": "^4.2.1",
-    "nodemailer": "^9.0.5",
+    "nodemailer": "^10.3.1",
     "pg": "^8.13.1",
     "winston": "^3.18.3"
   }

@@ -180,7 +180,7 @@ export class DbDataService {
       return result;
     } catch (error) {
       console.error('Error setting GP result:', error);
-      throw new Error(`Failed to set GP result: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(`Failed to set GP result: ${error instanceof Error ? error.message : 'Unknown error'}`, { cause: error });
     }
   }
 
