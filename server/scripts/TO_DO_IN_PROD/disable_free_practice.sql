@@ -8,7 +8,7 @@ BEGIN;
 
 INSERT INTO property (name, description, value)
 VALUES (
-  'free_practice_enabled_season_' || :'season_id',
+  'free_practice_enabled_season_3',
   'Enables free practice results and points for a season',
   '0'
 )

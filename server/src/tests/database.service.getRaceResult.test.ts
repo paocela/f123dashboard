@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { DatabaseService } from '../services/database.service.js';
+import { CarService } from '../services/car.service.js';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -29,7 +30,7 @@ describe('DatabaseService.getRaceResult – Phase 2 positions[] shape', () => {
         list_dnf: [99],
       },
     ]);
-    const service = new DatabaseService(pool);
+    const service = new DatabaseService(pool, new CarService());
 
     const results = await service.getRaceResult();
 
@@ -47,7 +48,7 @@ describe('DatabaseService.getRaceResult – Phase 2 positions[] shape', () => {
     const pool = createMockPool([
       { id: 2, track_id: 20, positions: null, list_dnf: null },
     ]);
-    const service = new DatabaseService(pool);
+    const service = new DatabaseService(pool, new CarService());
 
     const results = await service.getRaceResult();
     expect(results).toHaveLength(1);
@@ -58,7 +59,7 @@ describe('DatabaseService.getRaceResult – Phase 2 positions[] shape', () => {
 
   it('returns empty list when no race results exist', async () => {
     const pool = createMockPool([]);
-    const service = new DatabaseService(pool);
+    const service = new DatabaseService(pool, new CarService());
 
     const results = await service.getRaceResult();
     expect(results).toHaveLength(0);
@@ -66,7 +67,7 @@ describe('DatabaseService.getRaceResult – Phase 2 positions[] shape', () => {
 
   it('forwards seasonId as query parameter', async () => {
     const pool = createMockPool([]);
-    const service = new DatabaseService(pool);
+    const service = new DatabaseService(pool, new CarService());
 
     await service.getRaceResult(42);
 
@@ -78,7 +79,7 @@ describe('DatabaseService.getRaceResult – Phase 2 positions[] shape', () => {
 
   it('passes null/undefined when no seasonId supplied', async () => {
     const pool = createMockPool([]);
-    const service = new DatabaseService(pool);
+    const service = new DatabaseService(pool, new CarService());
 
     await service.getRaceResult();
 
@@ -90,7 +91,7 @@ describe('DatabaseService.getRaceResult – Phase 2 positions[] shape', () => {
 
   it('uses JSON_AGG in the SQL query (not MAX/CASE pivot)', async () => {
     const pool = createMockPool([]);
-    const service = new DatabaseService(pool);
+    const service = new DatabaseService(pool, new CarService());
 
     await service.getRaceResult();
 
@@ -103,7 +104,7 @@ describe('DatabaseService.getRaceResult – Phase 2 positions[] shape', () => {
 
   it('filters position-0 rows into list_dnf via ARRAY_AGG', async () => {
     const pool = createMockPool([]);
-    const service = new DatabaseService(pool);
+    const service = new DatabaseService(pool, new CarService());
 
     await service.getRaceResult();
 
@@ -117,7 +118,7 @@ describe('DatabaseService.getRaceResult – Phase 2 positions[] shape', () => {
       { id: 1, track_id: 10, positions: [{ position: 1, pilot_id: 1, fast_lap: false }], list_dnf: [] },
       { id: 2, track_id: 20, positions: [{ position: 1, pilot_id: 2, fast_lap: true }], list_dnf: [5] },
     ]);
-    const service = new DatabaseService(pool);
+    const service = new DatabaseService(pool, new CarService());
 
     const results = await service.getRaceResult();
     expect(results).toHaveLength(2);
@@ -139,7 +140,7 @@ describe('DatabaseService.getRaceResult – Phase 2 positions[] shape', () => {
         list_dnf: [],
       },
     ]);
-    const service = new DatabaseService(pool);
+    const service = new DatabaseService(pool, new CarService());
 
     const results = await service.getRaceResult();
     const fastLapDriver = results[0].positions.find(p => p.fast_lap);
@@ -159,7 +160,7 @@ describe('DatabaseService.getRaceResult – Phase 2 positions[] shape', () => {
         list_dnf: [99, 100],
       },
     ]);
-    const service = new DatabaseService(pool);
+    const service = new DatabaseService(pool, new CarService());
 
     const results = await service.getRaceResult();
     const allPositions = results[0].positions.map(p => p.position);

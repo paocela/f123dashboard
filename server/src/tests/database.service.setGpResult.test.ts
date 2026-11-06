@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { DatabaseService } from '../services/database.service.js';
+import { CarService } from '../services/car.service.js';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -75,7 +76,7 @@ describe('DatabaseService.setGpResult – dynamic driver count', () => {
     it('inserts exactly N position rows when provided N drivers (default 8)', async () => {
       const drivers = [1, 2, 3, 4, 5, 6, 7, 8];
       const { pool, client } = createMockPool(BASE_GP);
-      const service = new DatabaseService(pool);
+      const service = new DatabaseService(pool, new CarService());
 
       await service.setGpResult(
         1, false,
@@ -94,7 +95,7 @@ describe('DatabaseService.setGpResult – dynamic driver count', () => {
     it('inserts exactly 10 position rows when provided 10 drivers', async () => {
       const drivers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
       const { pool, client } = createMockPool(BASE_GP);
-      const service = new DatabaseService(pool);
+      const service = new DatabaseService(pool, new CarService());
 
       await service.setGpResult(
         1, false,
@@ -114,7 +115,7 @@ describe('DatabaseService.setGpResult – dynamic driver count', () => {
       const drivers = [1, 2, 3];
       const fastLapDriver = 2;
       const { pool, client } = createMockPool(BASE_GP);
-      const service = new DatabaseService(pool);
+      const service = new DatabaseService(pool, new CarService());
 
       await service.setGpResult(
         1, false,
@@ -142,7 +143,7 @@ describe('DatabaseService.setGpResult – dynamic driver count', () => {
       const finishers = [1, 2, 3];
       const dnfDrivers = [4, 5];
       const { pool, client } = createMockPool(BASE_GP);
-      const service = new DatabaseService(pool);
+      const service = new DatabaseService(pool, new CarService());
 
       await service.setGpResult(
         1, false,
@@ -168,7 +169,7 @@ describe('DatabaseService.setGpResult – dynamic driver count', () => {
       const gpWithX2 = { ...BASE_GP, has_x2: 1, full_race_results_id: 99 };
       const drivers = [1, 2, 3, 4, 5, 6];
       const { pool, client } = createMockPool(gpWithX2);
-      const service = new DatabaseService(pool);
+      const service = new DatabaseService(pool, new CarService());
 
       await service.setGpResult(
         1, false,
@@ -192,7 +193,7 @@ describe('DatabaseService.setGpResult – dynamic driver count', () => {
     it('inserts exactly N rows matching the quali array length', async () => {
       const drivers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
       const { pool, client } = createMockPool(BASE_GP);
-      const service = new DatabaseService(pool);
+      const service = new DatabaseService(pool, new CarService());
 
       await service.setGpResult(
         1, false,
@@ -213,7 +214,7 @@ describe('DatabaseService.setGpResult – dynamic driver count', () => {
     it('inserts exactly N rows matching the fp array length', async () => {
       const drivers = [1, 2, 3, 4, 5, 6];
       const { pool, client } = createMockPool(BASE_GP);
-      const service = new DatabaseService(pool);
+      const service = new DatabaseService(pool, new CarService());
 
       await service.setGpResult(
         1, false,
@@ -231,7 +232,7 @@ describe('DatabaseService.setGpResult – dynamic driver count', () => {
 
     it('casts the season ID when looking up the free practice flag', async () => {
       const { pool, client } = createMockPool(BASE_GP);
-      const service = new DatabaseService(pool);
+      const service = new DatabaseService(pool, new CarService());
 
       await service.setGpResult(1, false, [1, 1], [], [], [], [1], [1], 2024);
 
@@ -246,7 +247,7 @@ describe('DatabaseService.setGpResult – dynamic driver count', () => {
     it('inserts exactly N rows into sprint_result_entries', async () => {
       const drivers = [1, 2, 3, 4, 5];
       const { pool, client } = createMockPool(BASE_GP);
-      const service = new DatabaseService(pool);
+      const service = new DatabaseService(pool, new CarService());
 
       await service.setGpResult(
         1, true,
@@ -272,7 +273,7 @@ describe('DatabaseService.setGpResult – dynamic driver count', () => {
       release: vi.fn(),
     };
     const pool = { connect: vi.fn().mockResolvedValue(client) } as unknown as import('pg').Pool;
-    const service = new DatabaseService(pool);
+    const service = new DatabaseService(pool, new CarService());
 
     const result = await service.setGpResult(1, false, [1, 99], [], [], [], [], [], 2024);
 
