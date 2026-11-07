@@ -18,13 +18,18 @@
             <ul>
               <li><strong>Giorno del campionato:</strong> ogni lunedì sera</li>
               <li><strong>Orario di inizio:</strong> dalle 21:45 (puntuali)</li>
-              <li><strong>Formato:</strong> 2 GP per serata, con qualifiche e gara (+sprint) per ogni GP</li>
+              <li><strong>Formato:</strong> 1 GP per serata, con prove libere, qualifiche e gara (+sprint)</li>
               <li><strong>Meteo:</strong> dinamico, e se bisogna rifare le gara si mette lo stesso meteo</li>
-              <li><strong>Scuderie Pilota:</strong> prestazioni reali, e scuderie assegnate inversamente all'abilità del pilota. Da stabilire all'inizio, ma possono subire variazioni</li>
-              <li><strong>Durata prove libere:</strong> dalla fine dei GP precedenti, alle 23:59 del giorno prima del GP (domenica)</li>
+              <li><strong>Scuderie Pilota:</strong> prestazioni reali, e scuderie assegnate inversamente alla classifica generale. La prima gara della stagione è con prestazioni uguali.</li>
+              <li><strong>Durata prove libere:</strong> 45 min. No requisiti gomme. Partenza ultimo giro entro il tempo massimo</li>
+              <li><strong>Durata prove libere (gara completa):</strong> Tutta la settimana precedente al gp</li>
               <li><strong>Durata qualifiche:</strong> sessione unica, dalla durata di 17 min (circa 3 giri lanciati)</li>
+              <li><strong>Durata qualifiche sprint:</strong> giro secco</li>
               <li><strong>Durata sprint:</strong> gara 5 giri</li>
-              <li><strong>Durata gara:</strong> gara 35% (se GP sprint, gara 25%)</li>
+              <li><strong>Durata gara:</strong> gara 50% (se GP sprint, gara 35%)</li>
+              <li><strong>Ordine GP:</strong> prove libere (45min) → qualifiche (20min) → gara (50min)</li>
+              <li><strong>Ordine GP sprint:</strong> prove libere (45min) → qualifica sprint (1lap) → sprint (5laps) → qualifiche (20min) → gara (35min))</li>
+              <li><strong>Ordine GP completo:</strong> qualifiche (20min) → gara (90min)</li>
             </ul>
           </div>
         </div>
@@ -47,7 +52,6 @@
                     <th>Gara</th>
                     <th>Sprint</th>
                     <th>Qualifiche</th>
-                    <th>Prove Libere</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -56,55 +60,47 @@
                     <td>25</td>
                     <td>10</td>
                     <td>7</td>
-                    <td>5</td>
                   </tr>
                   <tr>
                     <td><strong>2°</strong></td>
                     <td>21</td>
                     <td>8</td>
                     <td>6</td>
-                    <td>4</td>
                   </tr>
                   <tr>
                     <td><strong>3°</strong></td>
                     <td>18</td>
                     <td>7</td>
                     <td>5</td>
-                    <td>3</td>
                   </tr>
                   <tr>
                     <td><strong>4°</strong></td>
                     <td>14</td>
                     <td>6</td>
                     <td>4</td>
-                    <td>2</td>
                   </tr>
                   <tr>
                     <td><strong>5°</strong></td>
                     <td>11</td>
                     <td>4</td>
                     <td>3</td>
-                    <td>1</td>
                   </tr>
                   <tr>
                     <td><strong>6°</strong></td>
                     <td>8</td>
                     <td>3</td>
                     <td>2</td>
-                    <td>0</td>
                   </tr>
                   <tr>
                     <td><strong>7°</strong></td>
                     <td>5</td>
                     <td>2</td>
                     <td>1</td>
-                    <td>0</td>
                   </tr>
                   <tr>
                     <td><strong>8°</strong></td>
                     <td>2</td>
                     <td>1</td>
-                    <td>0</td>
                     <td>0</td>
                   </tr>
                   <tr>
@@ -147,9 +143,16 @@
                 <li><strong>Votazioni:</strong> quando non è possibile stabilire in maniera ovvia se una regola è stata violata o no (esempio per i contatti) è prevista una votazione. Nel caso di parità di voti, la violazione / penalità viene convalidata</li>
                 <li><strong>Zone grigie del regolamento:</strong> la decisione è della FIA dopo votazione, e la regola aggiuntiva viene resa valida dalla giornata seguente</li>
               </ul>
+            <h5 id="regole-contatti-qualifica">Regole / contatti prove libere</h5>
+              <ul>
+                <li><strong>Ostruzione:</strong>Nessuna penalità</li>
+                <li><strong>Contatto con colpa giro uscita, danno terzo parziale:</strong>nessuna penalità</li>
+                <li><strong>Contatto con colpa giro lanciato o dopo ultima curva giro uscita, danno terzo parziale:</strong>nessuna penalità</li>
+                <li><strong>Contatto con colpa, danno terzo totale:</strong> arretramento 1 posizioni in griglia</li>
+              </ul>
             <h5 id="regole-contatti-qualifica">Regole / contatti qualifica</h5>
               <ul>
-                <li><strong>Ostruzione in qualifiche:</strong> arretramento 1 posizione in griglia</li>
+                <li><strong>Ostruzione:</strong> arretramento 1 posizione in griglia</li>
                 <li><strong>Contatto con colpa giro uscita, danno terzo parziale:</strong> arretramento 1 posizioni in griglia</li>
                 <li><strong>Contatto con colpa giro lanciato o dopo ultima curva giro uscita, danno terzo parziale:</strong> arretramento 1 posizioni qualifica, quindi anche in griglia</li>
                 <li><strong>Contatto con colpa, danno terzo totale:</strong> arretramento in ultima posizione in qualifica, quindi anche in griglia</li>
@@ -186,6 +189,7 @@
             <h5 id="problemi-gioco-in-qualifica">Problemi gioco in qualifica</h5>
               <ul>
                 <li><strong>Penalità date dal gioco:</strong> tutte valide (tranne se davvero ingiuste e rimovibili a fine qualifica)</li>
+                <li><strong>Problemi di connessione / corrente / gioco / esterni durante prove libere 1o+ piloti:</strong> la sessione va avanti fino alla fine, provando a rientrare nella sessione.</li>
                 <li><strong>Problemi di connessione / corrente / gioco / esterni durante qualifiche 1o+ piloti:</strong> la sessione va avanti fino alla fine, provando a rientrare nella sessione. I tempi già fatti sono validi. Se non sono stati fatti tempi, vengolo usate le ultime posizioni disponibili (tempi delle prove libere per risolvere i pareggi)</li>
                 <li><strong>Problemi di connessione / gioco per 1o+ piloti durante la creazione lobby:</strong> riprovare fino a quando non vengono risolte</li>
               </ul>

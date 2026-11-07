@@ -48,6 +48,7 @@ describe('GpEditComponent', () => {
     mockGpEditService.deleteGp.and.returnValue(of({ success: true }));
 
     await TestBed.configureTestingModule({
+      animationsEnabled: true,
       providers: [
         provideNoopAnimations(),
         { provide: GpEditService, useValue: mockGpEditService },
@@ -120,6 +121,38 @@ describe('GpEditComponent', () => {
     expect(component.toasts()[0].title).toBe('Test Title');
     expect(component.toasts()[0].message).toBe('Test Message');
     expect(component.toasts()[0].color).toBe('success');
+  });
+
+  it('should keep a short notification compact instead of filling the viewport', async () => {
+    const response = await fetch('/test-shell/index.html');
+    expect(response.ok).toBeTrue();
+    const shell = new DOMParser().parseFromString(await response.text(), 'text/html');
+    const shellStyles = document.createElement('style');
+    shellStyles.textContent = Array.from(shell.querySelectorAll('style'))
+      .map(style => style.textContent).join('\n');
+    document.head.append(shellStyles);
+
+    try {
+      component.addToast('Deleted', 'Grand Prix deleted.', 'info');
+      fixture.detectChanges();
+
+      const host: HTMLElement = fixture.nativeElement;
+      const toaster = host.querySelector<HTMLElement>('c-toaster')!;
+      const toast = host.querySelector<HTMLElement>('c-toast')!;
+      const body = host.querySelector<HTMLElement>('c-toast-body')!;
+
+      await new Promise(resolve => setTimeout(resolve, 50));
+      fixture.detectChanges();
+      await new Promise(resolve => setTimeout(resolve, 350));
+      fixture.detectChanges();
+
+      expect(body.textContent).toContain('Grand Prix deleted.');
+      expect(toast.getBoundingClientRect().height).toBeGreaterThan(40);
+      expect(toast.getBoundingClientRect().height).toBeLessThan(150);
+      expect(toaster.getBoundingClientRect().height).toBeLessThan(200);
+    } finally {
+      shellStyles.remove();
+    }
   });
 
   it('should remove toast when visibility changes to false', () => {

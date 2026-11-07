@@ -115,7 +115,12 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              {
+                "glob": "index.html",
+                "input": "src",
+                "output": "test-shell"
+              }
             ],
             "styles": [
               "src/scss/styles.scss"
