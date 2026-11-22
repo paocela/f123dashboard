@@ -1,6 +1,6 @@
 export interface GPEditItem {
     id: number;
-    date: Date;
+    date: string;
   track_id: number | null;
     track_name: string;
     has_sprint: boolean;

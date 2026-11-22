@@ -16,7 +16,7 @@ describe('TrackExtractionComponent', () => {
   ];
   const unassignedGp: GPEditItem = {
     id: 10,
-    date: new Date('2026-05-24T14:00'),
+    date: '2026-05-24T14:00',
     track_id: null,
     track_name: 'Da assegnare',
     has_sprint: false,
@@ -51,6 +51,10 @@ describe('TrackExtractionComponent', () => {
     expect(mockGpEditService.getEligibleTracks).toHaveBeenCalled();
     expect(component.tracks()).toEqual(tracks);
     expect(component.isLoading()).toBeFalse();
+  });
+
+  it('should display GP dates in UTC', () => {
+    expect(component.formatGpDate('2026-05-24T14:00')).toBe('24/05/2026, 14:00');
   });
 
   it('should show an error when eligible tracks cannot be loaded', () => {

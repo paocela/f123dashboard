@@ -17,7 +17,7 @@ async getUpcomingGps(): Promise<GPEditItem[]> {
     const query = `
         SELECT 
             gp.id,
-            gp.date,
+            to_char(gp.date, 'YYYY-MM-DD"T"HH24:MI') AS date,
             gp.track_id,
             t.name as track_name,
             gp.has_sprint,
@@ -57,7 +57,7 @@ async getUpcomingGps(): Promise<GPEditItem[]> {
         ${data.has_sprint ? "nextval('results_id_seq')" : "NULL"},
         ${data.has_x2 ?  "nextval('results_id_seq')" : "NULL"  }
       )
-      RETURNING id, date, track_id, has_sprint, has_x2
+      RETURNING id, to_char(date, 'YYYY-MM-DD"T"HH24:MI') AS date, track_id, has_sprint, has_x2
     `;
     const values = [
       data.date, 

@@ -209,15 +209,16 @@ export class TrackExtractionComponent implements OnInit {
     return `assets/images/tracks/${trackId}.png`;
   }
 
-  formatGpDate(date: Date): string {
+  formatGpDate(date: string): string {
     return new Intl.DateTimeFormat('it-IT', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
-      hourCycle: 'h23'
-    }).format(new Date(date));
+      hourCycle: 'h23',
+      timeZone: 'UTC'
+    }).format(new Date(`${date}Z`));
   }
 
   getLabelTransform(index: number): string {
