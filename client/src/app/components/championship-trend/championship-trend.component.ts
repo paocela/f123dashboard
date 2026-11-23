@@ -1,8 +1,8 @@
 import { NgStyle } from '@angular/common';
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, effect, inject, OnInit, Renderer2, signal, WritableSignal, DOCUMENT } from '@angular/core';
+import { Component, DestroyRef, effect, inject, OnInit, Renderer2, signal, DOCUMENT } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { ChartOptions } from 'chart.js';
+import type { Chart, ChartOptions } from 'chart.js';
 import {
   ButtonDirective,
   ButtonGroupComponent,
@@ -40,23 +40,24 @@ import { DashboardChartsData, IChartProps } from '../../views/dashboard/dashboar
 })
 export class ChampionshipTrendComponent implements OnInit {
 
-  constructor() {}
-
   readonly #destroyRef: DestroyRef = inject(DestroyRef);
   readonly #document: Document = inject(DOCUMENT);
   readonly #renderer: Renderer2 = inject(Renderer2);
   readonly #chartsData: DashboardChartsData = inject(DashboardChartsData);
 
   public mainChart: IChartProps = { type: 'line' };
-  public mainChartRef: WritableSignal<any> = signal(undefined);
-  #mainChartRefEffect = effect(() => {
-    if (this.mainChartRef()) {
-      this.setChartStyles();
-    }
-  });
+  public mainChartRef = signal<Chart | undefined>(undefined);
   public trafficRadioGroup = new FormGroup({
     trafficRadio: new FormControl('Year')
   });
+
+  constructor() {
+    effect(() => {
+      if (this.mainChartRef()) {
+        this.setChartStyles();
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.setTrafficPeriod('Year', 0);
@@ -72,7 +73,7 @@ export class ChampionshipTrendComponent implements OnInit {
     this.initCharts();
   }
 
-  handleChartRef($chartRef: any) {
+  handleChartRef($chartRef: Chart | undefined) {
     if ($chartRef) {
       this.mainChartRef.set($chartRef);
     }
@@ -91,10 +92,14 @@ export class ChampionshipTrendComponent implements OnInit {
   setChartStyles() {
     if (this.mainChartRef()) {
       setTimeout(() => {
+        const chart = this.mainChartRef();
+        if (!chart) {
+          return;
+        }
         const options: ChartOptions = { ...this.mainChart.options };
         const scales = this.#chartsData.getScales();
-        this.mainChartRef().options.scales = { ...options.scales, ...scales };
-        this.mainChartRef().update();
+        chart.options.scales = { ...options.scales, ...scales };
+        chart.update();
       });
     }
   }

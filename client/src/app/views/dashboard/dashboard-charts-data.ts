@@ -3,13 +3,12 @@ import {
   ChartData,
   ChartDataset,
   ChartOptions,
-  ChartType,
-  ScaleOptions
+  ChartType
 } from 'chart.js';
 
 import { getStyle } from '@coreui/utils';
 import { DbDataService } from '../../service/db-data.service'; 
-import type { CumulativePointsData } from '@f123dashboard/shared';
+import type { CumulativePointsData, TrackData } from '@f123dashboard/shared';
 
 // Constants
 const DEFAULT_CHART_SCALE = 500;
@@ -24,23 +23,13 @@ const DRIVER_COLORS = [
   '#ff6384', '#36a2eb', '#ffce56', '#4bc0c0', '#9966ff', '#ff9f40'
 ];
 
-interface Track {
-  name: string;
-  country: string;
-  [key: string]: any;
-}
-
 type DriverDataMap = Record<string, (number | null)[]>;
 
 export interface IChartProps {
   data?: ChartData;
-  labels?: string[];
   options?: ChartOptions;
-  colors?: any;
   type: ChartType;
-  legend?: any;
   elements?: number;
-  [propName: string]: any;
 }
 
 @Injectable({
@@ -51,7 +40,7 @@ export class DashboardChartsData {
 
   public mainChart: IChartProps = { type: 'line' };
   public championshipTrend: CumulativePointsData[] = [];
-  public championshipTracks: Track[] = [];
+  public championshipTracks: TrackData[] = [];
 
   private chartScale: number = DEFAULT_CHART_SCALE;
 
@@ -74,8 +63,8 @@ export class DashboardChartsData {
     this.mainChart.elements = period === 'Month' ? MONTH_PERIOD_ELEMENTS : ALL_PERIOD_ELEMENTS;
     
     const { labels, driverData } = period === 'Month' 
-      ? this.prepareMonthPeriodData(completedTracks, maxNumberOfRaces, uniqueDrivers)
-      : this.prepareAllPeriodData(completedTracks.length, uniqueDrivers);
+      ? this.prepareMonthPeriodData(completedTracks, maxNumberOfRaces)
+      : this.prepareAllPeriodData(completedTracks.length);
     
     this.updateChartConfiguration(labels, driverData, uniqueDrivers);
   }
@@ -91,7 +80,7 @@ export class DashboardChartsData {
   /**
    * Get list of tracks that have completed races.
    */
-  private getCompletedTracks(): Track[] {
+  private getCompletedTracks(): TrackData[] {
     const completedTrackNames = new Set(
       this.championshipTrend.map(item => item.track_name)
     );
@@ -128,9 +117,8 @@ export class DashboardChartsData {
    * Prepare data for the Month period view (showing last N races).
    */
   private prepareMonthPeriodData(
-    completedTracks: Track[], 
-    maxNumberOfRaces: number,
-    uniqueDrivers: string[]
+    completedTracks: TrackData[],
+    maxNumberOfRaces: number
   ): { labels: string[], driverData: DriverDataMap } {
     const tracksToUse = this.selectTracksForMonthView(completedTracks, maxNumberOfRaces);
     const labels = tracksToUse.map(track => track.country);
@@ -148,7 +136,7 @@ export class DashboardChartsData {
   /**
    * Select which tracks to display in Month view.
    */
-  private selectTracksForMonthView(completedTracks: Track[], maxNumberOfRaces: number): Track[] {
+  private selectTracksForMonthView(completedTracks: TrackData[], maxNumberOfRaces: number): TrackData[] {
     const numberOfCompletedRaces = completedTracks.length;
     
     if (numberOfCompletedRaces < maxNumberOfRaces) {
@@ -238,8 +226,7 @@ export class DashboardChartsData {
    * Prepare data for the All period view (showing entire season).
    */
   private prepareAllPeriodData(
-    numberOfCompletedRaces: number,
-    uniqueDrivers: string[]
+    numberOfCompletedRaces: number
   ): { labels: string[], driverData: DriverDataMap } {
     const labels = this.championshipTracks.map(track => track.country);
     
@@ -283,12 +270,7 @@ export class DashboardChartsData {
     driverData: DriverDataMap, 
     uniqueDrivers: string[]
   ): void {
-    // Store driver data in mainChart for Chart.js consumption
-    for (const driver of uniqueDrivers) 
-      {this.mainChart[driver] = driverData[driver] || [];}
-    
-    
-    const datasets = this.createDatasets(uniqueDrivers);
+    const datasets = this.createDatasets(uniqueDrivers, driverData);
     const options = this.createChartOptions();
     
     this.mainChart.type = 'line';
@@ -302,12 +284,12 @@ export class DashboardChartsData {
   /**
    * Create Chart.js datasets for each driver.
    */
-  private createDatasets(uniqueDrivers: string[]): ChartDataset[] {
+  private createDatasets(uniqueDrivers: string[], driverData: DriverDataMap): ChartDataset[] {
     return uniqueDrivers.map((driverUsername, index) => {
       const color = DRIVER_COLORS[index % DRIVER_COLORS.length];
       
       return {
-        data: this.mainChart[driverUsername] || [],
+        data: driverData[driverUsername] || [],
         label: driverUsername,
         backgroundColor: color,
         borderColor: color,
@@ -364,7 +346,7 @@ export class DashboardChartsData {
   /**
    * Get Chart.js scale configuration for X and Y axes.
    */
-  getScales(): ScaleOptions<any> {
+  getScales(): NonNullable<ChartOptions<'line'>['scales']> {
     const colorBorderTranslucent = getStyle('--cui-border-color-translucent');
     const colorBody = getStyle('--cui-body-color');
 
