@@ -127,7 +127,7 @@ describe('TrackExtractionComponent', () => {
     expect(wheels[1].classList).toContain('format-wheel');
     expect(wheels[1].classList).toContain('is-small');
     expect(wheels[0].querySelector('.wheel-label.is-highlighted').textContent.trim()).toBe(tracks[1].name);
-    expect(wheels[0].querySelector('.wheel-center-button').disabled).toBeTrue();
+    expect(wheels[0].querySelector('.wheel-hub').disabled).toBeTrue();
   });
 
   it('should label and colour format segments by format only', () => {

@@ -1,11 +1,26 @@
-<div class="wheel-stage">
-  <div class="wheel-pointer" aria-hidden="true"></div>
+<div
+  class="wheel-stage"
+  [class.is-spinning]="isSpinning()"
+  [class.has-result]="highlightIndex() !== null"
+  [style.--label-size]="labelFontSize()">
+  <div class="wheel-rim" aria-hidden="true">
+    @for (angle of bulbs(); track $index) {
+      <span class="wheel-bulb" [style.--angle]="angle + 'deg'"></span>
+    }
+  </div>
+
   <div
+    #wheel
     class="wheel"
     [style.background]="background()"
     [style.transform]="'rotate(' + rotation() + 'deg)'"
     (transitionend)="onTransitionEnd($event)"
     aria-hidden="true">
+    @if (segments().length > 1) {
+      @for (segment of segments(); track $index) {
+        <span class="wheel-divider" [style.transform]="getDividerTransform($index)"></span>
+      }
+    }
     @for (segment of segments(); track $index) {
       <span
         class="wheel-label"
@@ -14,9 +29,18 @@
         [style.transform]="getLabelTransform($index)">{{ segment.label }}</span>
     }
   </div>
+
+  <div class="wheel-gloss" aria-hidden="true"></div>
+
+  <div #pointer class="wheel-pointer" aria-hidden="true">
+    <svg viewBox="0 0 40 54" focusable="false">
+      <path d="M20 52 L5.5 25 A16 16 0 1 1 34.5 25 Z" fill="#d93a2f" stroke="#fff" stroke-width="2.5" stroke-linejoin="round" />
+      <circle cx="20" cy="18" r="5" fill="#fff" />
+    </svg>
+  </div>
+
   <button
-    cButton
-    class="wheel-center-button"
+    class="wheel-hub"
     type="button"
     (click)="spin()"
     [disabled]="isSpinning() || disabled()">
