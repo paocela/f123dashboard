@@ -10,6 +10,20 @@ Full-stack dashboard for the Esport F1 23 championship (friendly, but not so muc
 
 **Architecture**: Angular 18+ frontend + Express.js backend + PostgreSQL database
 
+## Grand Prix scheduling
+
+The upcoming GP cards include races without an assigned track, displayed as "Da definire".
+The reusable calendar component remains available but is not shown on the dashboard.
+The public `/api/database/gp-schedule` endpoint provides the latest season's events
+(or the requested `seasonId`) separately from assigned-track data.
+
+GP Edit shows the latest season's past races in an initially collapsed card. Track,
+date, Sprint, double-points settings, and deletion are available only when no result
+entries exist in any session. Preallocated result IDs do not count as results.
+Bulk date changes affect only upcoming GPs without results. These rules are also
+enforced by the backend. `/api/gp-edit/list` includes past races when `includePast`
+is `true`; its default remains upcoming-only.
+
 ## Preview 🧐
 
 | **Dashboard**                                              | **Championship**                                             |

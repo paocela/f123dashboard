@@ -73,6 +73,19 @@ describe('DatabaseService.setGpResult – dynamic driver count', () => {
   }
 
   describe('race (has_x2 = 0)', () => {
+    it('locks the GP before writing entries so property edits cannot detach concurrent results', async () => {
+      const { pool, client } = createMockPool(BASE_GP);
+      const service = new DatabaseService(pool, new CarService());
+
+      await service.setGpResult(1, false, [1, 1], [], [], [], [], [], 2024);
+
+      expect(client.query.mock.calls[1]).toEqual([
+        expect.stringMatching(/FROM gran_prix.*FOR UPDATE/),
+        [1, 2024]
+      ]);
+      expect(getInsertCalls(client, 'race_result_entries')).toHaveLength(1);
+    });
+
     it('inserts exactly N position rows when provided N drivers (default 8)', async () => {
       const drivers = [1, 2, 3, 4, 5, 6, 7, 8];
       const { pool, client } = createMockPool(BASE_GP);

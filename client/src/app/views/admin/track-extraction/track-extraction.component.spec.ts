@@ -3,6 +3,7 @@ import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { of, throwError } from 'rxjs';
 import type { EligibleTrack, GPEditItem } from '@f123dashboard/shared';
 import { GpEditService } from '../../../service/gp-edit.service';
+import { DbDataService } from '../../../service/db-data.service';
 import { TrackExtractionComponent, buildFormatEntries } from './track-extraction.component';
 
 describe('buildFormatEntries', () => {
@@ -30,6 +31,7 @@ describe('TrackExtractionComponent', () => {
   let component: TrackExtractionComponent;
   let fixture: ComponentFixture<TrackExtractionComponent>;
   let mockGpEditService: jasmine.SpyObj<GpEditService>;
+  let mockDbDataService: jasmine.SpyObj<DbDataService>;
 
   const tracks: EligibleTrack[] = [
     { id: 1, name: 'Monza', country: 'Italy' },
@@ -43,7 +45,9 @@ describe('TrackExtractionComponent', () => {
     track_id: null,
     track_name: 'Da assegnare',
     has_sprint: false,
-    has_x2: false
+    has_x2: false,
+    has_results: false,
+    is_past: false
   };
 
   function drawTrackAndFormat(trackIndex: number, formatIndex: number): void {
@@ -65,11 +69,14 @@ describe('TrackExtractionComponent', () => {
     mockGpEditService.getSprintDrawInfo.and.returnValue(of({ success: true, data: { remaining_sprints: 1 } }));
     mockGpEditService.getUpcomingGps.and.returnValue(of({ success: true, data: [unassignedGp] }));
     mockGpEditService.updateGp.and.returnValue(of({ success: true }));
+    mockDbDataService = jasmine.createSpyObj('DbDataService', ['refreshGpSchedule']);
+    mockDbDataService.refreshGpSchedule.and.resolveTo();
 
     await TestBed.configureTestingModule({
       providers: [
         provideNoopAnimations(),
-        { provide: GpEditService, useValue: mockGpEditService }
+        { provide: GpEditService, useValue: mockGpEditService },
+        { provide: DbDataService, useValue: mockDbDataService }
       ],
       imports: [TrackExtractionComponent]
     }).compileComponents();
@@ -162,6 +169,7 @@ describe('TrackExtractionComponent', () => {
     expect(component.selectedTrack()).toBeNull();
     expect(component.stage()).toBe('track');
     expect(component.toasts()).toContain(jasmine.objectContaining({ color: 'success' }));
+    expect(mockDbDataService.refreshGpSchedule).toHaveBeenCalled();
   }));
 
   it('should assign a regular format as a non-sprint GP', fakeAsync(() => {

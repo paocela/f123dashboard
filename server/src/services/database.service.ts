@@ -512,7 +512,7 @@ export class DatabaseService {
       await client.query('BEGIN');
 
       const gpRes = await client.query(
-        'SELECT id, race_results_id, sprint_results_id, qualifying_results_id, free_practice_results_id, full_race_results_id, has_x2 FROM gran_prix WHERE track_id = $1 and season_id = $2',
+        'SELECT id, race_results_id, sprint_results_id, qualifying_results_id, free_practice_results_id, full_race_results_id, has_x2 FROM gran_prix WHERE track_id = $1 and season_id = $2 FOR UPDATE',
         [trackId, seasonId]
       );
       

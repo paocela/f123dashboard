@@ -2,9 +2,11 @@ export interface GPEditItem {
     id: number;
     date: string;
   track_id: number | null;
-    track_name: string;
+    track_name: string | null;
     has_sprint: boolean;
     has_x2: boolean;
+    has_results: boolean;
+    is_past: boolean;
   }
   
   export interface CreateGpData {
@@ -31,3 +33,20 @@ export interface GPEditItem {
     /** Sprints still to be drawn this season: the season total minus sprints already on GPs with a track. */
     remaining_sprints: number;
   }
+
+export interface GpMutationResponse {
+  success: boolean;
+  message?: string;
+}
+
+export interface GpListResponse extends GpMutationResponse {
+  data: GPEditItem[];
+}
+
+export interface GpCreateResponse extends GpMutationResponse {
+  data: GPEditItem;
+}
+
+export interface GpTracksResponse extends GpMutationResponse {
+  data: Pick<EligibleTrack, 'id' | 'name'>[];
+}

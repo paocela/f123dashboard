@@ -1,17 +1,114 @@
 :host {
+  display: block;
+}
+
+.gp-edit__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-height: 3.25rem;
+}
+
+.gp-edit__accordion {
+  --cui-accordion-body-padding-x: 1rem;
+}
+
+.gp-edit__primary-action {
+  min-width: 11.5rem;
+  white-space: nowrap;
+}
+
+.gp-edit__table {
+  table-layout: fixed;
+  min-width: 60rem;
+
+  th {
+    white-space: nowrap;
+  }
+
+  .form-check-input {
+    float: none;
+    margin: 0;
+  }
+}
+
+.gp-edit__col-track {
+  width: 25%;
+}
+
+.gp-edit__col-date {
+  width: 25%;
+}
+
+.gp-edit__col-flag {
+  width: 12%;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.gp-edit__col-actions {
+  width: 26%;
+  text-align: right;
+}
+
+.gp-edit__create-table {
+  width: 100%;
+  min-width: 60rem;
+  table-layout: fixed;
+
+  .gp-edit__mobile-label {
+    display: none;
+  }
+}
+
+@media (max-width: 767.98px) {
+  #createGpForm .gp-edit__create-table {
     display: block;
-}
+    min-width: 0;
+    table-layout: auto;
 
-.form-check {
-    min-height: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0;
-}
+    thead {
+      display: none;
+    }
 
-.table-datetime {
-    padding: 0.4rem 0.5rem;
-    min-height: 38px;
-    font-size: 0.85rem;
+    tbody,
+    tr {
+      display: grid;
+      width: 100%;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.5rem;
+    }
+
+    td {
+      display: block;
+      width: auto;
+      min-width: 0;
+      padding: 0.5rem 0;
+      border: 0;
+      text-align: start !important;
+    }
+
+    td:nth-child(1),
+    td:nth-child(2),
+    td:nth-child(5) {
+      grid-column: 1 / -1;
+    }
+
+    .gp-edit__mobile-label {
+      display: block;
+      margin-bottom: 0.25rem;
+      font-weight: 600;
+    }
+
+    select,
+    input[type="datetime-local"] {
+      width: 100%;
+      min-width: 0;
+    }
+
+    td:last-child button {
+      width: 100%;
+    }
+  }
 }

@@ -19,6 +19,7 @@ import {
 import { forkJoin } from 'rxjs';
 import type { EligibleTrack, GPEditItem } from '@f123dashboard/shared';
 import { GpEditService } from '../../../service/gp-edit.service';
+import { DbDataService } from '../../../service/db-data.service';
 import { SpinWheelComponent, WheelSegment } from '../../../components/spin-wheel/spin-wheel.component';
 
 const TRACK_WHEEL_COLORS = [
@@ -98,6 +99,7 @@ export function buildFormatEntries(totalCount: number, sprintCount: number): Rac
 })
 export class TrackExtractionComponent implements OnInit {
   private readonly gpEditService = inject(GpEditService);
+  private readonly dbDataService = inject(DbDataService);
 
   readonly tracks = signal<EligibleTrack[]>([]);
   readonly remainingSprints = signal(0);
@@ -250,6 +252,10 @@ export class TrackExtractionComponent implements OnInit {
         this.closeAssignmentModal();
         this.resetDraw();
         this.loadEligibleTracks();
+        void this.dbDataService.refreshGpSchedule().catch((error: unknown) => {
+          console.error('Error refreshing dashboard GP schedule', error);
+          this.addToast('Errore', 'La pista è stata assegnata, ma non è stato possibile aggiornare la dashboard.', 'danger');
+        });
         this.addToast('Pista assegnata', 'La pista e il formato sono stati assegnati al prossimo Gran Premio.', 'success');
       },
       error: () => {
