@@ -1,11 +1,10 @@
 import {
-  AfterContentInit,
   AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  HostBinding,
-  Input
+  Input,
+  inject
 } from '@angular/core';
 
 import packageJson from '../../../package.json';
@@ -18,20 +17,13 @@ import { NavComponent, NavItemComponent, NavLinkDirective } from '@coreui/angula
     templateUrl: './docs-example.component.html',
     styleUrls: ['./docs-example.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [NavComponent, NavItemComponent, NavLinkDirective, RouterLink, IconDirective]
+    imports: [NavComponent, NavItemComponent, NavLinkDirective, RouterLink, IconDirective],
+    host: { class: 'example' }
 })
-export class DocsExampleComponent implements AfterContentInit, AfterViewInit {
-
-  constructor(
-    private changeDetectorRef: ChangeDetectorRef
-  ) {}
+export class DocsExampleComponent implements AfterViewInit {
+  private readonly changeDetectorRef = inject(ChangeDetectorRef);
 
   @Input() fragment?: string;
-
-  @HostBinding('class.example')
-  get exampleClass() {
-    return true;
-  };
 
   private _href = 'https://coreui.io/angular/docs/';
 
@@ -41,14 +33,8 @@ export class DocsExampleComponent implements AfterContentInit, AfterViewInit {
 
   @Input()
   set href(value: string) {
-    const version = packageJson?.config?.coreui_library_short_version;
     const docsUrl = packageJson?.config?.coreui_library_docs_url ?? 'https://coreui.io/angular/';
-    // const path: string = version ? `${version}/${value}` : '';
     this._href = `${docsUrl}${value}`;
-  }
-
-  ngAfterContentInit(): void {
-    // this.changeDetectorRef.detectChanges();
   }
 
   ngAfterViewInit(): void {

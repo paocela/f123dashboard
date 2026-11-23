@@ -129,8 +129,12 @@ export class DashboardComponent implements OnInit {
   private constructorMap = computed(() => {
     const map = new Map<string, string>();
     this.constructors().forEach(c => {
-      if (c.driver_1_username) map.set(c.driver_1_username, c.constructor_name);
-      if (c.driver_2_username) map.set(c.driver_2_username, c.constructor_name);
+      if (c.driver_1_username) {
+        map.set(c.driver_1_username, c.constructor_name);
+      }
+      if (c.driver_2_username) {
+        map.set(c.driver_2_username, c.constructor_name);
+      }
     });
     return map;
   });
@@ -321,7 +325,7 @@ export class DashboardComponent implements OnInit {
   /**
    * Finds the driver with the most points gained in the latest GP
    */
-  private calculateDriverOfWeek(latestGrandPrixPoints: Array<CumulativePointsData & { points: number }>): void {
+  private calculateDriverOfWeek(latestGrandPrixPoints: (CumulativePointsData & { points: number })[]): void {
     let bestPoints = 0;
     let bestDriver: DriverOfWeek = { driver_username: '', driver_id: 0, points: 0 };
 
@@ -342,7 +346,7 @@ export class DashboardComponent implements OnInit {
   /**
    * Finds the constructor with the most combined driver points in the latest GP
    */
-  private calculateConstructorOfWeek(latestGrandPrixPoints: Array<CumulativePointsData & { points: number }>): void {
+  private calculateConstructorOfWeek(latestGrandPrixPoints: (CumulativePointsData & { points: number })[]): void {
     const constructorsOfWeek: ConstructorOfWeek[] = this.constructors().map(constructor => ({
       constructor_name: constructor.constructor_name,
       constructor_id: constructor.constructor_id,

@@ -12,12 +12,12 @@
                     <svg size='lg' [cIcon]="allFlags[gp.track_country]"></svg>
                   </h5>
                 </c-col>
-                @if (gp.gran_prix_has_sprint == 1) {
+                @if (gp.gran_prix_has_sprint === 1) {
                   <c-col xs="auto">
                     <c-badge color="info">Sprint</c-badge>
                   </c-col>
                 }
-                @if (gp.gran_prix_has_x2 == 1) {
+                @if (gp.gran_prix_has_x2 === 1) {
                   <c-col xs="auto">
                     <c-badge color="danger">Points X2</c-badge>
                   </c-col>
@@ -36,7 +36,7 @@
                     <tr>
                       <th scope="col" class="text-center">#</th>
                       <th scope="col">Gara</th>
-                      @if (gp.gran_prix_has_sprint == 1) {
+                      @if (gp.gran_prix_has_sprint === 1) {
                         <th scope="col">Sprint</th>
                       }
                       <th scope="col">Qualifica</th>
@@ -61,7 +61,7 @@
                           }
                         </th>
                         <td [ngStyle]="getPositionStyle(position)">{{getDriverByPosition(getActiveRaceSession(gp), position)}}</td>
-                        @if (gp.gran_prix_has_sprint == 1) {
+                        @if (gp.gran_prix_has_sprint === 1) {
                           <td [ngStyle]="getPositionStyle(position)">{{getDriverByPosition(gp.sessions.sprint, position)}}</td>
                         }
                         <td [ngStyle]="getPositionStyle(position)">{{getDriverByPosition(gp.sessions.qualifying, position)}}</td>
@@ -72,14 +72,14 @@
                     }
                     
                     <!-- Giro veloce Row -->
-                    @if (getActiveFastLapDriver(gp) || (gp.gran_prix_has_sprint == 1 && gp.fastLapDrivers.sprint)) {
+                    @if (getActiveFastLapDriver(gp) || (gp.gran_prix_has_sprint === 1 && gp.fastLapDrivers.sprint)) {
                       <tr>
                         <th scope="row" class="text-center" [ngStyle]="{'color':'purple'}">
                           GV
                           <svg [cIcon]="fireIcon"></svg>
                         </th>
                         <td [ngStyle]="{'color':'purple'}">{{getActiveFastLapDriver(gp)}}</td>
-                        @if (gp.gran_prix_has_sprint == 1) {
+                        @if (gp.gran_prix_has_sprint === 1) {
                           <td [ngStyle]="{'color':'purple'}">{{gp.fastLapDrivers.sprint || ''}}</td>
                         }
                         <td></td>
@@ -90,11 +90,11 @@
                     }
                     
                     <!-- DNF Row -->
-                    @if (getDNFDrivers(getActiveRaceSession(gp)) || (gp.gran_prix_has_sprint == 1 && getDNFDrivers(gp.sessions.sprint))) {
+                    @if (getDNFDrivers(getActiveRaceSession(gp)) || (gp.gran_prix_has_sprint === 1 && getDNFDrivers(gp.sessions.sprint))) {
                       <tr>
                         <th scope="row" class="text-center" [ngStyle]="{'color':'red'}">DNF</th>
                         <td [ngStyle]="{'color':'red'}">{{getDNFDrivers(getActiveRaceSession(gp))}}</td>
-                        @if (gp.gran_prix_has_sprint == 1) {
+                        @if (gp.gran_prix_has_sprint === 1) {
                           <td [ngStyle]="{'color':'red'}">{{getDNFDrivers(gp.sessions.sprint)}}</td>
                         }
                         <td></td>

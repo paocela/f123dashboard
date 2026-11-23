@@ -1,4 +1,4 @@
-import { Component, OnDestroy, inject, signal, computed, input, output, viewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnDestroy, inject, signal, computed, output, viewChild, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
