@@ -17,6 +17,12 @@ type DriverWithIdealCar = Driver & {
     idealCar: number;
 };
 
+/**
+ * Pairing cost compared in priority order: distant pairs (fewer is better), close pairs (negated, more is better),
+ * close-pair standings positions (negated, higher in the standings is better), total point gap (smaller is better).
+ */
+type PairingCost = [number, number, number, number];
+
 type DriverUnit = {
     drivers: DriverWithIdealCar[];
     idealCar: number;
@@ -26,9 +32,12 @@ type DriverUnit = {
  * Builds a balanced starting grid by assigning stronger cars to lower-scoring drivers.
  *
  * The algorithm first maps each driver's points onto the inverse car-score range to calculate an ideal car score.
- * It then uses dynamic programming to create the required number of two-driver units, prioritizing adjacent drivers
- * in the standings whose point gap is within the configured tolerance. If sharing is required for capacity and there
- * are not enough close pairs, it selects the remaining pairs with the smallest point gaps. A second dynamic-programming
+ * It then uses dynamic programming to group drivers into two-driver units. Adjacent drivers in the standings whose
+ * point gap is within the configured tolerance always share a car, even when there are enough cars for everyone, so
+ * that drivers fighting closely get no car advantage over each other. When more than two consecutive drivers are close,
+ * they are paired from the top of the standings down, so the lowest-placed one drives alone. This voluntary pairing is
+ * skipped while every driver has the same points (season start). If sharing is required for capacity and there are not
+ * enough close pairs, it adds the remaining pairs with the smallest point gaps. A second dynamic-programming
  * pass assigns each unit to a distinct car while minimizing the total distance from drivers' ideal car scores.
  *
  * @param driverPoints Maps each driver ID to their current championship points.
@@ -140,42 +149,58 @@ export class CarService {
     ): DriverUnit[] {
         const driversByPoints = [...drivers].sort((first, second) => first.points - second.points || first.driverId - second.driverId);
         const pointRange = driversByPoints[driversByPoints.length - 1].points - driversByPoints[0].points;
-        const distantPairPenalty = (pointRange + 1) * driversByPoints.length;
+        // With every driver on the same points (season start) there is no fight to neutralize: only pair for capacity.
+        const maxPairCount = pointRange === 0
+            ? requiredPairCount
+            : Math.floor(driversByPoints.length / this.MAX_DRIVERS_PER_CAR);
         const pairingCosts = Array.from(
             { length: driversByPoints.length + 1 },
-            () => Array<number>(requiredPairCount + 1).fill(Infinity)
+            () => Array<PairingCost | null>(maxPairCount + 1).fill(null)
         );
         const includesPair = Array.from(
             { length: driversByPoints.length + 1 },
-            () => Array<boolean>(requiredPairCount + 1).fill(false)
+            () => Array<boolean>(maxPairCount + 1).fill(false)
         );
-        pairingCosts[0][0] = 0;
+        pairingCosts[0][0] = [0, 0, 0, 0];
 
         for (let driverIndex = 1; driverIndex <= driversByPoints.length; driverIndex++) {
-            for (let pairCount = 0; pairCount <= requiredPairCount; pairCount++) {
+            for (let pairCount = 0; pairCount <= maxPairCount; pairCount++) {
                 pairingCosts[driverIndex][pairCount] = pairingCosts[driverIndex - 1][pairCount];
 
-                if (driverIndex < 2 || pairCount === 0) {
+                const previousCost = driverIndex < 2 || pairCount === 0 ? null : pairingCosts[driverIndex - 2][pairCount - 1];
+                if (!previousCost) {
                     continue;
                 }
 
                 const firstDriver = driversByPoints[driverIndex - 2];
                 const secondDriver = driversByPoints[driverIndex - 1];
                 const pointGap = secondDriver.points - firstDriver.points;
-                const pairingCost = pairingCosts[driverIndex - 2][pairCount - 1]
-                    + pointGap
-                    + (pointGap > pointTolerance ? distantPairPenalty : 0);
+                const isClosePair = pointGap <= pointTolerance;
+                // driverIndex grows with standings position, so rewarding it pairs close drivers from the top down.
+                const pairingCost: PairingCost = [
+                    previousCost[0] + (isClosePair ? 0 : 1),
+                    previousCost[1] - (isClosePair ? 1 : 0),
+                    previousCost[2] - (isClosePair ? driverIndex : 0),
+                    previousCost[3] + pointGap
+                ];
 
-                if (pairingCost < pairingCosts[driverIndex][pairCount]) {
+                if (this.isCheaper(pairingCost, pairingCosts[driverIndex][pairCount])) {
                     pairingCosts[driverIndex][pairCount] = pairingCost;
                     includesPair[driverIndex][pairCount] = true;
                 }
             }
         }
 
+        // Close pairs always share a car; distant pairs are only formed when capacity requires them.
+        let pairCount = requiredPairCount;
+        for (let candidatePairCount = requiredPairCount + 1; candidatePairCount <= maxPairCount; candidatePairCount++) {
+            if (this.isCheaper(pairingCosts[driversByPoints.length][candidatePairCount], pairingCosts[driversByPoints.length][pairCount])) {
+                pairCount = candidatePairCount;
+            }
+        }
+
         const units: DriverUnit[] = [];
         let driverIndex = driversByPoints.length;
-        let pairCount = requiredPairCount;
         while (driverIndex > 0) {
             if (!includesPair[driverIndex][pairCount]) {
                 units.push({ drivers: [driversByPoints[driverIndex - 1]], idealCar: driversByPoints[driverIndex - 1].idealCar });
@@ -194,6 +219,18 @@ export class CarService {
         }
 
         return units.sort((first, second) => first.idealCar - second.idealCar);
+    }
+
+    private isCheaper(candidate: PairingCost | null, current: PairingCost | null): boolean {
+        if (!candidate) {
+            return false;
+        }
+        if (!current) {
+            return true;
+        }
+
+        const differingIndex = candidate.findIndex((value, index) => value !== current[index]);
+        return differingIndex !== -1 && candidate[differingIndex] < current[differingIndex];
     }
 
     private assignUnitsToCars(
