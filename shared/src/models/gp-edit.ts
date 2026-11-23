@@ -26,3 +26,8 @@ export interface GPEditItem {
     name: string;
     country: string;
   }
+
+  export interface SprintDrawInfo {
+    /** Sprints still to be drawn this season: the season total minus sprints already on GPs with a track. */
+    remaining_sprints: number;
+  }

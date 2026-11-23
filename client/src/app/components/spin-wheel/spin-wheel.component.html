@@ -1,0 +1,29 @@
+<div class="wheel-stage">
+  <div class="wheel-pointer" aria-hidden="true"></div>
+  <div
+    class="wheel"
+    [style.background]="background()"
+    [style.transform]="'rotate(' + rotation() + 'deg)'"
+    (transitionend)="onTransitionEnd($event)"
+    aria-hidden="true">
+    @for (segment of segments(); track $index) {
+      <span
+        class="wheel-label"
+        [class.is-dimmed]="highlightIndex() !== null && highlightIndex() !== $index"
+        [class.is-highlighted]="highlightIndex() === $index"
+        [style.transform]="getLabelTransform($index)">{{ segment.label }}</span>
+    }
+  </div>
+  <button
+    cButton
+    class="wheel-center-button"
+    type="button"
+    (click)="spin()"
+    [disabled]="isSpinning() || disabled()">
+    @if (isSpinning()) {
+      <span>{{ spinningLabel() }}</span>
+    } @else {
+      <span>{{ spinLabel() }}</span>
+    }
+  </button>
+</div>
