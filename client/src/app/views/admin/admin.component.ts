@@ -271,7 +271,13 @@ export class AdminComponent implements OnInit {
       };
 
       const result = await this.dbData.setGpResult(trackId, gpResult);
-      this.handleBackendResult(trackId, result);
+      if (this.handleBackendResult(trackId, result)) {
+        try {
+          await Promise.all([this.dbData.allData(), this.loadSeasonData()]);
+        } catch (error) {
+          console.error('Errore durante il ricaricamento dei dati dopo il salvataggio dei risultati:', error);
+        }
+      }
     } catch (error) {
       const msg = error instanceof Error ? error.message : 'Errore sconosciuto';
       this.formErrors.update(e => ({ ...e, [trackId]: [`Errore: ${msg}`] }));
@@ -282,22 +288,25 @@ export class AdminComponent implements OnInit {
     }
   }
 
-  private handleBackendResult(trackId: number, result: unknown): void {
+  private handleBackendResult(trackId: number, result: unknown): boolean {
     if (typeof result !== 'string') {
       this.formStatus.update(s => ({ ...s, [trackId]: 1 }));
-      return;
+      return true;
     }
     try {
       const parsed = JSON.parse(result);
       if (parsed.success) {
         this.formStatus.update(s => ({ ...s, [trackId]: 1 }));
+        return true;
       } else {
         const msg = parsed.message ?? 'Errore sconosciuto';
         this.formErrors.update(e => ({ ...e, [trackId]: [`Errore del server: ${msg}`] }));
         this.formStatus.update(s => ({ ...s, [trackId]: 3 }));
+        return false;
       }
     } catch {
       this.formStatus.update(s => ({ ...s, [trackId]: 1 }));
+      return true;
     }
   }
 

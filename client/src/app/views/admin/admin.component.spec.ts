@@ -36,7 +36,8 @@ describe('AdminComponent', () => {
       'getDriversData',
       'getAllTracksBySeason',
       'getChampionshipBySeason',
-      'setGpResult'
+      'setGpResult',
+      'allData'
     ]);
     
     mockAuthService = jasmine.createSpyObj('AuthService', [], { currentUser: signal({ isAdmin: true, id: 1, username: 'admin', name: 'Admin', surname: 'User' }) });
@@ -46,6 +47,7 @@ describe('AdminComponent', () => {
     mockDbDataService.getDriversData.and.returnValue(Promise.resolve(mockDrivers));
     mockDbDataService.getAllTracksBySeason.and.returnValue(Promise.resolve(mockTracks));
     mockDbDataService.getChampionshipBySeason.and.returnValue(Promise.resolve(mockChampionship));
+    mockDbDataService.allData.and.resolveTo();
 
     await TestBed.configureTestingModule({
       providers: [
@@ -75,7 +77,8 @@ describe('AdminComponent', () => {
       'getDriversData',
       'getAllTracksBySeason',
       'getChampionshipBySeason',
-      'setGpResult'
+      'setGpResult',
+      'allData'
     ]);
     
     await TestBed.configureTestingModule({
@@ -407,5 +410,6 @@ describe('AdminComponent', () => {
         seasonId: 1
       }));
     }
+    expect(mockDbDataService.allData).toHaveBeenCalledTimes(2);
   });
 });
