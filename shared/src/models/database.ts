@@ -38,6 +38,8 @@ export type SessionResult = {
   fast_lap: boolean | null;
 }
 
+export type SessionResultFormValue = number | string | (number | string)[] | null | undefined;
+
 export type ChampionshipData = {
   gran_prix_id: number;
   track_name: string;

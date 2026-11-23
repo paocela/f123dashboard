@@ -128,6 +128,20 @@ describe('AdminComponent', () => {
     expect(mockDbDataService.getChampionshipBySeason).toHaveBeenCalledWith(1);
   });
 
+  it('shows Sprint fields when the track flag arrives as a database string', async () => {
+    const sprintTrack: TrackData = JSON.parse(JSON.stringify({ ...mockTracks[0], has_sprint: '1' }));
+    mockDbDataService.getAllTracksBySeason.and.resolveTo([sprintTrack]);
+    fixture.autoDetectChanges();
+    await fixture.whenStable();
+
+    const host: HTMLElement = fixture.nativeElement;
+    host.querySelector<HTMLButtonElement>('.accordion-button')?.click();
+    await fixture.whenStable();
+
+    const headings = Array.from(host.querySelectorAll('th'), heading => heading.textContent?.trim());
+    expect(headings).toContain('Sprint');
+  });
+
   it('should validate race results with DNF correctly', () => {
     // Set up 8 drivers — the array format is [pos1..posN, fastLap, dnf[]]
     component.piloti.set(Array.from({ length: 8 }, (_, i) => ({
@@ -411,5 +425,28 @@ describe('AdminComponent', () => {
       }));
     }
     expect(mockDbDataService.allData).toHaveBeenCalledTimes(2);
+  });
+
+  it('submits selected DNF driver IDs from the form as numbers', async () => {
+    component.selectedSeason.set(1);
+    component.piloti.set([
+      { id: 1, username: 'd1', first_name: 'A', surname: 'B' },
+      { id: 2, username: 'd2', first_name: 'C', surname: 'D' }
+    ]);
+    component.setRaceResult(1, 1, '1');
+    component.setRaceResult(1, 2, '0');
+    component.setRaceResult(1, 3, '1');
+    component.setRaceResult(1, 4, ['2']);
+    component.sprintResults.set(new Map([[1, []]]));
+    component.qualiResults.set(new Map([[1, [1, 2]]]));
+    component.fpResults.set(new Map([[1, [1, 2]]]));
+    mockDbDataService.setGpResult.and.resolveTo(JSON.stringify({ success: true }));
+
+    await component.publishResult(1, '0', {} as NgForm);
+
+    expect(mockDbDataService.setGpResult).toHaveBeenCalledOnceWith(1, jasmine.objectContaining({
+      raceResult: [1, 0, 1],
+      raceDnfResult: [2]
+    }));
   });
 });
