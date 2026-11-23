@@ -86,6 +86,24 @@ export type TrackData = {
   username: string;
 }
 
+export interface GpScheduleItem {
+  id: number;
+  track_id: number | null;
+  name: string | null;
+  date: string;
+  has_sprint: number;
+  has_x2: number;
+  country: string | null;
+  besttime_driver_time: string | null;
+  username: string | null;
+}
+
+export interface GpScheduleResponse {
+  success: boolean;
+  data: GpScheduleItem[];
+  message?: string;
+}
+
 export type CarData = {
   car_id: number;
   car_name: string;

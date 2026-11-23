@@ -218,6 +218,9 @@ describe('DashboardComponent', () => {
       constructors: computed(() => constructorsSignal()),
       cumulativePoints: cumulativePointsSignal.asReadonly()
     };
+    Object.assign(mockDbDataService, {
+      gpSchedule: computed(() => tracksSignal().map((track, index) => ({ ...track, id: index + 1 })))
+    });
 
     mockTwitchApiService = jasmine.createSpyObj('TwitchApiService', [
       'getChannel',
@@ -269,6 +272,25 @@ describe('DashboardComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('includes unassigned GPs in upcoming cards without showing a calendar', () => {
+    Object.assign(mockDbDataService, {
+      gpSchedule: signal([
+        { id: 10, track_id: null, name: null, country: null, date: '2026-03-02T14:00:00Z', has_sprint: 1, has_x2: 0, besttime_driver_time: null, username: null },
+        { id: 11, track_id: null, name: null, country: null, date: '2026-03-03T14:00:00Z', has_sprint: 0, has_x2: 1, besttime_driver_time: null, username: null }
+      ])
+    });
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('app-calendar')).toBeNull();
+    expect(component.championshipNextTracks().length).toBe(2);
+    expect(fixture.nativeElement.textContent).toContain('Prossimo GP: Da definire');
+    expect(fixture.nativeElement.querySelector('img[src*="tracks/null"]')).toBeNull();
+    const indicators: HTMLButtonElement[] = Array.from(fixture.nativeElement.querySelectorAll('c-carousel-indicators button'));
+    expect(indicators.map(button => button.getAttribute('aria-label'))).toEqual([
+      'Mostra il GP 10: Da definire', 'Mostra il GP 11: Da definire'
+    ]);
   });
 
   describe('ngOnInit', () => {
