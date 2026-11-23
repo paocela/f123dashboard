@@ -43,6 +43,26 @@ describe('GP Edit API', () => {
       expect(pool.query).toHaveBeenLastCalledWith(expect.stringContaining('LEFT JOIN tracks'), [2025]);
     });
 
+    it('should return GP dates as UTC wall-clock strings', async () => {
+      (pool.query as any).mockResolvedValueOnce({ rows: [{ id: 2025 }] });
+      (pool.query as any).mockResolvedValueOnce({
+        rows: [{
+          id: 1,
+          date: '2025-05-25T14:00',
+          track_id: 1,
+          track_name: 'Monza',
+          has_sprint: 0,
+          has_x2: 0
+        }]
+      });
+
+      const res = await request(app).post('/api/gp-edit/list');
+
+      expect(res.status).toBe(200);
+      expect(res.body.data[0].date).toBe('2025-05-25T14:00');
+      expect((pool.query as any).mock.calls[1][0]).toContain('to_char(gp.date');
+    });
+
     it('should handle errors', async () => {
       // Mock season fetch failure
       (pool.query as any).mockRejectedValueOnce(new Error('DB Error'));
@@ -103,7 +123,7 @@ describe('GP Edit API', () => {
         // Mock season fetch
         (pool.query as any).mockResolvedValueOnce({ rows: [{ id: 10 }] }); 
         // Mock insert
-        (pool.query as any).mockResolvedValueOnce({ rows: [{ id: 100, date: '2025-01-01', track_id: 5, has_sprint: 1, has_x2: 0 }] });
+        (pool.query as any).mockResolvedValueOnce({ rows: [{ id: 100, date: '2025-01-01T14:00', track_id: 5, has_sprint: 1, has_x2: 0 }] });
         // Mock track fetch
         (pool.query as any).mockResolvedValueOnce({ rows: [{ name: 'Bahrain' }] });
 
@@ -114,6 +134,8 @@ describe('GP Edit API', () => {
         expect(res.status).toBe(200);
         expect(res.body.success).toBe(true);
         expect(res.body.data.track_name).toBe('Bahrain');
+        expect(res.body.data.date).toBe('2025-01-01T14:00');
+        expect((pool.query as any).mock.calls[1][0]).toContain('to_char(date');
      });
 
      it('should create a GP without an assigned track', async () => {

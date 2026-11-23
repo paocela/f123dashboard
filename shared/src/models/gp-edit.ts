@@ -1,6 +1,6 @@
 export interface GPEditItem {
     id: number;
-    date: Date;
+    date: string;
   track_id: number | null;
     track_name: string;
     has_sprint: boolean;
@@ -25,4 +25,9 @@ export interface GPEditItem {
     id: number;
     name: string;
     country: string;
+  }
+
+  export interface SprintDrawInfo {
+    /** Sprints still to be drawn this season: the season total minus sprints already on GPs with a track. */
+    remaining_sprints: number;
   }

@@ -1,0 +1,136 @@
+:host {
+  display: block;
+  width: min(100%, 46rem);
+}
+
+.wheel-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 1.25rem;
+}
+
+.wheel {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  border: 0.5rem solid var(--cui-body-bg);
+  border-radius: 50%;
+  box-shadow: var(--cui-box-shadow);
+  transition: transform 10s linear(
+    0,
+    0.3 15%,
+    0.55 30%,
+    0.72 43%,
+    0.82 53%,
+    0.89 62%,
+    0.94 72%,
+    0.97 82%,
+    0.99 92%,
+    1
+  );
+}
+
+.wheel-pointer {
+  position: absolute;
+  z-index: 1;
+  top: 0.4rem;
+  width: 0;
+  height: 0;
+  border-right: 1rem solid transparent;
+  border-left: 1rem solid transparent;
+  border-top: 1.75rem solid var(--cui-emphasis-color);
+}
+
+.wheel-center-button {
+  position: absolute;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: clamp(5.75rem, 19%, 9rem);
+  aspect-ratio: 1;
+  padding: 0.5rem;
+  color: var(--cui-emphasis-color);
+  background-color: var(--cui-body-bg);
+  border-color: var(--cui-border-color);
+  border-radius: 50%;
+  box-shadow: var(--cui-box-shadow-sm);
+  font-size: clamp(0.625rem, 1.5vw, 0.875rem);
+  font-weight: 700;
+  line-height: 1.1;
+  text-align: center;
+}
+
+.wheel-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 32%;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.1;
+  text-align: center;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 60%);
+  transform-origin: center;
+}
+
+.wheel-label {
+  transition: opacity 0.4s ease;
+}
+
+.wheel-label.is-dimmed {
+  opacity: 0.35;
+}
+
+.wheel-label.is-highlighted {
+  font-size: 0.95rem;
+  text-shadow: 0 1px 3px rgb(0 0 0 / 80%);
+}
+
+// Compact variant
+:host(.is-small) {
+  .wheel-stage {
+    padding: 0.6rem;
+  }
+
+  .wheel {
+    border-width: 0.25rem;
+  }
+
+  .wheel-pointer {
+    top: 0.1rem;
+    border-right-width: 0.5rem;
+    border-left-width: 0.5rem;
+    border-top-width: 0.9rem;
+  }
+
+  .wheel-center-button {
+    width: 34%;
+    padding: 0.25rem;
+    font-size: 0.6rem;
+  }
+
+  .wheel {
+    container-type: inline-size;
+  }
+
+  .wheel-label {
+    font-size: 3.8cqi;
+  }
+
+  // Too small to read the labels: the colours (and the page legend) carry the meaning.
+  @container (max-width: 160px) {
+    .wheel-label {
+      display: none;
+    }
+  }
+}
+
+@media (max-width: 575.98px) {
+  .wheel-label {
+    font-size: 0.625rem;
+  }
+}

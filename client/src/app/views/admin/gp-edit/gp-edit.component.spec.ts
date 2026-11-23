@@ -12,14 +12,14 @@ describe('GpEditComponent', () => {
   let component: GpEditComponent;
   let fixture: ComponentFixture<GpEditComponent>;
   let mockGpEditService: jasmine.SpyObj<GpEditService>;
-  let freePracticeEnabled = signal(true);
+  const freePracticeEnabled = signal(true);
 
   const mockGpData: GPEditItem[] = [
     {
       id: 1,
       track_id: 1,
       track_name: 'Monaco',
-      date: new Date('2024-05-26T14:00:00Z'),
+      date: '2024-05-26T14:00',
       has_sprint: false,
       has_x2: false
     }
@@ -88,8 +88,8 @@ describe('GpEditComponent', () => {
     expect(component.tracks().length).toBe(2);
   });
 
-  it('should format dates correctly for datetime-local input', () => {
-    expect(component.gps()[0].date).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/);
+  it('should preserve UTC date strings for datetime-local input', () => {
+    expect(component.gps()[0].date).toBe('2024-05-26T14:00');
   });
 
   it('should set loading state when loading data', () => {

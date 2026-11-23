@@ -1,5 +1,8 @@
 import pg from 'pg';
-import type { EligibleTrack, GPEditItem, CreateGpData, UpdateGpData } from '@f123dashboard/shared';
+import type { EligibleTrack, GPEditItem, CreateGpData, UpdateGpData, SprintDrawInfo } from '@f123dashboard/shared';
+
+/** Number of sprint races in every season. */
+export const SEASON_SPRINT_COUNT = 6;
 
 export class GpEditService {
   constructor(private pool: pg.Pool) {}
@@ -17,7 +20,7 @@ async getUpcomingGps(): Promise<GPEditItem[]> {
     const query = `
         SELECT 
             gp.id,
-            gp.date,
+            to_char(gp.date, 'YYYY-MM-DD"T"HH24:MI') AS date,
             gp.track_id,
             t.name as track_name,
             gp.has_sprint,
@@ -57,7 +60,7 @@ async getUpcomingGps(): Promise<GPEditItem[]> {
         ${data.has_sprint ? "nextval('results_id_seq')" : "NULL"},
         ${data.has_x2 ?  "nextval('results_id_seq')" : "NULL"  }
       )
-      RETURNING id, date, track_id, has_sprint, has_x2
+      RETURNING id, to_char(date, 'YYYY-MM-DD"T"HH24:MI') AS date, track_id, has_sprint, has_x2
     `;
     const values = [
       data.date, 
@@ -188,5 +191,24 @@ async getUpcomingGps(): Promise<GPEditItem[]> {
       name: row.name,
       country: row.country
     }));
+  }
+
+  /**
+   * Counts the sprints still available for the track-extraction draw in the latest season.
+   * A sprint is used once a GP that already has a track is flagged as sprint.
+   */
+  async getSprintDrawInfoForLatestSeason(): Promise<SprintDrawInfo> {
+    const result = await this.pool.query(
+      `
+        SELECT COUNT(*) AS assigned_sprints
+        FROM gran_prix gp
+        WHERE gp.season_id = (SELECT id FROM seasons ORDER BY start_date DESC LIMIT 1)
+          AND gp.track_id IS NOT NULL
+          AND gp.has_sprint = 1
+      `
+    );
+    const assignedSprints = Number(result.rows[0]?.assigned_sprints ?? 0);
+
+    return { remaining_sprints: Math.max(0, SEASON_SPRINT_COUNT - assignedSprints) };
   }
 }

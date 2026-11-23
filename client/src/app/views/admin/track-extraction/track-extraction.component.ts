@@ -16,10 +16,12 @@ import {
   ToastHeaderComponent,
   ToastBodyComponent
 } from '@coreui/angular';
+import { forkJoin } from 'rxjs';
 import type { EligibleTrack, GPEditItem } from '@f123dashboard/shared';
 import { GpEditService } from '../../../service/gp-edit.service';
+import { SpinWheelComponent, WheelSegment } from '../../../components/spin-wheel/spin-wheel.component';
 
-const WHEEL_COLORS = [
+const TRACK_WHEEL_COLORS = [
   '#321fdb',
   '#3399ff',
   '#2eb85c',
@@ -37,10 +39,17 @@ const WHEEL_COLORS = [
   '#795548',
   '#607d8b'
 ];
-const SPIN_TURNS = 8;
+export type RaceFormat = 'sprint' | 'regular';
+
+const FORMAT_COLORS: Record<RaceFormat, string> = {
+  sprint: '#e55353',
+  regular: '#321fdb'
+};
+const MODAL_DELAY_MS = 500;
 
 interface PendingTrackAssignment {
   track: EligibleTrack;
+  format: RaceFormat;
   gp: GPEditItem;
 }
 
@@ -48,6 +57,19 @@ interface Toast {
   title: string;
   message: string;
   color: string;
+}
+
+/**
+ * Spreads `sprintCount` sprint entries as evenly as possible among `totalCount` wheel entries.
+ * The draw is uniform over entries, so the sprint probability is sprintCount / totalCount whatever the order.
+ */
+export function buildFormatEntries(totalCount: number, sprintCount: number): RaceFormat[] {
+  const sprints = Math.min(Math.max(sprintCount, 0), totalCount);
+  return Array.from({ length: totalCount }, (_, index): RaceFormat =>
+    Math.floor(((index + 1) * sprints) / totalCount) > Math.floor((index * sprints) / totalCount)
+      ? 'sprint'
+      : 'regular'
+  );
 }
 
 @Component({
@@ -64,6 +86,7 @@ interface Toast {
     ModalTitleDirective,
     RowComponent,
     SpinnerComponent,
+    SpinWheelComponent,
     ToasterComponent,
     ToastComponent,
     ToastHeaderComponent,
@@ -77,33 +100,41 @@ export class TrackExtractionComponent implements OnInit {
   private readonly gpEditService = inject(GpEditService);
 
   readonly tracks = signal<EligibleTrack[]>([]);
+  readonly remainingSprints = signal(0);
   readonly isLoading = signal(true);
   readonly isSpinning = signal(false);
   readonly hasError = signal(false);
-  readonly rotation = signal(0);
+  /** Which wheel is shown: the track draw first, then the race-format draw for the drawn track. */
+  readonly stage = signal<'track' | 'format'>('track');
   readonly selectedTrack = signal<EligibleTrack | null>(null);
+  /** Segment of the track wheel the draw landed on; kept highlighted while the format is drawn. */
+  readonly drawnTrackIndex = signal<number | null>(null);
+  readonly selectedFormat = signal<RaceFormat | null>(null);
   readonly assignmentModalVisible = signal(false);
   readonly isLoadingPendingGp = signal(false);
   readonly isAssigningTrack = signal(false);
   readonly hasAssignmentError = signal(false);
   readonly pendingTrackAssignment = signal<PendingTrackAssignment | null>(null);
   readonly toasts = signal<Toast[]>([]);
-  readonly wheelBackground = computed(() => {
-    const availableTracks = this.tracks();
-    if (availableTracks.length === 0) {
-      return '';
-    }
+  readonly formatColors = FORMAT_COLORS;
 
-    const segmentAngle = 360 / availableTracks.length;
-    const segments = availableTracks.map((_, index) => {
-      const color = WHEEL_COLORS[index % WHEEL_COLORS.length];
-      const start = index * segmentAngle;
-      const end = (index + 1) * segmentAngle;
-      return `${color} ${start}deg ${end}deg`;
-    });
+  readonly trackSegments = computed<WheelSegment[]>(() =>
+    this.tracks().map((track, index) => ({
+      label: track.name,
+      color: TRACK_WHEEL_COLORS[index % TRACK_WHEEL_COLORS.length]
+    }))
+  );
 
-    return `conic-gradient(${segments.join(', ')})`;
-  });
+  /** One entry per race still to be drawn (the drawn track included), of which the remaining sprints are sprint. */
+  readonly formatEntries = computed(() => buildFormatEntries(this.tracks().length, this.remainingSprints()));
+  readonly sprintEntryCount = computed(() => this.formatEntries().filter((format) => format === 'sprint').length);
+
+  readonly formatSegments = computed<WheelSegment[]>(() =>
+    this.formatEntries().map((format) => ({
+      label: this.getFormatLabel(format),
+      color: FORMAT_COLORS[format]
+    }))
+  );
 
   ngOnInit(): void {
     this.loadEligibleTracks();
@@ -113,9 +144,13 @@ export class TrackExtractionComponent implements OnInit {
     this.isLoading.set(true);
     this.hasError.set(false);
 
-    this.gpEditService.getEligibleTracks().subscribe({
-      next: (response) => {
-        this.tracks.set(response.data);
+    forkJoin({
+      tracks: this.gpEditService.getEligibleTracks(),
+      sprintInfo: this.gpEditService.getSprintDrawInfo()
+    }).subscribe({
+      next: ({ tracks, sprintInfo }) => {
+        this.tracks.set(tracks.data);
+        this.remainingSprints.set(sprintInfo.data.remaining_sprints);
         this.isLoading.set(false);
       },
       error: () => {
@@ -125,31 +160,35 @@ export class TrackExtractionComponent implements OnInit {
     });
   }
 
-  spinWheel(): void {
-    const availableTracks = this.tracks();
-    if (this.isSpinning() || availableTracks.length === 0) {
-      return;
-    }
-
-    const selectedIndex = this.getRandomIndex(availableTracks.length);
-    const segmentAngle = 360 / availableTracks.length;
-    const targetAngle = 360 - (selectedIndex + 0.5) * segmentAngle;
-    const currentAngle = this.rotation() % 360;
-    const additionalRotation = (targetAngle - currentAngle + 360) % 360;
-
+  onTrackSpinStart(): void {
     this.selectedTrack.set(null);
+    this.drawnTrackIndex.set(null);
+    this.selectedFormat.set(null);
     this.isSpinning.set(true);
-    this.rotation.update((currentRotation) => currentRotation + SPIN_TURNS * 360 + additionalRotation);
-    this.selectedTrack.set(availableTracks[selectedIndex]);
   }
 
-  onWheelTransitionEnd(event: TransitionEvent): void {
-    if (event.propertyName === 'transform') {
-      this.isSpinning.set(false);
-      setTimeout(() => {
-        this.openAssignmentModal();
-      }, 500); // Wait for 500ms before opening the assignment modal
-    }
+  onTrackSpinEnd(index: number): void {
+    this.isSpinning.set(false);
+    this.selectedTrack.set(this.tracks()[index] ?? null);
+    this.drawnTrackIndex.set(index);
+    this.stage.set('format');
+  }
+
+  onFormatSpinStart(): void {
+    this.selectedFormat.set(null);
+    this.isSpinning.set(true);
+  }
+
+  onFormatSpinEnd(index: number): void {
+    this.isSpinning.set(false);
+    this.selectedFormat.set(this.formatEntries()[index] ?? null);
+    setTimeout(() => {
+      this.openAssignmentModal();
+    }, MODAL_DELAY_MS);
+  }
+
+  getFormatLabel(format: RaceFormat): string {
+    return format === 'sprint' ? 'Sprint' : 'Normale';
   }
 
   closeAssignmentModal(): void {
@@ -159,9 +198,22 @@ export class TrackExtractionComponent implements OnInit {
     this.isLoadingPendingGp.set(false);
   }
 
+  /** Cancels the current draw and goes back to the track wheel. */
+  cancelDraw(): void {
+    this.closeAssignmentModal();
+    this.resetDraw();
+  }
+
+  private resetDraw(): void {
+    this.selectedTrack.set(null);
+    this.drawnTrackIndex.set(null);
+    this.selectedFormat.set(null);
+    this.stage.set('track');
+  }
+
   onAssignmentModalVisibleChange(visible: boolean): void {
-    if (!visible) {
-      this.closeAssignmentModal();
+    if (!visible && this.assignmentModalVisible()) {
+      this.cancelDraw();
     }
   }
 
@@ -183,7 +235,10 @@ export class TrackExtractionComponent implements OnInit {
 
     this.isAssigningTrack.set(true);
     this.hasAssignmentError.set(false);
-    this.gpEditService.updateGp(assignment.gp.id, { track_id: assignment.track.id }).subscribe({
+    this.gpEditService.updateGp(assignment.gp.id, {
+      track_id: assignment.track.id,
+      has_sprint: assignment.format === 'sprint'
+    }).subscribe({
       next: (response) => {
         this.isAssigningTrack.set(false);
         if (!response.success) {
@@ -193,9 +248,9 @@ export class TrackExtractionComponent implements OnInit {
         }
 
         this.closeAssignmentModal();
-        this.selectedTrack.set(null);
+        this.resetDraw();
         this.loadEligibleTracks();
-        this.addToast('Pista assegnata', 'La pista e stata assegnata al prossimo Gran Premio.', 'success');
+        this.addToast('Pista assegnata', 'La pista e il formato sono stati assegnati al prossimo Gran Premio.', 'success');
       },
       error: () => {
         this.isAssigningTrack.set(false);
@@ -209,32 +264,22 @@ export class TrackExtractionComponent implements OnInit {
     return `assets/images/tracks/${trackId}.png`;
   }
 
-  formatGpDate(date: Date): string {
+  formatGpDate(date: string): string {
     return new Intl.DateTimeFormat('it-IT', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
-      hourCycle: 'h23'
-    }).format(new Date(date));
-  }
-
-  getLabelTransform(index: number): string {
-    const segmentAngle = 360 / this.tracks().length;
-    const angle = (index + 0.5) * segmentAngle - 90;
-    return `translate(-50%, -50%) rotate(${angle}deg) translateX(105%)`;
-  }
-
-  private getRandomIndex(trackCount: number): number {
-    const randomValue = new Uint32Array(1);
-    crypto.getRandomValues(randomValue);
-    return randomValue[0] % trackCount;
+      hourCycle: 'h23',
+      timeZone: 'UTC'
+    }).format(new Date(`${date}Z`));
   }
 
   private openAssignmentModal(): void {
     const track = this.selectedTrack();
-    if (!track) {
+    const format = this.selectedFormat();
+    if (!track || !format) {
       return;
     }
 
@@ -246,7 +291,7 @@ export class TrackExtractionComponent implements OnInit {
       next: (response) => {
         const gp = response.data.find((item) => item.track_id === null);
         if (gp) {
-          this.pendingTrackAssignment.set({ track, gp });
+          this.pendingTrackAssignment.set({ track, format, gp });
         }
         this.isLoadingPendingGp.set(false);
       },

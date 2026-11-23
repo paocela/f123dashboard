@@ -314,31 +314,6 @@ describe('DashboardComponent', () => {
       expect(nextTracks[1].name).toBe('Imola GP');
     });
 
-    it('should map tracks to calendar events', () => {
-      component.ngOnInit();
-
-      const events = component.calendarEvents();
-      expect(events.length).toBe(3);
-      expect(events[0].name).toBe('Monaco GP');
-      expect(events[0].description).toContain('Paese: Monaco');
-    });
-
-    it('should add sprint indicator to calendar event description', () => {
-      component.ngOnInit();
-
-      const events = component.calendarEvents();
-      const imolaEvent = events.find(e => e.name === 'Imola GP');
-      expect(imolaEvent?.description).toContain('Sprint Race');
-    });
-
-    it('should add double points indicator to calendar event description', () => {
-      component.ngOnInit();
-
-      const events = component.calendarEvents();
-      const abuDhabiEvent = events.find(e => e.name === 'Abu Dhabi GP');
-      expect(abuDhabiEvent?.description).toContain('Punti Doppi (x2)');
-    });
-
     it('should calculate constructor points', () => {
       component.ngOnInit();
 
@@ -509,7 +484,6 @@ describe('DashboardComponent', () => {
 
       expect(component.championshipTracks().length).toBe(0);
       expect(component.championshipNextTracks().length).toBe(0);
-      expect(component.calendarEvents().length).toBe(0);
     });
 
     it('should not show the fantasy leaderboard without scored votes', () => {

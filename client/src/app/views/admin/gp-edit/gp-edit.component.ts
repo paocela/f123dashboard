@@ -34,8 +34,6 @@ interface Toast {
   color: string;
 }
 
-type GPEditViewModel = Omit<GPEditItem, 'date'> & { date: string };
-
 @Component({
   selector: 'app-gp-edit',
   imports: [
@@ -73,7 +71,7 @@ export class GpEditComponent implements OnInit {
   private featureFlagsService = inject(FeatureFlagsService);
   private fb = inject(FormBuilder);
 
-  gps = signal<GPEditViewModel[]>([]);
+  gps = signal<GPEditItem[]>([]);
   tracks = signal<{ id: number; name: string }[]>([]);
   loading = signal(false);
   readonly freePracticeEnabled = this.featureFlagsService.freePracticeEnabled;
@@ -109,10 +107,7 @@ export class GpEditComponent implements OnInit {
     this.loading.set(true);
     this.gpEditService.getUpcomingGps().subscribe({
       next: (res) => {
-        this.gps.set(res.data.map((gp: GPEditItem) => ({
-            ...gp,
-          date: this.formatDateTimeLocal(gp.date)
-        })));
+        this.gps.set(res.data);
         this.loading.set(false);
       },
       error: (err) => {
@@ -263,7 +258,7 @@ export class GpEditComponent implements OnInit {
     });
   }
 
-  onSave(gp: GPEditViewModel): void { 
+  onSave(gp: GPEditItem): void {
     
     this.gpEditService.updateGp(gp.id, {
       track_id: gp.track_id,
@@ -283,10 +278,4 @@ export class GpEditComponent implements OnInit {
     });
   }
 
-  private formatDateTimeLocal(date: Date): string {
-    const localDate = new Date(date);
-    const pad = (value: number) => value.toString().padStart(2, '0');
-
-    return `${localDate.getFullYear()}-${pad(localDate.getMonth() + 1)}-${pad(localDate.getDate())}T${pad(localDate.getHours())}:${pad(localDate.getMinutes())}`;
-  }
 }
