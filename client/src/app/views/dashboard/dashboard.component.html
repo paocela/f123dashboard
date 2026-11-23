@@ -60,11 +60,9 @@
                       Scuderia
                     </th>
                     }
-                    @if (showColumn()) {
                     <th class="bg-body-tertiary text-center">
                       Monoposto
                     </th>
-                    }
                     <th class="bg-body-tertiary text-center">Punti</th>
                     @if (showGainedPointsColumn()) {
                     <th class="bg-body-tertiary text-center">
@@ -99,13 +97,11 @@
                       />
                     </td>
                     }
-                    @if (showColumn()) {
                     <td class="text-center">
-                      <div class="text-nowrap">
+                      <div class="car-name">
                         {{ user.assigned_car_name }}
                       </div>
                     </td>
-                    }
                     <td>
                       <div class="fw-semibold text-center">
                         {{ user.total_points }}
@@ -355,16 +351,6 @@
 
 <app-championship-trend></app-championship-trend>
 
-<c-row class="mt-4 mb-4">
-  <c-col>
-    <app-calendar 
-      title="Prossimi Eventi 📅" 
-      defaultView="month" 
-      [compactView]="true"
-      [events]="calendarEvents()">
-    </app-calendar>
-  </c-col>
-</c-row>
 <!-- 
 <c-modal
   alignment="center"

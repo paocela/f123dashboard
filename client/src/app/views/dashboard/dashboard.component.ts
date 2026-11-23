@@ -36,7 +36,6 @@ import { ChampionshipTrendComponent } from '../../components/championship-trend/
 import type { Constructor, CumulativePointsData, DriverData, TrackData } from '@f123dashboard/shared';
 import { PilotCardComponent } from '../../components/pilot-card/pilot-card.component';
 import { ConstructorCardComponent } from '../../components/constructor-card/constructor-card.component';
-import { CalendarComponent, CalendarEvent } from '../../components/calendar/calendar.component';
 import type { DriverOfWeek, ConstructorOfWeek } from '../../model/dashboard.model';
 import { allFlags } from '../../model/constants';
 
@@ -76,8 +75,7 @@ export interface DriverDataWithGainedPoints extends DriverData {
     Tabs2Module,
     PilotCardComponent,
     ButtonCloseDirective,
-    ConstructorCardComponent,
-    CalendarComponent
+    ConstructorCardComponent
 ]
 })
 export class DashboardComponent implements OnInit {
@@ -96,7 +94,6 @@ export class DashboardComponent implements OnInit {
   );
 
   twitchEmbedUrl = signal<SafeResourceUrl>('' as SafeResourceUrl);
-  calendarEvents = signal<CalendarEvent[]>([]);
 
   championship_standings_users = signal<DriverDataWithGainedPoints[]>([]);
   championshipTracks = signal<TrackData[]>([]);
@@ -152,7 +149,7 @@ export class DashboardComponent implements OnInit {
   ngOnInit(): void {
     this.initializeTwitchEmbed();
     this.initializeDriversData();
-    this.initializeTracksAndCalendar();
+    this.initializeTracks();
     this.initializeConstructorsData();
     this.calculateNextTracks();
     
@@ -194,32 +191,10 @@ export class DashboardComponent implements OnInit {
   }
 
   /**
-   * Initializes tracks data and maps them to calendar events
+   * Initializes championship tracks data
    */
-  private initializeTracksAndCalendar(): void {
+  private initializeTracks(): void {
     this.championshipTracks.set(this.dbData.tracks());
-    this.calendarEvents.set(this.mapTracksToCalendarEvents(this.championshipTracks()));
-  }
-
-  /**
-   * Maps track data to calendar event format
-   */
-  private mapTracksToCalendarEvents(tracks: TrackData[]): CalendarEvent[] {
-    return tracks.map(track => {
-      let desc = `Paese: ${track.country}`;
-      if (track.has_sprint === 1) {
-        desc += '\n• Sprint Race';
-      }
-      if (track.has_x2 === 1) {
-        desc += '\n• Punti Doppi (x2)';
-      }
-      
-      return {
-        name: track.name,
-        date: track.date,
-        description: desc
-      };
-    });
   }
 
   /**
