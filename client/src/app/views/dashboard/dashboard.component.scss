@@ -170,10 +170,9 @@ c-card-body {
   white-space: nowrap;
 }
 
-@media (max-width: 767px) {
-  .car-name {
-    white-space: normal;
-    font-size: 0.8rem;
-    line-height: 1.2;
-  }
+// Phones: the car is shown under the driver's name instead of in its own column.
+.car-under-name {
+  color: var(--cui-secondary-color);
+  font-size: 0.75rem;
+  line-height: 1.2;
 }

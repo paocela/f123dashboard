@@ -60,7 +60,7 @@
                       Scuderia
                     </th>
                     }
-                    <th class="bg-body-tertiary text-center">
+                    <th class="bg-body-tertiary text-center d-none d-md-table-cell">
                       Monoposto
                     </th>
                     <th class="bg-body-tertiary text-center">Punti</th>
@@ -86,6 +86,9 @@
                     </td>
                     <td>
                       <div>{{ user.driver_username }}</div>
+                      @if (user.assigned_car_name) {
+                        <div class="car-under-name d-md-none">{{ user.assigned_car_name }}</div>
+                      }
                     </td>
                     @if (showColumn()) {
                     <td class="text-center p-0">
@@ -97,7 +100,7 @@
                       />
                     </td>
                     }
-                    <td class="text-center">
+                    <td class="text-center d-none d-md-table-cell">
                       <div class="car-name">
                         {{ user.assigned_car_name }}
                       </div>
