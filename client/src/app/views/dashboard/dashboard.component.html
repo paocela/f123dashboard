@@ -215,24 +215,35 @@
       [dark]="false"
       [touch]="true"
     >
-      <c-carousel-indicators></c-carousel-indicators>
+      <c-carousel-indicators #indicators="cCarouselIndicators">
+        <ng-template cTemplateId="carouselIndicatorsTemplate" let-active="active">
+          @for (gp of championshipNextTracks(); track gp.id; let i = $index) {
+            <button type="button" [attr.data-coreui-target]="i"
+              [class.active]="active === i" [attr.aria-current]="active === i ? 'true' : null"
+              [attr.aria-label]="showGpLabel + ' ' + gp.id + ': ' + (gp.name ?? undefinedTrackLabel)"
+              (click)="indicators.onClick(i)"></button>
+          }
+        </ng-template>
+      </c-carousel-indicators>
       <c-carousel-inner>
-        @for (next_track of championshipNextTracks(); track next_track.track_id) {
+        @for (next_track of championshipNextTracks(); track next_track.id) {
         <c-carousel-item>
           <c-card class="mb-4">
             <c-card-header>
               <c-row>
                 <c-col xs="auto">
                   <h4 class="card-title mb-0" id="traffic">
-                    Prossimo GP: {{ next_track.name }}
-                    <svg size="lg" [cIcon]="allFlags[next_track.country]"></svg>
+                    Prossimo GP: {{ next_track.name ?? undefinedTrackLabel }}
+                    @if (next_track.country && allFlags[next_track.country]) {
+                      <svg size="lg" [cIcon]="allFlags[next_track.country]"></svg>
+                    }
                   </h4>
                 </c-col>
-                @if (next_track.has_sprint == 1) {
+                @if (next_track.has_sprint === 1) {
                 <c-col xs="auto">
-                  <c-badge color="info">Sprint</c-badge>
+                  <c-badge color="info" textColor="dark">Sprint</c-badge>
                 </c-col>
-                } @if (next_track.has_x2 == 1) {
+                } @if (next_track.has_x2 === 1) {
                 <c-col xs="auto">
                   <c-badge color="danger">Points X2</c-badge>
                 </c-col>
@@ -240,6 +251,7 @@
               </c-row>
             </c-card-header>
             <c-card-body>
+              @if (next_track.track_id !== null) {
               <div style="max-height: 311px; aspect-ratio: 587/311;">
                 <img
                   style="width: 100%; height: 100%; object-fit: contain;"
@@ -247,6 +259,7 @@
                   alt="Track image for {{ next_track.name }}"
                 />
               </div>
+              }
               <c-row>
                 <c-col>
                   <div class="small text-body-secondary">
@@ -254,6 +267,7 @@
                     <strong> Date:</strong> {{ next_track.date }}
                   </div>
                 </c-col>
+                @if (next_track.besttime_driver_time && next_track.username) {
                 <c-col class="text-end">
                   <div class="small text-body-secondary">
                     <svg [cIcon]="fireIcon" style="color: purple"></svg>
@@ -263,6 +277,7 @@
                     }})
                   </div>
                 </c-col>
+                }
               </c-row>
             </c-card-body>
           </c-card>

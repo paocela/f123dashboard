@@ -1,158 +1,212 @@
-<c-container fluid>
-    <c-row>
-        <h2 class="mt-4 mb-4 text-center">Gestione GranPremi</h2>
-    </c-row>
-    <c-row class="mb-4">
-      <c-col xs="12">
-        <c-card>
-          <c-card-header>
-            <strong>Azioni di Massa</strong>
-          </c-card-header>
+<c-container fluid class="gp-edit">
+  <h2 class="my-4 text-center">Gestione GranPremi</h2>
+
+  <c-card class="mb-4">
+    <c-card-header class="gp-edit__header">
+      <strong>Aggiungi Nuovo Gran Premio</strong>
+    </c-card-header>
+    <c-card-body>
+      <form id="createGpForm" [formGroup]="createForm" (ngSubmit)="onCreate()" cForm>
+        <div class="table-responsive">
+          <table cTable align="middle" class="gp-edit__table gp-edit__create-table mb-0">
+            <thead>
+              <tr>
+                <th scope="col" class="gp-edit__col-track"><label cLabel class="mb-0" for="track">Pista</label></th>
+                <th scope="col" class="gp-edit__col-date"><label cLabel class="mb-0" for="date">Data (UTC)</label></th>
+                <th scope="col" class="gp-edit__col-flag"><label cLabel class="mb-0" for="newSprint">Sprint</label></th>
+                <th scope="col" class="gp-edit__col-flag"><label cLabel class="mb-0" for="newX2">Punti Doppi</label></th>
+                <th scope="col" class="gp-edit__col-actions"><span class="form-label mb-0">Azioni</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <span class="gp-edit__mobile-label">Pista</span>
+                  <select cSelect sizing="sm" formControlName="track_id" id="track" aria-label="Pista">
+                    <option [ngValue]="null">Da assegnare</option>
+                    @for (track of tracks(); track track.id) {
+                      <option [ngValue]="track.id">{{ track.name }}</option>
+                    }
+                  </select>
+                </td>
+                <td>
+                  <span class="gp-edit__mobile-label">Data (UTC)</span>
+                  <input cFormControl sizing="sm" type="datetime-local" formControlName="date" id="date" aria-label="Data (UTC)">
+                </td>
+                <td class="text-center">
+                  <span class="gp-edit__mobile-label">Sprint</span>
+                  <input cFormCheckInput type="checkbox" formControlName="has_sprint" id="newSprint" aria-label="Sprint">
+                </td>
+                <td class="text-center">
+                  <span class="gp-edit__mobile-label">Punti Doppi</span>
+                  <input cFormCheckInput type="checkbox" formControlName="has_x2" id="newX2" aria-label="Punti doppi">
+                </td>
+                <td class="text-end">
+                  <span class="gp-edit__mobile-label">Azioni</span>
+                  <button cButton color="primary" size="sm" type="submit" [disabled]="loading() || createForm.invalid">
+                    Aggiungi GP
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </form>
+    </c-card-body>
+  </c-card>
+
+  @for (group of raceGroups(); track group.past) {
+    @if (group.past) {
+      <c-accordion id="past-races-accordion" class="mb-4 gp-edit__accordion">
+        <c-accordion-item [visible]="false">
+          <ng-template cTemplateId="accordionHeader">
+            <strong>{{ group.title }}</strong>
+            <c-badge color="secondary" class="ms-1">{{ group.gps.length }}</c-badge>
+          </ng-template>
+          <ng-template cTemplateId="accordionBody">
+            <div id="past-races-body">
+              <ng-container *ngTemplateOutlet="raceGroupContent" />
+            </div>
+          </ng-template>
+        </c-accordion-item>
+      </c-accordion>
+    } @else {
+      <c-card class="mb-4">
+        <c-card-header class="gp-edit__header">
+          <strong>
+            {{ group.title }}
+            <c-badge color="secondary" class="ms-1">{{ group.gps.length }}</c-badge>
+          </strong>
+        </c-card-header>
+        @if (loading() || group.gps.length > 0) {
           <c-card-body>
-            <form [formGroup]="bulkForm" (ngSubmit)="onBulkUpdate()" cForm inline class="row g-3 align-items-center">
-              <c-col xs="auto">
-                <label cLabel for="daysOffset">Sposta tutte le date (Giorni)</label>
+            <ng-container *ngTemplateOutlet="raceGroupContent" />
+          </c-card-body>
+        }
+      </c-card>
+    }
+
+    <ng-template #raceGroupContent>
+        @if (loading()) {
+          <div class="text-center py-3">
+            <c-spinner></c-spinner>
+          </div>
+        } @else if (group.gps.length === 0) {
+          <p class="text-center text-body-secondary py-3 mb-0">{{ labels.noRaces }}</p>
+        } @else {
+          <div class="table-responsive">
+            <table cTable [striped]="true" [hover]="true" align="middle" class="gp-edit__table mb-0">
+              <thead>
+                <tr>
+                  <th scope="col" class="gp-edit__col-track">Pista</th>
+                  <th scope="col" class="gp-edit__col-date">Data (UTC)</th>
+                  <th scope="col" class="gp-edit__col-flag">Sprint</th>
+                  <th scope="col" class="gp-edit__col-flag">Punti Doppi</th>
+                  <th scope="col" class="gp-edit__col-actions">Azioni</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (gp of group.gps; track gp.id) {
+                  <tr>
+                    <td>
+                      <select cSelect sizing="sm" [(ngModel)]="gp.track_id"
+                        [disabled]="gp.has_results" [attr.aria-label]="labels.track + ' ' + gp.id">
+                        <option [ngValue]="null">Da assegnare</option>
+                        @for (track of tracks(); track track.id) {
+                          <option [ngValue]="track.id">{{ track.name }}</option>
+                        }
+                      </select>
+                      @if (gp.has_results) {
+                        <div class="form-text mt-1">{{ labels.locked }}</div>
+                      }
+                    </td>
+                    <td>
+                      <input cFormControl sizing="sm" type="datetime-local" [(ngModel)]="gp.date"
+                        [disabled]="gp.has_results" [attr.aria-label]="labels.date + ' ' + gp.id">
+                    </td>
+                    <td class="text-center">
+                      <input cFormCheckInput type="checkbox" [(ngModel)]="gp.has_sprint"
+                        [disabled]="gp.has_results" [attr.aria-label]="labels.sprint + ' ' + gp.id">
+                    </td>
+                    <td class="text-center">
+                      <input cFormCheckInput type="checkbox" [(ngModel)]="gp.has_x2"
+                        [disabled]="gp.has_results" [attr.aria-label]="labels.doublePoints + ' ' + gp.id">
+                    </td>
+                    <td>
+                      <div class="d-flex justify-content-end gap-2">
+                        <button cButton color="primary" size="sm" [disabled]="gp.has_results || loading()" (click)="onSave(gp)">
+                          Salva
+                        </button>
+                        <button cButton color="danger" size="sm" [disabled]="gp.has_results || loading()" (click)="onDelete(gp.id)">
+                          Elimina
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+    </ng-template>
+  }
+
+  <c-row class="g-3 mb-4">
+    <c-col xs="12" lg="6">
+      <c-accordion class="gp-edit__accordion">
+        <c-accordion-item [visible]="false">
+          <ng-template cTemplateId="accordionHeader">
+            <strong>Azioni di Massa</strong>
+          </ng-template>
+          <ng-template cTemplateId="accordionBody">
+            <form [formGroup]="bulkForm" (ngSubmit)="onBulkUpdate()" cForm class="row g-3 align-items-end">
+              <c-col xs="12" xl="5">
+                <label cLabel for="daysOffset" class="fw-semibold mb-0">Sposta tutte le date (giorni)</label>
+                <div class="form-text mt-1 mb-2" id="daysOffsetHelp">{{ labels.bulk }}</div>
+                <input cFormControl type="number" formControlName="daysOffset" id="daysOffset"
+                  placeholder="0" aria-describedby="daysOffsetHelp">
               </c-col>
-              <c-col xs="auto">
-                <input cFormControl type="number" formControlName="daysOffset" id="daysOffset" placeholder="0">
-              </c-col>
-              <c-col xs="auto">
-                <button cButton color="warning" type="submit" [disabled]="loading()">
+              <c-col xs="12" xl="auto" class="d-flex flex-column align-items-end justify-content-end">
+                <button cButton color="primary" type="submit" class="gp-edit__primary-action" [disabled]="loading()">
                   Sposta Calendario
                 </button>
               </c-col>
             </form>
-          </c-card-body>
-        </c-card>
-      </c-col>
-    </c-row>
-
-    <c-row class="mb-4">
-      <c-col xs="12">
-        <c-card>
-          <c-card-header><strong>Stagione corrente</strong></c-card-header>
-          <c-card-body>
-            <div class="form-check">
-              <input
-                cFormCheckInput
-                id="freePracticeEnabled"
-                type="checkbox"
-                [checked]="freePracticeEnabled()"
-                (change)="updateFreePracticeEnabled($event)">
-              <label cFormCheckLabel for="freePracticeEnabled">Abilita prove libere e relativi punti</label>
-            </div>
-          </c-card-body>
-        </c-card>
-      </c-col>
-    </c-row>
-  
-    <c-row class="mb-4">
-      <c-col xs="12">
-        <c-card>
-          <c-card-header>
-            <strong>Aggiungi Nuovo Gran Premio</strong>
-          </c-card-header>
-          <c-card-body>
-            <form [formGroup]="createForm" (ngSubmit)="onCreate()" cForm class="row g-3">
-              <c-col md="3" class="global-select-group">
-                <label cLabel for="track" class="global-select-label">Pista</label>
-                <select cFormControl formControlName="track_id" id="track" class="global-select">
-                  <option [ngValue]="null">Da assegnare</option>
-                  @for (track of tracks(); track track.id) {
-                    <option [ngValue]="track.id">{{ track.name }}</option>
-                  }
-                </select>
-              </c-col>
-              <c-col md="3">
-                <label cLabel for="date" class="global-select-label">Data e Ora</label>
-                <input cFormControl type="datetime-local" formControlName="date" id="date" class="global-datetime">
-              </c-col>
-              <c-col md="2" class="d-flex align-items-center">
-                <div class="form-check">
-                  <input cFormCheckInput type="checkbox" formControlName="has_sprint" id="newSprint">
-                  <label cFormCheckLabel for="newSprint">Sprint</label>
+          </ng-template>
+        </c-accordion-item>
+      </c-accordion>
+    </c-col>
+    <c-col xs="12" lg="6">
+      <c-accordion class="gp-edit__accordion">
+        <c-accordion-item [visible]="false">
+          <ng-template cTemplateId="accordionHeader">
+            <strong>{{ labels.seasonSettings }}</strong>
+          </ng-template>
+          <ng-template cTemplateId="accordionBody">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+              <div>
+                <div class="d-flex align-items-center gap-2">
+                  <span class="fw-semibold">{{ labels.freePractice }}</span>
+                  <c-badge [color]="freePracticeEnabled() ? 'success' : 'secondary'"
+                    [textColor]="freePracticeEnabled() ? 'dark' : 'white'" id="freePracticeStatus">
+                    {{ freePracticeEnabled() ? labels.enabled : labels.disabled }}
+                  </c-badge>
                 </div>
-              </c-col>
-              <c-col md="2" class="d-flex align-items-center">
-                <div class="form-check">
-                  <input cFormCheckInput type="checkbox" formControlName="has_x2" id="newX2">
-                  <label cFormCheckLabel for="newX2">Punti Doppi</label>
-                </div>
-              </c-col>
-              <c-col md="2" class="d-flex align-items-center">
-                <button cButton color="success" type="submit" [disabled]="loading() || createForm.invalid">
-                  Aggiungi GP
-                </button>
-              </c-col>
-            </form>
-          </c-card-body>
-        </c-card>
-      </c-col>
-    </c-row>
-  
-    <c-row>
-      <c-col xs="12">
-        <c-card>
-          <c-card-header>
-            <strong>Prossime Gare</strong>
-          </c-card-header>
-          <c-card-body>
-            @if (loading()) {
-              <div class="text-center">
-                <c-spinner></c-spinner>
+                <div class="form-text mt-1">{{ labels.freePracticeHelp }}</div>
               </div>
-            } @else {
-              <table [striped]="true" cTable hover>
-                <thead>
-                  <tr>
-                    <th>Pista</th>
-                    <th>Data (UTC)</th>
-                    <th>Sprint</th>
-                    <th>Punti Doppi</th>
-                    <th>Azioni</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (gp of gps(); track gp.id) {
-                    <tr>
-                      <td class="global-select-group">
-                        <select cFormControl [(ngModel)]="gp.track_id" class="global-select" [attr.aria-label]="'Pista per il GP ' + gp.id">
-                          <option [ngValue]="null">Da assegnare</option>
-                          @for (track of tracks(); track track.id) {
-                            <option [ngValue]="track.id">{{ track.name }}</option>
-                          }
-                        </select>
-                      </td>
-                      <td>
-                        <input cFormControl type="datetime-local" [(ngModel)]="gp.date" class="global-datetime table-datetime">
-                      </td>
-                      <td>
-                        <div class="form-check">
-                            <input cFormCheckInput type="checkbox" [(ngModel)]="gp.has_sprint">
-                        </div>
-                      </td>
-                      <td>
-                        <div class="form-check">
-                            <input cFormCheckInput type="checkbox" [(ngModel)]="gp.has_x2">
-                        </div>
-                      </td>
-                      <td>
-                        <button cButton color="primary" size="sm" class="me-2" (click)="onSave(gp)">
-                          Salva
-                        </button>
-                        <button cButton color="danger" size="sm" (click)="onDelete(gp.id)">
-                          Elimina
-                        </button>
-                      </td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            }
-          </c-card-body>
-        </c-card>
-      </c-col>
-    </c-row>
+              <button cButton id="freePracticeEnabled" type="button"
+                class="gp-edit__primary-action ms-auto"
+                [color]="freePracticeEnabled() ? 'danger' : 'success'"
+                [disabled]="freePracticeSaving()" aria-describedby="freePracticeStatus"
+                (click)="requestFreePracticeToggle()">
+                {{ freePracticeEnabled() ? labels.disableFreePractice : labels.enableFreePractice }}
+              </button>
+            </div>
+          </ng-template>
+        </c-accordion-item>
+      </c-accordion>
+    </c-col>
+  </c-row>
 
   <c-toaster [placement]="'top-end'" class="p-3" position="fixed">
     @for (toast of toasts(); track $index) {

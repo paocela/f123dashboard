@@ -15,6 +15,7 @@ router.post('/cumulative-points', (req, res) => databaseController.getCumulative
 
 // Track endpoints
 router.post('/tracks', (req, res) => databaseController.getAllTracks(req, res));
+router.post('/gp-schedule', (req, res) => databaseController.getGpSchedule(req, res));
 
 // Race result endpoints
 router.post('/race-results', (req, res) => databaseController.getRaceResult(req, res));

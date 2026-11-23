@@ -1,4 +1,4 @@
-import { Component, OnInit, DestroyRef, inject, signal, effect, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, DestroyRef, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common'; // Import CommonModule
 import {
   CardBodyComponent,

@@ -1,7 +1,6 @@
 import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common'; 
-import { BadgeComponent, RowComponent, ColComponent, TextColorDirective, CardComponent, CardHeaderComponent, CardBodyComponent, TableDirective, TableColorDirective, TableActiveDirective, BorderDirective, AlignDirective, ContainerComponent } from '@coreui/angular';
-import { cifBh, cifAt, cifMc, cifJp, cifHu, cifCn, cifCa, cifEs, cifGb, cifBe, cifNl, cifAz, cifSg, cifIt, cifUs, cifAu, cifMx, cifBr, cifQa, cifAe, cifSa } from '@coreui/icons';
+import { BadgeComponent, RowComponent, ColComponent, TextColorDirective, CardComponent, CardHeaderComponent, CardBodyComponent, TableDirective, ContainerComponent } from '@coreui/angular';
 import { cilFire } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
 import { DbDataService } from '../../service/db-data.service';
@@ -11,7 +10,7 @@ import type { ChampionshipData, SessionResult } from '@f123dashboard/shared';
 
 @Component({
     selector: 'app-championship',
-    imports: [BadgeComponent, ContainerComponent, IconDirective, CommonModule, IconDirective, RowComponent, ColComponent, TextColorDirective, CardComponent, CardHeaderComponent, CardBodyComponent, TableDirective],
+    imports: [BadgeComponent, ContainerComponent, IconDirective, CommonModule, RowComponent, ColComponent, TextColorDirective, CardComponent, CardHeaderComponent, CardBodyComponent, TableDirective],
     templateUrl: './championship.component.html',
     styleUrl: './championship.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush

@@ -4,10 +4,24 @@ import type { EligibleTrack, GPEditItem, CreateGpData, UpdateGpData, SprintDrawI
 /** Number of sprint races in every season. */
 export const SEASON_SPRINT_COUNT = 6;
 
+const hasResultsSql = `
+  EXISTS (SELECT 1 FROM race_result_entries WHERE race_results_id = gp.race_results_id)
+  OR EXISTS (SELECT 1 FROM sprint_result_entries WHERE sprint_results_id = gp.sprint_results_id)
+  OR EXISTS (SELECT 1 FROM qualifying_result_entries WHERE qualifying_results_id = gp.qualifying_results_id)
+  OR EXISTS (SELECT 1 FROM free_practice_result_entries WHERE free_practice_results_id = gp.free_practice_results_id)
+  OR EXISTS (SELECT 1 FROM full_race_result_entries WHERE race_results_id = gp.full_race_results_id)
+`;
+
+export class GpEditError extends Error {
+  constructor(message: string, readonly status: 404 | 409) {
+    super(message);
+  }
+}
+
 export class GpEditService {
   constructor(private pool: pg.Pool) {}
 
-async getUpcomingGps(): Promise<GPEditItem[]> {
+async getUpcomingGps(includePast = false): Promise<GPEditItem[]> {
     // Get the greatest (latest) season_id
     const seasonRes = await this.pool.query(
         `SELECT id FROM seasons ORDER BY start_date DESC LIMIT 1`
@@ -24,16 +38,20 @@ async getUpcomingGps(): Promise<GPEditItem[]> {
             gp.track_id,
             t.name as track_name,
             gp.has_sprint,
-            gp.has_x2
+            gp.has_x2,
+            (${hasResultsSql}) AS has_results,
+            gp.date <= (NOW() AT TIME ZONE 'UTC') AS is_past
         FROM gran_prix gp
         LEFT JOIN tracks t ON gp.track_id = t.id
         WHERE gp.season_id = $1
-            AND gp.date > NOW()
-        ORDER BY gp.date ASC
+            AND ($2::boolean OR gp.date > (NOW() AT TIME ZONE 'UTC'))
+        ORDER BY gp.date ASC, gp.id ASC
     `;
-    const result = await this.pool.query(query, [seasonId]);
+    const result = await this.pool.query(query, [seasonId, includePast]);
     return result.rows.map(row => ({
         ...row,
+        id: Number(row.id),
+        track_id: row.track_id === null ? null : Number(row.track_id),
         has_sprint: row.has_sprint == 1,
         has_x2: row.has_x2 == 1
     }));
@@ -60,7 +78,8 @@ async getUpcomingGps(): Promise<GPEditItem[]> {
         ${data.has_sprint ? "nextval('results_id_seq')" : "NULL"},
         ${data.has_x2 ?  "nextval('results_id_seq')" : "NULL"  }
       )
-      RETURNING id, to_char(date, 'YYYY-MM-DD"T"HH24:MI') AS date, track_id, has_sprint, has_x2
+      RETURNING id, to_char(date, 'YYYY-MM-DD"T"HH24:MI') AS date, track_id, has_sprint, has_x2,
+        date <= NOW() AS is_past
     `;
     const values = [
       data.date, 
@@ -79,7 +98,10 @@ async getUpcomingGps(): Promise<GPEditItem[]> {
 
     return {
       ...row,
+      id: Number(row.id),
+      track_id: row.track_id === null ? null : Number(row.track_id),
       track_name: trackName,
+      has_results: false,
       has_sprint: row.has_sprint === 1,
       has_x2: row.has_x2 === 1
     };
@@ -87,7 +109,7 @@ async getUpcomingGps(): Promise<GPEditItem[]> {
 
   async updateGp(id: number, data: UpdateGpData): Promise<void> {
     const fields: string[] = [];
-    const values: any[] = [];
+    const values: unknown[] = [];
     let idx = 1;
 
     if (data.track_id !== undefined) {
@@ -128,11 +150,40 @@ async getUpcomingGps(): Promise<GPEditItem[]> {
 
     values.push(id);
     const query = `UPDATE gran_prix SET ${fields.join(', ')} WHERE id = $${idx}`;
-    await this.pool.query(query, values);
+    await this.withEditableGp(id, async client => {
+      await client.query(query, values);
+    });
   }
 
   async deleteGp(id: number): Promise<void> {
-    await this.pool.query('DELETE FROM gran_prix WHERE id = $1', [id]);
+    await this.withEditableGp(id, async client => {
+      await client.query('DELETE FROM gran_prix WHERE id = $1', [id]);
+    });
+  }
+
+  private async withEditableGp(id: number, action: (client: pg.PoolClient) => Promise<void>): Promise<void> {
+    const client = await this.pool.connect();
+    try {
+      await client.query('BEGIN');
+      const gp = await client.query('SELECT id FROM gran_prix WHERE id = $1 FOR UPDATE', [id]);
+      if (gp.rows.length === 0) {
+        throw new GpEditError('Gran Premio non trovato.', 404);
+      }
+      const result = await client.query<{ has_results: boolean }>(
+        `SELECT (${hasResultsSql}) AS has_results FROM gran_prix gp WHERE gp.id = $1`,
+        [id]
+      );
+      if (result.rows[0].has_results) {
+        throw new GpEditError('Il Gran Premio contiene risultati e non puo essere modificato o eliminato.', 409);
+      }
+      await action(client);
+      await client.query('COMMIT');
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
   }
 
   async bulkUpdateGpDate(daysOffset: number): Promise<void> {
@@ -144,18 +195,31 @@ async getUpcomingGps(): Promise<GPEditItem[]> {
     }
     const seasonId = seasonRes.rows[0].id;
 
-    const query = `
-      UPDATE gran_prix
-      SET date = date + make_interval(days => $1)
-      WHERE date > NOW() AND season_id = $2
-    `;
-    // daysOffset can be negative
-    await this.pool.query(query, [daysOffset, seasonId]);
+    const client = await this.pool.connect();
+    try {
+      await client.query('BEGIN');
+      const gps = await client.query<{ id: number }>(
+        "SELECT id FROM gran_prix WHERE date > (NOW() AT TIME ZONE 'UTC') AND season_id = $1 ORDER BY id FOR UPDATE",
+        [seasonId]
+      );
+      await client.query(`
+        UPDATE gran_prix gp
+        SET date = gp.date + make_interval(days => $1)
+        WHERE gp.id = ANY($2::bigint[])
+          AND NOT (${hasResultsSql})
+      `, [daysOffset, gps.rows.map(gp => gp.id)]);
+      await client.query('COMMIT');
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
   }
   
   async getAllTracks(): Promise<{id: number, name: string}[]> {
      const result = await this.pool.query('SELECT id, name FROM tracks ORDER BY name');
-     return result.rows;
+     return result.rows.map(row => ({ ...row, id: Number(row.id) }));
   }
 
   async getEligibleTracksForLatestSeason(): Promise<EligibleTrack[]> {

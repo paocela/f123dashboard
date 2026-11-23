@@ -42,8 +42,6 @@ export class AppComponent implements OnInit {
     this.#colorModeService.eventName.set('ColorSchemeChange');
   }
 
-  piloti: any[] = [];
-
   ngOnInit(): void {
     this.#router.events.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe((evt) => {
       if (!(evt instanceof NavigationEnd)) {

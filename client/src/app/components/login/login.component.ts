@@ -23,7 +23,7 @@ import { PasswordChangeModalComponent } from '../password-change-modal/password-
 import type { User } from '@f123dashboard/shared';
 
 @Component({
-  selector: 'login-component',
+  selector: 'app-login',
   imports: [
     CommonModule,
     FormsModule,
@@ -107,7 +107,6 @@ export class LoginComponent {
 
         // Check if user has email, if not open registration modal for email completion
         if (response.user && (!response.user.mail || response.user.mail.trim() === '')) {
-          console.log('User email is missing, opening email completion modal.');
           this.isLoading.set(false);
           this.errorMessage.set('È necessario completare il profilo inserendo un indirizzo email valido.');
           setTimeout(() => {
@@ -198,11 +197,5 @@ export class LoginComponent {
     }
     
     // Opzionalmente mostra un messaggio di successo o aggiorna i dati utente
-  }
-
-  onPasswordChanged() {
-    // Gestisce il cambio password avvenuto con successo
-    console.log('Password modificata con successo');
-    // Potrebbe mostrare un messaggio di successo o eseguire altre azioni
   }
 }

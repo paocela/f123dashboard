@@ -38,6 +38,8 @@ export type SessionResult = {
   fast_lap: boolean | null;
 }
 
+export type SessionResultFormValue = number | string | (number | string)[] | null | undefined;
+
 export type ChampionshipData = {
   gran_prix_id: number;
   track_name: string;
@@ -84,6 +86,24 @@ export type TrackData = {
   country: string;
   besttime_driver_time: string;
   username: string;
+}
+
+export interface GpScheduleItem {
+  id: number;
+  track_id: number | null;
+  name: string | null;
+  date: string;
+  has_sprint: number;
+  has_x2: number;
+  country: string | null;
+  besttime_driver_time: string | null;
+  username: string | null;
+}
+
+export interface GpScheduleResponse {
+  success: boolean;
+  data: GpScheduleItem[];
+  message?: string;
 }
 
 export type CarData = {

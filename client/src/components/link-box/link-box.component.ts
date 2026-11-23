@@ -50,7 +50,6 @@ export class LinkBoxComponent {
   }
 
   goTo() {
-    console.log('Link clicked:', this.linkUrl());
     if (this.linkUrl()) {
         window.open(this.linkUrl(), '_blank');
     }

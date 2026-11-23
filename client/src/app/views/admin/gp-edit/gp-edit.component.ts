@@ -1,9 +1,9 @@
-import { Component, OnInit, inject, ChangeDetectionStrategy, signal } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy, signal, computed } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import {
   ContainerComponent,
-  RowComponent,
   ColComponent,
   CardComponent,
   CardHeaderComponent,
@@ -22,11 +22,16 @@ import {
   ModalHeaderComponent,
   ModalTitleDirective,
   ModalBodyComponent,
-  ModalFooterComponent
+  ModalFooterComponent,
+  BadgeComponent,
+  AccordionComponent,
+  AccordionItemComponent,
+  TemplateIdDirective
 } from '@coreui/angular';
 import { GpEditService } from '../../../service/gp-edit.service';
 import { FeatureFlagsService } from '../../../service/feature-flags.service';
-import type { GPEditItem } from '@f123dashboard/shared';
+import { DbDataService } from '../../../service/db-data.service';
+import type { EligibleTrack, GPEditItem } from '@f123dashboard/shared';
 
 interface Toast {
   title: string;
@@ -41,8 +46,7 @@ interface Toast {
     FormsModule,
     ReactiveFormsModule,
     ContainerComponent,
-    RowComponent,
-    ColComponent,
+      ColComponent,
     CardComponent,
     CardHeaderComponent,
     CardBodyComponent,
@@ -60,7 +64,11 @@ interface Toast {
     ModalHeaderComponent,
     ModalTitleDirective,
     ModalBodyComponent,
-    ModalFooterComponent
+    ModalFooterComponent,
+    BadgeComponent,
+    AccordionComponent,
+    AccordionItemComponent,
+    TemplateIdDirective
   ],
   templateUrl: './gp-edit.component.html',
   styleUrls: ['./gp-edit.component.scss'],
@@ -69,12 +77,34 @@ interface Toast {
 export class GpEditComponent implements OnInit {
   private gpEditService = inject(GpEditService);
   private featureFlagsService = inject(FeatureFlagsService);
+  private dbDataService = inject(DbDataService);
   private fb = inject(FormBuilder);
 
   gps = signal<GPEditItem[]>([]);
-  tracks = signal<{ id: number; name: string }[]>([]);
+  tracks = signal<Pick<EligibleTrack, 'id' | 'name'>[]>([]);
   loading = signal(false);
+  readonly raceGroups = computed(() => [
+    { past: false, title: $localize`Prossime Gare`, gps: this.gps().filter(gp => !gp.is_past) },
+    { past: true, title: $localize`Gare passate`, gps: this.gps().filter(gp => gp.is_past).reverse() }
+  ]);
+  readonly labels = {
+    locked: $localize`Risultati presenti: modifica ed eliminazione non consentite.`,
+    noRaces: $localize`Nessuna gara.`,
+    bulk: $localize`Vengono spostate solo le gare future senza risultati.`,
+    track: $localize`Pista per il GP`,
+    date: $localize`Data per il GP`,
+    sprint: $localize`Sprint per il GP`,
+    doublePoints: $localize`Punti doppi per il GP`,
+    seasonSettings: $localize`Impostazioni stagione corrente`,
+    freePractice: $localize`Prove libere`,
+    freePracticeHelp: $localize`Abilita le sessioni di prove libere e i relativi punti.`,
+    enabled: $localize`Abilitate`,
+    disabled: $localize`Disabilitate`,
+    enableFreePractice: $localize`Abilita prove libere`,
+    disableFreePractice: $localize`Disabilita prove libere`
+  };
   readonly freePracticeEnabled = this.featureFlagsService.freePracticeEnabled;
+  readonly freePracticeSaving = signal(false);
   
   // Toaster state
   toasts = signal<Toast[]>([]);
@@ -99,20 +129,26 @@ export class GpEditComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    void this.featureFlagsService.loadFlags();
     this.loadData();
     this.loadTracks();
   }
 
   loadData(): void {
     this.loading.set(true);
-    this.gpEditService.getUpcomingGps().subscribe({
+    this.gpEditService.getUpcomingGps(true).subscribe({
       next: (res) => {
-        this.gps.set(res.data);
         this.loading.set(false);
+        if (!res.success) {
+          this.addToast($localize`Errore`, res.message ?? $localize`Errore durante il caricamento dei GP.`, 'danger');
+          return;
+        }
+        this.gps.set(res.data);
       },
       error: (err) => {
         console.error('Error loading GPs', err);
         this.loading.set(false);
+        this.addToast($localize`Errore`, $localize`Errore durante il caricamento dei GP.`, 'danger');
       }
     });
   }
@@ -126,14 +162,27 @@ export class GpEditComponent implements OnInit {
     });
   }
 
-  async updateFreePracticeEnabled(event: Event): Promise<void> {
-    const enabled = (event.target as HTMLInputElement).checked;
+  requestFreePracticeToggle(): void {
+    const enabled = !this.freePracticeEnabled();
+    this.showConfirmation(
+      enabled ? $localize`Abilita prove libere` : $localize`Disabilita prove libere`,
+      enabled
+        ? $localize`Sei sicuro di voler abilitare le prove libere e i relativi punti per la stagione corrente?`
+        : $localize`Sei sicuro di voler disabilitare le prove libere e i relativi punti per la stagione corrente?`,
+      () => void this.updateFreePracticeEnabled(enabled)
+    );
+  }
+
+  private async updateFreePracticeEnabled(enabled: boolean): Promise<void> {
+    this.freePracticeSaving.set(true);
     try {
       await this.featureFlagsService.setFreePracticeEnabled(enabled);
-      this.addToast('Salvato', 'Impostazione delle prove libere aggiornata.', 'success');
+      this.addToast($localize`Salvato`, $localize`Impostazione delle prove libere aggiornata.`, 'success');
     } catch (error) {
       console.error('Error updating free practice setting', error);
-      this.addToast('Errore', 'Non e stato possibile aggiornare le prove libere.', 'danger');
+      this.addToast($localize`Errore`, $localize`Non è stato possibile aggiornare le prove libere.`, 'danger');
+    } finally {
+      this.freePracticeSaving.set(false);
     }
   }
 
@@ -197,7 +246,11 @@ export class GpEditComponent implements OnInit {
       next: (res) => {
         if (res.success) {
           this.loadData();
+          this.refreshDashboardSchedule();
           this.addToast('Successo', 'Date aggiornate con successo!', 'success');
+        } else {
+          this.loading.set(false);
+          this.addToast($localize`Errore`, res.message ?? $localize`Errore durante lo spostamento delle date.`, 'danger');
         }
       },
       error: (err) => {
@@ -222,7 +275,9 @@ export class GpEditComponent implements OnInit {
     }).subscribe({
       next: (res) => {
         if (res.success) {
-          this.loadData();
+          this.loading.set(false);
+          this.gps.update(gps => [...gps, res.data].sort((a, b) => a.date.localeCompare(b.date)));
+          this.refreshDashboardSchedule();
           this.createForm.reset({ has_sprint: false, has_x2: false });
           this.addToast('Successo', 'GP creato con successo!', 'success');
         }
@@ -236,6 +291,10 @@ export class GpEditComponent implements OnInit {
   }
 
   onDelete(id: number): void {
+    const gp = this.gps().find(item => item.id === id);
+    if (gp && !this.canEditGp(gp)) {
+      return;
+    }
     this.showConfirmation(
         'Conferma Eliminazione',
         'Sei sicuro di voler eliminare questo GP?',
@@ -247,19 +306,24 @@ export class GpEditComponent implements OnInit {
     this.gpEditService.deleteGp(id).subscribe({
       next: (res) => {
         if (res.success) {
-          this.loadData();
+          this.gps.update(gps => gps.filter(gp => gp.id !== id));
+          this.refreshDashboardSchedule();
           this.addToast('Eliminato', 'GP eliminato con successo.', 'info');
+        } else {
+          this.addToast($localize`Errore`, res.message ?? $localize`Errore durante l'eliminazione.`, 'danger');
         }
       },
       error: (err) => {
         console.error('Error deleting GP', err);
-        this.addToast('Errore', 'Errore durante l\'eliminazione.', 'danger');
+        this.addToast($localize`Errore`, this.getErrorMessage(err, $localize`Errore durante l'eliminazione.`), 'danger');
       }
     });
   }
 
   onSave(gp: GPEditItem): void {
-    
+    if (!this.canEditGp(gp)) {
+      return;
+    }
     this.gpEditService.updateGp(gp.id, {
       track_id: gp.track_id,
         date: gp.date,
@@ -269,12 +333,60 @@ export class GpEditComponent implements OnInit {
         next: (res) => {
             if (res.success) {
                 this.addToast('Salvato', 'Modifiche salvate con successo!', 'success');
+                this.refreshGpRow(gp.id);
+                this.refreshDashboardSchedule();
+            } else {
+                this.addToast($localize`Errore`, res.message ?? $localize`Errore durante il salvataggio.`, 'danger');
             }
         },
         error: (err) => {
           console.error('Error updating GP', err);
-          this.addToast('Errore', 'Errore durante il salvataggio.', 'danger');
+          this.addToast($localize`Errore`, this.getErrorMessage(err, $localize`Errore durante il salvataggio.`), 'danger');
         }
+    });
+  }
+
+  private canEditGp(gp: GPEditItem): boolean {
+    if (!gp.has_results) {
+      return true;
+    }
+    this.addToast($localize`Errore`, this.labels.locked, 'danger');
+    return false;
+  }
+
+  private getErrorMessage(error: unknown, fallback: string): string {
+    if (error instanceof HttpErrorResponse) {
+      const body: unknown = error.error;
+      if (body && typeof body === 'object' && 'message' in body && typeof body.message === 'string') {
+        return body.message;
+      }
+    }
+    return fallback;
+  }
+
+  private refreshGpRow(id: number): void {
+    this.gpEditService.getUpcomingGps(true).subscribe({
+      next: (res) => {
+        if (!res.success) {
+          this.addToast($localize`Errore`, res.message ?? $localize`Errore durante il ricaricamento del GP.`, 'danger');
+          return;
+        }
+        const updatedGp = res.data.find(item => item.id === id);
+        if (updatedGp) {
+          this.gps.update(gps => gps.map(gp => gp.id === id ? updatedGp : gp));
+        }
+      },
+      error: (error) => {
+        console.error('Error refreshing GP', error);
+        this.addToast($localize`Errore`, $localize`Errore durante il ricaricamento del GP.`, 'danger');
+      }
+    });
+  }
+
+  private refreshDashboardSchedule(): void {
+    void this.dbDataService.refreshGpSchedule().catch((error: unknown) => {
+      console.error('Error refreshing dashboard GP schedule', error);
+      this.addToast($localize`Errore`, $localize`Il GP è stato aggiornato, ma non è stato possibile aggiornare la dashboard.`, 'danger');
     });
   }
 

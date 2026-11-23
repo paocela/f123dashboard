@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { GpEditService } from '../services/gp-edit.service.js';
+import { GpEditService, GpEditError } from '../services/gp-edit.service.js';
 import pool from '../config/db.js';
 import logger from '../config/logger.js';
 
@@ -8,7 +8,7 @@ const gpEditService = new GpEditService(pool);
 export class GpEditController {
   async getUpcomingGps(req: Request, res: Response): Promise<void> {
     try {
-      const data = await gpEditService.getUpcomingGps();
+      const data = await gpEditService.getUpcomingGps(req.body?.includePast === true);
       res.json({ success: true, data });
     } catch (error) {
       logger.error('Error getting upcoming GPs:', error);
@@ -83,7 +83,7 @@ export class GpEditController {
       res.json({ success: true, data });
     } catch (error) {
       logger.error('Error updating GP:', error);
-      res.status(500).json({
+      res.status(error instanceof GpEditError ? error.status : 500).json({
         success: false,
         message: error instanceof Error ? error.message : 'Failed to update GP'
       });
@@ -102,7 +102,7 @@ export class GpEditController {
       res.json({ success: true });
     } catch (error) {
       logger.error('Error deleting GP:', error);
-      res.status(500).json({
+      res.status(error instanceof GpEditError ? error.status : 500).json({
         success: false,
         message: error instanceof Error ? error.message : 'Failed to delete GP'
       });

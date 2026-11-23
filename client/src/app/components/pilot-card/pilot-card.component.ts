@@ -10,6 +10,7 @@ import {
   ListGroupItemDirective
 } from '@coreui/angular';
 import { ChartjsComponent } from '@coreui/angular-chartjs';
+import type { ChartOptions } from 'chart.js';
 import { FeatureFlagsService } from '../../service/feature-flags.service';
 import type { DriverData } from '@f123dashboard/shared';
 
@@ -41,7 +42,7 @@ export class PilotCardComponent {
   private readonly CHART_TEXT_SIZE = 12;
 
   // Opzioni per il radar chart
-  radarChartOptions: any = {
+  radarChartOptions: ChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
     scales: {

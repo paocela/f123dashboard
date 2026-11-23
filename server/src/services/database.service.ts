@@ -7,6 +7,7 @@ import type {
   Season,
   CumulativePointsData,
   TrackData,
+  GpScheduleItem,
   RaceResult,
   Constructor,
   ConstructorGrandPrixPoints,
@@ -374,6 +375,29 @@ export class DatabaseService {
     return result.rows as TrackData[];
   }
 
+  async getGpSchedule(seasonId?: number): Promise<GpScheduleItem[]> {
+    const result = await this.pool.query<GpScheduleItem>(`
+      SELECT gp.id, gp.track_id, t.name,
+        to_char(gp.date, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS date,
+        gp.has_sprint, gp.has_x2,
+        t.country, t.besttime_driver_time, d.username
+      FROM gran_prix gp
+      LEFT JOIN tracks t ON t.id = gp.track_id
+      LEFT JOIN drivers d ON d.id = t.besttime_driver_id
+      WHERE gp.season_id = COALESCE($1, (
+        SELECT id FROM seasons ORDER BY start_date DESC LIMIT 1
+      ))
+      ORDER BY gp.date ASC, gp.id ASC
+    `, [seasonId]);
+    return result.rows.map(row => ({
+      ...row,
+      id: Number(row.id),
+      track_id: row.track_id === null ? null : Number(row.track_id),
+      has_sprint: Number(row.has_sprint),
+      has_x2: Number(row.has_x2)
+    }));
+  }
+
   async getRaceResult(seasonId?: number): Promise<RaceResult[]> {
     const result = await this.pool.query(`
       WITH latest_season AS (
@@ -488,7 +512,7 @@ export class DatabaseService {
       await client.query('BEGIN');
 
       const gpRes = await client.query(
-        'SELECT id, race_results_id, sprint_results_id, qualifying_results_id, free_practice_results_id, full_race_results_id, has_x2 FROM gran_prix WHERE track_id = $1 and season_id = $2',
+        'SELECT id, race_results_id, sprint_results_id, qualifying_results_id, free_practice_results_id, full_race_results_id, has_x2 FROM gran_prix WHERE track_id = $1 and season_id = $2 FOR UPDATE',
         [trackId, seasonId]
       );
       

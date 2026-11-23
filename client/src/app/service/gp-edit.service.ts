@@ -1,7 +1,10 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiService } from './api.service';
-import type { EligibleTrack, GPEditItem, CreateGpData, UpdateGpData, SprintDrawInfo } from '@f123dashboard/shared';
+import type {
+  EligibleTrack, CreateGpData, UpdateGpData, SprintDrawInfo,
+  GpListResponse, GpTracksResponse, GpCreateResponse, GpMutationResponse
+} from '@f123dashboard/shared';
 
 @Injectable({
   providedIn: 'root'
@@ -10,12 +13,12 @@ export class GpEditService {
   private api = inject(ApiService);
   private readonly baseUrl = 'gp-edit';
 
-  getUpcomingGps(): Observable<{ success: boolean; data: GPEditItem[] }> {
-    return this.api.post<{ success: boolean; data: GPEditItem[] }>(`${this.baseUrl}/list`, {});
+  getUpcomingGps(includePast = false): Observable<GpListResponse> {
+    return this.api.post<GpListResponse>(`${this.baseUrl}/list`, { includePast });
   }
 
-  getAllTracks(): Observable<{ success: boolean; data: {id: number, name: string}[] }> {
-    return this.api.post<{ success: boolean; data: {id: number, name: string}[] }>(`${this.baseUrl}/tracks`, {});
+  getAllTracks(): Observable<GpTracksResponse> {
+    return this.api.post<GpTracksResponse>(`${this.baseUrl}/tracks`, {});
   }
 
   getEligibleTracks(): Observable<{ success: boolean; data: EligibleTrack[] }> {
@@ -26,19 +29,19 @@ export class GpEditService {
     return this.api.post<{ success: boolean; data: SprintDrawInfo }>(`${this.baseUrl}/sprint-draw-info`, {});
   }
 
-  createGp(data: CreateGpData): Observable<{ success: boolean; data: GPEditItem }> {
-    return this.api.post<{ success: boolean; data: GPEditItem }>(`${this.baseUrl}/create`, data);
+  createGp(data: CreateGpData): Observable<GpCreateResponse> {
+    return this.api.post<GpCreateResponse>(`${this.baseUrl}/create`, data);
   }
 
-  updateGp(id: number, data: UpdateGpData): Observable<{ success: boolean }> {
-    return this.api.post<{ success: boolean }>(`${this.baseUrl}/update/${id}`, data);
+  updateGp(id: number, data: UpdateGpData): Observable<GpMutationResponse> {
+    return this.api.post<GpMutationResponse>(`${this.baseUrl}/update/${id}`, data);
   }
 
-  deleteGp(id: number): Observable<{ success: boolean }> {
-    return this.api.post<{ success: boolean }>(`${this.baseUrl}/delete/${id}`, {});
+  deleteGp(id: number): Observable<GpMutationResponse> {
+    return this.api.post<GpMutationResponse>(`${this.baseUrl}/delete/${id}`, {});
   }
 
-  bulkUpdateGpDate(daysOffset: number): Observable<{ success: boolean }> {
-    return this.api.post<{ success: boolean }>(`${this.baseUrl}/bulk-update-date`, { daysOffset });
+  bulkUpdateGpDate(daysOffset: number): Observable<GpMutationResponse> {
+    return this.api.post<GpMutationResponse>(`${this.baseUrl}/bulk-update-date`, { daysOffset });
   }
 }

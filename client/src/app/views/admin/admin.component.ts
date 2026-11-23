@@ -25,7 +25,7 @@ import { AuthService } from 'src/app/service/auth.service';
 import { FeatureFlagsService } from '../../service/feature-flags.service';
 import { GpResult } from '../../model/championship';
 import { medals, allFlags } from '../../model/constants';
-import type { ChampionshipData, Driver, Season, SessionResult, TrackData } from '@f123dashboard/shared';
+import type { ChampionshipData, Driver, Season, SessionResult, SessionResultFormValue, TrackData } from '@f123dashboard/shared';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -68,10 +68,10 @@ export class AdminComponent implements OnInit {
   selectedSeason = signal<number | null>(null);
   formStatus = signal<Record<number, number>>({}); // 0: none, 1: success, 2: validation error, 3: backend error
   formErrors = signal<Record<number, string[]>>({});
-  raceResults = signal<Map<number, any[]>>(new Map<number, any[]>()); // [track_id, array_of_results]
-  sprintResults = signal<Map<number, any[]>>(new Map<number, any[]>());
-  qualiResults = signal<Map<number, any[]>>(new Map<number, any[]>());
-  fpResults = signal<Map<number, any[]>>(new Map<number, any[]>());
+  raceResults = signal(new Map<number, SessionResultFormValue[]>());
+  sprintResults = signal(new Map<number, SessionResultFormValue[]>());
+  qualiResults = signal(new Map<number, SessionResultFormValue[]>());
+  fpResults = signal(new Map<number, SessionResultFormValue[]>());
   freePracticeEnabled = signal(true);
 
   // Loading states
@@ -175,14 +175,16 @@ export class AdminComponent implements OnInit {
   initializeResults(): void {
     const piloti = this.piloti();
     const pilotiMap = new Map(piloti.map(p => [p.username, p.id]));
-    const raceMap = new Map<number, any[]>();
-    const sprintMap = new Map<number, any[]>();
-    const qualiMap = new Map<number, any[]>();
-    const fpMap = new Map<number, any[]>();
+    const raceMap = new Map<number, SessionResultFormValue[]>();
+    const sprintMap = new Map<number, SessionResultFormValue[]>();
+    const qualiMap = new Map<number, SessionResultFormValue[]>();
+    const fpMap = new Map<number, SessionResultFormValue[]>();
 
     for (const gp of this.championshipData()) {
       const track = this.tracks().find(t => t.name === gp.track_name);
-      if (!track) continue;
+      if (!track) {
+        continue;
+      }
 
       const { track_id: trackId } = track;
       const isX2 = gp.gran_prix_has_x2 === 1;
@@ -211,9 +213,10 @@ export class AdminComponent implements OnInit {
     piloti: Driver[],
     pilotiMap: Map<string, number>,
     fastLapDriver: string | undefined
-  ): any[] {
-    if (!session?.length)
+  ): SessionResultFormValue[] {
+    if (!session?.length) {
       return [...Array(piloti.length).fill(0), 0, []];
+    }
     const positions = Array.from({ length: piloti.length }, (_, i) => {
       const driver = session.find(r => r.position === i + 1);
       return driver ? pilotiMap.get(driver.driver_username) ?? 0 : 0;
@@ -230,9 +233,10 @@ export class AdminComponent implements OnInit {
     session: SessionResult[] | undefined,
     piloti: Driver[],
     pilotiMap: Map<string, number>
-  ): any[] {
-    if (!session)
+  ): SessionResultFormValue[] {
+    if (!session) {
       return Array(piloti.length).fill(0);
+    }
     return Array.from({ length: piloti.length }, (_, i) => {
       const driver = session.find(r => r.position === i + 1);
       return driver ? pilotiMap.get(driver.driver_username) ?? 0 : 0;
@@ -240,9 +244,11 @@ export class AdminComponent implements OnInit {
   }
 
 
-  async publishResult(trackId: number, hasSprint: string, form: NgForm): Promise<void> {
+  async publishResult(trackId: number, hasSprint: string, _form: NgForm): Promise<void> {
     const seasonId = this.selectedSeason();
-    if (!seasonId) throw new Error('Nessuna stagione selezionata');
+    if (!seasonId) {
+      throw new Error('Nessuna stagione selezionata');
+    }
 
     this.isSubmitting.update(s => ({ ...s, [trackId]: true }));
     this.formErrors.update(e => ({ ...e, [trackId]: [] }));
@@ -262,16 +268,22 @@ export class AdminComponent implements OnInit {
         trackId,
         hasSprint: hasSprintBool,
         raceResult: raceData.slice(0, driverCount + 1).map(Number),
-        raceDnfResult: (raceData[driverCount + 1] ?? []).map(Number),
+        raceDnfResult: this.getDnfResults(raceData[driverCount + 1] ?? []),
         sprintResult: hasSprintBool ? sprintData.slice(0, driverCount + 1).map(Number) : [],
-        sprintDnfResult: hasSprintBool ? (sprintData[driverCount + 1] ?? []).map(Number) : [],
+        sprintDnfResult: hasSprintBool ? this.getDnfResults(sprintData[driverCount + 1] ?? []) : [],
         qualiResult: this.qualiResults().get(trackId)!.map(Number),
         fpResult: this.freePracticeEnabled() ? this.fpResults().get(trackId)!.map(Number) : [],
         seasonId: +seasonId,
       };
 
       const result = await this.dbData.setGpResult(trackId, gpResult);
-      this.handleBackendResult(trackId, result);
+      if (this.handleBackendResult(trackId, result)) {
+        try {
+          await Promise.all([this.dbData.allData(), this.loadSeasonData()]);
+        } catch (error) {
+          console.error('Errore durante il ricaricamento dei dati dopo il salvataggio dei risultati:', error);
+        }
+      }
     } catch (error) {
       const msg = error instanceof Error ? error.message : 'Errore sconosciuto';
       this.formErrors.update(e => ({ ...e, [trackId]: [`Errore: ${msg}`] }));
@@ -282,22 +294,25 @@ export class AdminComponent implements OnInit {
     }
   }
 
-  private handleBackendResult(trackId: number, result: unknown): void {
+  private handleBackendResult(trackId: number, result: unknown): boolean {
     if (typeof result !== 'string') {
       this.formStatus.update(s => ({ ...s, [trackId]: 1 }));
-      return;
+      return true;
     }
     try {
       const parsed = JSON.parse(result);
       if (parsed.success) {
         this.formStatus.update(s => ({ ...s, [trackId]: 1 }));
+        return true;
       } else {
         const msg = parsed.message ?? 'Errore sconosciuto';
         this.formErrors.update(e => ({ ...e, [trackId]: [`Errore del server: ${msg}`] }));
         this.formStatus.update(s => ({ ...s, [trackId]: 3 }));
+        return false;
       }
     } catch {
       this.formStatus.update(s => ({ ...s, [trackId]: 1 }));
+      return true;
     }
   }
 
@@ -322,16 +337,17 @@ export class AdminComponent implements OnInit {
     label: string,
     acc: string[]
   ): boolean {
-    if (!validation.isValid)
+    if (!validation.isValid) {
       validation.errors.forEach(e => acc.push(`${label}: ${e}`));
+    }
     return validation.isValid;
   }
 
-  hasAllPlayersExactlyOnce(positions: number[]): boolean {
+  hasAllPlayersExactlyOnce(positions: SessionResultFormValue[]): boolean {
     return this.getDriverValidationErrors(positions).length === 0;
   }
 
-  getDriverValidationErrors(positions: number[]): string[] {
+  getDriverValidationErrors(positions: SessionResultFormValue[]): string[] {
     const errors: string[] = [];
     const piloti = this.piloti();
     const driverCount = piloti.length;
@@ -340,8 +356,9 @@ export class AdminComponent implements OnInit {
     
     const validDriverIds = new Set(piloti.map(p => +p.id));
 
-    if (validPositions.length !== uniqueDrivers.size)
+    if (validPositions.length !== uniqueDrivers.size) {
       errors.push(`Alcuni piloti sono assegnati più volte`);
+    }
 
     if (uniqueDrivers.size < driverCount) {
       errors.push(`${driverCount - uniqueDrivers.size} pilota/i mancante/i dai risultati`);
@@ -351,7 +368,7 @@ export class AdminComponent implements OnInit {
 
     for (const driverId of uniqueDrivers) {
       if (!validDriverIds.has(driverId)) {
-        const driver = piloti.find(p => p.id == driverId);
+        const driver = piloti.find(p => Number(p.id) === driverId);
         errors.push(`Pilota ${driver ? driver.username : `ID ${driverId}`} non esiste`);
         break;
       }
@@ -360,7 +377,7 @@ export class AdminComponent implements OnInit {
     return errors;
   }
 
-  validateSessionWithDnf(resultArray: any[], sessionName: string): { isValid: boolean; errors: string[] } {
+  validateSessionWithDnf(resultArray: SessionResultFormValue[], sessionName: string): { isValid: boolean; errors: string[] } {
     const errors: string[] = [];
     
     const n = this.driverCount();
@@ -371,21 +388,26 @@ export class AdminComponent implements OnInit {
 
     const positions = resultArray.slice(0, n);
     const fastLap = resultArray[n];
-    const dnf: number[] = resultArray.length > n + 1 && resultArray[n + 1] ? resultArray[n + 1].map((x: any) => Number(x)) : [];
+    const dnfValue = resultArray[n + 1];
+    const dnf = dnfValue ? this.getDnfResults(dnfValue) : [];
     
     const nonZeroPositions = positions.filter(p => p !== 0);
-    if (nonZeroPositions.length !== new Set(nonZeroPositions).size)
+    if (nonZeroPositions.length !== new Set(nonZeroPositions).size) {
       errors.push(`Piloti duplicati trovati nelle posizioni`);
+    }
 
-    if (!fastLap || fastLap === 0)
+    if (!fastLap || fastLap === 0) {
       errors.push(`Il pilota del giro veloce deve essere selezionato`);
+    }
 
-    if (dnf.some(d => positions.includes(d)))
+    if (dnf.some(d => positions.includes(d))) {
       errors.push(`I piloti DNF non possono essere anche nelle posizioni di gara`);
+    }
 
     const emptyPositionsNeeded = dnf.length;
-    if (positions.slice(n - emptyPositionsNeeded).some(p => p !== 0))
+    if (positions.slice(n - emptyPositionsNeeded).some(p => p !== 0)) {
       errors.push(`Le ultime ${emptyPositionsNeeded} posizioni devono essere vuote quando ${dnf.length} piloti sono DNF`);
+    }
     
 
     // Check all drivers are present exactly once
@@ -398,7 +420,7 @@ export class AdminComponent implements OnInit {
     return { isValid: errors.length === 0, errors };
   }
 
-  validateSessionNoDnf(resultArray: any[], sessionName: string): { isValid: boolean; errors: string[] } {
+  validateSessionNoDnf(resultArray: SessionResultFormValue[], sessionName: string): { isValid: boolean; errors: string[] } {
     const errors: string[] = [];
     
     const n = this.driverCount();
@@ -410,11 +432,13 @@ export class AdminComponent implements OnInit {
     const positions = resultArray.slice(0, n);
     
     const nonZeroPositions = positions.filter(p => p !== 0);
-    if (nonZeroPositions.length !== new Set(nonZeroPositions).size)
+    if (nonZeroPositions.length !== new Set(nonZeroPositions).size) {
       errors.push(`Piloti duplicati trovati nelle posizioni`);
+    }
 
-    if (positions.some(p => p === 0 || p === null || p === undefined))
+    if (positions.some(p => p === 0 || p === null || p === undefined)) {
       errors.push(`Tutte le posizioni devono essere compilate`);
+    }
     
 
     // Check all drivers are present exactly once
@@ -426,36 +450,47 @@ export class AdminComponent implements OnInit {
     return { isValid: errors.length === 0, errors };
   }
 
-  private getResult(map: Map<number, any[]>, trackId: number, position: number): any {
+  private getDnfResults(value: SessionResultFormValue): number[] {
+    if (!Array.isArray(value)) {
+      throw new TypeError('Invalid DNF result');
+    }
+    return value.map(Number);
+  }
+
+  private getResult(map: Map<number, SessionResultFormValue[]>, trackId: number, position: number): SessionResultFormValue {
     return (map.get(trackId) ?? [])[position - 1] ?? 0;
   }
 
-  getRaceResult(trackId: number, position: number): any { return this.getResult(this.raceResults(), trackId, position); }
-  getSprintResult(trackId: number, position: number): any { return this.getResult(this.sprintResults(), trackId, position); }
-  getQualiResult(trackId: number, position: number): any { return this.getResult(this.qualiResults(), trackId, position); }
-  getFpResult(trackId: number, position: number): any { return this.getResult(this.fpResults(), trackId, position); }
+  getRaceResult(trackId: number, position: number): SessionResultFormValue { return this.getResult(this.raceResults(), trackId, position); }
+  getSprintResult(trackId: number, position: number): SessionResultFormValue { return this.getResult(this.sprintResults(), trackId, position); }
+  getQualiResult(trackId: number, position: number): SessionResultFormValue { return this.getResult(this.qualiResults(), trackId, position); }
+  getFpResult(trackId: number, position: number): SessionResultFormValue { return this.getResult(this.fpResults(), trackId, position); }
 
   private updateResultMap(
-    resultSignal: WritableSignal<Map<number, any[]>>,
+    resultSignal: WritableSignal<Map<number, SessionResultFormValue[]>>,
     trackId: number,
     position: number,
-    value: any,
+    value: SessionResultFormValue,
     withDnfSlot = false
   ): void {
-    if (!value) return;
+    if (!value) {
+      return;
+    }
     resultSignal.update(results => {
       const newResults = new Map(results);
       const arr = newResults.get(trackId) ?? [];
-      if (!newResults.has(trackId)) newResults.set(trackId, arr);
+      if (!newResults.has(trackId)) {
+        newResults.set(trackId, arr);
+      }
       const idx = position - 1;
-      arr[idx] = withDnfSlot && idx >= this.driverCount() + 1 ? value : +value;
+      arr[idx] = withDnfSlot && idx >= this.driverCount() + 1 ? value : Number(value);
       return newResults;
     });
   }
 
-  setRaceResult(trackId: number, position: number, value: any): void { this.updateResultMap(this.raceResults, trackId, position, value, true); }
-  setSprintResult(trackId: number, position: number, value: any): void { this.updateResultMap(this.sprintResults, trackId, position, value, true); }
-  setQualiResult(trackId: number, position: number, value: any): void { this.updateResultMap(this.qualiResults, trackId, position, value); }
-  setFpResult(trackId: number, position: number, value: any): void { this.updateResultMap(this.fpResults, trackId, position, value); }
+  setRaceResult(trackId: number, position: number, value: SessionResultFormValue): void { this.updateResultMap(this.raceResults, trackId, position, value, true); }
+  setSprintResult(trackId: number, position: number, value: SessionResultFormValue): void { this.updateResultMap(this.sprintResults, trackId, position, value, true); }
+  setQualiResult(trackId: number, position: number, value: SessionResultFormValue): void { this.updateResultMap(this.qualiResults, trackId, position, value); }
+  setFpResult(trackId: number, position: number, value: SessionResultFormValue): void { this.updateResultMap(this.fpResults, trackId, position, value); }
 
 }

@@ -16,9 +16,9 @@
               type="radio"
               value="Month4"
               id="radio4Month"
+              (change)="setTrafficPeriod('Month', 4)"
             />
             <label
-              (click)="setTrafficPeriod('Month', 4)"
               cButton
               cFormCheckLabel
               color="secondary"
@@ -33,9 +33,9 @@
               type="radio"
               value="Month8"
               id="radio8Month"
+              (change)="setTrafficPeriod('Month', 8)"
             />
             <label
-              (click)="setTrafficPeriod('Month', 8)"
               cButton
               cFormCheckLabel
               color="secondary"
@@ -50,9 +50,9 @@
               type="radio"
               value="Year"
               id="radioYear"
+              (change)="setTrafficPeriod('Year', 0)"
             />
             <label
-              (click)="setTrafficPeriod('Year', 0)"
               cButton
               cFormCheckLabel
               color="secondary"

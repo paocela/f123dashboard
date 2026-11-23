@@ -83,7 +83,7 @@
                           @if (hasUnsavedData(track.track_id)) {
                               <c-badge color="danger">NON<br>Salvato</c-badge>
                           }
-                          @if (formStatus()[track.track_id] == 1) {
+                          @if (formStatus()[track.track_id] === 1) {
                               <c-badge color="success">Salvato</c-badge>
                           }
                       </div>
@@ -190,7 +190,7 @@
                     </c-row>
                     <c-row class="status-row">
                       <c-col class="text-center">
-                          @if (formStatus()[track.track_id] == 2) {
+                          @if (formStatus()[track.track_id] === 2) {
                             <div class="error">
                               @if (validationDetails()[track.track_id]?.hasEmptyVotes) {
                                 <p class="mb-1">
@@ -204,12 +204,12 @@
                               }
                             </div>
                           }
-                          @if (formStatus()[track.track_id] == 3) {
+                          @if (formStatus()[track.track_id] === 3) {
                             <p class="error">
                               <c-badge color="danger">Errore nel salvataggio: contattare l'assistenza :(</c-badge>
                             </p>
                           }
-                          @if (formStatus()[track.track_id] == 1) {
+                          @if (formStatus()[track.track_id] === 1) {
                             <p class="success">
                               <c-badge color="success">Preferenze salvate correttamente :)</c-badge>
                             </p>
@@ -309,7 +309,7 @@
 <c-modal id="liveDemoModal" [visible]="modalRankingVisible()">
   <c-modal-header>
     <h5 cModalTitle>Classifica Fanta</h5>
-    <button (click)="toggleModalRanking()" cButtonClose></button>
+    <button (click)="toggleModalRanking()" cButtonClose aria-label="Chiudi classifica" i18n-aria-label></button>
   </c-modal-header>
   <c-modal-body>
     <app-leaderboard></app-leaderboard>
@@ -318,7 +318,7 @@
 <c-modal id="rulesModal" [visible]="modalRulesVisible()" size="lg">
   <c-modal-header>
     <h5 cModalTitle>Regolamento Punteggi Fanta</h5>
-    <button (click)="toggleModalRules()" cButtonClose></button>
+    <button (click)="toggleModalRules()" cButtonClose aria-label="Chiudi regolamento" i18n-aria-label></button>
   </c-modal-header>
   <c-modal-body>
     <app-fanta-rules></app-fanta-rules>

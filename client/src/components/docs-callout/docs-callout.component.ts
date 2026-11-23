@@ -21,9 +21,7 @@ export class DocsCalloutComponent {
 
   @Input()
   set href(value: string) {
-    const version = packageJson?.config?.coreui_library_short_version;
     const docsUrl = packageJson?.config?.coreui_library_docs_url ?? 'https://coreui.io/angular/';
-    // const path: string = version ? `${version}/${value}` : `${value}`;
     const path: string = value;
     this._href = `${docsUrl}${path}`;
   }

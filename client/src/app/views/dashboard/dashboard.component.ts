@@ -22,7 +22,8 @@ import {
   CarouselItemComponent,
   ThemeDirective,
   Tabs2Module,
-  ButtonCloseDirective
+  ButtonCloseDirective,
+  TemplateIdDirective
 } from '@coreui/angular';
 import { RouterLink } from '@angular/router';
 import { IconDirective } from '@coreui/icons-angular';
@@ -33,7 +34,7 @@ import { LoadingService } from '../../service/loading.service';
 import { FantaService } from '../../service/fanta.service';
 import { FeatureFlagsService } from '../../service/feature-flags.service';
 import { ChampionshipTrendComponent } from '../../components/championship-trend/championship-trend.component';
-import type { Constructor, CumulativePointsData, DriverData, TrackData } from '@f123dashboard/shared';
+import type { Constructor, CumulativePointsData, DriverData, TrackData, GpScheduleItem } from '@f123dashboard/shared';
 import { PilotCardComponent } from '../../components/pilot-card/pilot-card.component';
 import { ConstructorCardComponent } from '../../components/constructor-card/constructor-card.component';
 import type { DriverOfWeek, ConstructorOfWeek } from '../../model/dashboard.model';
@@ -75,7 +76,8 @@ export interface DriverDataWithGainedPoints extends DriverData {
     Tabs2Module,
     PilotCardComponent,
     ButtonCloseDirective,
-    ConstructorCardComponent
+    ConstructorCardComponent,
+    TemplateIdDirective
 ]
 })
 export class DashboardComponent implements OnInit {
@@ -97,7 +99,7 @@ export class DashboardComponent implements OnInit {
 
   championship_standings_users = signal<DriverDataWithGainedPoints[]>([]);
   championshipTracks = signal<TrackData[]>([]);
-  championshipNextTracks = signal<TrackData[]>([]);
+  championshipNextTracks = signal<GpScheduleItem[]>([]);
   isLive = signal<boolean>(true);
   constructors = signal<Constructor[]>([]);
   showGainedPointsColumn = signal<boolean>(false);
@@ -127,8 +129,12 @@ export class DashboardComponent implements OnInit {
   private constructorMap = computed(() => {
     const map = new Map<string, string>();
     this.constructors().forEach(c => {
-      if (c.driver_1_username) map.set(c.driver_1_username, c.constructor_name);
-      if (c.driver_2_username) map.set(c.driver_2_username, c.constructor_name);
+      if (c.driver_1_username) {
+        map.set(c.driver_1_username, c.constructor_name);
+      }
+      if (c.driver_2_username) {
+        map.set(c.driver_2_username, c.constructor_name);
+      }
     });
     return map;
   });
@@ -137,6 +143,8 @@ export class DashboardComponent implements OnInit {
   public calendarIcon: string[] = cilCalendar;
   public mapIcon: string[] = cilMap;
   public fireIcon: string[] = cilFire;
+  readonly undefinedTrackLabel = $localize`Da definire`;
+  readonly showGpLabel = $localize`Mostra il GP`;
 
   constructor() { 
       this.screenWidth.set(window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth);
@@ -213,20 +221,13 @@ export class DashboardComponent implements OnInit {
    * Filters and formats the next 2 upcoming championship tracks
    */
   private calculateNextTracks(): void {
-    const currentDate = new Date();
-    currentDate.setHours(0, 0, 0, 0);
-    
-    const nextTracks = this.championshipTracks()
-      .map(track => {
-        const dbDate = new Date(track.date);
-        dbDate.setHours(0, 0, 0, 0);
-        return { ...track, date: dbDate, dbDate };
-      })
-      .filter(track => track.dbDate >= currentDate)
+    const currentDate = new Date().toISOString().slice(0, 10);
+    const nextTracks = this.dbData.gpSchedule()
+      .filter(track => track.date.slice(0, 10) >= currentDate)
       .slice(0, 2)
       .map(track => ({
         ...track,
-        date: track.dbDate.toLocaleDateString("it-CH")
+        date: new Intl.DateTimeFormat('it-CH', { timeZone: 'UTC' }).format(new Date(track.date))
       }));
     
     this.championshipNextTracks.set(nextTracks);
@@ -324,7 +325,7 @@ export class DashboardComponent implements OnInit {
   /**
    * Finds the driver with the most points gained in the latest GP
    */
-  private calculateDriverOfWeek(latestGrandPrixPoints: Array<CumulativePointsData & { points: number }>): void {
+  private calculateDriverOfWeek(latestGrandPrixPoints: (CumulativePointsData & { points: number })[]): void {
     let bestPoints = 0;
     let bestDriver: DriverOfWeek = { driver_username: '', driver_id: 0, points: 0 };
 
@@ -345,7 +346,7 @@ export class DashboardComponent implements OnInit {
   /**
    * Finds the constructor with the most combined driver points in the latest GP
    */
-  private calculateConstructorOfWeek(latestGrandPrixPoints: Array<CumulativePointsData & { points: number }>): void {
+  private calculateConstructorOfWeek(latestGrandPrixPoints: (CumulativePointsData & { points: number })[]): void {
     const constructorsOfWeek: ConstructorOfWeek[] = this.constructors().map(constructor => ({
       constructor_name: constructor.constructor_name,
       constructor_id: constructor.constructor_id,

@@ -1,9 +1,8 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { firstValueFrom, forkJoin } from 'rxjs';
-import type { DriverData, Driver, ChampionshipData, Season, CumulativePointsData, TrackData, User, RaceResult, ConstructorGrandPrixPoints, Constructor } from '@f123dashboard/shared';
+import type { DriverData, Driver, ChampionshipData, Season, CumulativePointsData, TrackData, User, RaceResult, ConstructorGrandPrixPoints, Constructor, GpScheduleItem, GpScheduleResponse } from '@f123dashboard/shared';
 import { GpResult } from '../model/championship';
 import { ApiService } from './api.service';
-import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -25,6 +24,9 @@ export class DbDataService {
 
   private tracksSignal = signal<TrackData[]>([]);
   readonly tracks = this.tracksSignal.asReadonly();
+
+  private gpScheduleSignal = signal<GpScheduleItem[]>([]);
+  readonly gpSchedule = this.gpScheduleSignal.asReadonly();
 
   private raceResultSignal = signal<RaceResult[]>([]);
   readonly raceResult = this.raceResultSignal.asReadonly();
@@ -67,6 +69,7 @@ export class DbDataService {
       championship,
       cumulativePoints,
       tracks,
+      gpSchedule,
       users,
       raceResult,
       constructors,
@@ -77,6 +80,7 @@ export class DbDataService {
       championship: this.apiService.post<ChampionshipData[]>('/database/championship', {}),
       cumulativePoints: this.apiService.post<CumulativePointsData[]>('/database/cumulative-points', {}),
       tracks: this.apiService.post<TrackData[]>('/database/tracks', {}),
+      gpSchedule: this.apiService.post<GpScheduleResponse>('/database/gp-schedule', {}),
       users: this.apiService.post<User[]>('/auth/users', {}),
       raceResult: this.apiService.post<RaceResult[]>('/database/race-results', {}),
       constructors: this.apiService.post<Constructor[]>('/database/constructors', {}),
@@ -84,6 +88,10 @@ export class DbDataService {
       constructorGrandPrixPoints: this.apiService.post<ConstructorGrandPrixPoints[]>('/database/constructor-grand-prix-points', {})
     }));
 
+    if (!gpSchedule.success) {
+      throw new Error(gpSchedule.message ?? 'Failed to load GP schedule');
+    }
+    this.gpScheduleSignal.set(gpSchedule.data);
     this.allDriversSignal.set(allDrivers);
     this.championshipSignal.set(championship);
     this.cumulativePointsSignal.set(cumulativePoints);
@@ -93,6 +101,16 @@ export class DbDataService {
     this.constructorsSignal.set(constructors);
     this.driversSignal.set(drivers);
     this.constructorGrandPrixPointsSignal.set(constructorGrandPrixPoints);
+  }
+
+  async refreshGpSchedule(): Promise<void> {
+    const response = await firstValueFrom(
+      this.apiService.post<GpScheduleResponse>('/database/gp-schedule', {})
+    );
+    if (!response.success) {
+      throw new Error(response.message ?? 'Failed to refresh GP schedule');
+    }
+    this.gpScheduleSignal.set(response.data);
   }
 
 /****************************************************************/
@@ -187,7 +205,7 @@ export class DbDataService {
   getAvatarSrc(user: User | null): string {
     if (user?.image) {
       // Handle case where image might be a Buffer or other non-string type
-      const image = user.image as any; // Type assertion since image can be Buffer from DB
+      const image: unknown = user.image;
       let imageStr: string;
       
       if (typeof image === 'string') {
@@ -198,7 +216,11 @@ export class DbDataService {
         imageStr = btoa(String.fromCharCode(...bytes));
       } else if (image && typeof image === 'object' && 'data' in image) {
         // Handle Buffer-like object with data property
-        const bytes = new Uint8Array(image.data);
+        const data = image.data;
+        if (!(Array.isArray(data) || data instanceof ArrayBuffer || data instanceof Uint8Array)) {
+          throw new TypeError('Invalid avatar image data');
+        }
+        const bytes = new Uint8Array(data);
         imageStr = btoa(String.fromCharCode(...bytes));
       } else {
         // Try to convert to string
