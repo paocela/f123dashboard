@@ -21,24 +21,12 @@ import type { EligibleTrack, GPEditItem } from '@f123dashboard/shared';
 import { GpEditService } from '../../../service/gp-edit.service';
 import { SpinWheelComponent, WheelSegment } from '../../../components/spin-wheel/spin-wheel.component';
 
-const TRACK_WHEEL_COLORS = [
-  '#321fdb',
-  '#3399ff',
-  '#2eb85c',
-  '#f9b115',
-  '#e55353',
-  '#636f83',
-  '#20c997',
-  '#d63384',
-  '#fd7e14',
-  '#0dcaf0',
-  '#6f42c1',
-  '#198754',
-  '#dc3545',
-  '#0d6efd',
-  '#795548',
-  '#607d8b'
-];
+/** Evenly spaced hues around the wheel, alternating two lightness levels so neighbours stay distinct. */
+export function getTrackWheelColor(index: number, total: number): string {
+  const hue = Math.round((index * 360) / Math.max(total, 1) + 20) % 360;
+  const lightness = index % 2 === 0 ? 0.58 : 0.5;
+  return `oklch(${lightness} 0.15 ${hue})`;
+}
 export type RaceFormat = 'sprint' | 'regular';
 
 const FORMAT_COLORS: Record<RaceFormat, string> = {
@@ -110,6 +98,8 @@ export class TrackExtractionComponent implements OnInit {
   /** Segment of the track wheel the draw landed on; kept highlighted while the format is drawn. */
   readonly drawnTrackIndex = signal<number | null>(null);
   readonly selectedFormat = signal<RaceFormat | null>(null);
+  /** Segment of the format wheel the draw landed on. */
+  readonly drawnFormatIndex = signal<number | null>(null);
   readonly assignmentModalVisible = signal(false);
   readonly isLoadingPendingGp = signal(false);
   readonly isAssigningTrack = signal(false);
@@ -119,9 +109,9 @@ export class TrackExtractionComponent implements OnInit {
   readonly formatColors = FORMAT_COLORS;
 
   readonly trackSegments = computed<WheelSegment[]>(() =>
-    this.tracks().map((track, index) => ({
+    this.tracks().map((track, index, tracks) => ({
       label: track.name,
-      color: TRACK_WHEEL_COLORS[index % TRACK_WHEEL_COLORS.length]
+      color: getTrackWheelColor(index, tracks.length)
     }))
   );
 
@@ -176,12 +166,14 @@ export class TrackExtractionComponent implements OnInit {
 
   onFormatSpinStart(): void {
     this.selectedFormat.set(null);
+    this.drawnFormatIndex.set(null);
     this.isSpinning.set(true);
   }
 
   onFormatSpinEnd(index: number): void {
     this.isSpinning.set(false);
     this.selectedFormat.set(this.formatEntries()[index] ?? null);
+    this.drawnFormatIndex.set(index);
     setTimeout(() => {
       this.openAssignmentModal();
     }, MODAL_DELAY_MS);
@@ -208,6 +200,7 @@ export class TrackExtractionComponent implements OnInit {
     this.selectedTrack.set(null);
     this.drawnTrackIndex.set(null);
     this.selectedFormat.set(null);
+    this.drawnFormatIndex.set(null);
     this.stage.set('track');
   }
 
