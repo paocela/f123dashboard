@@ -3,7 +3,6 @@ import { firstValueFrom, forkJoin } from 'rxjs';
 import type { DriverData, Driver, ChampionshipData, Season, CumulativePointsData, TrackData, User, RaceResult, ConstructorGrandPrixPoints, Constructor, GpScheduleItem, GpScheduleResponse } from '@f123dashboard/shared';
 import { GpResult } from '../model/championship';
 import { ApiService } from './api.service';
-import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -206,7 +205,7 @@ export class DbDataService {
   getAvatarSrc(user: User | null): string {
     if (user?.image) {
       // Handle case where image might be a Buffer or other non-string type
-      const image = user.image as any; // Type assertion since image can be Buffer from DB
+      const image: unknown = user.image;
       let imageStr: string;
       
       if (typeof image === 'string') {
@@ -217,7 +216,11 @@ export class DbDataService {
         imageStr = btoa(String.fromCharCode(...bytes));
       } else if (image && typeof image === 'object' && 'data' in image) {
         // Handle Buffer-like object with data property
-        const bytes = new Uint8Array(image.data);
+        const data = image.data;
+        if (!(Array.isArray(data) || data instanceof ArrayBuffer || data instanceof Uint8Array)) {
+          throw new TypeError('Invalid avatar image data');
+        }
+        const bytes = new Uint8Array(data);
         imageStr = btoa(String.fromCharCode(...bytes));
       } else {
         // Try to convert to string

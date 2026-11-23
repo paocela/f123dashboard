@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import type { User } from '@f123dashboard/shared';
 
 import { DbDataService } from './db-data.service';
 
@@ -60,6 +61,18 @@ describe('DbDataService', () => {
     await refresh;
 
     expect(service.gpSchedule().map(gp => gp.id)).toEqual([12]);
+  });
+
+  it('renders a serialized database buffer as a base64 avatar', () => {
+    const user: User = JSON.parse('{"id":1,"username":"driver","name":"A","surname":"B","image":{"type":"Buffer","data":[1,2,3]}}');
+
+    expect(service.getAvatarSrc(user)).toBe('data:image/jpeg;base64,AQID');
+  });
+
+  it('rejects malformed serialized avatar data', () => {
+    const user: User = JSON.parse('{"id":1,"username":"driver","name":"A","surname":"B","image":{"data":"3"}}');
+
+    expect(() => service.getAvatarSrc(user)).toThrowError(TypeError, 'Invalid avatar image data');
   });
 
   it('should be created', () => {
