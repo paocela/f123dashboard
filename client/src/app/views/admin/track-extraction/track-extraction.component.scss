@@ -8,78 +8,59 @@
   justify-items: center;
 }
 
-.wheel-stage {
+.draw-status {
+  min-height: 4.75rem;
+}
+
+.format-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.75rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.legend-item {
+  display: inline-flex;
+  gap: 0.35rem;
+  align-items: center;
+  font-weight: 600;
+}
+
+.legend-swatch {
+  width: 0.85rem;
+  height: 0.85rem;
+  border-radius: 50%;
+}
+
+.wheels {
   position: relative;
-  display: grid;
-  place-items: center;
   width: min(100%, 46rem);
-  aspect-ratio: 1;
-  padding: 1.25rem;
 }
 
-.wheel {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 1;
-  border: 0.5rem solid var(--cui-body-bg);
-  border-radius: 50%;
-  box-shadow: var(--cui-box-shadow);
-  transition: transform 10s linear(
-    0,
-    0.3 15%,
-    0.55 30%,
-    0.72 43%,
-    0.82 53%,
-    0.89 62%,
-    0.94 72%,
-    0.97 82%,
-    0.99 92%,
-    1
-  );
-}
-
-.wheel-pointer {
+.format-wheel {
   position: absolute;
-  z-index: 1;
-  top: 0.4rem;
-  width: 0;
-  height: 0;
-  border-right: 1rem solid transparent;
-  border-left: 1rem solid transparent;
-  border-top: 1.75rem solid var(--cui-emphasis-color);
-}
-
-.wheel-center-button {
-  position: absolute;
-  z-index: 1;
-  display: grid;
-  place-items: center;
-  width: clamp(5.75rem, 19%, 9rem);
-  aspect-ratio: 1;
-  padding: 0.5rem;
-  color: var(--cui-emphasis-color);
-  background-color: var(--cui-body-bg);
-  border-color: var(--cui-border-color);
-  border-radius: 50%;
-  box-shadow: var(--cui-box-shadow-sm);
-  font-size: clamp(0.625rem, 1.5vw, 0.875rem);
-  font-weight: 700;
-  line-height: 1.1;
-  text-align: center;
-}
-
-.wheel-label {
-  position: absolute;
-  top: 50%;
-  left: 50%;
+  z-index: 2;
+  top: 0;
+  right: 0;
   width: 32%;
-  color: #fff;
-  font-size: 0.75rem;
-  font-weight: 700;
-  line-height: 1.1;
-  text-align: center;
-  text-shadow: 0 1px 2px rgb(0 0 0 / 60%);
-  transform-origin: center;
+  border-radius: 50%;
+  animation: format-wheel-in 0.4s ease-out;
+}
+
+// With room beside the main wheel, move the format wheel further out so it covers less of it.
+@media (min-width: 992px) {
+  .format-wheel {
+    width: 34%;
+    transform: translate(45%, -10%);
+  }
+}
+
+@keyframes format-wheel-in {
+  from {
+    opacity: 0;
+    scale: 0.6;
+  }
 }
 
 .selection {
@@ -124,8 +105,15 @@
   font-weight: 600;
 }
 
-@media (max-width: 575.98px) {
-  .wheel-label {
-    font-size: 0.625rem;
-  }
+.format-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  color: #fff;
+  background-color: #321fdb;
+  font-weight: 700;
+}
+
+.format-badge.is-sprint {
+  background-color: #e55353;
 }

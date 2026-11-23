@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiService } from './api.service';
-import type { EligibleTrack, GPEditItem, CreateGpData, UpdateGpData } from '@f123dashboard/shared';
+import type { EligibleTrack, GPEditItem, CreateGpData, UpdateGpData, SprintDrawInfo } from '@f123dashboard/shared';
 
 @Injectable({
   providedIn: 'root'
@@ -20,6 +20,10 @@ export class GpEditService {
 
   getEligibleTracks(): Observable<{ success: boolean; data: EligibleTrack[] }> {
     return this.api.post<{ success: boolean; data: EligibleTrack[] }>(`${this.baseUrl}/eligible-tracks`, {});
+  }
+
+  getSprintDrawInfo(): Observable<{ success: boolean; data: SprintDrawInfo }> {
+    return this.api.post<{ success: boolean; data: SprintDrawInfo }>(`${this.baseUrl}/sprint-draw-info`, {});
   }
 
   createGp(data: CreateGpData): Observable<{ success: boolean; data: GPEditItem }> {

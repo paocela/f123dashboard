@@ -309,5 +309,96 @@ describe('CarService', () => {
                 expect(count).toBeLessThanOrEqual(2);
             });
         });
+
+        it('should make close drivers share a car even when there are enough cars', () => {
+            const driverPoints = new Map([
+                [1, 100],
+                [2, 98],
+                [3, 50],
+                [4, 22],
+                [5, 20],
+                [6, 0]
+            ]);
+            const carsScore = new Map([
+                [1, 95], [2, 92], [3, 90], [4, 88], [5, 85],
+                [6, 83], [7, 80], [8, 78], [9, 75], [10, 72]
+            ]);
+
+            const assignment = carService.assignCars(driverPoints, carsScore);
+
+            expect(assignment.get(1)).toBe(assignment.get(2));
+            expect(assignment.get(4)).toBe(assignment.get(5));
+            expect(new Set([assignment.get(1), assignment.get(3), assignment.get(4), assignment.get(6)]).size).toBe(4);
+        });
+
+        it('should not pair drivers outside the tolerance when there are enough cars', () => {
+            const driverPoints = new Map([
+                [1, 100],
+                [2, 80],
+                [3, 60],
+                [4, 40]
+            ]);
+            const carsScore = new Map([[1, 90], [2, 70], [3, 50], [4, 30], [5, 10]]);
+
+            const assignment = carService.assignCars(driverPoints, carsScore);
+
+            expect(new Set(assignment.values()).size).toBe(4);
+        });
+
+        it('should leave the lowest-placed of three close drivers alone', () => {
+            const driverPoints = new Map([
+                [1, 100],
+                [2, 99],
+                [3, 98],
+                [4, 0]
+            ]);
+            const carsScore = new Map([[1, 90], [2, 70], [3, 50], [4, 30]]);
+
+            const assignment = carService.assignCars(driverPoints, carsScore);
+
+            expect(assignment.get(1)).toBe(assignment.get(2));
+            expect(assignment.get(3)).not.toBe(assignment.get(2));
+            expect(new Set(assignment.values()).size).toBe(3);
+        });
+
+        it('should pair a chain of close drivers from the top of the standings down', () => {
+            const driverPoints = new Map([
+                [1, 100],
+                [2, 95],
+                [3, 90],
+                [4, 85],
+                [5, 80],
+                [6, 0]
+            ]);
+            const carsScore = new Map([
+                [1, 95], [2, 92], [3, 90], [4, 88], [5, 85],
+                [6, 83], [7, 80], [8, 78], [9, 75], [10, 72]
+            ]);
+
+            const assignment = carService.assignCars(driverPoints, carsScore);
+
+            expect(assignment.get(1)).toBe(assignment.get(2));
+            expect(assignment.get(3)).toBe(assignment.get(4));
+            expect(new Set([assignment.get(1), assignment.get(3), assignment.get(5), assignment.get(6)]).size).toBe(4);
+        });
+
+        it('should not pair drivers at the start of the season when there are enough cars', () => {
+            const driverPoints = new Map([[1, 0], [2, 0], [3, 0], [4, 0]]);
+            const carsScore = new Map([[1, 90], [2, 70], [3, 50], [4, 30], [5, 10]]);
+
+            const assignment = carService.assignCars(driverPoints, carsScore);
+
+            expect(new Set(assignment.values()).size).toBe(4);
+        });
+
+        it('should still pair for capacity at the start of the season', () => {
+            const driverPoints = new Map([[1, 0], [2, 0], [3, 0], [4, 0]]);
+            const carsScore = new Map([[1, 90], [2, 70], [3, 50]]);
+
+            const assignment = carService.assignCars(driverPoints, carsScore);
+
+            expect(assignment.size).toBe(4);
+            expect(new Set(assignment.values()).size).toBe(3);
+        });
     });
 });
